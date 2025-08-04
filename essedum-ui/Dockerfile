@@ -1,46 +1,30 @@
-# Use official Node image
-FROM node:18-alpine AS build
-
-WORKDIR /aip-app-ui
-
-COPY aip-app-ui/ ./
-
-RUN yarn config set registry https://registry.npmjs.org && yarn install --network-timeout 100000
-
-#RUN yarn install
-
-RUN npm run build-prod
-
-WORKDIR /shell-app-ui
-
-COPY shell-app-ui/ ./
-
-RUN yarn config set registry https://registry.npmjs.org && yarn install --network-timeout 100000
-
-#RUN yarn install
-
-RUN npm run build-prod
-
-COPY nginx_ui.conf /
-
+# Use the official Nginx image
 FROM nginx:alpine
-#FROM --platform=linux/amd64 nginx:alpine
 
+COPY nginx.conf /etc/nginx/nginx.conf
 
-COPY /nginx_ui.conf /etc/nginx/nginx.conf
+RUN mkdir -p /app/ui
 
 WORKDIR /app
-RUN mkdir -p /app/ui/aip /app/ui/common
 
-COPY --from=build /shell-app-ui/dist/common-app /app/ui/common/
-COPY --from=build /aip-app-ui/dist/aip-app /app/ui/aip
+COPY aip.zip /app/
+COPY shell.zip /app/
 
-RUN chmod -R 755 /app/ui
+RUN unzip /app/aip.zip -d /app/aip
+RUN unzip /app/shell.zip -d /app/shell
 
-# Set working directory to root
+RUN mkdir -p /app/ui/aip
+RUN mkdir -p /app/ui/common
+
+RUN cp -r /app/aip/dist/aip-app/* /app/ui/aip
+RUN cp -r /app/shell/dist/common-app/* /app/ui/common
+
+RUN rm -rf /app/aip
+RUN rm -rf /app/shell
+RUN rm -f /app/*.zip
+
 WORKDIR /
 
-# Expose ports
 EXPOSE 8082 8084
 
 # Start Nginx in the foreground

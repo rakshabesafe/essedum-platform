@@ -1,11 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: essedum-ui-service
+  name: leap-app-ui-service
   namespace: aipns
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true" # Makes the LoadBalancer internal
 spec:
   selector:
-    app: essedum-ui # Matches the label in the Deployment
+    app: leap-app-ui # Matches the label in the Deployment
   ports:
   - protocol: TCP
     port: 8082          # External port to expose
