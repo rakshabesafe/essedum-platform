@@ -165,7 +165,7 @@ kubectl apply -f leap-ui-service.yaml
 
 
 ## 4. Change Log:
-  Initial Version
+  Model Upload Download Features added
 
  
 ## 5. License Info:
