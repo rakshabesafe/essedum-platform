@@ -1,33 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: essedum-backend
+  name: leap-app-backend
   namespace: aipns # Namespace where the deployment will run
 spec:
   replicas: 1 # Number of replicas
   selector:
     matchLabels:
-      app: essedum-backend
+      app: leap-app-backend
   template:
     metadata:
       labels:
-        app: essedum-backend
+        app: leap-app-backend
     spec:
       containers:
-      - name: essedum-backend
-        image: 10.200.111.174:5000/essedum_backend:v1
+      - name: leap-app-backend
+        image: acrreq0762935.azurecr.io/leap_app_backend:latest # Updated to use the ACR image
         imagePullPolicy: Always
         ports:
         - containerPort: 8082
+      imagePullSecrets:
+      - name: acr-secret # Secret to authenticate with ACR
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: essedum-backend-service
+  name: leap-app-backend-service
   namespace: aipns
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true" # Makes the LoadBalancer internal
 spec:
   selector:
-    app: essedum-backend # Matches the label in the Deployment
+    app: leap-app-backend # Matches the label in the Deployment
   ports:
   - protocol: TCP
     port: 8080          # External port to expose
