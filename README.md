@@ -45,7 +45,8 @@ Essedum is a modular, microservices-based framework designed to simplify the dev
 
     #### 2.2.3 Backend deployment
       •	Go to path essedum-platform/sv.
-      •	copy keycloak ssl cert file(crt file) at essedum/sv. currently we have wildcard.lfn.crt we created for domain login.lfn.essedum.anuket.iol.unh.edu.
+      •	copy keycloak ssl cert file(crt file) at essedum-platform/sv. currently we have wildcard.lfn.crt we created for domain login.lfn.essedum.anuket.iol.unh.edu.
+      •	update the keycloak domain, realm, client id in file essedum-platform/sv/common-app/src/main/resources/application-oauth2.yml if using different one.
       •	update reference of wildcard.lfn.crt with new keycloak cert file name in Dockerfile_oauth2 file. Later Use Dockerfile_oauth2 to create docker image with name essedum_app_backend:latest.
       •	Push this image in the local docker registry.
       •	Goto path essedum-platform/aks-deployment. Update the docker registry and image name in essedum-backend.yaml
