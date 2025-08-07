@@ -93,17 +93,17 @@ we are using namespace aipns in our deployment yaml file.
 kubectl create namespace aipns
 
 #### 2.5.3 Backend:
-sudo docker build   --platform=linux/amd64   --tag essedum_app_backend:latest   --build-arg TARGETPLATFORM=linux/amd64   --no-cache   -f Dockerfile_oauth2 .
-sudo docker tag essedum_app_backend:latest <registry-ip>:5000/essedum_app_backend:latest
-sudo docker push <registry-ip>:5000/essedum_app_backend:latest
-kubectl apply -f essedum-backend.yaml
+##### sudo docker build   --platform=linux/amd64   --tag essedum_app_backend:latest   --build-arg TARGETPLATFORM=linux/amd64   --no-cache   -f Dockerfile_oauth2 .
+##### sudo docker tag essedum_app_backend:latest <registry-ip>:5000/essedum_app_backend:latest
+##### sudo docker push <registry-ip>:5000/essedum_app_backend:latest
+##### kubectl apply -f essedum-backend.yaml
 
 #### 2.5.4 Frontend:
-sudo docker build   --platform=linux/amd64   --tag essedum_app_frontend:latest   --build-arg TARGETPLATFORM=linux/amd64   --no-cache   -f Dockerfile .
-sudo docker tag essedum_app_frontend:latest <registry-ip>:5000/essedum_app_backend:latest
-sudo docker push <registry-ip>:5000/essedum_app_backend:latest
-kubectl apply -f essedum-ui.yaml
-kubectl apply -f essedum-ui-service.yaml
+##### sudo docker build   --platform=linux/amd64   --tag essedum_app_frontend:latest   --build-arg TARGETPLATFORM=linux/amd64   --no-cache   -f Dockerfile .
+##### sudo docker tag essedum_app_frontend:latest <registry-ip>:5000/essedum_app_backend:latest
+##### sudo docker push <registry-ip>:5000/essedum_app_backend:latest
+##### kubectl apply -f essedum-ui.yaml
+##### kubectl apply -f essedum-ui-service.yaml
 
 #### 2.5.5 mysql:
 kubectl apply -f mysql_file_pv.yaml
