@@ -14,7 +14,7 @@ telemetry:
     password: password
  
 config:
-  active-profiles: mysql,dbjwt,btf,dbconstants,vault
+  active-profiles: mysql,oauth2,btf,dbconstants,vault
   #active-profiles: mysql,oauth2,btf,dbconstants
   #static-locations: file:/D:/common-app/
   static-locations: file:/C:/Users/mohan.peta/Documents/AIP_2024_March28/common-app-mar-14/
