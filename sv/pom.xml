@@ -169,7 +169,6 @@
 	    <reflections.version>0.9.12</reflections.version>
 	    <javax.interceptor.version>1.2</javax.interceptor.version>
 	    <slf4j.version>2.0.9</slf4j.version>
-	    <logback.version>1.4.14</logback.version>
 	    <junit4.version>4.13.2</junit4.version>
 
 		</properties>
@@ -255,6 +254,12 @@
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter</artifactId>
 				<version>${org.springframework.cloud.spring-cloud-starter.version}</version>
+				<exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+								    </exclusion>
+								      </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
@@ -296,6 +301,12 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter</artifactId>
 				<version>${org.springframework.boot.spring-boot-starter.version}</version>
+				<exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+								    </exclusion>
+								      </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
@@ -304,6 +315,10 @@
 				<type>pom</type>
 				<scope>import</scope>
 				<exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+								    </exclusion>
 					<exclusion>
 						<groupId>com.rabbitmq</groupId>
 						<artifactId>amqp-client</artifactId>
@@ -413,6 +428,12 @@
 				<groupId>com.azure</groupId>
 				<artifactId>azure-core</artifactId>
 				<version>${com.azure.azure-core.version}</version>
+				<exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+								    </exclusion>
+								      </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.azure</groupId>
@@ -630,16 +651,34 @@
 			    <groupId>org.apache.tika</groupId>
 			    <artifactId>tika-parsers</artifactId>
 			    <version>${org.apache.tika.tika-parsers.version}</version>
+				<exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+								    </exclusion>
+								      </exclusions>
 			</dependency>
 			<dependency>
 			    <groupId>org.apache.tika</groupId>
 			    <artifactId>tika-parsers-standard-package</artifactId>
 			    <version>${org.apache.tika.tika-parsers-standard-package.version}</version>
+				<exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+								    </exclusion>
+								      </exclusions>
 			</dependency>
 			<dependency>
 			    <groupId>io.swagger.core.v3</groupId>
 			    <artifactId>swagger-core</artifactId>
 			    <version>${io.swagger.core.v3.swagger-core.version}</version>
+				<exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+								    </exclusion>
+								      </exclusions>
 			</dependency>
 			<dependency>
 			    <groupId>com.azure.spring</groupId>
@@ -650,6 +689,12 @@
 			    <groupId>com.azure</groupId>
 			    <artifactId>azure-identity</artifactId>
 			    <version>${com.azure.azure-identity.version}</version>
+				<exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+								    </exclusion>
+								      </exclusions>
 			</dependency>
 			<dependency>
 			    <groupId>org.springframework.vault</groupId>
@@ -690,6 +735,12 @@
 		      <groupId>org.springframework.boot</groupId>
 		      <artifactId>spring-boot-starter-validation</artifactId>
 		      <version>${spring.boot.starter.validation.version}</version>
+				<exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+								    </exclusion>
+								      </exclusions>
 		    </dependency>
 		    <dependency>
 		      <groupId>javax.validation</groupId>
@@ -699,7 +750,13 @@
 	        <dependency>
 	            <groupId>org.apache.httpcomponents.client5</groupId>
 	            <artifactId>httpclient5</artifactId>
-	            <version>${httpclient5.version}</version>
+		    <version>${httpclient5.version}</version>
+		    <exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+							</exclusion>
+						</exclusions>
 	        </dependency>
 	        <dependency>
 	            <groupId>com.microsoft.graph</groupId>
@@ -786,7 +843,13 @@
 	        <dependency>
 	            <groupId>org.testng</groupId>
 	            <artifactId>testng</artifactId>
-	            <version>${testng.version}</version>
+		    <version>${testng.version}</version>
+		    <exclusions>
+					    <exclusion>
+						          <groupId>org.slf4j</groupId>
+							        <artifactId>slf4j-api</artifactId>
+							</exclusion>
+						</exclusions>
 	            <scope>test</scope>
 	        </dependency>
 	        <dependency>
