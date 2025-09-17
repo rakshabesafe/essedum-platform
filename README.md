@@ -208,7 +208,7 @@ For a step-by-step guide on how to use the Essedum platform to create AI applica
 
 ## 7. Change Log
 
-- **v1.0.0**: Initial version of the Essedum platform.
+See the [CHANGELOG.md](CHANGELOG.md) file for details.
 
 ## 8. License
 
