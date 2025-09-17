@@ -204,6 +204,7 @@ Once the platform is up and running, you can access the frontend in your browser
 
 ## 6. Getting Started
 
+
 For a step-by-step guide on how to use the Essedum platform to create AI applications, please see our [User Guide](USER_GUIDE.md).
 
 ## 7. Change Log
