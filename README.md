@@ -41,6 +41,17 @@ The Python Job Executor is a separate service responsible for executing Python-b
   - AWS SageMaker
   - Azure AI Studio
 
+### Libraries and Utilities
+- **Machine Learning Libraries:**
+  - scikit-learn (classification and regression)
+- **Vector Database:**
+  - Qdrant (via vector DB library)
+- **LLM Integration:**
+  - Langchain, Azure OpenAI SDK (for LLM calls)
+- **Embedded Web UI for AI applications:**
+  - Streamlit
+  - Gradio
+
 ## 4. Installation
 
 There are two ways to install and run the Essedum platform: a manual developer setup or a containerized setup using Docker.
