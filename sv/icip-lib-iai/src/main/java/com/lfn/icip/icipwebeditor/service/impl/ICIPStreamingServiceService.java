@@ -76,6 +76,7 @@ import com.lfn.ai.comm.lib.util.domain.NameAndAliasDTO;
 import com.lfn.ai.comm.lib.util.service.dto.support.NameEncoderService;
 import com.lfn.icip.dataset.model.ICIPDatasource;
 import com.lfn.icip.dataset.repository.ICIPDatasourceRepository;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import com.lfn.icip.icipwebeditor.job.enums.RuntimeType;
 import com.lfn.icip.icipwebeditor.model.ICIPMLFederatedRuntime;
 import com.lfn.icip.icipwebeditor.model.ICIPStreamingServices;
@@ -733,10 +734,12 @@ public class ICIPStreamingServiceService implements IICIPStreamingServiceService
 		String pipelineJson = resolvePipelineJson(pipelineJsonUnresolved, org);
 
 		FileOutputStream outputStream = null;
-		String path = Paths.get(pipelineScriptPath, org + '/' + name).toString() + "/pipeline.json";
+		String path = PathValidationUtil.validateAndGetPath(
+				Paths.get(pipelineScriptPath, org + '/' + name).toString() + "/pipeline.json").toString();
 		try {
-			Files.createDirectories(Paths.get(pipelineScriptPath, org + '/' + name));
-			File fileObj = new File(path);
+			Files.createDirectories(PathValidationUtil.validateAndGetPath(
+					Paths.get(pipelineScriptPath, org + '/' + name).toString()));
+			File fileObj = PathValidationUtil.validatePath(path);
 			if (!fileObj.exists())
 				fileObj.createNewFile();
 			logger.info("File created: " + fileObj.getName());
@@ -824,10 +827,11 @@ public class ICIPStreamingServiceService implements IICIPStreamingServiceService
 	@Override
 	public JSONObject getGeneratedScript(String name, String org) {
 		try {
-			Path path = Paths.get(pipelineScriptPath, org + '/' + name, name + "_generatedCode.py");
+			Path path = PathValidationUtil.validateAndGetPath(
+					Paths.get(pipelineScriptPath, org + '/' + name, name + "_generatedCode.py").toString());
 			JSONObject obj = new JSONObject();
 			obj.append("script", ICIPUtils.readFile(path));
-			obj.append("lastmodified", new File(path.toString()).lastModified());
+			obj.append("lastmodified", PathValidationUtil.validatePath(path.toString()).lastModified());
 			return obj;
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);

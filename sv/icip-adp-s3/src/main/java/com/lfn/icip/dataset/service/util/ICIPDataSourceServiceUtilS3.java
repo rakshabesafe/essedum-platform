@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import com.lfn.icip.dataset.util.SsrfProtectionUtil;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -409,7 +410,7 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
         logger.info("bucketName "+bucketName);
         String objectKey = attr.optString("uploadFilePath")+"/"+attr.optString("object");
         logger.info("objectKey "+objectKey);
-        File localFilePath = new File(uploadFile);
+        File localFilePath = PathValidationUtil.validatePath(uploadFile);
         BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withClientConfiguration(clientConfiguration)
                 .withPathStyleAccessEnabled(true)  // Enable path-style access for MinIO compatibility
@@ -484,7 +485,7 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
             String bucketName = attr.optString("bucket");
             String objectKey = attr.optString("uploadFilePath");
             String region = attr.optString("region");
-            File localFilePath = new File(uploadFile);
+            File localFilePath = PathValidationUtil.validatePath(uploadFile);
             BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
             AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.AP_SOUTH_1)
                      .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
@@ -540,7 +541,7 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
 
         try {
             MultipleFileDownload xfer = xfer_mgr.downloadDirectory(
-                    bucketName, objectKey,new File(localFilePath));
+                    bucketName, objectKey, PathValidationUtil.validatePath(localFilePath));
             xfer.waitForCompletion();
             return downloadFilePath;
             //	} catch (AmazonClientException | InterruptedException e) {
@@ -730,7 +731,7 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
                 .build();
         try {
             TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(s3Client).build();
-            File dir = new File(localFilePath);
+            File dir = PathValidationUtil.validatePath(localFilePath);
         } catch (Exception e) {
             logger.error("Error Message:    " + e.getMessage());
         }

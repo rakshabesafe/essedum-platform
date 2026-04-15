@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -297,7 +298,7 @@ public class IICIPAppServiceImpl implements IICIPAppService, IICIPSearchable {
 		int lastIndex = path.lastIndexOf("\\");
 		int secondLastIndex = path.lastIndexOf("\\", lastIndex - 1);
 		String folderPath = path.substring(0, secondLastIndex);
-		deleteDir(new File(folderPath));
+		deleteDir(PathValidationUtil.validatePath(folderPath));
 
 	}
 

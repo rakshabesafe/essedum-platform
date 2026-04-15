@@ -95,6 +95,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import com.lfn.icip.dataset.util.SsrfProtectionUtil;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -1710,7 +1711,7 @@ return Flux.just(datasetRepository.findById((id)).get()).defaultIfEmpty(new ICIP
 			objectKey = attr.optString("object");
 		logger.info("objectKey " + objectKey);
 		String uploadFile = attr.optString("uploadFile");
-		File localFilePath = new File(uploadFile);
+		File localFilePath = PathValidationUtil.validatePath(uploadFile);
 		BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 		AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withClientConfiguration(clientConfiguration)
 				.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpointUrl.toString(), region))

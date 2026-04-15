@@ -44,6 +44,7 @@ import com.lfn.ai.comm.lib.util.annotation.EssedumProperty;
 import com.lfn.ai.comm.lib.util.exceptions.EssedumException;
 import com.lfn.icip.dataset.model.ICIPDataset;
 import com.lfn.icip.dataset.util.SsrfProtectionUtil;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import com.lfn.icip.icipwebeditor.rest.WebSocketController;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -401,7 +402,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 ? uploadFilePath + "/" + attr.optString(OBJECT_KEY)
                 : attr.optString(OBJECT_KEY);
 
-        File localFile = new File(uploadFile);
+        File localFile = PathValidationUtil.validatePath(uploadFile);
         if (!localFile.exists()) {
             logger.error("Local file does not exist: {}", uploadFile);
             throw new FileNotFoundException("File not found: " + uploadFile);
@@ -628,7 +629,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
 
             logger.info("Uploading file to S3: bucket={}, key={}", bucket, objectKey);
 
-            File file = new File(uploadFile);
+            File file = PathValidationUtil.validatePath(uploadFile);
             if (!file.exists()) {
                 logger.error("Local file does not exist: {}", uploadFile);
                 throw new FileNotFoundException("File not found: " + uploadFile);
@@ -885,7 +886,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             objectKey = attr.optString("path") + "/" + attr.optString(OBJECT_KEY);
         } else
             objectKey = attr.optString(OBJECT_KEY);
-        File localFilePath = new File(uploadFile);
+        File localFilePath = PathValidationUtil.validatePath(uploadFile);
         BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withClientConfiguration(clientConfiguration)
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpointUrl.toString(), region))
@@ -1438,7 +1439,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 }
                 logger.debug("Detected file extension: {}", extension);
 
-                byteArray = Files.readAllBytes(Paths.get(downloadedFilePath));
+                byteArray = Files.readAllBytes(PathValidationUtil.validateAndGetPath(downloadedFilePath));
                 logger.info("Read {} bytes from downloaded file", byteArray.length);
 
                 switch (extension) {
@@ -1631,7 +1632,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 }
                 logger.debug("Detected file extension: {}", extension);
 
-                byteArray = Files.readAllBytes(Paths.get(downloadedFilePath));
+                byteArray = Files.readAllBytes(PathValidationUtil.validateAndGetPath(downloadedFilePath));
                 logger.info("Read {} bytes from downloaded file", byteArray.length);
 
                 switch (extension) {

@@ -74,6 +74,7 @@ import com.lfn.icip.dataset.service.IICIPDatasourceService;
 import com.lfn.icip.dataset.service.IICIPSchemaRegistryService;
 import com.lfn.icip.dataset.service.IICIPTagsService;
 import com.lfn.icip.dataset.service.impl.ICIPDatasetPluginsService;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import com.lfn.icip.icipmodelserver.v2.model.dto.ICIPPolyAIRequestWrapper;
 import com.lfn.icip.icipmodelserver.v2.model.dto.ICIPPolyAIResponseWrapper;
 import com.lfn.icip.icipmodelserver.v2.service.impl.ICIPEndpointPluginsService;
@@ -2346,7 +2347,7 @@ public class ICIPMlopsController {
 	@GetMapping(value = "/jobs/image", produces = MediaType.IMAGE_JPEG_VALUE)
 	public ResponseEntity<?> getImage(@RequestParam(name = "path") String path) throws IOException {
 		logger.debug("Getting image by path");
-		BufferedImage bImage = ImageIO.read(new File(path));
+		BufferedImage bImage = ImageIO.read(PathValidationUtil.validatePath(path));
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ImageIO.write(bImage, "png", bos);
 		byte[] data = bos.toByteArray();

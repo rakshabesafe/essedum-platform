@@ -119,6 +119,7 @@ import com.jayway.jsonpath.MapFunction;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import com.lfn.icip.dataset.util.GroovySandboxUtil;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 
 /**
  * The Class ICIPDataSetServiceUtilRestAbstract.
@@ -470,7 +471,7 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 				}
 
 				content = fileserverservice.download(fileId, "1", dataset.getDatasource().getOrganization());
-				File tempFile = new File(fileUploadPath + "/bigqueryAuth.json");
+				File tempFile = PathValidationUtil.validatePath(fileUploadPath, "bigqueryAuth.json");
 				FileUtils.writeByteArrayToFile(tempFile, content);
 				FileInputStream fileInpStream = null;
 				try {
@@ -667,7 +668,7 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 	private KeyStore getKeystore(boolean mtlsAdded, String keyStorePath, String keystorepass) throws IOException {
 		KeyStore keyStore = null;
 		if (mtlsAdded) {
-			FileInputStream instream = new FileInputStream(new File(keyStorePath));
+			FileInputStream instream = new FileInputStream(PathValidationUtil.validatePath(keyStorePath));
 			try {
 				keyStore = KeyStore.getInstance("JKS");
 				keyStore.load(instream, keystorepass.toCharArray());
@@ -1475,7 +1476,7 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 						}
 
 						content = fileserverservice.download(fileId, "1", dataset.getDatasource().getOrganization());
-						File tempFile = new File(fileUploadPath + "/bigqueryAuth.json");
+						File tempFile = PathValidationUtil.validatePath(fileUploadPath, "bigqueryAuth.json");
 						FileUtils.writeByteArrayToFile(tempFile, content);
 						FileInputStream fileInpStream = null;
 						try {
