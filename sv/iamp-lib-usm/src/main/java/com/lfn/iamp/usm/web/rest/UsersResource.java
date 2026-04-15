@@ -216,7 +216,7 @@ public class UsersResource {
 
 			ModelMapper modelMapper = new ModelMapper();
 			Users users = modelMapper.map(users_dto, Users.class);
-			boolean validatedUserName = users_dto.getUser_f_name().matches("^(\\w*[-_.]?[a-zA-Z]\\w*)$");
+			boolean validatedUserName = users_dto.getUser_f_name().matches("^[a-zA-Z\\w]*(?:[\\-_.]?[a-zA-Z][a-zA-Z\\w]*)?$");
             if(!validatedUserName){
                 return new ResponseEntity<String>("Alpha numeric and atmost one special characters -_. allowed", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -287,7 +287,7 @@ public class UsersResource {
 			}
 			ModelMapper modelMapper = new ModelMapper();
 			Users users = modelMapper.map(users_dto, Users.class);
-			boolean validatedUserName = users_dto.getUser_f_name().matches("^(\\w*[-_.]?[a-zA-Z]\\w*)$");
+			boolean validatedUserName = users_dto.getUser_f_name().matches("^[a-zA-Z\\w]*(?:[\\-_.]?[a-zA-Z][a-zA-Z\\w]*)?$");
             if(!validatedUserName){
                 return new ResponseEntity<String>("Alpha numeric and atmost one special characters -_. allowed", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -429,7 +429,7 @@ public class UsersResource {
 			log.debug("REST request to update User Password : {}", users_dto);
 			ModelMapper modelMapper = new ModelMapper();
 			Users users = modelMapper.map(users_dto, Users.class);
-			boolean validatedpassword = users_dto.getPassword().matches("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_\\[\\]-{}|';:,+=|`~<\\\\\\/>?])[A-Za-z\\d!@#$%^&*_\\[\\]-{}|';:,+=|`~<\\\\\\/>?].{7,19}");
+			boolean validatedpassword = users_dto.getPassword().matches("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_\\[\\]\\-{}|';:,+=|`~<\\\\/>?])[A-Za-z\\d!@#$%^&*_\\[\\]\\-{}|';:,+=|`~<\\\\/>?]{8,20}");
             if(!validatedpassword){
                 return new ResponseEntity<String>("Password should contain atleast 1 number, 1 uppercase and lowercase character and 1 special character", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -474,7 +474,7 @@ public class UsersResource {
 			log.debug("REST request to update User Password : {}", users_dto);
 			ModelMapper modelMapper = new ModelMapper();
 			Users users = modelMapper.map(users_dto, Users.class);
-			boolean validatedpassword = users_dto.getPassword().matches("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_\\[\\]-{}|';:,+=|`~<\\\\\\/>?])[A-Za-z\\d!@#$%^&*_\\[\\]-{}|';:,+=|`~<\\\\\\/>?].{7,19}");
+			boolean validatedpassword = users_dto.getPassword().matches("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_\\[\\]\\-{}|';:,+=|`~<\\\\/>?])[A-Za-z\\d!@#$%^&*_\\[\\]\\-{}|';:,+=|`~<\\\\/>?]{8,20}");
             if(!validatedpassword){
                 return new ResponseEntity<String>("Password should contain atleast 1 number, 1 uppercase and lowercase character and 1 special character", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
