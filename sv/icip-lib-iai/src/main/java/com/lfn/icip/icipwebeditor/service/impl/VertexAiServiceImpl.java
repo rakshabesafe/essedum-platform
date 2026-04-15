@@ -39,6 +39,7 @@ import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.vertexai.VertexAiGeminiChatModel;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import com.lfn.icip.dataset.util.GroovySandboxUtil;
 
 @Service("vertexaichatmodel")
 public class VertexAiServiceImpl implements ICIPPromptChatModel {
@@ -156,7 +157,7 @@ public class VertexAiServiceImpl implements ICIPPromptChatModel {
 			Binding binding = new Binding();
 			binding.setProperty("response", Answer);
 
-			GroovyShell shell = new GroovyShell(binding);
+			GroovyShell shell = GroovySandboxUtil.createSandboxedShell(binding);
 			Object transformedResult = shell.evaluate(new StringReader(transformScript));
 
 			Answer = transformedResult.toString();

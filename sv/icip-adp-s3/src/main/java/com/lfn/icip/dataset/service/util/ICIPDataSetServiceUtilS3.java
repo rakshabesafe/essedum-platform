@@ -863,10 +863,12 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         String region = connectionDetails.optString(REGION_KEY);
         URL endpointUrl = null;
         try {
-            endpointUrl = new URL(connectionDetails.optString("url"));
+            endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
             logger.info("endpointUrl: {}", endpointUrl);
         } catch (MalformedURLException e1) {
             logger.error(UPLOAD_DATASOURCE_URL_ERROR + e1.getMessage());
+        } catch (IllegalArgumentException e1) {
+            logger.error("SSRF validation failed: {}", e1.getMessage());
         }
         TrustManager[] trustAllCerts = getTrustAllCerts();
         SSLContext sslContext = getSslContext(trustAllCerts);
@@ -1010,10 +1012,12 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             URL endpointUrl = null;
             String filePath2;
             try {
-                endpointUrl = new URL(connectionDetails.optString("url"));
+                endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
                 logger.info("endpointUrl " + endpointUrl);
             } catch (MalformedURLException e1) {
                 logger.error(UPLOAD_DATASOURCE_URL_ERROR + e1.getMessage());
+            } catch (IllegalArgumentException e1) {
+                logger.error("SSRF validation failed: " + e1.getMessage());
             }
             TrustManager[] trustAllCerts = getTrustAllCerts();
             SSLContext sslContext = getSslContext(trustAllCerts);
@@ -1071,9 +1075,11 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         String region = connectionDetails.optString(REGION_KEY);
         URL endpointUrl = null;
         try {
-            endpointUrl = new URL(connectionDetails.optString("url"));
+            endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
         } catch (MalformedURLException e1) {
             logger.error("Error occured while fetching FileInfo" + e1.getMessage());
+        } catch (IllegalArgumentException e1) {
+            logger.error("SSRF validation failed: " + e1.getMessage());
         }
         BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         TrustManager[] trustAllCerts = getTrustAllCerts();
@@ -1155,9 +1161,11 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         String region = connectionDetails.optString(REGION_KEY);
         URL endpointUrl = null;
         try {
-            endpointUrl = new URL(connectionDetails.optString("url"));
+            endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
         } catch (MalformedURLException e1) {
             logger.error(UPLOAD_DATASOURCE_URL_ERROR + e1.getMessage());
+        } catch (IllegalArgumentException e1) {
+            logger.error("SSRF validation failed: " + e1.getMessage());
         }
 
         if (!(connectionDetails.optString("url").contains("blob") || (connectionDetails.optString("url").contains("aws")) || (connectionDetails.optString("url").contains("google")))) {

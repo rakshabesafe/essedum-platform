@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
+import com.lfn.icip.dataset.util.SsrfProtectionUtil;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -388,10 +389,13 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
         URL endpointUrl = null;
 //		System.setProperty(SDKGlobalConfiguration.DISABLE_CERT_CHECKING_SYSTEM_PROPERTY, "false");
         try {
-            endpointUrl = new URL(connectionDetails.optString("url"));
+            endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
             logger.info("endpointUrl "+endpointUrl);
         } catch (MalformedURLException e1) {
             logger.error("Upload DATASOURCE URL not correct" + e1.getMessage());
+            return "Error";
+        } catch (IllegalArgumentException e1) {
+            logger.error("SSRF validation failed: " + e1.getMessage());
             return "Error";
         }
         TrustManager[] trustAllCerts = getTrustAllCerts();
@@ -507,11 +511,14 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
         String region = connectionDetails.optString("Region");
         URL endpointUrl = null;
         try {
-            endpointUrl = new URL(connectionDetails.optString("url"));
+            endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
         } catch (MalformedURLException e1) {
             logger.error("Upload DATASOURCE URL not correct" + e1.getMessage());
             return "Error";
 
+        } catch (IllegalArgumentException e1) {
+            logger.error("SSRF validation failed: " + e1.getMessage());
+            return "Error";
         }
         JSONObject attr = new JSONObject(attributes);
         String bucketName = attr.optString("bucket");

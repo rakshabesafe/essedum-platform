@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import com.lfn.icip.dataset.util.SsrfProtectionUtil;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -117,6 +118,7 @@ import com.jayway.jsonpath.MapFunction;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import com.lfn.icip.dataset.util.GroovySandboxUtil;
 
 /**
  * The Class ICIPDataSetServiceUtilRestAbstract.
@@ -1214,7 +1216,7 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 			binding.setProperty("Url", inputUrl);
 			binding.setProperty("ConfigVariables", ConfigVariables);
 
-			GroovyShell shell = new GroovyShell(binding);
+			GroovyShell shell = GroovySandboxUtil.createSandboxedShell(binding);
 			Object transformedResult = shell.evaluate(new StringReader(prescript));
 
 			JSONObject transformedattr = new JSONObject(transformedResult.toString());
@@ -1262,7 +1264,7 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 					Binding binding = new Binding();
 					binding.setProperty("inputJson", resp);
 
-					GroovyShell shell = new GroovyShell(binding);
+					GroovyShell shell = GroovySandboxUtil.createSandboxedShell(binding);
 					Object transformedResult = shell.evaluate(new StringReader(script));
 
 					resp = transformedResult.toString();
@@ -1318,7 +1320,7 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 		binding.setProperty("Body", Body);
 		binding.setProperty("ConnectionDetails", datasource_attributes.toString());
 		if (ScriptType.equals("Groovy")) {
-			GroovyShell shell = new GroovyShell(binding);
+			GroovyShell shell = GroovySandboxUtil.createSandboxedShell(binding);
 			Object transformedResult = shell.evaluate(new StringReader(transformScript));
 			logger.info("transformedResult--->{}", transformedResult);
 			response = transformedResult.toString();
@@ -1341,10 +1343,12 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 				String keypass = connectionDetails.optString("KeyPass");;
 				URL extractURL=null;
 				try {
-					extractURL = new URL(connectionDetails.optString("Url"));
+					extractURL = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("Url"));
 				} catch (MalformedURLException e1) {
 					// TODO Auto-generated catch block
 					logger.error(e1.getMessage());
+				} catch (IllegalArgumentException e1) {
+					logger.error("SSRF validation failed: {}", e1.getMessage());
 				}
 						String host = extractURL.getProtocol().concat("://").concat(extractURL.getHost());
 				if (extractURL.getPort() != -1)
@@ -1618,12 +1622,12 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 		String path = "";
 		URL dsrcUrlObj;
 		try {
-			dsrcUrlObj = new URL(dsrcUrl);
+			dsrcUrlObj = SsrfProtectionUtil.validateAndCreateUrl(dsrcUrl);
 			host = dsrcUrlObj.getProtocol().concat("://").concat(dsrcUrlObj.getHost());
 			if (dsrcUrlObj.getPort() != -1)
 				host = host.concat(":").concat(String.valueOf(dsrcUrlObj.getPort()));
 			if (dsetUrl.startsWith("http")) {
-				URL dsetUrlObj = new URL(dsetUrl);
+				URL dsetUrlObj = SsrfProtectionUtil.validateAndCreateUrl(dsetUrl);
 				String dsethost = "";
 				dsethost = dsetUrlObj.getProtocol().concat("://").concat(dsetUrlObj.getHost());
 				if (dsrcUrlObj.getPort() != -1)
@@ -1635,6 +1639,9 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 			newUrl = host.concat(path);
 		} catch (MalformedURLException e) {
 			logger.error("Error in forming URL {}", e.getMessage());
+			return newUrl;
+		} catch (IllegalArgumentException e) {
+			logger.error("SSRF validation failed while forming URL: {}", e.getMessage());
 			return newUrl;
 		}
 		return newUrl;

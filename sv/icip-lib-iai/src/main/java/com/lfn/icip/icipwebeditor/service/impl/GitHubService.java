@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import com.lfn.icip.dataset.util.SsrfProtectionUtil;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -440,9 +441,11 @@ public class GitHubService {
 			String region = s3ConnectionDetails.optString("Region");
 			URL endpointUrl = null;
 			try {
-				endpointUrl = new URL(s3ConnectionDetails.optString("url"));
+				endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(s3ConnectionDetails.optString("url"));
 			} catch (MalformedURLException e1) {
 				log.error("URL not correct: {}", e1.getMessage());
+			} catch (IllegalArgumentException e1) {
+				log.error("SSRF validation failed: {}", e1.getMessage());
 			}
 			TrustManager[] trustAllCerts = getTrustAllCerts();
 			SSLContext sslContext = getSslContext(trustAllCerts);
