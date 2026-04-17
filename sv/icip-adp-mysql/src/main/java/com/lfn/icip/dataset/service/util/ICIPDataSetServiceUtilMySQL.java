@@ -67,6 +67,7 @@ import com.lfn.ai.comm.lib.util.exceptions.EssedumException;
 //import com.lfn.iamp.usm.annotation.EssedumProperty;
 import com.lfn.icip.dataset.factory.IICIPDataSetServiceUtilFactory;
 import com.lfn.icip.dataset.model.ICIPDataset;
+import com.lfn.icip.dataset.util.SqlSanitizationUtil;
 
 // TODO: Auto-generated Javadoc
 // 
@@ -629,7 +630,7 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 	 * @return the filter query
 	 */
 	private String getFilterQuery(JSONObject attributes) {
-		String table = attributes.getString(TNAME);
+		String table = SqlSanitizationUtil.validateIdentifier(attributes.getString(TNAME));
 		DbSpec spec = new DbSpec();
 		DbSchema schema = spec.addDefaultSchema();
 		DbTable cTable = schema.addTable(table);
@@ -822,12 +823,12 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 				        	}
 				        	schema = uniqueSchemaArray;
 					}}
-					sqlCreate = "CREATE TABLE IF NOT EXISTS " + attributes.getString(TNAME) + "("
+					sqlCreate = "CREATE TABLE IF NOT EXISTS " + SqlSanitizationUtil.validateIdentifier(attributes.getString(TNAME)) + "("
 							+ getcolumnMappings(schema,
 									dataset.getIsApprovalRequired() != null ? dataset.getIsApprovalRequired() : false,
 									dataset.getIsInboxRequired() != null ? dataset.getIsInboxRequired() : false)
 							+ ");";
-				} 
+				}
 				else {
 					if(!dataset.getIsInboxRequired()) {
 					sqlCreate = alterTable(dataset);
@@ -858,7 +859,7 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 							stmt.execute();
 						}
 					}
-					sqlCreateAudit = "CREATE TABLE IF NOT EXISTS " + attributes.getString(TNAME) + "_task_durations"
+					sqlCreateAudit = "CREATE TABLE IF NOT EXISTS " + SqlSanitizationUtil.validateIdentifier(attributes.getString(TNAME)) + "_task_durations"
 							+ "(id INT auto_increment primary key,process_name VARCHAR(100),task_name VARCHAR(100),business_key VARCHAR(255),"
 							+ "proc_inst_id VARCHAR(64),task_inst_id VARCHAR(64),start_date DATETIME,end_date DATETIME,"
 							+ "duration INT(30),due_date DATETIME,sla_met BOOLEAN,extra_time VARCHAR(50),assignee VARCHAR(255),"
@@ -884,7 +885,7 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 		String tableColumns = extractTableSchema(dataset, attributes.getString(TNAME));
 		JSONArray columns = new JSONArray(tableColumns);
 //		String sqlAlter = "ALTER TABLE " + attributes.getString(TNAME) + " ADD ";
-		String sqlAlter = "ALTER TABLE " + attributes.getString(TNAME);
+		String sqlAlter = "ALTER TABLE " + SqlSanitizationUtil.validateIdentifier(attributes.getString(TNAME));
 		Boolean flag = false;
 		for (Object scm : schema) {
 			flag = false;
@@ -899,7 +900,7 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 			if (!flag)
 //				sqlAlter = sqlAlter + scmjson.getString("recordcolumnname") + " "
 //						+ getSQLType(scmjson.getString("columntype")) + ", ";
-				sqlAlter = sqlAlter  + " ADD " + scmjson.getString("recordcolumnname") + " "
+				sqlAlter = sqlAlter  + " ADD " + SqlSanitizationUtil.validateIdentifier(scmjson.getString("recordcolumnname")) + " "
 						+ getSQLType(scmjson.getString("columntype")) + ", ";
 		}
 		if (!sqlAlter.contains("ADD "))
@@ -917,7 +918,7 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 		JSONArray schema = new JSONArray(map);
 		JSONObject attributes = new JSONObject(dataset.getAttributes());
 		if (attributes.getString(TNAME) != null && attributes.getString(TNAME) != "") {
-			String sqlCreate = "CREATE TABLE IF NOT EXISTS " + attributes.getString(TNAME) + "("
+			String sqlCreate = "CREATE TABLE IF NOT EXISTS " + SqlSanitizationUtil.validateIdentifier(attributes.getString(TNAME)) + "("
 					+ getcolumnMappingsForCsv(schema) + ");";
 			try (Connection conn = getDbConnection(connectionDetails)) {
 				try (PreparedStatement stmt = conn.prepareStatement(sqlCreate)) {
@@ -937,7 +938,7 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 		JSONObject connectionDetails = new JSONObject(dataset.getDatasource().getConnectionDetails());
 		JSONObject attributes = new JSONObject(dataset.getAttributes());
 		if (attributes.getString(TNAME) != null && attributes.getString(TNAME) != "") {
-			String sqlCreate = "DELETE FROM " + attributes.getString(TNAME);
+			String sqlCreate = "DELETE FROM " + SqlSanitizationUtil.validateIdentifier(attributes.getString(TNAME));
 			try (Connection conn = getDbConnection(connectionDetails)) {
 				try (PreparedStatement stmt = conn.prepareStatement(sqlCreate)) {
 					stmt.execute();
@@ -968,7 +969,7 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 		List<String> columnMappings = new ArrayList<>();
 		for (int i = 0; i < schema.length(); i++) {
 			JSONObject obj = schema.getJSONObject(i);
-			String columnName = obj.getString("field");
+			String columnName = SqlSanitizationUtil.validateIdentifier(obj.getString("field"));
 			String type = getSQLType(obj.getString("type"));
 			if (obj.getBoolean("primary") && !obj.getBoolean("autoincrement"))
 				columnMappings.add(String.format("%s %s %s %s", columnName, type, "NOT NULL", "PRIMARY KEY"));
@@ -1403,8 +1404,8 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 	public boolean isTablePresent(ICIPDataset ds, String tableName) throws SQLException, NoSuchAlgorithmException {
 		JSONObject condetails = new JSONObject(ds.getDatasource().getConnectionDetails());
 		String[] dbName = condetails.getString("url").split("/");
-		String query = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" + tableName
-				+ "' AND TABLE_SCHEMA = " + "'" + dbName[dbName.length - 1] + "'";
+		String query = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" + SqlSanitizationUtil.escapeSqlLiteral(tableName)
+				+ "' AND TABLE_SCHEMA = " + "'" + SqlSanitizationUtil.escapeSqlLiteral(dbName[dbName.length - 1]) + "'";
 		try (Connection conn = getDbConnection(condetails)) {
 			try (PreparedStatement stmt = conn.prepareStatement(query)) {
 				try (ResultSet res = stmt.executeQuery()) {
@@ -1422,7 +1423,7 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 		JSONObject condetails = new JSONObject(dataset.getDatasource().getConnectionDetails());
 		List<JSONObject> row = new ArrayList<>();
 		//String query = "DESCRIBE " + tablename.replaceAll("^\"|\"$", "");
-		String query = "DESCRIBE " + tablename.replaceAll("(^\")|(\"$)", "");
+		String query = "DESCRIBE " + SqlSanitizationUtil.validateIdentifier(tablename.replaceAll("(^\")|(\"$)", ""));
 		try (Connection conn = getDbConnection(condetails)) {
 			try (PreparedStatement stmt = conn.prepareStatement(query)) {
 				try (ResultSet res = stmt.executeQuery()) {
@@ -1499,15 +1500,16 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 			throws NoSuchAlgorithmException, SQLException {
 		//DateTime.now();
 		JSONObject attributes = new JSONObject(dataset.getAttributes());
-		String tableName = attributes.getString("tableName");
+		String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
 		if (attributes.getString("uniqueIdentifier").equalsIgnoreCase("BID")) {
 			Integer rowId1 = Integer.parseInt(rowId);
 			rowId = rowId1.toString();
 
 		}
-		String columns = "action,userName," + attributes.getString("uniqueIdentifier") + ",row_data";
-		String colvalues = "'" + action + "'," + "'" + user + "'," + "'" + rowId + "'," + "'"
-				+ rowdata + "'";
+		String uniqueId = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
+		String columns = "action,userName," + uniqueId + ",row_data";
+		String colvalues = "'" + SqlSanitizationUtil.escapeSqlLiteral(action) + "'," + "'" + SqlSanitizationUtil.escapeSqlLiteral(user) + "'," + "'" + SqlSanitizationUtil.escapeSqlLiteral(rowId) + "'," + "'"
+				+ SqlSanitizationUtil.escapeSqlLiteral(rowdata) + "'";
 		String qryinsert = String.format("INSERT INTO %s_audit (%s) VALUES(%s)", tableName, columns, colvalues);
 		JSONObject obj = new JSONObject(dataset.getDatasource().getConnectionDetails());
 		try (Connection conn = getDbConnection(obj)) {

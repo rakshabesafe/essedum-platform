@@ -42,6 +42,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.lfn.ai.comm.lib.util.annotation.EssedumProperty;
 import com.lfn.icip.icipwebeditor.fileserver.service.impl.CommonService;
 import com.lfn.icip.icipwebeditor.fileserver.util.FileServerUtil;
+import com.lfn.icip.icipwebeditor.fileserver.util.UrlSanitizationUtil;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -101,8 +102,8 @@ public class LocalServer implements FileServerUtil {
 	 */
 	@Override
 	public String generateFileID(String bucket, String prefix) throws Exception {
-		String url = String.format("%s%s%s%s%s%s", fileserverUrl, "/api/generate/fileid", BUCKET_EQUALS, bucket,
-				"&prefix=", prefix);
+		String url = String.format("%s%s%s%s%s%s", fileserverUrl, "/api/generate/fileid", BUCKET_EQUALS, UrlSanitizationUtil.encodeQueryParam(bucket),
+				"&prefix=", UrlSanitizationUtil.encodeQueryParam(prefix));
 		log.info("Generate URL {}", url);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(ACCESS_TOKEN, accessToken);
@@ -133,7 +134,7 @@ public class LocalServer implements FileServerUtil {
 			
 			String checksum = DigestUtils.sha256Hex(fis);
 			String url = String.format("%s%s%s%s", fileserverUrl,
-					"/api/upload/" + (folder != null ? folder + "/" : "") + fileid + "/true", BUCKET_EQUALS, bucket);
+					"/api/upload/" + (folder != null ? UrlSanitizationUtil.sanitizePathSegment(folder) + "/" : "") + UrlSanitizationUtil.sanitizePathSegment(fileid) + "/true", BUCKET_EQUALS, UrlSanitizationUtil.encodeQueryParam(bucket));
 			log.info("Upload URL {}", url);
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -158,7 +159,7 @@ public class LocalServer implements FileServerUtil {
 			
 			String checksum = DigestUtils.sha256Hex(fis);
 			String url = String.format("%s%s%s%s", fileserverUrl,
-					"/api/upload/" + (folder != null ? folder + "/" : "") + fileid + "/true", BUCKET_EQUALS, bucket);
+					"/api/upload/" + (folder != null ? UrlSanitizationUtil.sanitizePathSegment(folder) + "/" : "") + UrlSanitizationUtil.sanitizePathSegment(fileid) + "/true", BUCKET_EQUALS, UrlSanitizationUtil.encodeQueryParam(bucket));
 			log.info("Upload URL {}", url);
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -187,8 +188,8 @@ public class LocalServer implements FileServerUtil {
 	 */
 	@Override
 	public byte[] download(String fileid, String index, String bucket) throws Exception {
-		String url = String.format("%s%s%s%s%s%s%s", fileserverUrl, "/api/download/", fileid, "/", index, BUCKET_EQUALS,
-				bucket);
+		String url = String.format("%s%s%s%s%s%s%s", fileserverUrl, "/api/download/", UrlSanitizationUtil.sanitizePathSegment(fileid), "/", UrlSanitizationUtil.sanitizePathSegment(index), BUCKET_EQUALS,
+				UrlSanitizationUtil.encodeQueryParam(bucket));
 		log.info("Download URL {}", url);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(ACCESS_TOKEN, accessToken);
@@ -213,7 +214,7 @@ public class LocalServer implements FileServerUtil {
 	 */
 	@Override
 	public String delete(String fileid, String bucket) throws Exception {
-		String url = String.format("%s%s%s%s%s", fileserverUrl, "/api/delete/", fileid, BUCKET_EQUALS, bucket);
+		String url = String.format("%s%s%s%s%s", fileserverUrl, "/api/delete/", UrlSanitizationUtil.sanitizePathSegment(fileid), BUCKET_EQUALS, UrlSanitizationUtil.encodeQueryParam(bucket));
 		log.info("Last Delete URL {}", url);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(ACCESS_TOKEN, accessToken);
@@ -233,7 +234,7 @@ public class LocalServer implements FileServerUtil {
 	 */
 	@Override
 	public boolean lastCall(String fileid, String bucket) throws Exception {
-		String url = String.format("%s%s%s%s%s", fileserverUrl, "/api/lastcall/", fileid, BUCKET_EQUALS, bucket);
+		String url = String.format("%s%s%s%s%s", fileserverUrl, "/api/lastcall/", UrlSanitizationUtil.sanitizePathSegment(fileid), BUCKET_EQUALS, UrlSanitizationUtil.encodeQueryParam(bucket));
 		log.info("Last Call URL {}", url);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(ACCESS_TOKEN, accessToken);
@@ -253,7 +254,7 @@ public class LocalServer implements FileServerUtil {
 	 */
 	@Override
 	public String getLastIndex(String fileid, String bucket) throws Exception {
-		String url = String.format("%s%s%s%s%s", fileserverUrl, "/api/lastcount/", fileid, BUCKET_EQUALS, bucket);
+		String url = String.format("%s%s%s%s%s", fileserverUrl, "/api/lastcount/", UrlSanitizationUtil.sanitizePathSegment(fileid), BUCKET_EQUALS, UrlSanitizationUtil.encodeQueryParam(bucket));
 		log.info("Last Index URL {}", url);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(ACCESS_TOKEN, accessToken);
@@ -266,7 +267,7 @@ public class LocalServer implements FileServerUtil {
 	
 	@Override
 	public String getLastIndex(String fileid, String bucket, String datasource) throws Exception {
-		String url = String.format("%s%s%s%s%s", datasource, "/api/lastcount/", fileid, BUCKET_EQUALS, bucket);
+		String url = String.format("%s%s%s%s%s", datasource, "/api/lastcount/", UrlSanitizationUtil.sanitizePathSegment(fileid), BUCKET_EQUALS, UrlSanitizationUtil.encodeQueryParam(bucket));
 		log.info("Last Index URL {}", url);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(ACCESS_TOKEN, accessToken);
@@ -287,8 +288,8 @@ public class LocalServer implements FileServerUtil {
 	 */
 	@Override
 	public String getChecksum(String fileid, String index, String bucket) throws Exception {
-		String url = String.format("%s%s%s%s%s%s%s", fileserverUrl, "/api/checksum/", fileid, "/", index, BUCKET_EQUALS,
-				bucket);
+		String url = String.format("%s%s%s%s%s%s%s", fileserverUrl, "/api/checksum/", UrlSanitizationUtil.sanitizePathSegment(fileid), "/", UrlSanitizationUtil.sanitizePathSegment(index), BUCKET_EQUALS,
+				UrlSanitizationUtil.encodeQueryParam(bucket));
 		log.info("Checksum URL {}", url);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(ACCESS_TOKEN, accessToken);
@@ -351,7 +352,7 @@ public class LocalServer implements FileServerUtil {
 			
 			String checksum = DigestUtils.sha256Hex(fis);
 			String url = String.format("%s%s%s%s", archivalFileserverurl,
-					"/api/upload/" + (folder != null ? folder + "/" : "") + fileid + "/true", BUCKET_EQUALS, bucket);
+					"/api/upload/" + (folder != null ? UrlSanitizationUtil.sanitizePathSegment(folder) + "/" : "") + UrlSanitizationUtil.sanitizePathSegment(fileid) + "/true", BUCKET_EQUALS, UrlSanitizationUtil.encodeQueryParam(bucket));
 			log.info("Upload URL {}", url);
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -369,8 +370,8 @@ public class LocalServer implements FileServerUtil {
 	}
 	@Override
 	public byte[] download(String fileid, String index, String bucket,String fileserverurl) throws Exception {
-		String url = String.format("%s%s%s%s%s%s%s", fileserverurl, "/api/download/", fileid, "/", index, BUCKET_EQUALS,
-				bucket);
+		String url = String.format("%s%s%s%s%s%s%s", fileserverurl, "/api/download/", UrlSanitizationUtil.sanitizePathSegment(fileid), "/", UrlSanitizationUtil.sanitizePathSegment(index), BUCKET_EQUALS,
+				UrlSanitizationUtil.encodeQueryParam(bucket));
 		log.info("Download URL {}", url);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(ACCESS_TOKEN, accessToken);

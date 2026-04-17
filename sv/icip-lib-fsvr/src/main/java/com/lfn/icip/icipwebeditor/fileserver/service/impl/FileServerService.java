@@ -45,6 +45,7 @@ import com.lfn.ai.comm.lib.util.dto.FileValidateSummary;
 import com.lfn.ai.comm.lib.util.exceptions.EssedumException;
 import com.lfn.icip.icipwebeditor.fileserver.dto.ICIPChunkMetaData;
 import com.lfn.icip.icipwebeditor.fileserver.factory.FileServerFactory;
+import com.lfn.icip.icipwebeditor.fileserver.util.UrlSanitizationUtil;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -276,7 +277,8 @@ public class FileServerService {
 			CsvValidationException, EssedumException, Exception {
 		
 		checkFileForEmbeddedContent(file, allowedExtensions, maxDepth);
-		
+		fileid = UrlSanitizationUtil.sanitizePathSegment(fileid);
+
 		String chunkIndex = String.valueOf(chunkMetadata.getIndex());
 		String fileName = chunkMetadata.getFileName();
 		String s = "/";
@@ -340,7 +342,8 @@ public class FileServerService {
 			CsvValidationException, EssedumException, Exception {
 		
 		checkFileForEmbeddedContent(file, allowedExtensions, maxDepth);
-		
+		fileid = UrlSanitizationUtil.sanitizePathSegment(fileid);
+
 		String chunkIndex = String.valueOf(chunkMetadata.getIndex());
 		String fileName = chunkMetadata.getFileName();
 		String s = "/";

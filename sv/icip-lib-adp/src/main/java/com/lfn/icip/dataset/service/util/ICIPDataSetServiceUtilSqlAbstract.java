@@ -99,6 +99,7 @@ import com.lfn.icip.dataset.repository.ICIPDatasetFilesRepository;
 import com.lfn.icip.dataset.service.IICIPSchemaRegistryService;
 import com.lfn.icip.dataset.service.impl.ICIPDatasetFilesService;
 import com.lfn.icip.dataset.util.DecryptPassword;
+import com.lfn.icip.dataset.util.SqlSanitizationUtil;
 import com.lfn.icip.icipwebeditor.event.factory.IAPIEventFactory;
 import com.lfn.icip.icipwebeditor.fileserver.service.impl.FileServerService;
 import com.lfn.icip.reader.xlsx.StreamingReader;
@@ -496,7 +497,7 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 		try {
 
 			JSONObject attributes = new JSONObject(dataset.getAttributes());
-			String tableName = attributes.getString("tableName");
+			String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
 			if (tableName != null) {
 				logger.info(marker, "Inserting entry in " + tableName);
 				String colNames = "";
@@ -513,8 +514,8 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 				while (kyItr.hasNext()) {
 					String ky = kyItr.next();
 					if (!ky.equals("action")) {
-						colNames += "" + ky + ",";
-						colValues += "'" + entryObj.get(ky) + "',";
+						colNames += "" + SqlSanitizationUtil.validateIdentifier(ky) + ",";
+						colValues += "'" + SqlSanitizationUtil.escapeSqlLiteral(String.valueOf(entryObj.get(ky))) + "',";
 					}
 				}
 
@@ -524,8 +525,8 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 					Iterator<String> dfltValItr = dfltVals.keys();
 					while (dfltValItr.hasNext()) {
 						String ky = dfltValItr.next();
-						colNames += "`" + ky + "`,";
-						colValues += "'" + dfltVals.get(ky) + "',";
+						colNames += "`" + SqlSanitizationUtil.validateIdentifier(ky) + "`,";
+						colValues += "'" + SqlSanitizationUtil.escapeSqlLiteral(String.valueOf(dfltVals.get(ky))) + "',";
 					}
 				}
 				colNames = colNames.substring(0, colNames.length() - 1);
@@ -604,8 +605,8 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 		try {
 			JSONObject attributes = new JSONObject(dataset.getAttributes());
 
-			String tableName = attributes.getString("tableName");
-			String uniqueIdentifier = attributes.getString("uniqueIdentifier");
+			String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
+			String uniqueIdentifier = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
 			if (tableName != null && uniqueIdentifier != null && !uniqueIdentifier.trim().isEmpty()) {
 
 				rowData = rowData.replaceAll("'", "");
@@ -620,8 +621,8 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 				while (kyItr.hasNext()) {
 					String ky = kyItr.next();
 					if (!ky.equals(uniqueIdentifier)) {
-						updtQry += ky + "=";
-						updtQry += "'" + entryObj.get(ky) + "',";
+						updtQry += SqlSanitizationUtil.validateIdentifier(ky) + "=";
+						updtQry += "'" + SqlSanitizationUtil.escapeSqlLiteral(String.valueOf(entryObj.get(ky))) + "',";
 					}
 				}
 				updtQry = updtQry.substring(0, updtQry.length() - 1);
@@ -629,7 +630,7 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 					updtQry += " WHERE " + uniqueIdentifier + "=" + entryObj.get(uniqueIdentifier);
 
 				} else {
-					updtQry += " WHERE " + uniqueIdentifier + "='" + entryObj.get(uniqueIdentifier) + "'";
+					updtQry += " WHERE " + uniqueIdentifier + "='" + SqlSanitizationUtil.escapeSqlLiteral(String.valueOf(entryObj.get(uniqueIdentifier))) + "'";
 				}
 				attributes.put(QU, updtQry);
 				dataset.setAttributes(attributes.toString());
@@ -740,12 +741,12 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 	    if (approve) {
 	        JSONObject attributes = new JSONObject(dataset.getAttributes());
 	        JSONObject entryObj = new JSONObject(rowData);
-	        String uniqueIdentifier = attributes.getString("uniqueIdentifier");
-	 
-	        String tableName = attributes.getString("tableName");
-	 
+	        String uniqueIdentifier = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
+
+	        String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
+
 	        String query = "SELECT COUNT(*) FROM " + tableName + " WHERE " + uniqueIdentifier + "='"
-	                + entryObj.get(uniqueIdentifier) + "' AND row_status!='UNCHANGED'";
+	                + SqlSanitizationUtil.escapeSqlLiteral(String.valueOf(entryObj.get(uniqueIdentifier))) + "' AND row_status!='UNCHANGED'";
 	        JSONObject connectionDetails = new JSONObject(dataset.getDatasource().getConnectionDetails());
 	        try (Connection conn = getDbConnection(connectionDetails);
 	             PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -773,15 +774,15 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 		try {
 			JSONObject attributes = new JSONObject(dataset.getAttributes());
 
-			String tableName = attributes.getString("tableName");
-			String uniqueIdentifier = attributes.getString("uniqueIdentifier");
+			String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
+			String uniqueIdentifier = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
 			if (tableName != null && uniqueIdentifier != null) {
 
 				logger.info("Updating {} entry in {}", businessKeyId, tableName);
 				String updtQry = "UPDATE " + tableName + " SET ";
 						updtQry += "_extras" + "=";
-						updtQry += "'" + rowData + "'";
-					updtQry += " WHERE " + uniqueIdentifier + "=" + businessKeyId;
+						updtQry += "'" + SqlSanitizationUtil.escapeSqlLiteral(rowData) + "'";
+					updtQry += " WHERE " + uniqueIdentifier + "=" + SqlSanitizationUtil.escapeSqlLiteral(businessKeyId);
 				attributes.put(QU, updtQry);
 				dataset.setAttributes(attributes.toString());
 				try {
@@ -825,17 +826,18 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 		try {
 			JSONObject attributes = new JSONObject(dataset.getAttributes());
 
-			String tableName = attributes.getString("tableName");
-			String uniqueIdentifier = attributes.getString("uniqueIdentifier");
+			String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
+			String uniqueIdentifier = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
 			if (tableName != null && uniqueIdentifier != null) {
 
 				logger.info("Updating {} entry in {}", businessKeyId, tableName);
+				String sanitizedBizKeyId = SqlSanitizationUtil.escapeSqlLiteral(businessKeyId);
 
 			String updateQuery = "UPDATE " + tableName + " SET extra_time = (" + "SELECT extra_time FROM "
-						+ tableName + "_task_durations " + "WHERE business_key = '" + businessKeyId + "' "
+						+ tableName + "_task_durations " + "WHERE business_key = '" + sanitizedBizKeyId + "' "
 						+ "AND id = (" + "SELECT MAX(id) FROM " + tableName + "_task_durations "
-						+ "WHERE business_key = '" + businessKeyId + "' " + "AND extra_time IS NOT NULL)" + ")"
-						+ " WHERE business_key_ = '" + businessKeyId + "';";
+						+ "WHERE business_key = '" + sanitizedBizKeyId + "' " + "AND extra_time IS NOT NULL)" + ")"
+						+ " WHERE business_key_ = '" + sanitizedBizKeyId + "';";
 
 				attributes.put(QU, updateQuery);
 				dataset.setAttributes(attributes.toString());
@@ -996,7 +998,7 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 		String whereClause = this.assembleSearchParams(searchParams, allowedProps);
 		query = query.replace(";", "");
 		if (attributes.has("selectClauseParams"))
-			query = "SELECT " + attributes.getString("selectClauseParams") + " from ( " + query + " ) ta ";
+			query = "SELECT " + SqlSanitizationUtil.validateSelectClause(attributes.getString("selectClauseParams")) + " from ( " + query + " ) ta ";
 		else
 			query = "SELECT * from ( " + query + " ) ta ";
 		/** ta is table alias **/
@@ -1988,8 +1990,8 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 	public String applyTag(ICIPDataset dataset, String data) {
 		String resStr = "";
 		JSONObject attributes = new JSONObject(dataset.getAttributes());
-		String tableName = attributes.getString("tableName");
-		String uniqueIdentifier = attributes.getString("uniqueIdentifier");
+		String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
+		String uniqueIdentifier = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
 		if (tableName != null && !tableName.trim().isEmpty()) {
 			JSONObject dataJobj = new JSONObject(data);
 			JSONObject propObj = new JSONObject(dataJobj.get("taggingDetails").toString());
@@ -2129,8 +2131,8 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 		String resp = "";
 		try {
 			JSONObject attributes = new JSONObject(dataset.getAttributes());
-			String tableName = attributes.getString("tableName");
-			String uniqueIdentifier = attributes.getString("uniqueIdentifier");
+			String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
+			String uniqueIdentifier = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
 			String deleteQry = "";
 			if (tableName != null && uniqueIdentifier != null && uniqueIdentifier != "") {
 				logger.info("Deleting entry in " + tableName);
@@ -2139,9 +2141,9 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 				String uniqueColValue = "";
 				if (rowMap.containsKey(uniqueIdentifier))
 
-					uniqueColValue = rowMap.get(uniqueIdentifier).toString();
+					uniqueColValue = SqlSanitizationUtil.escapeSqlLiteral(rowMap.get(uniqueIdentifier).toString());
 				if (approve) {
-					deleteQry = "UPDATE" + tableName + "SET row_status=DELETED WHERE" + uniqueIdentifier + " = " + "'"
+					deleteQry = "UPDATE " + tableName + " SET row_status='DELETED' WHERE " + uniqueIdentifier + " = " + "'"
 							+ uniqueColValue + "'";
 				} else {
 					deleteQry = "DELETE FROM " + tableName + " WHERE " + uniqueIdentifier + " = " + "'" + uniqueColValue
@@ -2218,7 +2220,7 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 		String action = "";
 		try {
 			JSONObject attributes = new JSONObject(dataset.getAttributes());
-			String tableName = attributes.getString("tableName");
+			String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
 			JSONObject entryObj = new JSONObject(rowData);
 			Map<String, Object> rowMap = entryObj.toMap();
 			if (tableName != null && rowMap.containsKey(BID)) {
@@ -2226,10 +2228,10 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 				BID = rowMap.get("BID").toString();
 
 				if (!assignee.isEmpty() && !context.isEmpty() && !BID.isEmpty()) {
-					String assignQry = "UPDATE " + tableName + " SET action =" + action + ",assignee =" + assignee
-							+ ",context=" + context;
+					String assignQry = "UPDATE " + tableName + " SET action ='" + SqlSanitizationUtil.escapeSqlLiteral(action) + "',assignee ='" + SqlSanitizationUtil.escapeSqlLiteral(assignee)
+							+ "',context='" + SqlSanitizationUtil.escapeSqlLiteral(context) + "'";
 
-					assignQry += " WHERE BID ='" + entryObj.get("BID") + "'";
+					assignQry += " WHERE BID ='" + SqlSanitizationUtil.escapeSqlLiteral(String.valueOf(entryObj.get("BID"))) + "'";
 					attributes.put(QU, assignQry);
 					dataset.setAttributes(attributes.toString());
 					try {
@@ -2329,9 +2331,9 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 	        throws NoSuchAlgorithmException, SQLException {
 	    JSONObject attributes = new JSONObject(dataset.getAttributes());
 	    JSONObject entryObj = new JSONObject(rowData);
-	    String uniqueIdentifier = attributes.getString("uniqueIdentifier");
- 
-	    String tableName = attributes.getString("tableName");
+	    String uniqueIdentifier = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
+
+	    String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
 	    if (tableName != null && !uniqueIdentifier.isEmpty()) {
  
 	        String checkquery = String.format("SELECT COUNT(*) as count1 FROM %s WHERE %s = ? AND row_status <> ?",
@@ -2368,13 +2370,13 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 		try {
 			JSONObject attributes = new JSONObject(dataset.getAttributes());
 			JSONObject entryObj = new JSONObject(rowData);
-			String tableName = attributes.getString("tableName");
-			String uniqueIdentifier = attributes.getString("uniqueIdentifier");
+			String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
+			String uniqueIdentifier = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
 
 			Map<String, Object> rowMap = entryObj.toMap();
 			String uniqueColValue = "";
 			if (rowMap.containsKey(uniqueIdentifier))
-				uniqueColValue = rowMap.get(uniqueIdentifier).toString();
+				uniqueColValue = SqlSanitizationUtil.escapeSqlLiteral(rowMap.get(uniqueIdentifier).toString());
 			if (dataset.getSchema() != null) {
 				org.json.JSONArray schema = new org.json.JSONArray(dataset.getSchema().getSchemavalue());
 
@@ -2405,12 +2407,12 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 				while (kyItr.hasNext()) {
 					String ky = kyItr.next();
 					if (!ky.equals(uniqueIdentifier)) {
-						updtQry += ky + "=";
-						updtQry += "'" + entryObj.get(ky) + "',";
+						updtQry += SqlSanitizationUtil.validateIdentifier(ky) + "=";
+						updtQry += "'" + SqlSanitizationUtil.escapeSqlLiteral(String.valueOf(entryObj.get(ky))) + "',";
 					}
 				}
 				updtQry = updtQry.substring(0, updtQry.length() - 1);
-				updtQry += " WHERE " + uniqueIdentifier + "='" + entryObj.get(uniqueIdentifier)
+				updtQry += " WHERE " + uniqueIdentifier + "='" + SqlSanitizationUtil.escapeSqlLiteral(String.valueOf(entryObj.get(uniqueIdentifier)))
 						+ "' AND row_status='UPDATED'";
 				try {
 					attributes.put(QU, qrystatusdetached);
@@ -2536,7 +2538,7 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 			Class<T> clazz) throws SQLException {
 		JSONObject connectionDetails = new JSONObject(dataset.getDatasource().getConnectionDetails());
 		JSONObject attributes = new JSONObject(dataset.getAttributes());
-		String table = String.format("%s_%s", attributes.getString("tableName"), "audit");
+		String table = String.format("%s_%s", SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName")), "audit");
 		DbSpec spec = new DbSpec();
 		DbSchema schema = spec.addDefaultSchema();
 		DbTable cTable = schema.addTable(table);
@@ -2588,8 +2590,8 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 	private JSONObject checkIfEncrypted(JSONObject entryObj, ICIPDataset dataset, Boolean newentry)
 			throws NoSuchAlgorithmException, ValidationException, JSONException, SQLException {
 		JSONObject attributes = new JSONObject(dataset.getAttributes());
-		String tableName = attributes.getString("tableName");
-		String uniqueIdentifier = attributes.getString("uniqueIdentifier");
+		String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
+		String uniqueIdentifier = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
 		String colNames = "";
 		String colValues = "";
 		byte[] salt;
@@ -2656,8 +2658,8 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 	private JSONObject checkIfDecrypted(JSONObject entryObj, ICIPDataset dataset)
 			throws NoSuchAlgorithmException, ValidationException, JSONException, SQLException {
 		JSONObject attributes = new JSONObject(dataset.getAttributes());
-		String tableName = attributes.getString("tableName");
-		String uniqueIdentifier = attributes.getString("uniqueIdentifier");
+		String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
+		String uniqueIdentifier = SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"));
 		String salt = getsaltfromtable(dataset, uniqueIdentifier, entryObj.get(uniqueIdentifier).toString(), tableName);
 
 		JSONArray schema = new JSONArray(dataset.getSchema().getSchemavalue());
@@ -2772,7 +2774,7 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 		ICIPDataAuditResponse resp = new ICIPDataAuditResponse("", Operation.INSERT, Status.ERROR, "", dataset, 0);
 		String assignee = "unassigned";
 		JSONObject attributes = new JSONObject(dataset.getAttributes());
-		String tableName = attributes.getString("tableName");
+		String tableName = SqlSanitizationUtil.validateIdentifier(attributes.getString("tableName"));
 		if (tableName != null) {
 			logger.info(marker, "Inserting entries in " + tableName);
 			String colNames = "";
@@ -2791,7 +2793,7 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 				while (kyItr.hasNext()) {
 					String ky = kyItr.next();
 					if (!ky.equals("action")) {
-						colValues += "'" + entryObj.get(ky) + "',";
+						colValues += "'" + SqlSanitizationUtil.escapeSqlLiteral(String.valueOf(entryObj.get(ky))) + "',";
 					}
 				}
 				colValues = colValues.substring(0, colValues.length() - 1);
@@ -2803,7 +2805,7 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 			while (kyItr.hasNext()) {
 				String ky = kyItr.next();
 				if (!ky.equals("action")) {
-					colNames += "" + ky + ",";
+					colNames += "" + SqlSanitizationUtil.validateIdentifier(ky) + ",";
 				}
 			}
 			colValues = colValues.substring(0, colValues.length() - 3);
@@ -2814,8 +2816,8 @@ public abstract class ICIPDataSetServiceUtilSqlAbstract extends ICIPDataSetServi
 				Iterator<String> dfltValItr = dfltVals.keys();
 				while (dfltValItr.hasNext()) {
 					String ky = dfltValItr.next();
-					colNames += "`" + ky + "`,";
-					colValues += "'" + dfltVals.get(ky) + "',";
+					colNames += "`" + SqlSanitizationUtil.validateIdentifier(ky) + "`,";
+					colValues += "'" + SqlSanitizationUtil.escapeSqlLiteral(String.valueOf(dfltVals.get(ky))) + "',";
 				}
 			}
 			colNames = colNames.substring(0, colNames.length() - 1);
