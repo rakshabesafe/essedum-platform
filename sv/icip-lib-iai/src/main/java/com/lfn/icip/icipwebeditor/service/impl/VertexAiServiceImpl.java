@@ -83,23 +83,33 @@ public class VertexAiServiceImpl implements ICIPPromptChatModel {
 		
 		ICIPPrompts icipPrompt= icipPromptService.getPromptByNameAndOrg(body.getString("prompt_name"),body.getString("organization"));
 		JSONObject jsonContent=new JSONObject(icipPrompt.getJson_content());
-		String provider = body.getString("provider");
+		String providerInput = body.getString("provider");
+		// Validate provider against allowlist pattern to prevent injection
+		if (providerInput == null || !providerInput.matches("^[a-zA-Z0-9_\\-]+$")) {
+			throw new IllegalArgumentException("Invalid provider name");
+		}
+		String provider = providerInput;
 		Boolean isTransform = false;
 		String transformScript = "";
+		boolean providerFound = false;
 		if(icipPrompt.getProviders() != null) {
 		JSONArray providersArray = new JSONArray(icipPrompt.getProviders());
 		for(int i = 0; i < providersArray.length(); i++)
 		{
 		      JSONObject obj = providersArray.getJSONObject(i);
-		      if((obj.has("friendly_name") && obj.getString("friendly_name").equals(body.getString("provider"))) || obj.getString("name").equals(body.getString("provider")))
+		      if((obj.has("friendly_name") && obj.getString("friendly_name").equals(providerInput)) || obj.getString("name").equals(providerInput))
 		    	  {
 		    	  provider = obj.getString("name");
+		    	  providerFound = true;
 		    	  if(obj.optBoolean("transform")) {
 		    		  isTransform = true;
 		    		  transformScript = obj.optString("transformScript");
 		    	  }
 		    	  }
 		      
+		}
+		if (!providerFound) {
+			throw new IllegalArgumentException("Provider not found in allowed providers list");
 		}
 		}
 		JSONArray arrayOfTemplates= jsonContent.getJSONArray("templates");
@@ -145,6 +155,9 @@ public class VertexAiServiceImpl implements ICIPPromptChatModel {
 	    }
 	    
 	    if(isTransform) {
+			if (transformScript == null || transformScript.isBlank()) {
+				throw new IllegalArgumentException("Transform script is empty or missing");
+			}
 			StringBuilder scriptBuilder = new StringBuilder();
 			transformScript = transformScript.substring(0, transformScript.length());
 			List<String> scriptLines = new ArrayList<String>(Arrays.asList(transformScript.split("\\\\n")));
@@ -154,13 +167,18 @@ public class VertexAiServiceImpl implements ICIPPromptChatModel {
 			});
 			transformScript = scriptBuilder.toString();
 
+			// Sanitize the Answer before binding to prevent injection
+			if (Answer == null) {
+				Answer = "";
+			}
+
 			Binding binding = new Binding();
 			binding.setProperty("response", Answer);
 
 			GroovyShell shell = GroovySandboxUtil.createSandboxedShell(binding);
 			Object transformedResult = shell.evaluate(new StringReader(transformScript));
 
-			Answer = transformedResult.toString();
+			Answer = transformedResult != null ? transformedResult.toString() : "";
 		}
 
 	    
