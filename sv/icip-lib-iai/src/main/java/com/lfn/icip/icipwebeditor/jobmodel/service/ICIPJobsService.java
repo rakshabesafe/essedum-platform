@@ -503,7 +503,7 @@ public class ICIPJobsService implements IICIPJobsService {
 		SSLContext sslContext = getSslContext(trustAllCerts);
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.build();
 		Request requestokHttp = new Request.Builder().url(url).addHeader("accept", "application/json").build();
 		logger.info("getLog request " + requestokHttp.toString());
@@ -1087,7 +1087,7 @@ public class ICIPJobsService implements IICIPJobsService {
 		SSLContext sslContext = getSslContext(trustAllCerts);
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.connectTimeout(50, TimeUnit.SECONDS).readTimeout(50, TimeUnit.SECONDS)
 				.writeTimeout(50, TimeUnit.SECONDS).build();
 		Request requestokHttp = new Request.Builder().url(url).addHeader("Content-Type", "application/json")
@@ -1111,7 +1111,7 @@ public class ICIPJobsService implements IICIPJobsService {
 		SSLContext sslContext = getSslContext(trustAllCerts);
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.connectTimeout(50, TimeUnit.SECONDS).readTimeout(50, TimeUnit.SECONDS)
 				.writeTimeout(50, TimeUnit.SECONDS).build();
 		String logUrl = url + "/" + jobId + "/getLog";
@@ -1136,7 +1136,7 @@ public class ICIPJobsService implements IICIPJobsService {
 		SSLContext sslContext = getSslContext(trustAllCerts);
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.connectTimeout(50, TimeUnit.SECONDS).readTimeout(50, TimeUnit.SECONDS)
 				.writeTimeout(50, TimeUnit.SECONDS).build();
 		String logUrl = url + "/" + jobId + "/stop";

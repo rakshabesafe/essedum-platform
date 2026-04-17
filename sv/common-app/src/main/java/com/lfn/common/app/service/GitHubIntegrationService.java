@@ -114,7 +114,7 @@ public class GitHubIntegrationService {
 
         return new OkHttpClient.Builder()
             .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-            .hostnameVerifier((hostname, session) -> true)
+            .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .build();

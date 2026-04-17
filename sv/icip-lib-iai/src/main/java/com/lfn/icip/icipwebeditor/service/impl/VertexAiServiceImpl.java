@@ -77,8 +77,7 @@ public class VertexAiServiceImpl implements ICIPPromptChatModel {
 	            sc.init(null, trustAllCerts, new java.security.SecureRandom());
 	            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 	 
-	            HostnameVerifier allHostsValid = (hostname, session) -> true;
-	            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+	            HttpsURLConnection.setDefaultHostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 	        }catch (Exception e) {
 	            log.error("Failed to configure SSL verification", e);
 	        }

@@ -142,7 +142,7 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
 
             OkHttpClient customHttpClient = new OkHttpClient.Builder()
                     .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                    .hostnameVerifier((hostname, session) -> true)
+                    .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE)
                     .build();
 
             if (url.contains("blob")) {
@@ -316,7 +316,7 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
 			SSLContext sslContext = getSslContext(trustAllCerts);
 			OkHttpClient customHttpClient = new OkHttpClient.Builder()
 					.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-					.hostnameVerifier((hostname, session) -> true).build();
+					.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE).build();
 			// Build the MinioClient with the provided connection details
 			MinioClient minioClient = MinioClient.builder()
 					.endpoint(url)
@@ -392,9 +392,9 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
         }
         TrustManager[] trustAllCerts = getTrustAllCerts();
         SSLContext sslContext = getSslContext(trustAllCerts);
-        //HostnameVerifier myVerifier = (hostname, session) -> true;
+        //HostnameVerifier myVerifier = com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE;
         ClientConfiguration clientConfiguration = new ClientConfiguration();
-        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
         clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
         JSONObject attr = new JSONObject(attributes);
         String bucketName = attr.optString("bucket");
@@ -468,7 +468,7 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
             String secretKey = connectionDetails.optString("secretKey");
             TrustManager[] trustAllCerts = getTrustAllCerts();
             SSLContext sslContext = getSslContext(trustAllCerts);
-            HostnameVerifier myVerifier = (hostname, session) -> true;
+            HostnameVerifier myVerifier = com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE;
             ClientConfiguration clientConfiguration = new ClientConfiguration();
             ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, myVerifier);
             clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
@@ -519,9 +519,9 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
         BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         TrustManager[] trustAllCerts = getTrustAllCerts();
         SSLContext sslContext = getSslContext(trustAllCerts);
-        //HostnameVerifier myVerifier = (hostname, session) -> true;
+        //HostnameVerifier myVerifier = com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE;
         ClientConfiguration clientConfiguration = new ClientConfiguration();
-        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
         clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
         System.setProperty(SDKGlobalConfiguration.DISABLE_CERT_CHECKING_SYSTEM_PROPERTY, "true");
         TransferManager xfer_mgr = TransferManagerBuilder.standard().withS3Client(AmazonS3ClientBuilder.standard().withClientConfiguration(clientConfiguration)
@@ -715,7 +715,7 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
             SSLContext sslContext = getSslContext(trustAllCerts);
             customHttpClient = new OkHttpClient.Builder()
                     .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                    .hostnameVerifier((hostname, session) -> true).build();
+                    .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE).build();
         } catch (Exception e) {
             logger.error("Error initializing custom HTTP client: " + e.getMessage());
             return allObjectDetails;
@@ -828,7 +828,7 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
             SSLContext sslContext = getSslContext(trustAllCerts);
             customHttpClient = new OkHttpClient.Builder()
                     .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                    .hostnameVerifier((hostname, session) -> true).build();
+                    .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE).build();
         } catch (Exception e) {
             logger.error("Error initializing custom HTTP client: " + e.getMessage());
             return 0L;

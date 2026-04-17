@@ -1054,7 +1054,7 @@ public class ICIPRemoteExecutorJob extends ICIPCommonJobServiceUtil implements I
 		if (sslContext != null) {
 			OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 			newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-			newBuilder.hostnameVerifier((hostname, session) -> true);
+			newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 			OkHttpClient client = newBuilder.build();
 			// MediaType mediaType = MediaType.parse("application/json");
 			// JSONObject bodyObject = new JSONObject();
@@ -1088,7 +1088,7 @@ public class ICIPRemoteExecutorJob extends ICIPCommonJobServiceUtil implements I
 		if (sslContext != null) {
 			OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 			newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-			newBuilder.hostnameVerifier((hostname, session) -> true);
+			newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 			OkHttpClient client = newBuilder.build();
 			Request requestokHttp = new Request.Builder().url(url).addHeader("accept", "application/json").build();
 			logger.info("getLog request " + requestokHttp.toString());
@@ -1181,7 +1181,7 @@ public class ICIPRemoteExecutorJob extends ICIPCommonJobServiceUtil implements I
 			if (sslContext != null) {
 				OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 				newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-				newBuilder.hostnameVerifier((hostname, session) -> true);
+				newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 				OkHttpClient client = newBuilder.build();
 				MediaType mediaType = MediaType.parse("application/json");
 				RequestBody requestBody = RequestBody.create(payload, mediaType);

@@ -831,7 +831,7 @@ public class ICIPFolderService {
         // Build custom HTTP client with SSL configuration
         OkHttpClient customHttpClient = new OkHttpClient.Builder()
                 .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                .hostnameVerifier((hostname, session) -> true)
+                .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE)
                 .build();
 
         // Build and return MinIO client
@@ -877,7 +877,7 @@ public class ICIPFolderService {
         // Build custom HTTP client with SSL configuration
         OkHttpClient customHttpClient = new OkHttpClient.Builder()
                 .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                .hostnameVerifier((hostname, session) -> true)
+                .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE)
                 .build();
 
         // Build and return MinIO client

@@ -450,7 +450,7 @@ public class GitHubService {
 			}
 			TrustManager[] trustAllCerts = getTrustAllCerts();
 			SSLContext sslContext = getSslContext(trustAllCerts);
-			HostnameVerifier myVerifier = (hostname, session) -> true;
+			HostnameVerifier myVerifier = com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE;
 			ClientConfiguration clientConfiguration = new ClientConfiguration();
 			ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, myVerifier);
 			clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);

@@ -1698,7 +1698,7 @@ return Flux.just(datasetRepository.findById((id)).get()).defaultIfEmpty(new ICIP
 		TrustManager[] trustAllCerts = getTrustAllCerts();
 		SSLContext sslContext = getSslContext(trustAllCerts);
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
-		ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+		ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
 		JSONObject attr = new JSONObject(dataset.getAttributes());
 		String bucketName = attr.optString("bucket");

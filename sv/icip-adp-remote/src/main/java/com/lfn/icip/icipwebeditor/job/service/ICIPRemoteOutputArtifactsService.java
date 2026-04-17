@@ -75,7 +75,7 @@ public class ICIPRemoteOutputArtifactsService implements IICIPOutputArtifactsSer
 		if (sslContext != null) {
 			OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 			newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-			newBuilder.hostnameVerifier((hostname, session) -> true);
+			newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 			OkHttpClient client = newBuilder.build();
 			Request requestokHttp = new Request.Builder().url(url).addHeader("accept", "application/json").build();
 			logger.info("getOutputArtifacts request " + requestokHttp.toString());

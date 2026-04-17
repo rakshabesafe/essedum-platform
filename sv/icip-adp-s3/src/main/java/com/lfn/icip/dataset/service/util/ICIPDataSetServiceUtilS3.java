@@ -224,7 +224,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             if (sslContext != null) {
                 OkHttpClient customHttpClient = new OkHttpClient.Builder()
                         .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                        .hostnameVerifier((hostname, session) -> true).build();
+                        .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE).build();
                 MinioClient mc = minioClient = MinioClient.builder().endpoint(url).credentials(accessKey, secretKey)
                         .httpClient(customHttpClient).build();
                 boolean found = mc.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
@@ -254,7 +254,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         if (sslContext != null) {
             OkHttpClient customHttpClient = new OkHttpClient.Builder()
                     .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                    .hostnameVerifier((hostname, session) -> true).build();
+                    .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE).build();
 
             String connectStr = String.format(
                     "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
@@ -382,7 +382,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         SSLContext sslContext = getSslContext(trustAllCerts);
         if (sslContext != null) {
             HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+            HttpsURLConnection.setDefaultHostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
         }
 
         return StorageOptions.newBuilder()
@@ -414,7 +414,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             SSLContext sslContext = getSslContext(trustAllCerts);
             if (sslContext != null) {
                 HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-                HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+                HttpsURLConnection.setDefaultHostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
             }
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectKey).build();
 
@@ -535,7 +535,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         if (sslContext != null) {
             OkHttpClient customHttpClient = new OkHttpClient.Builder()
                     .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                    .hostnameVerifier((hostname, session) -> true).build();
+                    .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE).build();
             String connectStr = String.format(
                     "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
                     accessKey, secretKey);
@@ -875,7 +875,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         TrustManager[] trustAllCerts = getTrustAllCerts();
         SSLContext sslContext = getSslContext(trustAllCerts);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
-        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
         clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
         JSONObject attr = new JSONObject(dataset.getAttributes());
         String bucketName = attr.optString(BUCKET_KEY);
@@ -1012,7 +1012,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             TrustManager[] trustAllCerts = getTrustAllCerts();
             SSLContext sslContext = getSslContext(trustAllCerts);
             ClientConfiguration clientConfiguration = new ClientConfiguration();
-            ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+            ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
             clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
             JSONObject attribute = new JSONObject(dataset.getAttributes());
             String bucketName = attribute.optString(BUCKET_KEY);
@@ -1075,7 +1075,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         TrustManager[] trustAllCerts = getTrustAllCerts();
         SSLContext sslContext = getSslContext(trustAllCerts);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
-        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
         clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
         System.setProperty(SDKGlobalConfiguration.DISABLE_CERT_CHECKING_SYSTEM_PROPERTY, "true");
         if (endpointUrl != null) {
@@ -1163,7 +1163,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             TrustManager[] trustAllCerts = getTrustAllCerts();
             SSLContext sslContext = getSslContext(trustAllCerts);
             ClientConfiguration clientConfiguration = new ClientConfiguration();
-            ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+            ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
             clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
             System.setProperty(SDKGlobalConfiguration.DISABLE_CERT_CHECKING_SYSTEM_PROPERTY, "true");
             TransferManager transferManager = TransferManagerBuilder.standard()

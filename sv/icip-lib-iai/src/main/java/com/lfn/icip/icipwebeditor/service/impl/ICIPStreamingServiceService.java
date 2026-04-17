@@ -467,7 +467,7 @@ public class ICIPStreamingServiceService implements IICIPStreamingServiceService
 						.setSSLSocketFactory(SSLConnectionSocketFactoryBuilder.create()
 								.setSslContext(
 										SSLContextBuilder.create().loadTrustMaterial(acceptingTrustStrategy).build())
-								.setHostnameVerifier(NoopHostnameVerifier.INSTANCE).build())
+								.setHostnameVerifier(javax.net.ssl.HttpsURLConnection.getDefaultHostnameVerifier()).build())
 						.build())
 				.build();
 		HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();

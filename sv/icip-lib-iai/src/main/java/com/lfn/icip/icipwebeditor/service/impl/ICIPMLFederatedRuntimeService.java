@@ -216,7 +216,7 @@ public class ICIPMLFederatedRuntimeService {
 		// Create OkHttp client
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.build();
 
 		// Create RequestBody
@@ -354,7 +354,7 @@ public class ICIPMLFederatedRuntimeService {
 		// Create OkHttp client
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.connectTimeout(50, TimeUnit.SECONDS).readTimeout(50, TimeUnit.SECONDS)
 				.writeTimeout(50, TimeUnit.SECONDS).build();
 
@@ -390,7 +390,7 @@ public class ICIPMLFederatedRuntimeService {
 		// Create OkHttp client
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.build();
 
 		// Create RequestBody
@@ -425,7 +425,7 @@ public class ICIPMLFederatedRuntimeService {
 		// Create OkHttp client
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.build();
 
 		// Create RequestBody
