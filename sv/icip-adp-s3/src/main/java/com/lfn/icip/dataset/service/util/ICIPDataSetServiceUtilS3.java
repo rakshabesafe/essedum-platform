@@ -254,7 +254,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         if (sslContext != null) {
             OkHttpClient customHttpClient = new OkHttpClient.Builder()
                     .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                    .hostnameVerifier((hostname, session) => true).build();
+                    .hostnameVerifier((hostname, session) -> true).build();
 
             String connectStr = String.format(
                     "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
@@ -1252,10 +1252,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                     while ((line = reader.readLine()) != null) {
                                         textBuilder.append(line);
                                     }
-                                    String[] qa = textBuilder.toString().split("Q\\. ");
+                                    String[] qa = textBuilder.toString().split("Q[.] ");
                                     List<Map<String, String>> keyVal = new ArrayList<>();
                                     for (String i : qa) {
-                                        String[] values = i.split("A\\.");
+                                        String[] values = i.split("A[.]", 2);
                                         if (values.length == 2) {
                                             String ques = values[0];
                                             String ans = values[1];
@@ -1290,10 +1290,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                     while ((line = reader.readLine()) != null) {
                                         textBuilder.append(line);
                                     }
-                                    String[] qa = textBuilder.toString().split("Q\\. ");
+                                    String[] qa = textBuilder.toString().split("Q[.] ");
                                     List<Map<String, String>> keyVal = new ArrayList<>();
                                     for (String i : qa) {
-                                        String[] values = i.split("A\\.");
+                                        String[] values = i.split("A[.]", 2);
                                         if (values.length == 2) {
                                             String ques = values[0];
                                             String ans = values[1];
@@ -1448,10 +1448,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                 while ((line = reader.readLine()) != null) {
                                     textBuilder.append(line);
                                 }
-                                String[] qa = textBuilder.toString().split("Q\\. ");
+                                String[] qa = textBuilder.toString().split("Q[.] ");
                                 List<Map<String, String>> keyVal = new ArrayList<>();
                                 for (String i : qa) {
-                                    String[] values = i.split("A\\.");
+                                    String[] values = i.split("A[.]", 2);
                                     if (values.length == 2) {
                                         String ques = values[0];
                                         String ans = values[1];
@@ -1486,10 +1486,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                 while ((line = reader.readLine()) != null) {
                                     textBuilder.append(line);
                                 }
-                                String[] qa = textBuilder.toString().split("Q\\. ");
+                                String[] qa = textBuilder.toString().split("Q[.] ");
                                 List<Map<String, String>> keyVal = new ArrayList<>();
                                 for (String i : qa) {
-                                    String[] values = i.split("A\\.");
+                                    String[] values = i.split("A[.]", 2);
                                     if (values.length == 2) {
                                         String ques = values[0];
                                         String ans = values[1];
@@ -1641,10 +1641,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                 while ((line = reader.readLine()) != null) {
                                     textBuilder.append(line);
                                 }
-                                String[] qa = textBuilder.toString().split("Q\\. ");
+                                String[] qa = textBuilder.toString().split("Q[.] ");
                                 List<Map<String, String>> keyVal = new ArrayList<>();
                                 for (String i : qa) {
-                                    String[] values = i.split("A\\.");
+                                    String[] values = i.split("A[.]", 2);
                                     if (values.length == 2) {
                                         String ques = values[0];
                                         String ans = values[1];
@@ -1679,10 +1679,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                 while ((line = reader.readLine()) != null) {
                                     textBuilder.append(line);
                                 }
-                                String[] qa = textBuilder.toString().split("Q\\. ");
+                                String[] qa = textBuilder.toString().split("Q[.] ");
                                 List<Map<String, String>> keyVal = new ArrayList<>();
                                 for (String i : qa) {
-                                    String[] values = i.split("A\\.");
+                                    String[] values = i.split("A[.]", 2);
                                     if (values.length == 2) {
                                         String ques = values[0];
                                         String ans = values[1];
