@@ -572,7 +572,8 @@ public class ICIPRemoteSagemakerJob extends ICIPCommonJobServiceUtil implements 
 				return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
-			throw new EssedumException(e.getMessage());
+			logger.error("Sagemaker job execution failed", e);
+			throw new EssedumException("Sagemaker job execution failed");
 
 		}
 

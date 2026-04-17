@@ -45,19 +45,11 @@ public class GlobalControllerExceptionHandler {
 	 */
 	@ExceptionHandler(GitHubAuthenticationException.class)
 	public ResponseEntity<ErrorResponse> handleGitHubAuthenticationException(GitHubAuthenticationException ex, WebRequest request) {
-		logger.error("GitHub authentication failed: {}", ex.getMessage());
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.UNAUTHORIZED.value(),
-				"Authentication Failed",
-				ex.getMessage(),
-				getCauseMessage(ex),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("Please authenticate with GitHub OAuth or provide a valid GitHub Personal Access Token (PAT) in the Authorization header.");
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+		logger.error("GitHub authentication failed: {}", ex.getMessage(), ex);
+		return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication Failed",
+				"GitHub authentication failed. Please check your credentials.",
+				"Please authenticate with GitHub OAuth or provide a valid GitHub Personal Access Token (PAT) in the Authorization header.",
+				request);
 	}
 
 	/**
@@ -69,19 +61,11 @@ public class GlobalControllerExceptionHandler {
 	 */
 	@ExceptionHandler(OAuthException.class)
 	public ResponseEntity<ErrorResponse> handleOAuthException(OAuthException ex, WebRequest request) {
-		logger.error("OAuth operation failed: {}", ex.getMessage());
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.UNAUTHORIZED.value(),
-				"OAuth Error",
-				ex.getMessage(),
-				getCauseMessage(ex),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("Please re-authenticate with GitHub OAuth. Ensure the authentication flow is completed successfully.");
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+		logger.error("OAuth operation failed: {}", ex.getMessage(), ex);
+		return buildErrorResponse(HttpStatus.UNAUTHORIZED, "OAuth Error",
+				"OAuth authentication failed. Please re-authenticate.",
+				"Please re-authenticate with GitHub OAuth. Ensure the authentication flow is completed successfully.",
+				request);
 	}
 
 	/**
@@ -93,19 +77,11 @@ public class GlobalControllerExceptionHandler {
 	 */
 	@ExceptionHandler(AuthenticationFailedException.class)
 	public ResponseEntity<ErrorResponse> handleAuthenticationFailed(AuthenticationFailedException ex, WebRequest request) {
-		logger.error("Authentication failed: {}", ex.getMessage());
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.UNAUTHORIZED.value(),
-				"Authentication Failed",
-				ex.getMessage(),
-				getCauseMessage(ex),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("Verify your username and password. Ensure your account is active and not locked.");
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+		logger.error("Authentication failed: {}", ex.getMessage(), ex);
+		return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication Failed",
+				"Authentication failed. Please verify your credentials.",
+				"Verify your username and password. Ensure your account is active and not locked.",
+				request);
 	}
 
 	/**
@@ -117,19 +93,11 @@ public class GlobalControllerExceptionHandler {
 	 */
 	@ExceptionHandler({AuthenticationException.class, BadCredentialsException.class})
 	public ResponseEntity<ErrorResponse> handleSecurityAuthenticationException(Exception ex, WebRequest request) {
-		logger.error("Security authentication failed: {}", ex.getMessage());
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.UNAUTHORIZED.value(),
-				"Authentication Failed",
-				"Invalid username or password",
-				ex.getMessage(),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("Verify your credentials and try again. Contact administrator if you've forgotten your password.");
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+		logger.error("Security authentication failed: {}", ex.getMessage(), ex);
+		return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication Failed",
+				"Invalid username or password.",
+				"Verify your credentials and try again. Contact administrator if you've forgotten your password.",
+				request);
 	}
 
 	/**
@@ -141,19 +109,11 @@ public class GlobalControllerExceptionHandler {
 	 */
 	@ExceptionHandler(TokenException.class)
 	public ResponseEntity<ErrorResponse> handleTokenException(TokenException ex, WebRequest request) {
-		logger.error("Token operation failed: {}", ex.getMessage());
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.UNAUTHORIZED.value(),
-				"Token Error",
-				ex.getMessage(),
-				getCauseMessage(ex),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("Your session may have expired. Please login again to get a new token.");
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+		logger.error("Token operation failed: {}", ex.getMessage(), ex);
+		return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Token Error",
+				"Token validation failed or session has expired.",
+				"Your session may have expired. Please login again to get a new token.",
+				request);
 	}
 
 	/**
@@ -165,24 +125,11 @@ public class GlobalControllerExceptionHandler {
 	 */
 	@ExceptionHandler(UnauthorizedAccessException.class)
 	public ResponseEntity<ErrorResponse> handleUnauthorizedAccess(UnauthorizedAccessException ex, WebRequest request) {
-		logger.error("Unauthorized access attempt: {}", ex.getMessage());
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.FORBIDDEN.value(),
-				"Access Denied",
-				ex.getMessage(),
-				getCauseMessage(ex),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("You do not have permission to access this resource. Contact your administrator for access.");
-
-		// Add GitHub API documentation URL if this is a GitHub permission error
-		if (ex.getMessage() != null && ex.getMessage().contains("push access to view collaborator permission")) {
-			errorResponse.setDocumentationUrl("https://docs.github.com/rest/collaborators/collaborators#get-repository-permissions-for-a-user");
-		}
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+		logger.error("Unauthorized access attempt: {}", ex.getMessage(), ex);
+		return buildErrorResponse(HttpStatus.FORBIDDEN, "Access Denied",
+				"You do not have permission to access this resource.",
+				"You do not have permission to access this resource. Contact your administrator for access.",
+				request);
 	}
 
 	/**
@@ -204,30 +151,10 @@ public class GlobalControllerExceptionHandler {
 	})
 	public ResponseEntity<ErrorResponse> handleCryptoException(Exception ex, WebRequest request) {
 		logger.error("Cryptographic operation failed: {}", ex.getMessage(), ex);
-
-		String errorMessage = "Cryptographic operation failed";
-		String suggestion = "Contact system administrator. This is likely a configuration issue.";
-
-		if (ex instanceof NoSuchAlgorithmException) {
-			errorMessage = "Required cryptographic algorithm is not available";
-		} else if (ex instanceof InvalidKeyException || ex instanceof InvalidKeySpecException) {
-			errorMessage = "Invalid cryptographic key";
-		} else if (ex instanceof BadPaddingException || ex instanceof IllegalBlockSizeException) {
-			errorMessage = "Data encryption/decryption failed";
-			suggestion = "The data may be corrupted or the encryption key may have changed. Contact support.";
-		}
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.INTERNAL_SERVER_ERROR.value(),
-				"Cryptographic Error",
-				errorMessage,
-				ex.getMessage(),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction(suggestion);
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+		return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Cryptographic Error",
+				"A cryptographic operation failed. Please contact the administrator.",
+				"Contact system administrator. This is likely a configuration issue.",
+				request);
 	}
 
 	/**
@@ -240,18 +167,10 @@ public class GlobalControllerExceptionHandler {
 	@ExceptionHandler(GitOperationException.class)
 	public ResponseEntity<ErrorResponse> handleGitOperationException(GitOperationException ex, WebRequest request) {
 		logger.error("Git operation failed: {}", ex.getMessage(), ex);
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.INTERNAL_SERVER_ERROR.value(),
-				"Git Operation Failed",
-				ex.getMessage(),
-				getCauseMessage(ex),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("Verify your GitHub token has the necessary permissions. Check repository name, branch, and network connectivity.");
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+		return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Git Operation Failed",
+				"A Git operation failed. Please verify your configuration.",
+				"Verify your GitHub token has the necessary permissions. Check repository name, branch, and network connectivity.",
+				request);
 	}
 
 	/**
@@ -263,19 +182,11 @@ public class GlobalControllerExceptionHandler {
 	 */
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
-		logger.error("Invalid argument: {}", ex.getMessage());
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.BAD_REQUEST.value(),
-				"Invalid Request",
-				ex.getMessage(),
-				null,
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("Check the request parameters and ensure all required fields are provided correctly.");
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+		logger.error("Invalid argument: {}", ex.getMessage(), ex);
+		return buildErrorResponse(HttpStatus.BAD_REQUEST, "Invalid Request",
+				"The request contains invalid parameters.",
+				"Check the request parameters and ensure all required fields are provided correctly.",
+				request);
 	}
 
 	/**
@@ -287,27 +198,19 @@ public class GlobalControllerExceptionHandler {
 	 */
 	@ExceptionHandler(value = {MissingServletRequestParameterException.class, JsonMappingException.class, HttpMessageNotReadableException.class})
 	public ResponseEntity<ErrorResponse> handleJsonMappingException(Exception ex, WebRequest request) {
-		logger.error("JSON parsing or request parameter error: {}", ex.getMessage());
+		logger.error("JSON parsing or request parameter error: {}", ex.getMessage(), ex);
 
-		String message = "Invalid request format or missing required parameters";
+		String message = "Invalid request format or missing required parameters.";
 		if (ex instanceof MissingServletRequestParameterException) {
 			MissingServletRequestParameterException paramEx = (MissingServletRequestParameterException) ex;
-			message = String.format("Missing required parameter: '%s' of type %s", paramEx.getParameterName(), paramEx.getParameterType());
+			message = String.format("Missing required parameter: '%s'", paramEx.getParameterName());
 		} else if (ex instanceof HttpMessageNotReadableException) {
-			message = "Invalid JSON format in request body";
+			message = "Invalid JSON format in request body.";
 		}
 
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.BAD_REQUEST.value(),
-				"Bad Request",
-				message,
-				ex.getMessage(),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("Ensure the request body is valid JSON and all required parameters are included.");
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+		return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", message,
+				"Ensure the request body is valid JSON and all required parameters are included.",
+				request);
 	}
 
 	/**
@@ -319,23 +222,16 @@ public class GlobalControllerExceptionHandler {
 	 */
 	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex, WebRequest request) {
-		logger.error("HTTP method not supported: {}", ex.getMessage());
+		logger.error("HTTP method not supported: {}", ex.getMessage(), ex);
 
 		String supportedMethods = ex.getSupportedHttpMethods() != null
 				? ex.getSupportedHttpMethods().toString()
 				: "N/A";
 
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.METHOD_NOT_ALLOWED.value(),
-				"Method Not Allowed",
-				String.format("HTTP method '%s' is not supported for this endpoint", ex.getMethod()),
-				String.format("Supported methods: %s", supportedMethods),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction(String.format("Use one of the supported HTTP methods: %s", supportedMethods));
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.METHOD_NOT_ALLOWED);
+		return buildErrorResponse(HttpStatus.METHOD_NOT_ALLOWED, "Method Not Allowed",
+				String.format("HTTP method '%s' is not supported for this endpoint.", ex.getMethod()),
+				String.format("Use one of the supported HTTP methods: %s", supportedMethods),
+				request);
 	}
 
 	/**
@@ -347,19 +243,11 @@ public class GlobalControllerExceptionHandler {
 	 */
 	@ExceptionHandler(NoHandlerFoundException.class)
 	public ResponseEntity<ErrorResponse> handleNoHandlerFound(NoHandlerFoundException ex, WebRequest request) {
-		logger.error("No handler found: {}", ex.getMessage());
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.NOT_FOUND.value(),
-				"Endpoint Not Found",
-				String.format("No endpoint found for %s %s", ex.getHttpMethod(), ex.getRequestURL()),
-				"The requested URL does not exist",
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("Verify the URL path and HTTP method. Check the API documentation for available endpoints.");
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+		logger.error("No handler found: {}", ex.getMessage(), ex);
+		return buildErrorResponse(HttpStatus.NOT_FOUND, "Endpoint Not Found",
+				"The requested endpoint does not exist.",
+				"Verify the URL path and HTTP method. Check the API documentation for available endpoints.",
+				request);
 	}
 
 	/**
@@ -372,30 +260,25 @@ public class GlobalControllerExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {
 		logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				HttpStatus.INTERNAL_SERVER_ERROR.value(),
-				"Internal Server Error",
-				"An unexpected error occurred while processing your request",
-				ex.getMessage(),
-				request.getDescription(false).replace("uri=", "")
-		);
-		errorResponse.setException(ex.getClass().getSimpleName());
-		errorResponse.setSuggestedAction("Please contact support with the error details if the problem persists.");
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+		return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
+				"An unexpected error occurred while processing your request.",
+				"Please contact support if the problem persists.",
+				request);
 	}
 
 	/**
-	 * Get the root cause message from an exception.
-	 *
-	 * @param ex the exception
-	 * @return the cause message
+	 * Build a safe error response that does not expose internal details.
 	 */
-	private String getCauseMessage(Throwable ex) {
-		if (ex.getCause() != null) {
-			return ex.getCause().getMessage();
-		}
-		return null;
+	private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String error, String message,
+			String suggestedAction, WebRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(
+				status.value(),
+				error,
+				message,
+				null,
+				request.getDescription(false).replace("uri=", "")
+		);
+		errorResponse.setSuggestedAction(suggestedAction);
+		return new ResponseEntity<>(errorResponse, status);
 	}
 }

@@ -13,6 +13,7 @@ import com.lfn.icip.icipwebeditor.service.ICIPPromptChatModel;
 import com.lfn.icip.icipwebeditor.service.ICIPPromptService;
 
 import ch.qos.logback.classic.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
 import java.security.KeyStore;
@@ -43,6 +44,8 @@ import com.lfn.icip.dataset.util.GroovySandboxUtil;
 
 @Service("vertexaichatmodel")
 public class VertexAiServiceImpl implements ICIPPromptChatModel {
+
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(VertexAiServiceImpl.class);
 
 
 	@Autowired
@@ -77,8 +80,7 @@ public class VertexAiServiceImpl implements ICIPPromptChatModel {
 	            HostnameVerifier allHostsValid = (hostname, session) -> true;
 	            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
 	        }catch (Exception e) {
-	            System.err.println("Failed to bypass SSL verification: " + e.getMessage());
-	            e.printStackTrace();
+	            log.error("Failed to configure SSL verification", e);
 	        }
 		
 		ICIPPrompts icipPrompt= icipPromptService.getPromptByNameAndOrg(body.getString("prompt_name"),body.getString("organization"));
@@ -149,9 +151,8 @@ public class VertexAiServiceImpl implements ICIPPromptChatModel {
 	//        System.out.println("RESPONSE:\n" + response);
 	        Answer = response.content().text();
 	    } catch (Exception e) {
-	//        Log("Error generating response: " + e.getMessage());
-	        Answer = "Exception in response: "+e.toString();
-	        e.printStackTrace();
+	        log.error("Error generating response", e);
+	        Answer = "An error occurred while generating the response.";
 	    }
 	    
 	    if(isTransform) {

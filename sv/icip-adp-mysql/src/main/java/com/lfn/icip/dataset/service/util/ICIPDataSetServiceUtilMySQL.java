@@ -151,7 +151,8 @@ public class ICIPDataSetServiceUtilMySQL extends ICIPDataSetServiceUtilSqlAbstra
 			try {
 				validateQuery(query);
 			} catch (SQLException e) {
-				throw new EssedumException(e.getMessage());
+				logger.error("Query validation failed", e);
+				throw new EssedumException("Query validation failed");
 			}
 
 			return true;

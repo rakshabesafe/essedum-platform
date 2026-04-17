@@ -288,7 +288,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_DATASETS_CREATE, project, headers, params, datasetbody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -330,7 +330,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_DATASETS_LIST_LIST, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 
@@ -359,7 +359,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_DATASETS_GET, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -386,7 +386,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_DATASETS_DELETE, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -432,7 +432,7 @@ public class ICIPMlopsController {
 						datasetExportBody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -489,7 +489,7 @@ public class ICIPMlopsController {
                 }
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 
 			}
 		
@@ -539,7 +539,7 @@ public class ICIPMlopsController {
 			 * JSONArray(results).toString();
 			 * 
 			 * return ResponseEntity.status(200).body(response); } catch (ParseException e)
-			 * { return ResponseEntity.status(500).body(e.getMessage()); }
+			 * { return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}"); }
 			 */
 			try {
 				Map<String, String> params = new HashMap<String, String>();
@@ -548,7 +548,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_ENDPOINTS_LIST_LIST, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 
@@ -587,7 +587,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_ENDPOINTS_GET, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -667,7 +667,7 @@ public class ICIPMlopsController {
 				return ResponseEntity.status(200).body(new JSONObject(results).toString());
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		} else {
 			Map<String, String> params = new HashMap<String, String>();
@@ -678,7 +678,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_ENDPOINTS_DELETE, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -713,7 +713,7 @@ public class ICIPMlopsController {
 			return ResponseEntity.status(200).body(new JSONObject(results).toString());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 	}
 
@@ -747,7 +747,7 @@ public class ICIPMlopsController {
 						endpointsdeploybody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -787,7 +787,7 @@ public class ICIPMlopsController {
             return ResponseEntity.status(201).body(new JSONObject(response).toString());
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
         }
     }
 
@@ -818,7 +818,7 @@ public class ICIPMlopsController {
                         endpointsdeploybody);
                 return ResponseEntity.status(200).body(results);
             } catch (Exception e) {
-                return ResponseEntity.status(500).body(e.getMessage());
+                return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
             }
         }
     }
@@ -864,7 +864,7 @@ public class ICIPMlopsController {
 						endpointsexplainbody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -898,7 +898,7 @@ public class ICIPMlopsController {
 						inferEndpointbody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -933,7 +933,7 @@ public class ICIPMlopsController {
 						endpointsUndeploybody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1089,7 +1089,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_MODELS_GET, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1119,7 +1119,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_MODELS_DELETE, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1148,7 +1148,7 @@ public class ICIPMlopsController {
 				return ResponseEntity.status(200).body(results.getResponse());
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		} else {
 			try {
@@ -1158,7 +1158,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_MODELS_EXPORT_CREATE, project, headers, params, exportModelsbody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1326,7 +1326,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.TRAINING_AUTOML_SIMPLIFIED_CREATE, project, headers, params, pipelinebody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1352,7 +1352,7 @@ public class ICIPMlopsController {
 						trainingCustomScriptbody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1402,7 +1402,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.TRAINING_ISTLIST, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1457,7 +1457,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.TRAINING_TRAIN_CREATE, project, headers, params, trainbody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1484,7 +1484,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.TRAINING_CANCEL_LIST, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1511,7 +1511,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.TRAINING_DELETE, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1538,7 +1538,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.TRAINING_GET_LIST, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1566,7 +1566,7 @@ public class ICIPMlopsController {
 						inferencePipelinebody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1593,7 +1593,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_INFERENCEPIPELINES_LIST_LIST, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1620,7 +1620,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_INFERENCEPIPELINES_DELETE, project, headers, params);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1648,7 +1648,7 @@ public class ICIPMlopsController {
 						cancelPipelinebody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -1675,7 +1675,7 @@ public class ICIPMlopsController {
 						ICIPMlOpsConstants.PROJECTS_INFERENCEPIPELINES_GET, project, headers, params, getPipelinebody);
 				return ResponseEntity.status(200).body(results);
 			} catch (Exception e) {
-				return ResponseEntity.status(500).body(e.getMessage());
+				return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 			}
 		}
 	}
@@ -2682,7 +2682,7 @@ public class ICIPMlopsController {
 			return ResponseEntity.status(200).body(response);
 
 		} catch (Exception e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 
 	}
@@ -2696,7 +2696,7 @@ public class ICIPMlopsController {
 			return ResponseEntity.status(200).body(response);
 
 		} catch (Exception e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 	}
 
@@ -2709,7 +2709,7 @@ public class ICIPMlopsController {
 			return ResponseEntity.status(200).body(response);
 
 		} catch (Exception e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 	}
 
@@ -2722,7 +2722,7 @@ public class ICIPMlopsController {
 			return ResponseEntity.status(200).body(response);
 
 		} catch (Exception e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 	}
 
@@ -2735,7 +2735,7 @@ public class ICIPMlopsController {
 			return ResponseEntity.status(200).body(response);
 
 		} catch (Exception e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 	}
 

@@ -578,8 +578,7 @@ public class GitHubService {
 					.setRemote("origin").setRemoteBranchName(repoBranch).call();
 			return git;
 		} catch (Exception e) {
-			log.error("Error due to : {}", e.getMessage());
-			e.printStackTrace();
+			log.error("Error due to : {}", e.getMessage(), e);
 			return null;
 		}
 	}

@@ -120,7 +120,7 @@ public final class CustomAuthorizationManager implements AuthorizationManager<Re
 			projectId = HeadersUtil.getProjectId(authorizationContext.getRequest());
 			roleId= HeadersUtil.getRoleId(authorizationContext.getRequest());
 		} catch (InvalidProjectRequestHeader e) {
-			e.printStackTrace();
+			log.error("Invalid project request header", e);
 		}
 		
 		if (projectId == null) {

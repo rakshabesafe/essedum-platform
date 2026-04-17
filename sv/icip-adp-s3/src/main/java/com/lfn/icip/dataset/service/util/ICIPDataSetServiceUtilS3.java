@@ -235,8 +235,8 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 throw new EssedumException(SSL_CONTEXT_ERROR_MESSAGE);
             }
         } catch (Exception e) {
-            logger.info(e.getMessage());
-            throw new EssedumException(e.getMessage());
+            logger.error("MinIO connection failed", e);
+            throw new EssedumException("Failed to connect to storage service");
         }
         return true;
     }
@@ -316,7 +316,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 logger.info("GCS connection successful. Buckets found: {}", blobsList.length());
             } catch (Exception ex) {
                 logger.error("Error listing GCS buckets: {}", ex.getMessage(), ex);
-                throw new EssedumException("Failed to list GCS buckets: " + ex.getMessage(), ex);
+                throw new EssedumException("Failed to list GCS buckets");
             }
             // If uploadFile attribute present, perform upload
             JSONObject attributes = new JSONObject(dataset.getAttributes());
@@ -405,7 +405,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         File localFile = PathValidationUtil.validatePath(uploadFile);
         if (!localFile.exists()) {
             logger.error("Local file does not exist: {}", uploadFile);
-            throw new FileNotFoundException("File not found: " + uploadFile);
+            throw new FileNotFoundException("The specified file could not be found");
         }
 
         try {
@@ -632,7 +632,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             File file = PathValidationUtil.validatePath(uploadFile);
             if (!file.exists()) {
                 logger.error("Local file does not exist: {}", uploadFile);
-                throw new FileNotFoundException("File not found: " + uploadFile);
+                throw new FileNotFoundException("The specified file could not be found");
             }
 
             PutObjectRequest putRequest = PutObjectRequest.builder()
@@ -2144,14 +2144,14 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
 
             return (T) getDataAsJSONArray(dataset, pagination.getSize(), pagination.getPage()).toString();
         } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException | IOException e) {
-            logger.error(e.getMessage());
-            throw new SQLException(e.getMessage());
+            logger.error("Error retrieving dataset data", e);
+            throw new SQLException("Failed to retrieve dataset data");
         } catch (NumberFormatException e) {
-            logger.error(e.getMessage());
-            throw new SQLException(e.getMessage());
+            logger.error("Invalid number format in dataset data", e);
+            throw new SQLException("Failed to retrieve dataset data");
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            throw new SQLException(e.getMessage());
+            logger.error("Unexpected error retrieving dataset data", e);
+            throw new SQLException("Failed to retrieve dataset data");
         }
 
     }
@@ -2262,7 +2262,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
 
         } catch (Exception e) {
             logger.error("Failed to download file as bytes: {}", fileName, e);
-            throw new RuntimeException("Failed to download file: " + fileName, e);
+            throw new RuntimeException("Failed to download file from storage");
         }
     }
 

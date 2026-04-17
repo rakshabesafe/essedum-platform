@@ -43,7 +43,7 @@ public class ICIPRelatedComponentsController {
 						
 		});
 		} catch (Exception e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 		
 
@@ -73,7 +73,7 @@ public class ICIPRelatedComponentsController {
 			String childType = removeObj.get("childType").toString();
 			fedEntityService.UnlinkUseCase(parentId, parentType, childId, childType, project);
 		} catch (Exception e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 
 		return ResponseEntity.status(200).body(null);

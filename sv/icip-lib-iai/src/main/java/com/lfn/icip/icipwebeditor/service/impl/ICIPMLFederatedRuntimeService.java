@@ -239,7 +239,7 @@ public class ICIPMLFederatedRuntimeService {
 			}
 			return responseBody;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Operation failed", e);
 			return "Error";
 		}
 	}
@@ -377,7 +377,7 @@ public class ICIPMLFederatedRuntimeService {
 			}
 			return responseBody;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Operation failed", e);
 			return "Error";
 		}
 	}
@@ -412,7 +412,7 @@ public class ICIPMLFederatedRuntimeService {
 			}
 			return responseBody;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Operation failed", e);
 			return "Error";
 		}
 	}
@@ -447,7 +447,7 @@ public class ICIPMLFederatedRuntimeService {
 			}
 			return responseBody;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Operation failed", e);
 			return "Error";
 		}
 	}
