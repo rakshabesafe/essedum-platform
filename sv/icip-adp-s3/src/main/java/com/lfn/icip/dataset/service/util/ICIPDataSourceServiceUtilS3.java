@@ -267,24 +267,15 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
 
     public static boolean verifyGCSConnection(ServiceAccountCredentials credentials, String bucketName) {
         try {
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        public X509Certificate[] getAcceptedIssuers() {
-                            return null;
-                        }
+            // Use default trust store for proper certificate validation
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory
+                    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init((KeyStore) null);
+            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
 
-                        public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                        }
-
-                        public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                        }
-                    }
-            };
-
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new SecureRandom());
+            SSLContext sc = SSLContext.getInstance("TLSv1.2");
+            sc.init(null, trustManagers, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
 
             // Connect to GCS
             JSONObject jsonObject;
@@ -650,54 +641,26 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
 
     private TrustManager[] getTrustAllCerts() {
         logger.info("certificateCheck value: {}", certificateCheck);
-        if ("true".equalsIgnoreCase(certificateCheck)) {
-            try {
-                // Load the default trust store
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory
-                        .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                trustManagerFactory.init((KeyStore) null);
-                // Get the trust managers from the factory
-                TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+        try {
+            // Always load the default trust store for proper certificate validation
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory
+                    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init((KeyStore) null);
+            // Get the trust managers from the factory
+            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
 
-                // Ensure we have at least one X509TrustManager
-                for (TrustManager trustManager : trustManagers) {
-                    if (trustManager instanceof X509TrustManager) {
-                        return new TrustManager[] { (X509TrustManager) trustManager };
-                    }
+            // Ensure we have at least one X509TrustManager
+            for (TrustManager trustManager : trustManagers) {
+                if (trustManager instanceof X509TrustManager) {
+                    return new TrustManager[] { (X509TrustManager) trustManager };
                 }
-            } catch (KeyStoreException e) {
-                logger.info(e.getMessage());
-            } catch (NoSuchAlgorithmException e) {
-                logger.info(e.getMessage());
             }
-            throw new IllegalStateException("No X509TrustManager found. Please install the certificate in keystore");
-        } else {
-            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                    // Log the certificate chain and authType
-                    logger.info("checkClientTrusted called with authType: {}", authType);
-                    for (X509Certificate cert : chain) {
-                        logger.info("Client certificate: {}", cert.getSubjectDN());
-                    }
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                    // Log the certificate chain and authType
-                    logger.info("checkServerTrusted called with authType: {}", authType);
-                    for (X509Certificate cert : chain) {
-                        logger.info("Server certificate: {}", cert.getSubjectDN());
-                    }
-                }
-
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[] {};
-                }
-            } };
-            return trustAllCerts;
+        } catch (KeyStoreException e) {
+            logger.error("Failed to load trust store: {}", e.getMessage(), e);
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("Failed to load trust manager algorithm: {}", e.getMessage(), e);
         }
+        throw new IllegalStateException("No X509TrustManager found. Please install the certificate in keystore");
     }
 
     private SSLContext getSslContext(TrustManager[] trustAllCerts) {
