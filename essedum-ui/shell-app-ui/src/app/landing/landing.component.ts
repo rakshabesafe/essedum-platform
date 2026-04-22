@@ -130,6 +130,8 @@ export class LandingComponent implements OnInit, AfterViewInit {
   offsetX = 0;
   offsetY = 0;
   essedum_title:string="ESSEDUM";
+  isDark: boolean = true;
+  showTopNav: boolean = true;
 
   @HostListener("window:resize", ["$event"])
   onResize(event) {
@@ -418,7 +420,37 @@ export class LandingComponent implements OnInit, AfterViewInit {
     return newArray;
   }
 
+  toggleTheme() {
+    this.isDark = !this.isDark;
+    if (this.isDark) {
+      document.body.classList.remove('header-light-theme');
+      document.body.classList.add('header-dark-theme');
+      document.documentElement.style.setProperty('--background-colour', '#060c1a');
+      document.documentElement.style.setProperty('--text-color', '#e2e8f0');
+      localStorage.setItem('aip-header-theme', 'dark');
+    } else {
+      document.body.classList.remove('header-dark-theme');
+      document.body.classList.add('header-light-theme');
+      document.documentElement.style.setProperty('--background-colour', '#ffffff');
+      document.documentElement.style.setProperty('--text-color', '#000000');
+      localStorage.setItem('aip-header-theme', 'light');
+    }
+  }
+
   ngOnInit() {
+    const savedTheme = localStorage.getItem('aip-header-theme');
+    if (savedTheme === 'light') {
+      this.isDark = false;
+      document.body.classList.add('header-light-theme');
+      document.documentElement.style.setProperty('--background-colour', '#ffffff');
+      document.documentElement.style.setProperty('--text-color', '#000000');
+    } else {
+      this.isDark = true;
+      document.body.classList.add('header-dark-theme');
+      document.documentElement.style.setProperty('--background-colour', '#060c1a');
+      document.documentElement.style.setProperty('--text-color', '#e2e8f0');
+    }
+
     this.showSidebarMenuList = JSON.parse(
       sessionStorage.getItem("showSidebarMenuList") || "false"
     );
@@ -794,6 +826,12 @@ export class LandingComponent implements OnInit, AfterViewInit {
       }
     }
     document.documentElement.style.setProperty("--text-color", "#000000");
+    // Re-apply dark/light theme variables since brand init above hardcodes them to light
+    const savedAipTheme = localStorage.getItem('aip-header-theme');
+    if (savedAipTheme !== 'light') {
+      document.documentElement.style.setProperty('--background-colour', '#060c1a');
+      document.documentElement.style.setProperty('--text-color', '#e2e8f0');
+    }
     document.documentElement.style.setProperty("--launch-color", "grey");
     // to set project logo
     let project;

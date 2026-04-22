@@ -581,7 +581,7 @@
     .mat-mdc-checkbox {
       pointer-events: none;
       margin-right: 8px;
-      
+
       .mdc-checkbox__background {
         border-color: #737373;
       }
@@ -602,5 +602,135 @@
       font-family: "Roboto", "Segoe UI", sans-serif !important;
       font-size: 14px;
     }
+  }
+}
+
+// ── Dark theme ───────────────────────────────────────────────────────────────
+body.header-dark-theme {
+  .filter-panel {
+    background-color: #0d1b35 !important;
+
+    &__header {
+      background-color: #0d1b35 !important;
+      border-color: rgba(79, 142, 247, 0.22) !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    &__title {
+      color: #e2e8f0 !important;
+    }
+
+    &__icon {
+      color: #94a3b8 !important;
+
+      &:hover {
+        color: #4f8ef7 !important;
+      }
+    }
+
+    &__toggle-icon {
+      color: #94a3b8 !important;
+
+      &:hover {
+        color: #4f8ef7 !important;
+      }
+    }
+
+    &__content {
+      background-color: #0a1628 !important;
+      border-color: rgba(79, 142, 247, 0.15) !important;
+    }
+  }
+
+  .filter-label {
+    color: #94a3b8 !important;
+  }
+
+  .filter-control label {
+    color: #94a3b8 !important;
+  }
+
+  .chip-input {
+    background: rgba(79, 142, 247, 0.1) !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35) !important;
+    border: 1px solid rgba(79, 142, 247, 0.2) !important;
+
+    .chip-close {
+      color: #64748b !important;
+
+      &:hover {
+        background-color: rgba(79, 142, 247, 0.15) !important;
+        color: #e2e8f0 !important;
+      }
+    }
+  }
+
+  .action-menu-trigger {
+    color: #64748b !important;
+
+    &:hover {
+      background-color: rgba(79, 142, 247, 0.12) !important;
+      color: #4f8ef7 !important;
+    }
+  }
+}
+
+::ng-deep {
+  body.header-dark-theme .mat-mdc-chip {
+    background-color: rgba(79, 142, 247, 0.12) !important;
+    border-color: rgba(79, 142, 247, 0.3) !important;
+
+    .mdc-evolution-chip__text-label {
+      color: #e2e8f0 !important;
+    }
+
+    &:hover {
+      background-color: rgba(79, 142, 247, 0.22) !important;
+
+      .mdc-evolution-chip__text-label {
+        color: #7db5ff !important;
+      }
+    }
+  }
+
+  body.header-dark-theme .custom-menu .mat-mdc-menu-panel {
+    background: #0d1b35 !important;
+    border: 1px solid rgba(79, 142, 247, 0.2) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+
+    .mat-mdc-menu-item {
+      color: #e2e8f0 !important;
+
+      &:hover {
+        background-color: rgba(79, 142, 247, 0.12) !important;
+      }
+    }
+  }
+}
+
+// ── Light theme ──────────────────────────────────────────────────────────────
+body.header-light-theme {
+  .filter-panel {
+    background-color: #ffffff !important;
+
+    &__header {
+      background-color: #ffffff !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
+    }
+
+    &__title {
+      color: #000000 !important;
+    }
+
+    &__content {
+      background-color: #ffffff !important;
+      border-color: rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+
+  .chip-input {
+    background: #ffffff !important;
+    color: #000000 !important;
   }
 }

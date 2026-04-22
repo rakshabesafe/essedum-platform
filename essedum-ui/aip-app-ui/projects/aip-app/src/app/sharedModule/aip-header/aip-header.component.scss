@@ -201,3 +201,87 @@ $animation-duration: 0.5s;
 .grey-color {
   color: #737373 !important;
 }
+
+// ── Dark theme ───────────────────────────────────────────────────────────────
+body.header-dark-theme {
+  .lfx-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(79, 142, 247, 0.12) !important;
+
+    .header-left {
+      mat-icon {
+        color: #94a3b8 !important;
+      }
+
+      h3 {
+        color: #e2e8f0 !important;
+      }
+    }
+
+    .header-right .header-actions {
+      p {
+        color: #64748b !important;
+      }
+
+      .lfx-panel {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border-color: rgba(79, 142, 247, 0.2) !important;
+        box-shadow: none !important;
+
+        .lfx-panel-input {
+          color: #e2e8f0 !important;
+          background: transparent !important;
+
+          &::placeholder {
+            color: #475569 !important;
+          }
+        }
+
+        mat-icon {
+          color: #64748b !important;
+
+          &:hover,
+          &.active {
+            color: #4f8ef7 !important;
+          }
+        }
+      }
+
+      .action-button mat-icon {
+        color: #64748b !important;
+
+        &:hover,
+        &.active {
+          color: #4f8ef7 !important;
+        }
+      }
+    }
+  }
+}
+
+// ── Light theme ──────────────────────────────────────────────────────────────
+body.header-light-theme {
+  .lfx-header {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+
+    .header-left {
+      mat-icon { color: #737373; }
+      h3 { color: #000000 !important; }
+    }
+
+    .header-right .header-actions {
+      p { color: #555555 !important; }
+
+      .lfx-panel {
+        background-color: #f0f0f0 !important;
+        border-color: rgba(0, 0, 0, 0.1) !important;
+      }
+
+      .action-button mat-icon {
+        color: #737373 !important;
+        &:hover, &.active { color: #0094ff !important; }
+      }
+    }
+  }
+}
