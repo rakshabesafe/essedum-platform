@@ -110,6 +110,9 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
     @EssedumProperty("icip.certificateCheck")
     private String certificateCheck;
 
+    @EssedumProperty("icip.ssrf.allowedHosts")
+    private String ssrfAllowedHosts;
+
     /**
      * Test connection.
      *
@@ -381,7 +384,9 @@ public class ICIPDataSourceServiceUtilS3 extends ICIPDataSourceServiceUtil {
         URL endpointUrl = null;
 //		System.setProperty(SDKGlobalConfiguration.DISABLE_CERT_CHECKING_SYSTEM_PROPERTY, "false");
         try {
-            endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
+            endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(
+                    connectionDetails.optString("url"),
+                    SsrfProtectionUtil.parseAllowedHosts(ssrfAllowedHosts));
             logger.info("endpointUrl "+endpointUrl);
         } catch (MalformedURLException e1) {
             logger.error("Upload DATASOURCE URL not correct" + e1.getMessage());

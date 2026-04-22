@@ -66,7 +66,15 @@ public final class SsrfProtectionUtil {
 
         validateScheme(url);
         validateHost(url, allowedHosts);
-        validateNoInternalAddress(url);
+
+        // Skip internal-IP check when the host is explicitly on the allowlist —
+        // this permits legitimate internal cluster services (e.g. MinIO, internal S3)
+        // while still blocking all other private-range addresses.
+        boolean isExplicitlyAllowed = allowedHosts != null && !allowedHosts.isEmpty()
+                && allowedHosts.stream().anyMatch(h -> h.trim().equalsIgnoreCase(url.getHost()));
+        if (!isExplicitlyAllowed) {
+            validateNoInternalAddress(url);
+        }
 
         return url;
     }
