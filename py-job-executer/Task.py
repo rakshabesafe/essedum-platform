@@ -129,6 +129,7 @@ class Task:
             d.update(self.env)
             print('d', d)
 
+        pid = None
         try:
             self.endpoint=self.credentials.get("endpoint","")
             self.access_key=self.credentials.get("access_key","")
@@ -138,12 +139,28 @@ class Task:
                 self.endpoint = 'http://' + self.endpoint.split('/')[-1]
             secure = True if urlparse(self.endpoint).scheme == 'https' else False
 
-            
             client = Minio(urlparse(self.endpoint).hostname+':'+str(urlparse(self.endpoint).port), access_key=self.access_key,secret_key=self.secret_key, secure=secure)
+            logger.info(f"Listing minio objects in bucket='{self.bucket}' with key prefix='{self.key}'")
             objects = client.list_objects(self.bucket, self.key, recursive=True)
+            downloaded_files = []
             for obj in objects:
                 object_save_path = f"{save_path}/{pathlib.Path(obj.object_name).name}"
+                logger.info(f"Downloading minio object '{obj.object_name}' -> '{object_save_path}'")
                 client.fget_object(self.bucket, obj.object_name, object_save_path)
+                downloaded_files.append(object_save_path)
+
+            if not downloaded_files:
+                error_message = (
+                    f"No files found in minio bucket='{self.bucket}' with prefix='{self.key}'. "
+                    "The script file was not downloaded. Check that the upload succeeded and "
+                    "the input_artifacts path is correct."
+                )
+                logger.error(error_message)
+                with open(log_text, "w") as err_file:
+                    err_file.write(error_message)
+                return {"pid": None, "return_code": -1}
+
+            logger.info(f"Downloaded {len(downloaded_files)} file(s): {downloaded_files}")
 
             with open(log_text, "wb") as log_file:
                 wd = os.getcwd()
@@ -192,7 +209,6 @@ class Task:
             with open(log_text, "w") as err_file:
                 err_file.write(exc_trace)
             logger.error('Exception occured', exc_info=True)
-            # print(exc_trace)
             return {"pid": pid, "return_code": -1}
 
 
@@ -210,18 +226,23 @@ class Task:
             d["output_dir"] = output_dir
             d.update(self.env)
 
+        pid = None
         try:
             self.endpoint=self.credentials.get("endpoint","")
             self.access_key=self.credentials.get("access_key","")
             self.secret_key=self.credentials.get("secret_key","")
             s3 = boto3.resource(service_name="s3", endpoint_url=self.endpoint,aws_access_key_id=self.access_key,aws_secret_access_key=self.secret_key,verify=False)
             bucket_object = s3.Bucket(self.bucket)
+            downloaded_files = []
+            logger.info(f"Listing S3 objects in bucket='{self.bucket}' with prefix='{self.key}'")
             try:
                 for my_bucket_object in bucket_object.objects.filter(Prefix=self.key):
                     object_save_path = (
                         f"{save_path}/{pathlib.Path(my_bucket_object.key).name}"
                     )
+                    logger.info(f"Downloading S3 object '{my_bucket_object.key}' -> '{object_save_path}'")
                     bucket_object.download_file(my_bucket_object.key, object_save_path)
+                    downloaded_files.append(object_save_path)
 
             except botocore.exceptions.ClientError as e:
                 if e.response["Error"]["Code"] == "404":
@@ -229,6 +250,19 @@ class Task:
                 else:
                     logger.error('Exception occured', exc_info=True)
                     raise
+
+            if not downloaded_files:
+                error_message = (
+                    f"No files found in S3 bucket='{self.bucket}' with prefix='{self.key}'. "
+                    "The script file was not downloaded. Check that the upload succeeded and "
+                    "the input_artifacts path is correct."
+                )
+                logger.error(error_message)
+                with open(log_text, "w") as err_file:
+                    err_file.write(error_message)
+                return {"pid": None, "return_code": -1}
+
+            logger.info(f"Downloaded {len(downloaded_files)} file(s): {downloaded_files}")
 
             with open(log_text, "wb") as log_file:
                 wd = os.getcwd()
