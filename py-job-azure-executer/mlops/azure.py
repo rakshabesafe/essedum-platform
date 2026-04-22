@@ -58,9 +58,9 @@ logger.info("Proxy disabled - all proxy environment variables cleared before req
 
 def token_generate():
   try:
-    logger.info(f"enviromenttest tenant_id :  {os.environ.get('tenant_id')}")
+    logger.info(f"tenant_id present: {bool(os.environ.get('tenant_id'))}")
 
-    logger.info(f"enviromenttest tenant_id :  {os.environ.get('client_secret')}")
+    logger.info(f"client_secret present: {bool(os.environ.get('client_secret'))}")
 
 
     url = f"https://login.microsoftonline.com/{os.environ.get('tenant_id')}/oauth2/token"
@@ -79,7 +79,6 @@ def token_generate():
       return response.text
     else:
       logger.error(f"Token generation failed with status code: {response.status_code}")
-      logger.error(f"Response: {response.text[:200]}")
       return response.text
       
   except Exception as e:
@@ -323,17 +322,14 @@ def projects_datasets_list_list(adapter_instance, project, isCached, isInstance,
   subscriptionId=connections.get('subscriptionId',None)
   resourceGroupName=connections.get('resourceGroupName',None)
   workspaceName=connections.get('workspaceName',None)
-  logger.info(f"Connection params - subscriptionId: {subscriptionId}, resourceGroup: {resourceGroupName}, workspace: {workspaceName}, api_version: {api_version}")
+  logger.info(f"Connection params present - subscriptionId: {bool(subscriptionId)}, resourceGroup: {bool(resourceGroupName)}, workspace: {bool(workspaceName)}, api_version: {api_version}")
   
   url=f"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/data?api-version={api_version}"
-  logger.info(f"Request URL: {url}")
-  
   headers = {
   "Authorization" : "Bearer "+str(Authorization)
   }
-  logger.info("Headers prepared")
   
-  logger.info("Making GET request to Azure Management API...")
+  logger.info("Making GET request to Azure Management API for datasets...")
   response = requests.request("GET", url, headers=headers, verify=False, proxies={'http': None, 'https': None})
   logger.info(f"Response received - Status code: {response.status_code}")
   
@@ -353,7 +349,6 @@ def projects_datasets_list_list(adapter_instance, project, isCached, isInstance,
       return "Internal Server Error(HTTP 500)"
     else:
       logger.error(f"Unexpected response status code: {response.status_code}")
-      logger.error(f"Response body: {response.text[:500]}")
       return f"Request failed with status code:{response.status_code}"
         
   except Exception as e:

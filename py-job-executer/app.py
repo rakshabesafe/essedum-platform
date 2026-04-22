@@ -420,16 +420,12 @@ def adapter_function_execute():
     result=""
     try:
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result = function_execute(request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), 200
     except Exception as err:
-        # Log detailed error for developers
-        exc_trace = traceback.format_exc()
-        logger.error(f"Error executing function: {str(err)}")
-        logger.error(f"Stack trace: {str(exc_trace)}")
-        # Return generic error message to users
+        logger.error("An unexpected error occurred", exc_info=True)
         result = {"error": "An error occurred while executing the function"}
     return jsonify(result), 500
 
