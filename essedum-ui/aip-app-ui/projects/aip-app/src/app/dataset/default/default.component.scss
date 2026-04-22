@@ -23,18 +23,18 @@
 .default-title {
   font-size: 16px !important;
   font-weight: 600 !important;
-  color: #64748b !important;
+  color: #b8cce0 !important;
   margin: 0 0 8px !important;
 }
 
 .default-subtitle {
   font-size: 13px !important;
-  color: #475569 !important;
+  color: #b8cce0 !important;
   margin: 0 !important;
   max-width: 360px;
 }
 
 body.header-light-theme {
-  .default-title { color: #475569 !important; }
-  .default-subtitle { color: #64748b !important; }
+  .default-title { color: #4A5568 !important; }
+  .default-subtitle { color: #4A5568 !important; }
 }

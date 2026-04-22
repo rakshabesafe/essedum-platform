@@ -1,15 +1,97 @@
 :host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
-// Force all form fields to full width (overrides inline style="width: X%")
-:host ::ng-deep mat-form-field, :host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
+:host ::ng-deep mat-form-field,
+:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
 :host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.05) !important; border-radius: 8px 8px 0 0 !important; }
+:host ::ng-deep .mdc-floating-label { color: #b8cce0 !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
+:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.25) !important; }
+:host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
+:host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e2e8f0 !important; }
+:host ::ng-deep mat-checkbox .mdc-label { color: #c8d8ea !important; font-size: 14px !important; }
 
-// Container layout
-.aip-container { padding: 20px 24px; width: 100%; box-sizing: border-box; }
+// Page wrapper
+.create-background { background: transparent !important; padding: 20px 0 32px !important; }
+.lfx-l-level2-middle-col { max-width: 720px !important; margin: 0 auto !important; padding: 0 20px !important; }
 
-// Action buttons area
-.dialog-actions, .form-actions {
-  display: flex; justify-content: flex-end; gap: 8px;
-  padding: 16px 0 0; margin-top: 16px;
-  border-top: 1px solid rgba(79,142,247,0.08);
+// Form card
+mat-card, .mat-mdc-card {
+  background: rgba(8,14,36,0.82) !important;
+  border: 1px solid rgba(79,142,247,0.2) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  position: relative !important;
+}
+
+// Card title row
+.d-flex.justify-content-between.align-items-center.px-4 {
+  padding: 18px 24px !important;
+  background: rgba(79,142,247,0.05) !important;
+  border-bottom: 1px solid rgba(79,142,247,0.12) !important;
+}
+
+// Card body
+.lfx-u-pad-t-32.lfx-u-pad-lr-24 { padding: 20px 24px 8px !important; }
+.row { margin: 0 !important; }
+.col-lg-12, .col-md-12 { width: 100% !important; max-width: 100% !important; padding: 0 !important; }
+
+// Form field row spacing
+.lfx-u-mar-b-16 { margin-bottom: 14px !important; }
+
+// Action button row
+.d-flex.justify-content-end.lfx-u-mar-b-16:last-child {
+  padding: 16px 0 8px !important;
+  margin-top: 8px !important;
+  border-top: 1px solid rgba(79,142,247,0.08) !important;
+  gap: 10px !important;
+}
+
+// Override inline-styled buttons (background-color: #0a142f; color: white)
+:host button[mat-raised-button] {
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 7px 22px !important;
+  letter-spacing: 0.2px !important;
+  transition: all 0.15s !important;
+  box-shadow: none !important;
+}
+:host button[mat-raised-button][style*="background-color"] {
+  background-color: rgba(79,142,247,0.12) !important;
+  color: #c8d8ea !important;
+  border: 1px solid rgba(79,142,247,0.28) !important;
+}
+:host button[mat-raised-button][style*="background-color"]:last-child,
+:host .d-flex.justify-content-end button[mat-raised-button][style*="background-color"]:not(:first-child) {
+  background: linear-gradient(135deg, #4f8ef7 0%, #6366f1 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 2px 12px rgba(79,142,247,0.35) !important;
+}
+
+// Error messages
+mat-error { font-size: 11px !important; }
+
+body.header-light-theme {
+  mat-card, .mat-mdc-card {
+    background: rgba(255,255,255,0.97) !important;
+    border-color: rgba(79,70,229,0.15) !important;
+    box-shadow: 0 8px 32px rgba(99,102,241,0.1), 0 1px 4px rgba(0,0,0,0.06) !important;
+  }
+  .d-flex.justify-content-between.align-items-center.px-4 {
+    background: rgba(79,70,229,0.04) !important;
+    border-bottom-color: rgba(79,70,229,0.1) !important;
+  }
+  :host ::ng-deep .mdc-text-field--filled { background: rgba(0,0,0,0.04) !important; }
+  :host ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
+  :host ::ng-deep .mdc-floating-label { color: #4A5568 !important; }
+  :host ::ng-deep mat-checkbox .mdc-label { color: #1e293b !important; }
+  button[mat-raised-button][style*="background-color"] {
+    background-color: rgba(79,70,229,0.08) !important;
+    color: #4F46E5 !important;
+    border-color: rgba(79,70,229,0.25) !important;
+  }
 }

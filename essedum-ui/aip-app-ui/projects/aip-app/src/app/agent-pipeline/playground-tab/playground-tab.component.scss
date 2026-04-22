@@ -22,7 +22,7 @@
 
 .playground-subtitle {
   font-size: 13px !important;
-  color: #64748b !important;
+  color: #b8cce0 !important;
   margin: 0 !important;
 }
 
@@ -72,7 +72,7 @@
     opacity: 0.5 !important;
     cursor: not-allowed !important;
     background: rgba(255,255,255,0.06) !important;
-    color: #64748b !important;
+    color: #b8cce0 !important;
     box-shadow: none !important;
   }
 }
@@ -87,7 +87,7 @@
   border-radius: 8px;
   border: 1px solid rgba(79,142,247,0.15);
   background: rgba(79,142,247,0.06);
-  color: #94a3b8;
+  color: #b8cce0;
 
   &.status-progress { background: rgba(250,204,21,0.08); border-color: rgba(250,204,21,0.2); color: #fcd34d; }
   &.status-error { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); color: #f87171; }
@@ -117,7 +117,7 @@
     color: #4f8ef7;
   }
 
-  span { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; }
+  span { font-size: 12px; font-weight: 600; color: #b8cce0; text-transform: uppercase; letter-spacing: 0.6px; }
 }
 
 .console-output {
@@ -146,7 +146,7 @@
 }
 
 .console-loading { color: #fcd34d; animation: pulse 1.5s ease-in-out infinite; }
-.console-empty { color: #475569; font-style: italic; padding: 16px 0; }
+.console-empty { color: #b8cce0; font-style: italic; padding: 16px 0; }
 
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
@@ -165,7 +165,7 @@
   border-bottom: 1px solid rgba(79,142,247,0.1);
 
   mat-icon { font-size: 16px !important; width: 16px !important; height: 16px !important; color: #4f8ef7; }
-  span { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; flex: 1; }
+  span { font-size: 12px; font-weight: 600; color: #b8cce0; text-transform: uppercase; letter-spacing: 0.5px; flex: 1; }
 
   .open-new-tab {
     display: flex;
@@ -182,8 +182,8 @@
 
 body.header-light-theme {
   .playground-title { color: #0f172a !important; }
-  .playground-subtitle { color: #475569 !important; }
+  .playground-subtitle { color: #4A5568 !important; }
   .console-container { background: #f8fafc !important; border-color: rgba(79,70,229,0.15) !important; }
-  .console-text { color: #334155 !important; }
-  .console-empty { color: #94a3b8 !important; }
+  .console-text { color: #4A5568 !important; }
+  .console-empty { color: #4A5568 !important; }
 }

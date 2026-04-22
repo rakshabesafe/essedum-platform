@@ -22,7 +22,7 @@
 .section-title {
   font-size: 13px !important;
   font-weight: 600 !important;
-  color: #94a3b8 !important;
+  color: #b8cce0 !important;
   margin: 0 0 4px !important;
   min-width: 160px;
 }
@@ -61,7 +61,7 @@
   font-size: 15px !important;
   width: 15px !important;
   height: 15px !important;
-  color: #475569;
+  color: #b8cce0;
   cursor: pointer;
   transition: color 0.15s;
   &:hover { color: #4f8ef7; }
@@ -90,7 +90,7 @@ body.header-light-theme {
     background: rgba(255,255,255,0.85) !important;
     border-color: rgba(79,70,229,0.12) !important;
   }
-  .section-title { color: #64748b !important; }
+  .section-title { color: #4A5568 !important; }
   .value { color: #0f172a !important; }
   .section-divider { background: rgba(0,0,0,0.07); }
 }

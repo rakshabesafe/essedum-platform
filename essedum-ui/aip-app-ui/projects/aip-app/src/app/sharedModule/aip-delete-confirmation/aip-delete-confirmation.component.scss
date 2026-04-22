@@ -9,7 +9,7 @@
 
 ::ng-deep mat-dialog-content {
   font-size: 14px !important;
-  color: #94a3b8 !important;
+  color: #b8cce0 !important;
   padding: 8px 0 16px !important;
 }
 
@@ -25,7 +25,7 @@
 
 .cancel-button {
   background: rgba(255,255,255,0.06) !important;
-  color: #94a3b8 !important;
+  color: #b8cce0 !important;
   border: 1px solid rgba(79,142,247,0.2) !important;
   border-radius: 8px !important;
   font-size: 13px !important;
@@ -46,6 +46,6 @@
 
 body.header-light-theme {
   ::ng-deep h2[mat-dialog-title] { color: #0f172a !important; }
-  ::ng-deep mat-dialog-content { color: #475569 !important; }
-  .cancel-button { background: rgba(0,0,0,0.04) !important; color: #475569 !important; border-color: rgba(0,0,0,0.12) !important; }
+  ::ng-deep mat-dialog-content { color: #4A5568 !important; }
+  .cancel-button { background: rgba(0,0,0,0.04) !important; color: #4A5568 !important; border-color: rgba(0,0,0,0.12) !important; }
 }

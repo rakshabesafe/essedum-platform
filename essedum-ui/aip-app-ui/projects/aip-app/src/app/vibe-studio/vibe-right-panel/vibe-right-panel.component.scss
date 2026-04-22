@@ -2,19 +2,19 @@
 .right-panel { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
 .empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 20px; color: #475569; text-align: center; flex: 1; }
 .empty-state i { font-size: 36px; opacity: 0.5; }
-.empty-state h3 { margin: 0; color: #94a3b8; }
+.empty-state h3 { margin: 0; color: #b8cce0; }
 .empty-state p { margin: 0; font-size: 13px; }
 .panel-content { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
 .tab-bar { display: flex; gap: 2px; padding: 8px 10px 0; flex-shrink: 0; border-bottom: 1px solid rgba(79,142,247,0.1); }
-.tab-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 6px 6px 0 0; border: none; cursor: pointer; font-size: 12px; font-weight: 500; background: transparent; color: #64748b; transition: all 0.15s; }
-.tab-btn:hover { color: #94a3b8; }
+.tab-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 6px 6px 0 0; border: none; cursor: pointer; font-size: 12px; font-weight: 500; background: transparent; color: #b8cce0; transition: all 0.15s; }
+.tab-btn:hover { color: #b8cce0; }
 .tab-btn.active { color: #e2e8f0; background: rgba(79,142,247,0.1); border-bottom: 2px solid #4f8ef7; }
 .file-badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: rgba(79,142,247,0.2); color: #4f8ef7; font-size: 10px; }
 .code-pane { display: flex; flex: 1; min-height: 0; overflow: hidden; }
 .vsc-sidebar { width: 220px; min-width: 160px; flex-shrink: 0; background: rgba(0,0,0,0.18); border-right: 1px solid rgba(79,142,247,0.08); display: flex; flex-direction: column; overflow: hidden; }
 .explorer-title { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #475569; padding: 10px 12px 8px; text-transform: uppercase; }
 .tree-scroll { flex: 1; overflow-y: auto; scrollbar-width: thin; }
-.tree-row { display: flex; align-items: center; gap: 4px; padding: 3px 8px; cursor: pointer; border-radius: 4px; font-size: 12px; color: #94a3b8; transition: background 0.1s; }
+.tree-row { display: flex; align-items: center; gap: 4px; padding: 3px 8px; cursor: pointer; border-radius: 4px; font-size: 12px; color: #b8cce0; transition: background 0.1s; }
 .tree-row:hover { background: rgba(255,255,255,0.05); }
 .tree-row.tree-selected { background: rgba(79,142,247,0.15); color: #e2e8f0; }
 .vsc-arrow { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: #475569; font-size: 10px; }
@@ -26,7 +26,7 @@
 .tree-name { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .vsc-editor { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: rgba(0,0,0,0.15); }
 .editor-tabs { display: flex; gap: 1px; padding: 4px 8px 0; flex-shrink: 0; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(79,142,247,0.08); }
-.editor-tab { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 4px 4px 0 0; font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.04); border: 1px solid rgba(79,142,247,0.08); border-bottom: none; }
+.editor-tab { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 4px 4px 0 0; font-size: 12px; color: #b8cce0; background: rgba(255,255,255,0.04); border: 1px solid rgba(79,142,247,0.08); border-bottom: none; }
 .editor-tab.active { color: #e2e8f0; background: rgba(0,0,0,0.15); }
 .breadcrumb-bar { display: flex; align-items: center; gap: 4px; padding: 5px 12px; font-size: 11px; color: #475569; background: rgba(0,0,0,0.1); flex-shrink: 0; }
 .crumb-sep { color: #334155; font-size: 10px; }
@@ -36,7 +36,7 @@
 .code-row:hover { background: rgba(255,255,255,0.02); }
 .line-num { text-align: right; padding: 0 12px 0 8px; width: 36px; font-size: 12px; color: #334155; font-family: monospace; user-select: none; vertical-align: top; border-right: 1px solid rgba(79,142,247,0.06); background: rgba(0,0,0,0.1); }
 .line-code { padding: 0 12px; white-space: pre; }
-.code-text { font-size: 12.5px; font-family: "Fira Code","Consolas",monospace; color: #94a3b8; }
+.code-text { font-size: 12.5px; font-family: "Fira Code","Consolas",monospace; color: #b8cce0; }
 .editor-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px; color: #475569; text-align: center; }
 .editor-empty i { font-size: 28px; }
 .editor-empty p { margin: 0; font-size: 13px; }
@@ -44,5 +44,5 @@
 .preview-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 20px; color: #475569; text-align: center; flex: 1; }
 .deployment-result { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
 .deployment-result-body { flex: 1; overflow: auto; padding: 16px; }
-.deployment-result-body pre { font-size: 12px; color: #94a3b8; font-family: monospace; }
+.deployment-result-body pre { font-size: 12px; color: #b8cce0; font-family: monospace; }
 .preview-iframe { width: 100%; height: 100%; border: none; flex: 1; }

@@ -1,20 +1,65 @@
 :host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
-// Force form fields full width
-:host ::ng-deep mat-form-field, :host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
-
-// Container & layout
-.aip-container { padding: 20px 24px; width: 100%; box-sizing: border-box; }
-.lfx-l-level2-middle-ctr { display: flex; gap: 20px; flex-wrap: wrap; }
-.lfx-l-level2-middle-col { flex: 1; min-width: 0; }
-
-// Tab alignment
 :host ::ng-deep .tabs-left-aligned .mat-mdc-tab-header { padding: 0 !important; }
-:host ::ng-deep .mat-mdc-tab-body-content { padding: 16px 0 !important; overflow: visible !important; }
+:host ::ng-deep .mat-mdc-tab-body-content { padding: 0 !important; overflow: visible !important; }
 
-// Detail field display
-.mat-label { font-size: 11px !important; color: #64748b !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important; display: block; margin-bottom: 3px; }
-.mat-field { font-size: 14px !important; color: #e2e8f0; word-break: break-word; }
+.aip-container { padding: 16px 24px !important; width: 100% !important; box-sizing: border-box !important; }
+.lfx-l-level2-middle-ctr { display: flex !important; gap: 20px !important; flex-wrap: wrap !important; width: 100% !important; }
+.lfx-l-level2-middle-col { flex: 1 !important; min-width: 0 !important; }
+.lfx-l-level2-right-col { width: 280px !important; flex-shrink: 0 !important; }
 
-// Model path copy area
-.aip-led-icons { font-size: 20px !important; cursor: pointer; transition: color 0.15s; &:hover { color: #4f8ef7; } }
+.lfx-u-pad-16 { padding: 24px !important; }
+.flex.mt-4 { display: flex !important; flex-wrap: wrap !important; margin-top: 20px !important; }
+.col-md-4 { flex: 1 !important; min-width: 140px !important; padding: 0 8px !important; }
+.col-md-6 { width: 50% !important; flex: 0 0 50% !important; padding: 0 8px !important; }
+
+.lfx-u-body-sm {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #9ab8d0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  margin-bottom: 6px !important;
+  display: block !important;
+}
+.lfx-u-body-md { font-size: 14px !important; color: #e2e8f0 !important; line-height: 1.7 !important; }
+.aip-desc-ellipsis { color: #b8cce0 !important; font-size: 13px !important; line-height: 1.6 !important; }
+.flex.mt-2.align-items-center { display: flex !important; align-items: center !important; margin-top: 8px !important; }
+
+.aip-line { border: none !important; border-top: 1px solid rgba(79,142,247,0.12) !important; margin: 20px 0 16px !important; }
+
+.lfx-c-avatar {
+  background: linear-gradient(135deg, #4f8ef7 0%, #6366f1 100%) !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  flex-shrink: 0 !important;
+}
+
+.aip-related-list { border-radius: 8px !important; padding: 4px !important; transition: background 0.15s !important; }
+.aip-related-list:hover { background: rgba(79,142,247,0.08) !important; cursor: pointer !important; }
+.aip-related-component-ellipsis { overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: 13px !important; color: #e2e8f0 !important; }
+.lfx-c-nav__nomar.lfx-u-header-xl.lfx-u-text-neutral-80 { font-size: 13px !important; color: #e2e8f0 !important; }
+.aip-related-badge { font-size: 10px !important; }
+
+.aip-scroll-hover { max-height: 420px !important; overflow-y: auto !important; }
+.aip-scroll-hover::-webkit-scrollbar { width: 4px !important; }
+.aip-scroll-hover::-webkit-scrollbar-track { background: transparent !important; }
+.aip-scroll-hover::-webkit-scrollbar-thumb { background: rgba(79,142,247,0.3) !important; border-radius: 2px !important; }
+
+body.header-light-theme {
+  .lfx-u-body-sm { color: #4A5568 !important; }
+  .lfx-u-body-md { color: #0f172a !important; }
+  .aip-desc-ellipsis { color: #4A5568 !important; }
+  .aip-line { border-top-color: rgba(79,70,229,0.1) !important; }
+  .aip-related-list:hover { background: rgba(79,70,229,0.06) !important; }
+  .aip-related-component-ellipsis { color: #0f172a !important; }
+  .lfx-c-nav__nomar.lfx-u-header-xl.lfx-u-text-neutral-80 { color: #0f172a !important; }
+  .aip-scroll-hover::-webkit-scrollbar-thumb { background: rgba(79,70,229,0.3) !important; }
+}

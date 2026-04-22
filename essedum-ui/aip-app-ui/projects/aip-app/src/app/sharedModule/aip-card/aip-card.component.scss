@@ -27,13 +27,13 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #e2e8f0;
+  color: #f1f5f9;
 }
 
 .card-main-date {
   font-size: 11px !important;
   margin: 0 !important;
-  color: #64748b;
+  color: #b8cce0;
 }
 
 .card-badge-group {
@@ -69,7 +69,7 @@
   width: 18px !important;
   height: 18px !important;
   cursor: pointer;
-  color: #64748b;
+  color: #b8cce0;
   transition: color 0.15s;
   &:hover { color: #4f8ef7; }
 }
@@ -126,12 +126,12 @@
 .aip-more-actions-icon {
   font-size: 20px !important;
   cursor: pointer;
-  color: #64748b;
+  color: #b8cce0;
   transition: color 0.15s;
   &:hover { color: #4f8ef7; }
 }
 
-.aip-menu-icon { color: #64748b !important; }
+.aip-menu-icon { color: #b8cce0 !important; }
 .aip-menu-delete { color: #ef4444 !important; }
 
 .agent-card-content { padding: 0 !important; }
@@ -139,13 +139,13 @@
 .agent-dir-stat {
   gap: 4px;
   font-size: 11px;
-  color: #64748b;
+  color: #b8cce0;
 }
 
 .small-count {
   font-size: 12px;
   font-weight: 600;
-  color: #94a3b8;
+  color: #b8cce0;
 }
 
 .skill-badge {

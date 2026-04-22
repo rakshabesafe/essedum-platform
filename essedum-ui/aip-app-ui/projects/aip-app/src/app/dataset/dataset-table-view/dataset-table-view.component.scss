@@ -15,7 +15,7 @@
   thead tr th {
     font-size: 11px !important;
     font-weight: 700 !important;
-    color: #64748b !important;
+    color: #b8cce0 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.6px !important;
     background: rgba(79,142,247,0.06) !important;
@@ -44,6 +44,6 @@
 
 body.header-light-theme {
   .table-view-container { border-color: rgba(79,70,229,0.12); }
-  .table thead tr th { background: rgba(79,70,229,0.05) !important; color: #475569 !important; border-color: rgba(79,70,229,0.15) !important; }
+  .table thead tr th { background: rgba(79,70,229,0.05) !important; color: #4A5568 !important; border-color: rgba(79,70,229,0.15) !important; }
   .table tbody tr td { color: #1e293b !important; }
 }
