@@ -1,105 +1,56 @@
-.text-view {
-  overflow-y: hidden;
-  overflow-x: auto;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 5px;
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+:host ::ng-deep mat-form-field,
+:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.05) !important; border-radius: 8px 8px 0 0 !important; }
+:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #64748b !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
+:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.25) !important; }
+:host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
+
+.mat-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
 }
 
-
-.lfx-u-pad-t-32 {
-  padding: 3%;
+.mat-field {
+  font-size: 14px !important;
+  color: #e2e8f0 !important;
+  word-break: break-word;
+  margin-bottom: 12px;
 }
 
-.data_header {
-  font-family: "Roboto", "Segoe UI", sans-serif !important;
-  color: #0a142f
+.description-section {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(79,142,247,0.08);
+  margin-bottom: 16px;
 }
 
-b {
-  color: gray;
+.dialog-actions, .form-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  padding: 16px 0 0 !important;
+  border-top: 1px solid rgba(79,142,247,0.08) !important;
 }
 
-.data-container {
-  border-radius: 8px;
-  margin: 3%;
+button[mat-raised-button][color="primary"] {
+  background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  padding: 6px 20px !important;
 }
 
-.metadata {
-  display: flex;
-  flex-wrap: wrap;
-  row-gap: 12px;
-
-}
-
-.meta-val {
-  background-color: #EFEFEF;
-  padding: 5px 8px 5px 8px;
-  border-radius: 8px;
-  margin: 0px 10px 0px 5px;
-  line-height: 2;
-  word-break: break-all;
-  font-family: "Roboto", "Segoe UI", sans-serif !important;
-
-}
-
-.meta-key {
-  color: #0094ff;
-  font-family: "Roboto", "Segoe UI", sans-serif !important;
-
-}
-
-::ng-deep .ngx-spinner-overlay {
-  position: relative !important;
-}
-
-::ng-deep .le-c-card.mat-mdc-card .mat-mdc-card-content {
-  margin-bottom: 0px;
-}
-
-::ng-deep .aip-initiative-desc {
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-::ng-deep .le-c-tab .mat-mdc-tab.mdc-tab {
-  text-transform: none;
-}
-
-.txt-cont {
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-
-.msg-banner {
-  padding: 10px;
-  border-radius: 5px;
-  background-color: rgb(255, 255, 255);
-  // width: 730px;
-  text-align: justify;
-  overflow-wrap: break-word !important;
-  ;
-  // display: block;
-  line-height: 1.2;
-}
-
-@media screen and (min-width: 1367px) {
-  .lfx-l-base-layout-center {
-    width: 1216px;
-    margin: 0 auto;
-  }
-
-  .lfx-l-left-layout-center,
-  .lfx-l-right-layout-center {
-    width: 1001px;
-    margin: 0 auto;
-  }
-
-  .lfx-l-lr-layout-center {
-    width: 786px;
-    margin: 0 auto;
-  }
+body.header-light-theme {
+  .mat-label { color: #475569 !important; }
+  .mat-field { color: #0f172a !important; }
+  :host ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
 }

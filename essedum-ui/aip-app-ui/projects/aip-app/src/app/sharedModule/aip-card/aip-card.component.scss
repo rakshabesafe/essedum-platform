@@ -1,655 +1,166 @@
-// ── Utility classes (preserved) ────────────────────────────
-.lfx-u-ellipsis {
+:host {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.card-main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 10px;
+}
+
+.card-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-main-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  margin: 0 0 4px !important;
+  line-height: 1.4 !important;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #e2e8f0;
+}
+
+.card-main-date {
+  font-size: 11px !important;
+  margin: 0 !important;
+  color: #64748b;
+}
+
+.card-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.card-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  font-family: monospace;
   white-space: nowrap;
-  display: block;
 }
 
-.lfx-u-mar-b-8 {
-  margin-bottom: 8px !important;
+.badge-connection  { background: rgba(79,142,247,0.15); color: #7eb8ff; border: 1px solid rgba(79,142,247,0.3); }
+.badge-model       { background: rgba(124,58,237,0.15); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.3); }
+.badge-agent       { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+.badge-agent-dir   { background: rgba(6,182,212,0.15);  color: #67e8f9; border: 1px solid rgba(6,182,212,0.3); }
+.badge-pipeline    { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+.badge-adapter     { background: rgba(79,142,247,0.15); color: #7eb8ff; border: 1px solid rgba(79,142,247,0.3); }
+.badge-instance    { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+.badge-dataset     { background: rgba(6,182,212,0.15);  color: #67e8f9; border: 1px solid rgba(6,182,212,0.3); }
+
+.card-action-icon {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  cursor: pointer;
+  color: #64748b;
+  transition: color 0.15s;
+  &:hover { color: #4f8ef7; }
 }
 
-.lfx-u-text-neutral-80 {
-  color: #737373;
+.card-actions-hover {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 10px 12px !important;
+  margin: 0 !important;
+  border-top: 1px solid rgba(79,142,247,0.08) !important;
+  min-height: 44px !important;
 }
 
-.lfx-u-text-primary-80 {
-  color: #0094ff;
-}
+.button-placeholder { min-width: 100px; }
 
-.lfx-u-header-sm {
-  font-size: 1rem;
-  line-height: 1.2;
-  font-weight: 600;
-  font-family: "Roboto", "Segoe UI", sans-serif !important;
-  font-style: normal;
-}
-
-.lfx-u-header-md {
-  font-size: 1.4rem;
-  font-weight: 600;
-  font-family: "Roboto", "Segoe UI", sans-serif !important;
-  font-style: normal;
-}
-
-.lfx-u-header-xl {
-  font-size: 1.5rem;
-  font-weight: 700;
-  font-family: "Roboto", "Segoe UI", sans-serif !important;
-  font-style: normal;
-  line-height: 1.3;
-  margin-bottom: 2px;
-  transition: color 0.2s;
-}
-
-.lfx-u-body-sm {
-  font-size: 1.2rem;
-  font-weight: 400;
-  line-height: 16px;
-  font-family: "Roboto", "Segoe UI", sans-serif !important;
-  font-style: normal;
-}
-
-.lfx-c-card__container-left {
-  float: left;
-  width: 80%;
-}
-
-.lfx-c-card__action-hover {
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  transition: bottom 0.2s ease 0.2s;
-  background: var(--default-card-action-bg-color);
+.view-details-btn {
+  font-size: 12px !important;
+  padding: 4px 14px !important;
+  border-radius: 6px !important;
+  background: rgba(79,142,247,0.12) !important;
+  color: #4f8ef7 !important;
+  border: 1px solid rgba(79,142,247,0.3) !important;
+  box-shadow: none !important;
+  line-height: 1.5 !important;
+  &:hover { background: rgba(79,142,247,0.2) !important; }
 }
 
 .aip-cursor {
-  cursor: pointer;
-}
-
-.aip-hover-avatar {
-  position: relative;
-}
-
-// ── Card wrapper ────────────────────────────────────────────
-.card-wrapper {
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s;
-
-  &:hover {
-    transform: translateY(-4px);
-  }
-
-  mat-card {
-    padding: 16px;
-
-    .card-category {
-      overflow: hidden;
-      border-right: none !important;
-    }
-  }
-}
-
-// ── Card base ───────────────────────────────────────────────
-.lfx-c-card.mat-mdc-card {
-  position: relative;
-  padding: 18px 20px 56px;
-  min-height: 50px;
-  border-radius: 14px;
-  display: block;
-  overflow: hidden;
-  transition: box-shadow 0.28s, border-color 0.28s, background 0.3s;
-
-  // Top accent gradient line
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #1d4ed8 0%, #4f8ef7 45%, #818cf8 75%, #6366f1 100%);
-    z-index: 1;
-    border-radius: 14px 14px 0 0;
-  }
-
-  // Subtle radial glow in top-right corner
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 80px;
-    height: 80px;
-    pointer-events: none;
-    border-radius: 0 14px 0 0;
-    z-index: 0;
-  }
-}
-
-// ── Light theme card ─────────────────────────────────────────
-.lfx-c-card.mat-mdc-card {
-  background: #ffffff;
-  color: #1e293b;
-  border: 1px solid #e2eaf7;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-
-  &::after {
-    background: radial-gradient(circle at 80% 20%, rgba(79, 142, 247, 0.06), transparent 70%);
-  }
-
-  &:hover {
-    box-shadow: 0 10px 28px rgba(37, 99, 235, 0.13), 0 3px 8px rgba(0, 0, 0, 0.06);
-    border-color: #c4d8f5;
-  }
-}
-
-body.header-light-theme .lfx-c-card.mat-mdc-card {
-  background: #ffffff;
-  color: #1e293b;
-  border: 1px solid #e2eaf7;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-
-  &:hover {
-    box-shadow: 0 10px 28px rgba(37, 99, 235, 0.13), 0 3px 8px rgba(0, 0, 0, 0.06);
-    border-color: #c4d8f5;
-  }
-}
-
-// ── Dark theme card ──────────────────────────────────────────
-body.header-dark-theme .lfx-c-card.mat-mdc-card {
-  background: linear-gradient(145deg, rgba(11, 22, 44, 0.97) 0%, rgba(8, 16, 32, 0.95) 100%);
-  color: #e2e8f0;
-  border: 1px solid rgba(79, 142, 247, 0.16);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px);
-
-  &::after {
-    background: radial-gradient(circle at 80% 20%, rgba(79, 142, 247, 0.1), transparent 70%);
-  }
-
-  &::before {
-    opacity: 0.8;
-  }
-
-  &:hover {
-    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(79, 142, 247, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    border-color: rgba(79, 142, 247, 0.32);
-  }
-}
-
-// ── Card overflow toggle ─────────────────────────────────────
-.lfx-c-card--hover {
-  overflow: hidden;
-}
-
-// ── Category badge ───────────────────────────────────────────
-.lfx-u-header-sm.lfx-u-text-primary-80 {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: 5px;
-  display: inline-block;
-  line-height: 1.6;
-  background: rgba(79, 142, 247, 0.1);
-  color: #2563eb;
-  border: 1px solid rgba(79, 142, 247, 0.22);
-  transition: background 0.15s;
-}
-
-body.header-dark-theme .lfx-u-header-sm.lfx-u-text-primary-80 {
-  background: rgba(79, 142, 247, 0.15);
-  color: #93c5fd;
-  border-color: rgba(79, 142, 247, 0.28);
-}
-
-// ── Card header ──────────────────────────────────────────────
-.card-header {
-  padding: 0 !important;
-  width: 95%;
-
-  .aip-fullname-card {
-    line-height: 20px;
-    margin-bottom: 0;
-  }
-
-  .aip-fullname-card:hover {
-    white-space: unset;
-    overflow-wrap: break-word;
-    word-break: break-word;
-  }
-}
-
-// ── Title color overrides ────────────────────────────────────
-.lfx-c-card.mat-mdc-card .lfx-u-header-xl {
-  color: #0f172a;
-}
-
-body.header-dark-theme .lfx-c-card.mat-mdc-card .lfx-u-header-xl {
-  color: #dde9f8;
-}
-
-.lfx-c-card.mat-mdc-card .lfx-u-body-sm.lfx-u-text-neutral-80 {
-  color: #6b7a9a !important;
-  font-size: 11px !important;
-}
-
-body.header-dark-theme .lfx-c-card.mat-mdc-card .lfx-u-body-sm.lfx-u-text-neutral-80 {
-  color: #5a6a88 !important;
-}
-
-// ── Card actions bar ─────────────────────────────────────────
-mat-card-actions.card-actions-hover {
-  transition: opacity 0.2s;
-  width: 90%;
-  padding: 8px 0 8px 0 !important;
-  margin: 0 !important;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(79, 142, 247, 0.1);
-
-  .button-placeholder {
-    width: 140px;
-  }
-
-  .avatar-container {
-    position: relative;
-
-    .aip-hover-avatar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      font-size: 13px;
-      font-weight: 600;
-      background-color: #e0e0e0;
-      color: #1e40af;
-      transition: transform 0.2s;
-
-      &:hover {
-        transform: scale(1.1);
-      }
-    }
-  }
-}
-
-body.header-dark-theme mat-card-actions.card-actions-hover {
-  border-top-color: rgba(79, 142, 247, 0.08);
-}
-
-// ── View Details button ──────────────────────────────────────
-.view-details-btn {
-  color: #ffffff !important;
-  height: 28px !important;
-  min-height: 28px !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.05em !important;
-  text-transform: uppercase;
-  border-radius: 20px !important;
-  border: none !important;
+  gap: 6px;
+  position: relative;
   cursor: pointer;
-  font-family: "Roboto", "Segoe UI", sans-serif !important;
-  background: linear-gradient(90deg, #1d4ed8 0%, #4f8ef7 100%) !important;
-  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.35) !important;
-  transition: box-shadow 0.2s, transform 0.2s !important;
-
-  &:hover {
-    box-shadow: 0 5px 18px rgba(37, 99, 235, 0.5) !important;
-    transform: translateY(-1px);
-  }
+  &:hover .aip-hover-detail { display: block; }
 }
 
-// ── Avatar ───────────────────────────────────────────────────
-.lfx-c-avatar {
-  background: var(--avatar-bg-color);
-  border-radius: 50%;
-  text-align: center;
-  vertical-align: middle;
-  font-weight: 700;
-  font-family: "Roboto", "Segoe UI", sans-serif !important;
-  font-style: normal;
-  float: left;
-  width: 32px !important;
-  height: 32px !important;
-  font-size: 11px;
-  line-height: 32px;
-  padding: 0;
-  color: #1d4ed8;
-  border: 2px solid rgba(79, 142, 247, 0.2);
-  transition: transform 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    transform: scale(1.1);
-    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.2);
-  }
-}
-
-body.header-dark-theme .lfx-c-avatar {
-  color: #93c5fd;
-  border-color: rgba(79, 142, 247, 0.22);
-}
-
-// ── Header action icons ──────────────────────────────────────
-.header-action-icon {
-  font-size: 16px !important;
-  height: 18px !important;
-  width: 18px !important;
-  color: #94a3b8;
-  cursor: pointer;
-  gap: 2rem;
-  padding: 3px;
-  border-radius: 6px;
-  transition: color 0.2s, background 0.2s, transform 0.15s;
-
-  &:hover {
-    color: #2563eb !important;
-    background: rgba(37, 99, 235, 0.08);
-    transform: scale(1.15);
-  }
-}
-
-body.header-dark-theme .header-action-icon {
-  color: #4a5a78;
-
-  &:hover {
-    color: #93c5fd !important;
-    background: rgba(79, 142, 247, 0.12);
-  }
-}
-
-// ── More actions icon ────────────────────────────────────────
-.aip-more-actions-icon {
-  font-size: 22px;
-  padding: 3px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: #94a3b8;
-  font-weight: 300;
-  transition: color 0.2s, background 0.2s, transform 0.15s;
-
-  &.aip-icon-hover,
-  &:hover {
-    color: #2563eb;
-    background: rgba(37, 99, 235, 0.07);
-    transform: scale(1.08);
-  }
-}
-
-body.header-dark-theme .aip-more-actions-icon {
-  color: #44556e;
-
-  &.aip-icon-hover,
-  &:hover {
-    color: #93c5fd;
-    background: rgba(79, 142, 247, 0.1);
-  }
-}
-
-// ── Action icons (Datasets) ──────────────────────────────────
-.action-icon {
-  font-size: 18px;
-  height: 18px;
-  color: #94a3b8;
-  cursor: pointer;
-  transition: color 0.2s, transform 0.2s;
-
-  &:hover {
-    color: #2563eb;
-    transform: scale(1.2);
-  }
-}
-
-body.header-dark-theme .action-icon {
-  color: #44556e;
-
-  &:hover {
-    color: #93c5fd;
-  }
-}
-
-// ── Hover tooltip popup ──────────────────────────────────────
-::ng-deep .aip-hover-detail {
-  border-radius: 10px;
+.aip-hover-detail {
   display: none;
-  cursor: pointer;
   position: absolute;
-  top: -3rem;
-  z-index: 10000;
-  left: 8%;
-  text-wrap: balance;
-  width: 20rem;
-  text-align: center;
-  word-break: break-all;
-  padding: 10px 14px;
-  font-size: 12px;
-  background: #ffffff;
-  border: 1px solid #dce8f5;
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.12);
-  color: #1e293b;
-}
-
-body.header-dark-theme ::ng-deep .aip-hover-detail {
-  background: linear-gradient(180deg, #0d1b35 0%, #0a1628 100%);
-  border: 1px solid rgba(79, 142, 247, 0.22);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
-  color: #e2e8f0;
-}
-
-::ng-deep .aip-hover-avatar:hover ~ .aip-hover-detail {
-  display: block;
-  transition: display 1s ease-out 0.5s;
-}
-
-::ng-deep .aip-hover-detail::after {
-  content: "";
-  position: absolute;
-  bottom: -1rem;
-  left: 60%;
+  bottom: 100%;
+  left: 50%;
   transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 3.2rem solid transparent;
-  border-right: 0 solid transparent;
-  border-top: 1rem solid white;
-}
-
-body.header-dark-theme ::ng-deep .aip-hover-detail::after {
-  border-top-color: #0a1628;
-}
-
-// ── Skill / tag badges ───────────────────────────────────────
-.skill-badge {
-  font-size: 10px !important;
-  font-weight: 600 !important;
-  padding: 3px 10px !important;
-  border-radius: 5px !important;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  display: inline-block;
-  background: #eff6ff !important;
-  color: #1d4ed8 !important;
-  border: 1px solid rgba(37, 99, 235, 0.18) !important;
-  transition: background 0.15s, transform 0.15s;
-
-  &:hover {
-    background: #dbeafe !important;
-    transform: translateY(-1px);
-  }
-}
-
-body.header-dark-theme .skill-badge {
-  background: rgba(59, 130, 246, 0.12) !important;
-  color: #93c5fd !important;
-  border-color: rgba(59, 130, 246, 0.24) !important;
-
-  &:hover {
-    background: rgba(59, 130, 246, 0.22) !important;
-  }
-}
-
-// ── Card type icon wrap (model, pipeline, adapters, etc.) ───
-.card-type-icon-wrap {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: scale(1.12);
-  }
-}
-
-.card-type-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  line-height: 1;
-}
-
-.card-type-icon-wrap {
-  background: rgba(79, 142, 247, 0.1);
-  border: 1px solid rgba(79, 142, 247, 0.2);
-}
-
-.card-type-icon {
-  color: #2563eb;
-}
-
-body.header-dark-theme .card-type-icon-wrap {
-  background: rgba(79, 142, 247, 0.14);
-  border-color: rgba(79, 142, 247, 0.25);
-}
-
-body.header-dark-theme .card-type-icon {
-  color: #93c5fd;
-}
-
-// ── Agent dir stat row ───────────────────────────────────────
-.agent-dir-stat {
-  gap: 3px;
-  padding: 2px 6px;
+  background: rgba(15,23,42,0.95);
+  border: 1px solid rgba(79,142,247,0.2);
   border-radius: 6px;
-  transition: background 0.15s;
-
-  img {
-    border-radius: 3px;
-    opacity: 0.85;
-  }
-
-  &:hover {
-    background: rgba(79, 142, 247, 0.07);
-
-    img {
-      opacity: 1;
-    }
-  }
-}
-
-body.header-dark-theme .agent-dir-stat:hover {
-  background: rgba(79, 142, 247, 0.1);
-}
-
-// ── Skill badge overflow indicator ───────────────────────────
-.skill-badge-more {
-  background: #f1f5f9 !important;
-  color: #64748b !important;
-  border-color: rgba(100, 116, 139, 0.2) !important;
-}
-
-body.header-dark-theme .skill-badge-more {
-  background: rgba(100, 116, 139, 0.12) !important;
-  color: #94a3b8 !important;
-  border-color: rgba(100, 116, 139, 0.2) !important;
-}
-
-// ── MCP / agent directory count badges ──────────────────────
-.small-count {
+  padding: 4px 8px;
+  white-space: nowrap;
   font-size: 11px;
-  font-weight: 700;
-  font-family: "Roboto", monospace;
-  color: #374151;
+  color: #e2e8f0;
+  z-index: 10;
 }
 
-body.header-dark-theme .small-count {
+.aip-more-actions-icon {
+  font-size: 20px !important;
+  cursor: pointer;
+  color: #64748b;
+  transition: color 0.15s;
+  &:hover { color: #4f8ef7; }
+}
+
+.aip-menu-icon { color: #64748b !important; }
+.aip-menu-delete { color: #ef4444 !important; }
+
+.agent-card-content { padding: 0 !important; }
+
+.agent-dir-stat {
+  gap: 4px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.small-count {
+  font-size: 12px;
+  font-weight: 600;
   color: #94a3b8;
 }
 
-// ── Context menu (mat-menu) ──────────────────────────────────
-::ng-deep {
-  .mat-mdc-menu-panel {
-    border-radius: 12px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    font-family: "Roboto", "Segoe UI", sans-serif !important;
-    overflow: hidden !important;
-    background: #ffffff !important;
-    border: 1px solid #e2eaf5 !important;
-    box-shadow: 0 8px 28px rgba(37, 99, 235, 0.1), 0 2px 6px rgba(0, 0, 0, 0.05) !important;
-  }
-
-  .mat-mdc-menu-item {
-    min-height: 40px !important;
-    font-size: 13px !important;
-    letter-spacing: 0.01em !important;
-    border-left: 3px solid transparent !important;
-    transition: background 0.15s, border-color 0.15s !important;
-  }
-
-  body.header-dark-theme .mat-mdc-menu-panel {
-    background: linear-gradient(180deg, #0d1b35 0%, #0a1628 100%) !important;
-    border: 1px solid rgba(79, 142, 247, 0.2) !important;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-  }
-
-  body.header-dark-theme .mat-mdc-menu-item {
-    color: #94a3b8 !important;
-
-    .mdc-list-item__primary-text {
-      color: #94a3b8 !important;
-    }
-
-    &:hover:not([disabled]) {
-      background: linear-gradient(90deg, rgba(59, 130, 246, 0.14) 0%, rgba(59, 130, 246, 0.03) 100%) !important;
-      border-left-color: #3b82f6 !important;
-
-      .mdc-list-item__primary-text {
-        color: #e2e8f0 !important;
-      }
-    }
-  }
-
-  body.header-light-theme .mat-mdc-menu-item {
-    &:hover:not([disabled]) {
-      background: linear-gradient(90deg, rgba(37, 99, 235, 0.07) 0%, rgba(37, 99, 235, 0.01) 100%) !important;
-      border-left-color: #2563eb !important;
-    }
-  }
+.skill-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(6,182,212,0.15);
+  color: #67e8f9;
+  border: 1px solid rgba(6,182,212,0.3);
+  font-family: monospace;
 }
 
-// ── Menu icons ───────────────────────────────────────────────
-.aip-menu-icon {
-  margin-right: 10px;
-  font-size: 18px;
-  color: #2563eb;
-  transition: color 0.2s;
-}
-
-body.header-dark-theme .aip-menu-icon {
-  color: #4f8ef7;
-}
-
-.aip-menu-delete {
-  color: #ef4444 !important;
-  margin-right: 10px;
-  font-size: 18px;
+.skill-badge-more {
+  background: rgba(79,142,247,0.15);
+  color: #7eb8ff;
+  border-color: rgba(79,142,247,0.3);
 }

@@ -1,111 +1,49 @@
-.header-title {
-  text-align: left;
-  font: normal normal 600 18px/24px "Roboto", sans-serif !important;
-  letter-spacing: 0px;
-  color: #0052cc;
-  opacity: 1;
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+:host ::ng-deep mat-form-field,
+:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.05) !important; border-radius: 8px 8px 0 0 !important; }
+:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #64748b !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
+:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.25) !important; }
+:host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
+
+.dialog-header, .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(79,142,247,0.1);
+
+  h2, h3 {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #e2e8f0 !important;
+    margin: 0 !important;
+  }
 }
 
-::ng-deep .save-btn {
-  padding: 0px !important;
-  color: #ffffff !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  font-size: 12px !important;
-  line-height: 2;
-  font-weight: 400;
-  letter-spacing: 0px;
-  font-family: "Roboto", sans-serif !important;
-  border-radius: 16px;
-  background: transparent linear-gradient(90deg, #0052cc 0%, #0094ff 100%) 0% 0%
-    no-repeat padding-box !important;
+.dialog-content { padding: 20px; }
+
+.dialog-actions, mat-dialog-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  padding: 12px 20px !important;
+  border-top: 1px solid rgba(79,142,247,0.08) !important;
 }
 
-::ng-deep .mat-mdc-input-element {
-  background-color: #f7f7f7ed !important;
-  border-bottom: 0px solid rgba(0, 0, 0, 0.42) !important;
+button[mat-raised-button][color="primary"] {
+  background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  padding: 6px 20px !important;
 }
 
-::ng-deep .mdc-text-field {
-  border-bottom: 0px solid rgba(0, 0, 0, 0.42) !important;
-}
-
-::ng-deep .mdc-text-field {
-  all: unset;
-  /* or use display: none; if you want to hide it completely */
-  /* display: none; */
-}
-
-::ng-deep .mat-mdc-select-arrow {
-  display: none !important; // Hide default arrow
-}
-
-::ng-deep .mat-mdc-select-trigger {
-  position: relative;
-}
-
-::ng-deep .mat-mdc-select-trigger::after {
-  content: "";
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 12px;
-  height: 12px;
-  background-image: url("/assets/images/Accordion_open.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  pointer-events: none;
-}
-
-::ng-deep mat-label {
-  text-align: left;
-  font: normal normal normal 12px/18px Roboto !important;
-  letter-spacing: 0px;
-  color: #555555;
-  opacity: 1;
-}
-
-::ng-deep .mat-mdc-form-field input.mat-mdc-input-element {
-  text-align: left;
-  font: normal normal normal 16px/24px Roboto !important;
-  letter-spacing: 0px;
-  color: #000000 !important;
-  opacity: 1;
-  margin-left: 4px !important;
-}
-
-::ng-deep .mat-mdc-form-field input.mat-mdc-input-element::placeholder {
-  color: #737373 !important;
-  text-align: left;
-  font: normal normal normal 16px/24px Roboto !important;
-  letter-spacing: 0px;
-  text-transform: capitalize;
-  opacity: 1;
-}
-
-.ml-15m {
-  margin-left: -11px !important;
-}
-
-::ng-deep .mat-mdc-select {
-  background-color: #f7f7f7ed !important;
-  border-radius: 4px !important;
-  margin-left: 4px !important;
-}
-
-.text-transform {
-  text-transform: capitalize !important;
-}
-
-.close-btn {
-  right: top;
-  cursor: pointer;
-  color: #737373 !important;
-  font-size: 16px !important;
-}
-
-.lfx-u-pad-r-22 {
-  padding-right: 22px !important;
+body.header-light-theme {
+  .dialog-header h2, .dialog-header h3 { color: #0f172a !important; }
+  :host ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
 }

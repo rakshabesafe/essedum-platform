@@ -1,298 +1,121 @@
-:host ::ng-deep body,
-:host ::ng-deep html {
-  font-family: "Roboto", sans-serif !important;
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+// Main layout containers
+.backgroud-color { background: transparent !important; padding: 0 !important; }
+.lfx-l-level1-middle-col { width: 100% !important; padding: 0 !important; }
+.lfx-l-level2-middle-ctr { width: 100% !important; padding: 0 !important; }
+.lfx-l-level2-middle-col { width: 100% !important; }
+.col-lg-12, .col-md-12 { width: 100% !important; max-width: 100% !important; padding: 0 !important; }
+.container-fluid { padding: 0 !important; }
+.row { display: flex !important; flex-wrap: wrap !important; margin: 0 !important; }
+
+// Breadcrumb header area
+.align-items-center.d-flex { display: flex !important; align-items: center !important; }
+.col-5 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 0 0 auto !important;
+  max-width: none !important;
+  padding: 0 0 12px !important;
+}
+.col-7 {
+  flex: 1 !important;
+  max-width: none !important;
+  padding: 0 0 0 16px !important;
 }
 
-.mat-mdc-form-field-infix {
-  position: relative;
-  top: 1rem;
+.header-p-title { font-size: 12px; color: #64748b; font-weight: 400; letter-spacing: 0.2px; }
+.header-title { font-size: 20px; font-weight: 700; color: #e2e8f0; }
+.aip-desc-title { font-size: 18px; font-weight: 700; color: #e2e8f0; }
+
+.aip-led-icons {
+  font-size: 20px !important;
+  cursor: pointer;
+  color: #64748b;
+  transition: color 0.15s;
+  width: 20px !important;
+  height: 20px !important;
 }
 
-.lfx-u-pad-16 {
-  padding: 16px !important;
-}
-
-.lfx-u-mar-b-16 {
-  margin-bottom: 16px !important;
-}
-
-.lfx-u-mar-l-8 {
-  margin-left: 8px !important;
-}
-
-.lfx-u-mar-tb-16 {
-  margin-top: 16px !important;
-  margin-bottom: 16px !important;
-}
-
-.lfx-u-pad-t-32 {
-  padding-top: 32px !important;
-}
-
-.lfx-u-pad-lr-24 {
-  padding-left: 24px !important;
-  padding-right: 24px !important;
-}
-
-.lfx-u-header-xxl {
-  font-size: 2.4rem;
-  font-weight: 600;
-  font-family: "myriad-pro", Arial, sans-serif !important;
-  font-style: normal;
-}
-
-.lfx-l-level2-middle-ctr {
-  display: table;
-  width: 100%;
-  //table-layout: fixed;
-}
-
-.lfx-l-level2-middle-col {
-  display: table-cell;
-  vertical-align: top;
-  height: 100%;
-}
-
-.lfx-l-level1-middle-col {
-  padding: 32px 16px 32px 16px !important;
-}
-
-.lfx-l-level2-middle-col {
-  display: table-cell;
-  vertical-align: top;
-  height: 100%;
-}
-
-.lfx-c-panel {
-  border-radius: 16px;
-  background: #ffffff;
-  min-height: 100px;
-}
-.lfx-c-panel {
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16) !important;
-}
-
-.lfx-c-panel__content {
-  min-height: 100px !important;
-}
-
-.lfx-u-mar-8 {
-  margin: 8px !important;
-}
-
-.lfx-u-pad-l-8 {
-  padding-left: 8px !important;
-}
-
-.lfx-u-pad-b-8 {
-  padding-bottom: 8px !important;
-}
-.lfx-u-mar-lr-8 {
-  margin-left: 8px !important;
-  margin-right: 8px !important;
-}
-
-.lfx-u-pad-8 {
-  padding: 8px !important;
-}
-.lfx-u-mar-t-8 {
-  margin-top: 8px !important;
-}
-
-.lfx-u-text-neutral-80 {
-  color: #737373 !important;
-}
-.lfx-u-body-lg {
-  font-size: 1.6rem;
-  font-weight: 400;
-  font-family: "roboto", Arial, sans-serif !important;
-  font-style: normal;
-}
-.lfx-u-header-lg {
-  font-size: 1.6rem;
-  font-weight: 600;
-  font-family: "myriad-pro", Arial, sans-serif !important;
-  font-style: normal;
-}
-
-.lfx-l-level2-right-col {
-  width: 350px !important;
-  padding-left: 32px !important;
-}
-
-.secondary-color {
-  color: #0a142f !important;
-}
-
-.back-icon {
-  font-size: 24px !important;
-  color: #0a142f !important;
-}
-
-// ::ng-deep .mat-form-field-infix {
-//   width: 200px !important;
-//   height: 10px !important;
-// }
-
-// .mat-form-field {
-//   --mat-form-field-container-text-line-height: 0.5em;
-// }
-
-// ::ng-deep .mat-mdc-text-field-wrapper
-//  {
-//     height: 28px !important;
-//     flex: auto;
-//     will-change: auto;
-// }
-
-// ::ng-deep .mat-mdc-form-field .mdc-text-field--outlined .mdc-notched-outline--upgraded .mdc-floating-label--float-above
-//  {
-//     font-size: 10px !important;
-// }
-
-// ::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-text-field__input {
-//     font-size: 12px;
-//     display: inline-block;
-
-// }
-
-.header-title {
-  text-align: left;
-  font: normal normal 600 24px/30px "myriad-pro", "Open Sans", sans-serif !important;
-  letter-spacing: 0px;
-  color: #000000;
-  opacity: 1;
-}
-.header-p-title {
-  text-align: left;
-  font: normal normal 600 24px/30px "myriad-pro", "Open Sans", sans-serif !important;
-  letter-spacing: 0px;
-  color: #999999;
-  opacity: 1;
-}
-
-.sub-header {
-  text-align: left;
-  font: normal normal 600 16px/22px "myriad-pro", "Open Sans", sans-serif !important;
-  letter-spacing: 0px;
-  color: #000000;
-  text-transform: capitalize;
-  opacity: 1;
-}
-
-.base-color {
-  color: #0052cc !important;
-}
-
-::ng-deep .save-btn {
-  color: #ffffff !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  font-size: 12px !important;
-  line-height: 2;
-  font-weight: 400;
-  letter-spacing: 0px;
-  font-family: "Roboto", sans-serif !important;
-  border-radius: 16px;
-  background: transparent linear-gradient(90deg, #0052cc 0%, #0094ff 100%) 0% 0%
-      no-repeat,
-    #0052cc padding-box !important;
-  background: transparent linear-gradient(90deg, #0052cc 0%, #0094ff 100%) 0% 0%
-    no-repeat padding-box !important;
-}
-
-::ng-deep .cancel-btn {
-  color: #002966 !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  font-size: 12px !important;
-  line-height: 2;
-  font-weight: 400;
-  letter-spacing: 0px;
-  font-family: "Roboto", sans-serif !important;
-  border-radius: 16px;
-  background: #dadada 0% 0% no-repeat padding-box;
-  opacity: 1;
-}
-
-::ng-deep .mat-mdc-input-element {
-  background-color: #f7f7f7ed !important;
-  border-bottom: 0px solid rgba(0, 0, 0, 0.42) !important;
-}
-
-::ng-deep .mdc-text-field {
-  border-bottom: 0px solid rgba(0, 0, 0, 0.42) !important;
-}
-
-::ng-deep .mdc-text-field {
-  all: unset;
-  /* or use display: none; if you want to hide it completely */
-  /* display: none; */
-}
-
-::ng-deep .mat-mdc-select-arrow {
-  display: none !important; // Hide default arrow
-}
-
-::ng-deep .mat-mdc-select-trigger {
-  position: relative;
-}
-
-::ng-deep .mat-mdc-select-trigger::after {
-  content: "";
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 12px;
-  height: 12px;
-  background-image: url("/assets/images/Accordion_open.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  pointer-events: none;
-}
-
-::ng-deep mat-label {
-  text-align: left;
-  font: normal normal normal 12px/18px Roboto !important;
-  letter-spacing: 0px;
-  color: #555555;
-  opacity: 1;
-}
-
-::ng-deep .mat-mdc-form-field input.mat-mdc-input-element {
-  text-align: left;
-  font: normal normal normal 16px/24px Roboto !important;
-  letter-spacing: 0px;
-  color: #000000 !important;
-  opacity: 1;
-  margin-left: 4px !important;
-}
-
-::ng-deep .mat-mdc-form-field input.mat-mdc-input-element::placeholder {
-  color: #737373 !important;
-  text-align: left;
-  font: normal normal normal 16px/24px Roboto !important;
-  letter-spacing: 0px;
-  text-transform: capitalize;
-  opacity: 1;
-}
-
-.ml-15m {
-  margin-left: -11px !important;
-}
-
-::ng-deep .mat-mdc-select {
-  background-color: #f7f7f7ed !important;
-  border-radius: 4px !important;
-  margin-left: 4px !important;
-}
-
-.mat-button-radius {
+// Main card
+::ng-deep mat-card.mat-elevation-z4 {
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(79,142,247,0.15) !important;
   border-radius: 16px !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+  padding: 28px !important;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,#6366f1 0%,#8b5cf6 45%,#06b6d4 100%);
+    border-radius: 16px 16px 0 0;
+  }
 }
 
-.text-transform {
-  text-transform: capitalize !important;
+// Section header inside card
+.sub-header {
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  color: #e2e8f0 !important;
+  margin: 0 0 20px !important;
 }
+
+// Override all form field widths
+::ng-deep mat-form-field {
+  width: 100% !important;
+  min-width: 100% !important;
+}
+::ng-deep .mat-mdc-text-field-wrapper {
+  width: 100% !important;
+}
+::ng-deep .mdc-text-field--filled {
+  background: rgba(255,255,255,0.05) !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+::ng-deep .mat-mdc-form-field-label, ::ng-deep .mdc-floating-label {
+  color: #64748b !important;
+  font-size: 13px !important;
+}
+::ng-deep .mat-mdc-input-element, ::ng-deep input.mat-mdc-input-element {
+  color: #e2e8f0 !important;
+  font-size: 14px !important;
+}
+::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.25) !important; }
+::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
+
+// Action buttons
+.cancel-btn, .save-btn, .test-btn {
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 20px !important;
+  letter-spacing: 0.2px !important;
+}
+
+.cancel-btn {
+  background: rgba(255,255,255,0.06) !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(79,142,247,0.2) !important;
+}
+
+.save-btn, .test-btn {
+  background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 2px 12px rgba(79,142,247,0.3) !important;
+}
+
+// Accordion expansion panel
+::ng-deep mat-expansion-panel {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(79,142,247,0.12) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+::ng-deep .mat-expansion-panel-header-title { color: #e2e8f0 !important; font-weight: 600 !important; }

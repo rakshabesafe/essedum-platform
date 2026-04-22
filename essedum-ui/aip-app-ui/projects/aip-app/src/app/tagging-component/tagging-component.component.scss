@@ -1,73 +1,30 @@
-.tagbrdr {
-  border-radius: 24px;
-  padding: 6px;
-  margin: 5px;
-  text-decoration: none;
-  box-shadow: 0 1px 4px 0 rgb(1 1 1 / 10%), 0 1px 1px 0 rgb(0 0 0 / 10%);
-}
-.items-baseline {
-  align-items: baseline;
-}
-.flex-wrap {
-  flex-wrap: wrap;
-}
-.flex {
-  display: flex;
-}
-.aip-tag-active:hover{
-  background: white 0% 0% no-repeat padding-box;
-  background: white 0% 0% no-repeat padding-box;
-  box-shadow: 0px 5px 6px  #0a142f;
-}
-.aip-tag-disabled:hover {
-  background: white 0% 0% no-repeat padding-box;
-  background: #b3dfff 0% 0% no-repeat padding-box;
-  box-shadow: 0px 5px 6px #0a142f;
-}
-.aip-tag-active {
-  background: white 0% 0% no-repeat padding-box;
-  box-shadow: 0px 2px 4px #0a142f;
-  color:#0094ff ;
-}
-.aip-tag-active:focus {
-  background: white 0% 0% no-repeat padding-box;
-  box-shadow: 0px 1px 2px #0a142f;
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+:host ::ng-deep mat-form-field,
+:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.05) !important; border-radius: 8px 8px 0 0 !important; }
+:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #64748b !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
+:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.25) !important; }
+:host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
+
+:host ::ng-deep mat-chip-list .mat-chip,
+:host ::ng-deep mat-chip-listbox .mat-mdc-chip {
+  background: rgba(79,142,247,0.12) !important;
+  color: #7eb8ff !important;
+  border: 1px solid rgba(79,142,247,0.25) !important;
+  font-size: 12px !important;
 }
 
-.lfx-u-body-md
- {
-    font-size: 1.4rem;
-    font-weight: 400;
-    font-family: "roboto", Arial, sans-serif !important;
-    font-style: normal;
+:host ::ng-deep .mat-mdc-chip-remove { color: #64748b !important; &:hover { color: #f87171 !important; } }
+
+.tagging-container {
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.lfx-u-header-md {
-  font-size: 1.4rem;
-  font-weight: 600;
-  font-family: "myriad-pro", Arial, sans-serif !important;
-  font-style: normal;
-}
-
-a{
- color: #0094ff
-}
-
-.lfx-u-pad-24{
-padding: 24px !important;
-}
-
-.lfx-u-mar-b-16{
-margin-bottom: 16px !important;
-}
-
-.lfx-u-mar-t-16{
-margin-top: 16px !important;
-}
-
-.lfx-u-header-xl{
-  font-size : 1.8rem;
-      font-weight: 600;
-      font-family: "myriad-pro", Arial, sans-serif !important;
-      font-style: normal;
+body.header-light-theme {
+  :host ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
+  :host ::ng-deep mat-chip-list .mat-chip { background: rgba(79,70,229,0.08) !important; color: #4f46e5 !important; border-color: rgba(79,70,229,0.2) !important; }
 }

@@ -1,45 +1,53 @@
-  :host ::ng-deep .cipJSONEditor div.jsoneditor.jsoneditor-mode-tree{
-    border: thin solid #0094ff !important;
-  }
-  
-  :host ::ng-deep .cipJSONEditor div.jsoneditor-menu{
-    background-color: #0094ff !important;
-    border-bottom: 1px solid #0094ff !important;
-  }
-  
-  :host ::ng-deep .cipJSONEditor div.jsoneditor-frame{
-    color: black !important;
-  }
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
-  mat-card{
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  ::ng-deep{ 
-    .ace-jsoneditor, textarea.jsoneditor-text {
-       height: 300px;
-    }
-  }
-  
-:host {
-     font-family: "Roboto", "Segoe UI", sans-serif !important;
+::ng-deep mat-card {
+  background: rgba(13,22,48,0.88) !important;
+  border: 1px solid rgba(79,142,247,0.14) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(12px) !important;
+  padding: 16px !important;
+  width: 100% !important;
 }
 
-:host ::ng-deep {
-     font-family: "Roboto", "Segoe UI", sans-serif !important;
+.table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  overflow: auto;
 
-  mat-form-field,
-  mat-select,
-  mat-option,
-  mat-label,
-  .mat-select-value,
-  .mat-option-text,
-  input,
-  textarea,
-  button,
-  .mat-button-wrapper,
-  .mat-select-placeholder {
-     font-family:  "Roboto", "Segoe UI", sans-serif !important;
+  tr:first-child td {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    background: rgba(79,142,247,0.06) !important;
+    border-bottom: 2px solid rgba(79,142,247,0.2) !important;
+    padding: 8px 12px !important;
+
+    h5 { margin: 0 !important; font-size: 12px !important; color: inherit !important; }
   }
+
+  tr td {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    color: #cbd5e1 !important;
+    border-bottom: 1px solid rgba(79,142,247,0.07) !important;
+    vertical-align: middle !important;
+  }
+}
+
+pre {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(79,142,247,0.1) !important;
+  border-radius: 8px !important;
+  color: #cbd5e1 !important;
+  font-size: 12px !important;
+  padding: 12px !important;
+  white-space: pre-wrap !important;
+}
+
+body.header-light-theme {
+  ::ng-deep mat-card { background: rgba(255,255,255,0.95) !important; border-color: rgba(79,70,229,0.12) !important; }
+  .table tr td { color: #1e293b !important; }
+  pre { background: rgba(0,0,0,0.04) !important; color: #1e293b !important; border-color: rgba(79,70,229,0.12) !important; }
 }
