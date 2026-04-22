@@ -63,10 +63,22 @@ def sanitize_subpath(subpath: str) -> str:
     normalized = posixpath.normpath("/" + subpath)
     return normalized.lstrip("/")
 
+# Expected host suffix for all upstream targets - computed once at startup
+_CLUSTER_SUFFIX = f".{NS}.svc.cluster.local"
+
 def build_upstream(service: str, subpath: str) -> str:
     """Build upstream URL base for service + subpath."""
     sub = f"/{subpath}" if subpath else "/"
-    return f"http://{service}.{NS}.svc.cluster.local{sub}"
+    return f"http://{service}{_CLUSTER_SUFFIX}{sub}"
+
+def validate_upstream_url(url: URL) -> bool:
+    """
+    Verify the upstream URL host is strictly within the cluster namespace.
+    Prevents SSRF by ensuring user-controlled input cannot redirect
+    requests to arbitrary hosts outside *.{NS}.svc.cluster.local.
+    """
+    host = url.host or ""
+    return host.endswith(_CLUSTER_SUFFIX) and url.scheme == "http"
 
 # -------------------------
 # HTTP proxy (polling etc.)
@@ -92,21 +104,25 @@ async def http_proxy(request: web.Request):
     connector = TCPConnector(ssl=False)
 
     # Preserve query string (EIO=4, transport=polling, t=..., etc.)
-    upstream_url = str(URL(target).with_query(request.rel_url.query))
+    upstream_url = URL(target).with_query(request.rel_url.query)
+
+    # Validate the final upstream URL host is within the expected cluster namespace
+    if not validate_upstream_url(upstream_url):
+        return web.Response(text="Invalid upstream target", status=400)
 
     async with ClientSession(timeout=timeout, connector=connector) as session:
         try:
             async with session.request(
                 method=request.method,
-                url=upstream_url,
+                url=str(upstream_url),
                 headers=headers,
                 data=data,
             ) as resp:
                 out_headers = {k: v for (k, v) in resp.headers.items()}
                 body = await resp.read()
                 return web.Response(body=body, status=resp.status, headers=out_headers)
-        except Exception as e:
-            return web.Response(text=f"Upstream error: {e}", status=502)
+        except Exception:
+            return web.Response(text="Upstream error", status=502)
 
 # ---------------------------------
 # WebSocket proxy (Socket.IO WS)
@@ -143,6 +159,10 @@ async def websocket_proxy(request: web.Request) -> web.StreamResponse:
     base = build_upstream(service, upstream_path)
     # Preserve the original query string (EIO=4&transport=websocket&sid=...)
     upstream_url = URL(base).with_query(request.rel_url.query)
+
+    # Validate the final upstream URL host is within the expected cluster namespace
+    if not validate_upstream_url(upstream_url):
+        return web.Response(text="Invalid upstream target", status=400)
 
     headers = sanitize_headers(request.headers)
 
@@ -188,10 +208,10 @@ async def websocket_proxy(request: web.Request) -> web.StreamResponse:
             # 3) Bridge frames BOTH WAYS (this was previously incorrect)
             await asyncio.gather(client_to_upstream(), upstream_to_client())
 
-        except Exception as e:
+        except Exception:
             # If upstream WS fails, close client WS and surface error
             await ws_client.close()
-            return web.Response(text=f"Upstream WS error: {e}", status=502)
+            return web.Response(text="Upstream WS error", status=502)
 
     return ws_client
 
