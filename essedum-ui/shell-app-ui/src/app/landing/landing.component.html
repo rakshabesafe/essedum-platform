@@ -87,7 +87,7 @@
                 (showSidebarMenu && !isExpanded) ||
                 (iconsidebarrole == selectedrole.name && showSidebarMenu)
               )" #sidenav="" class="width parentsidenav selector-3-21" mode="side" opened="true"
-              style="overflow-x: hidden; height: 100% ;width: 70px;" [ngClass]="{
+              style="overflow: visible; height: 100%; width: 64px;" [ngClass]="{
                 enableSidebarShadow: enableSidebarShadow == true,
                 sidebarbgcolor: sidebarbgcolor == true,
                 sidebarbgcolordefault: sidebarbgcolor != true,
@@ -97,15 +97,13 @@
                 class="dashboard sidebarlineheight" style="
                   display: flex;
                   flex-direction: column;
-                  overflow-x: hidden;
-                  padding-top: 1.3vh;
-                  height: inherit;
-                  align-items: center;
+                  overflow: hidden;
+                  padding-top: 0;
+                  height: 100%;
+                  align-items: stretch;
                 ">
                 <span class="list-menu-toggle" (click)="toggleSidebarMenu()" #sidebarMenuTrigger>
-                  <i class="fa fa-bars fa-2x sidebar-Icons-list" aria-hidden="true" [ngStyle]="{                    
-                      color: !showSidebarMenuList ? '#0052cc' : ''
-                    }" [ngClass]="{
+                  <i class="fa fa-bars fa-2x sidebar-Icons-list" aria-hidden="true" [ngClass]="{
                       sidebariconcolor: sidebariconcolor,
                       sidebartexticonhovercolor: sidebartexticonhovercolor
                     }"></i>
@@ -158,12 +156,7 @@
                       ? showTabs(item)
                       : viewtabsonload()
                   " [routerLink]="item.url">
-                  <div class="" [matTooltip]="item.altText ? item.altText : item.label"
-                    matTooltipClass="widgettitletooltip" [class.collapsed]="!isExpanded"
-                    [class.griddirection]="iconsidebarrole == selectedrole.name" [ngStyle]="{
-                      'border-left': item.label == highlightedLabel ? '5px solid #0052cc' : 'none',
-                      width: '57.6px'
-                    }">
+                  <div class="sidebar-item-inner">
                     <div class="sidebar-itemIcon" style="text-align: -webkit-center"
                       [class.iconmapping]="iconsidebarrole == selectedrole.name" [ngStyle]="{
                         'margin-left':
@@ -213,36 +206,36 @@
                           item.label !== 'Salus' &&
                           item.label !== 'Vibe Studio'
                         " [src]="item.icon" alt="" 
-                        style="height: 42px !important; width: 42px !important;" />
+                        class="sidebar-product-img" />
                       
                       <!-- Hardcoded image for Agent Designer -->
                       <img id="imgid" class="sidebar-itemImg sidebar-Icons-list" *ngIf="
                           item.label === 'Agent Designer'
                         " src="assets/img/ai-agent-logo.jpg" alt="Agent Designer Icon"
-                        style="height: 42px !important; width: 42px !important;" />
+                        class="sidebar-product-img" />
                       <div style="margin-top: 0px !important;">
                       <img class="sidebar-itemImg sidebar-Icons-list "  *ngIf="
                           item.label === 'Agent MCP Pipelines'
                         " src="assets/img/pipeline_agent.jpg" alt="Pipeline Agent Icon"
-                        style="height: 42px !important; width: 42px !important;" />
+                        class="sidebar-product-img" />
 
                                 <img class="sidebar-itemImg sidebar-Icons-list "  *ngIf="
                           item.label === 'Lite LLM'
                         " src="assets/img/lite-llm.jpg" alt="Lite LLM Icon"
-                        style="height: 42px !important; width: 42px !important;" />
+                        class="sidebar-product-img" />
                                 <img class="sidebar-itemImg sidebar-Icons-list "  *ngIf="
                           item.label === 'Langfuse'
                         " src="assets/img/langfuse.jpg" alt="langfuse Icon"
-                        style="height: 42px !important; width: 42px !important;" />
+                        class="sidebar-product-img" />
                                 <img class="sidebar-itemImg sidebar-Icons-list "  *ngIf="
                           item.label === 'Salus'
                         " src="assets/img/salus.png" alt="Salus Icon"
-                        style="height: 42px !important; width: 42px !important;" />
+                        class="sidebar-product-img" />
 
                                 <img class="sidebar-itemImg sidebar-Icons-list "  *ngIf="
                           item.label === 'Vibe Studio'
                         " src="assets/img/vibe.png" alt="Vibe Studio Icon"
-                        style="height: 42px !important; width: 42px !important;" />
+                        class="sidebar-product-img" />
                       </div>
                       <i *ngIf="
                           item.icon &&
@@ -256,9 +249,7 @@
                           item.label !== 'Salus' &&
                           item.label !== 'Vibe Studio' &&
                           !item.icon.includes('data:image/')
-                        " class="fa fa-{{ item.icon }} fa-2x" [ngStyle]="{
-                          color: item.label == highlightedLabel ? '#0052cc' : '#68696c'
-                        }" [ngClass]="{
+                        " class="fa fa-{{ item.icon }} fa-2x" [ngClass]="{
                           sidebariconcolor: sidebariconcolor,
                           sidebartexticonhovercolor: sidebartexticonhovercolor
                         }" class="sidebar-Icons-list"></i>
@@ -273,36 +264,8 @@
                         }"></i>
                       <i *ngIf="!item.icon" class="fa fa-folder fa-2x"
                         [ngClass]="{ sidebariconcolor: sidebariconcolor }"></i>
-                      <div [ngStyle]="{
-                          'font-size': sidebarMenuTextSize,
-                          'line-height': sidebarTextLineHeight,
-                          width:
-                            iconsidebarrole != selectedrole.name
-                              ? sidebarWidth
-                              : '',
-                          'padding-right':
-                            iconsidebarrole == selectedrole.name
-                              ? iconSideBarMarginLeft
-                              : '',
-                          'padding-left':
-                            iconsidebarrole == selectedrole.name
-                              ? iconsidebarpadding
-                              : ''
-                        }" style="margin: unset" [class.outlooksidebarfontsize]="
-                          iconsidebarrole == selectedrole.name
-                        " *ngIf="
-                          !(iconsidebarrole == selectedrole.name && !isExpanded)
-                        " [ngClass]="{
-                          'sidebar-item-full-text':
-                            show_sidebar_full_text == true,
-                          'sidebar-item-text': show_sidebar_full_text != true,
-                          sidebartextcolor: sidebartextcolor == true,
-                          sidebartextcolordefault: sidebartextcolor != true,
-                          sidebartexticonhovercolor: sidebartexticonhovercolor
-                        }" [class.collapsed]="!isExpanded">
-                        <!-- {{ item.label }} -->
-                      </div>
                     </div>
+                    <span class="sidebar-nav-label">{{ item.label }}</span>
                   </div>
                 </div>
               </mat-nav-list>

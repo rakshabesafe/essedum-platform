@@ -665,134 +665,294 @@ app-schema, app-user-secrets, app-playground-tab {
   box-sizing: border-box !important;
 }
 
-// ─── Left Icon Sidebar ─────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// LEFT SIDEBAR RAIL — Enterprise AI Platform Navigation
+// Compact 64px icon rail; expands to 228px on hover (overlay pattern).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// 1. Allow the sidenav layout container to visually overflow its reserved width
+mat-sidenav-container.example-sidenav-container {
+  overflow: visible !important;
+}
+
 mat-sidenav.parentsidenav {
-  width: 70px !important;
-  min-width: 70px !important;
-  max-width: 70px !important;
-  overflow-x: hidden !important;
+  width: 64px !important;
+  min-width: 64px !important;
+  max-width: 64px !important;
+  overflow: visible !important;
+  overflow-x: visible !important;
   border-right: none !important;
-  background-color: var(--sidebarbg-color, #003057) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  z-index: 200 !important;
 }
 
-.parentsidenav {
-  background-color: var(--sidebarbg-color, #003057) !important;
+// Angular Material's inner drawer wrapper — must be overflow:visible for expansion
+mat-sidenav.parentsidenav .mat-drawer-inner-container,
+mat-sidenav.parentsidenav > div {
+  overflow: visible !important;
+  width: 64px !important;
 }
 
-.parentsidenav.enableSidebarShadow {
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.25) !important;
-}
-
-.width {
-  overflow-x: hidden;
-}
-
-mat-nav-list.dashboard {
-  display: flex !important;
-  flex-direction: column !important;
-  overflow-x: hidden !important;
-  height: 100% !important;
-  align-items: center !important;
-  padding: 0 !important;
-}
-
+.parentsidenav { background: transparent !important; }
+.parentsidenav.enableSidebarShadow { box-shadow: none !important; }
+.width { overflow: visible; }
 .sidebarlineheight { line-height: normal !important; }
 
-// ─── Sidebar Item ──────────────────────────────────────────────────────────────
-.a-height { width: 100%; position: relative; }
+// 2. The visual sidebar rail (absolute within the sidenav, expands on hover)
+mat-nav-list.dashboard {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  height: 100% !important;
+  width: 64px !important;
+  z-index: 300 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79,142,247,0.15) transparent;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  padding: 8px 0 12px !important;
+
+  background: #060d1e !important;
+  border-right: 1px solid rgba(79, 142, 247, 0.12) !important;
+
+  transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.26s ease !important;
+
+  &::-webkit-scrollbar { width: 2px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(79,142,247,0.2); border-radius: 1px; }
+
+  // Accent gradient line at top
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #4f8ef7 0%, #6366f1 60%, transparent 100%);
+    opacity: 0.8;
+    z-index: 1;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  &:hover {
+    width: 228px !important;
+    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.6), 2px 0 0 rgba(79,142,247,0.08) !important;
+  }
+}
+
+// 3. Hamburger / menu toggle — hidden (labels reveal on rail hover instead)
+.list-menu-toggle { display: none !important; }
+
+// Hide waffle / expand button from header
+button.main-toggle-btn,
+button#sidebarexpand { display: none !important; }
+
+// 4. Each nav item outer wrapper
+.a-height { width: 100% !important; position: relative !important; }
 
 .sidebar-item-container {
   display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  padding: 0 !important;
+  margin: 1px 0 !important;
+  cursor: pointer !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+  border-left: 3px solid transparent !important;
+  overflow: hidden !important;
+  transition: background 0.18s, border-color 0.18s !important;
+  flex-shrink: 0 !important;
+
+  &:hover {
+    background: rgba(79, 142, 247, 0.06) !important;
+    border-left-color: rgba(79, 142, 247, 0.4) !important;
+  }
+}
+
+// 5. Inner wrapper (flex row, fills full item height)
+.sidebar-item-inner {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+// 6. Icon zone — 61px fixed; hosts the backdrop pill via ::before
+.sidebar-itemIcon {
+  width: 61px !important;
+  min-width: 61px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  flex-direction: column !important;
-  width: 100% !important;
-  min-height: 56px;
-  padding: 4px 0;
-  cursor: pointer;
-  position: relative;
-  transition: background 0.15s;
-  box-sizing: border-box;
+  height: 100% !important;
+  text-align: center !important;
+  position: relative !important;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+    z-index: 0;
+    pointer-events: none;
+  }
 }
 
-.sidebar-itemIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  text-align: center;
+.sidebar-item-container:hover .sidebar-itemIcon::before {
+  background: rgba(79, 142, 247, 0.13) !important;
+  box-shadow: 0 0 0 1px rgba(79, 142, 247, 0.28) !important;
 }
 
-.sidebar-itemImg {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  border-radius: 4px;
-  display: block;
+.sidebar-item-container.sidebar-border .sidebar-itemIcon::before,
+.sidebar-item-container.config .sidebar-itemIcon::before {
+  background: rgba(79, 142, 247, 0.22) !important;
+  box-shadow: 0 0 0 1.5px rgba(79, 142, 247, 0.5),
+              0 2px 14px rgba(79, 142, 247, 0.28) !important;
 }
 
-.sidebar-item-full-text {
-  font-size: 9px !important;
-  text-align: center;
-  white-space: normal;
-  word-break: break-word;
-  width: 60px;
-  line-height: 1.2;
-  margin-top: 2px;
+// 7. Image icons — sit above the backdrop
+.sidebar-itemImg,
+.sidebar-product-img {
+  width: 22px !important;
+  height: 22px !important;
+  object-fit: contain !important;
+  border-radius: 5px !important;
+  display: block !important;
+  opacity: 0.78 !important;
+  position: relative !important;
+  z-index: 1 !important;
+  transition: opacity 0.2s, transform 0.2s !important;
 }
 
-.sidebar-item-text {
-  font-size: 9px !important;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 60px;
-  margin-top: 2px;
+.sidebar-item-container:hover .sidebar-itemImg,
+.sidebar-item-container:hover .sidebar-product-img {
+  opacity: 1 !important;
+  transform: scale(1.08) !important;
 }
 
-.collapsed { display: none !important; }
-.griddirection { display: grid !important; place-items: center !important; }
-.iconmapping { margin: 0 auto; }
-.outlooksidebarfontsize { font-size: 0.75vw; }
-.iconsidebarheight { min-height: 48px; }
-.second-item { margin-top: 4px; }
-.expand-panel-name { font-size: inherit; font-weight: 500; }
+.sidebar-item-container.sidebar-border .sidebar-itemImg,
+.sidebar-item-container.sidebar-border .sidebar-product-img,
+.sidebar-item-container.config .sidebar-itemImg,
+.sidebar-item-container.config .sidebar-product-img {
+  opacity: 1 !important;
+}
 
+// 8. Font Awesome icons — blue-tinted for AI platform feel
+.sidebar-Icons-list {
+  font-size: 17px !important;
+  color: rgba(100, 155, 245, 0.6) !important;
+  position: relative !important;
+  z-index: 1 !important;
+  transition: color 0.18s, transform 0.18s !important;
+}
+.sidebar-item-container:hover .sidebar-Icons-list {
+  color: rgba(120, 175, 255, 0.92) !important;
+  transform: scale(1.1) !important;
+}
+
+// 9. Hover-reveal label
+.sidebar-nav-label {
+  flex: 1 !important;
+  white-space: nowrap !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.015em !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 0 10px 0 4px !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  pointer-events: none !important;
+  line-height: 1.3 !important;
+  font-family: 'Roboto', 'Segoe UI', sans-serif !important;
+  transition: opacity 0.18s ease 0.05s !important;
+}
+
+mat-nav-list.dashboard:hover .sidebar-nav-label { opacity: 1 !important; }
+.sidebar-item-container:hover .sidebar-nav-label { color: rgba(255, 255, 255, 0.9) !important; }
+
+// 10. Active / selected state
+.sidebar-item-container.sidebar-border,
+.sidebar-item-container.config {
+  background: rgba(79, 142, 247, 0.1) !important;
+  border-left-color: #4f8ef7 !important;
+
+  .sidebar-Icons-list {
+    color: #6eaeff !important;
+    transform: scale(1.1) !important;
+  }
+  .sidebar-nav-label { color: #deeeff !important; opacity: 1 !important; font-weight: 600 !important; }
+  .sidebar-itemImg, .sidebar-product-img { opacity: 1 !important; transform: scale(1.08) !important; }
+}
+
+// 11. SVG icon colour — blue-tinted default, bright on hover
 .sidebar-svg-iconcolor svg, .sidebar-svg-iconcolor path {
-  fill: var(--sidebartext-color, #e2e8f0) !important;
+  fill: rgba(100, 155, 245, 0.6) !important;
+  transition: fill 0.18s !important;
 }
 .sidebar-svg-iconcolordefault svg, .sidebar-svg-iconcolordefault path {
-  fill: var(--text-color, #374151) !important;
+  fill: rgba(100, 155, 245, 0.52) !important;
+}
+.sidebar-item-container:hover .sidebar-svg-iconcolor svg,
+.sidebar-item-container:hover .sidebar-svg-iconcolor path,
+.sidebar-item-container:hover .sidebar-svg-iconcolordefault svg,
+.sidebar-item-container:hover .sidebar-svg-iconcolordefault path {
+  fill: rgba(130, 185, 255, 0.94) !important;
+}
+.sidebar-item-container.sidebar-border .sidebar-svg-iconcolor svg,
+.sidebar-item-container.sidebar-border .sidebar-svg-iconcolor path,
+.sidebar-item-container.config .sidebar-svg-iconcolor svg,
+.sidebar-item-container.config .sidebar-svg-iconcolor path {
+  fill: #6eaeff !important;
 }
 
-// ─── Sidebar Menu Popup / Toggle ───────────────────────────────────────────────
-.list-menu-toggle {
-  cursor: pointer;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 0;
-  margin-bottom: 4px;
-}
-
+// 12. Expanded text menu popup (triggered by hamburger)
 .sidebar-menu-popup {
-  position: fixed;
-  z-index: 2000;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
-  height: calc(100vh - 75px);
-  overflow-y: auto;
-  overflow-x: visible;
-  min-width: 180px;
+  position: fixed !important;
+  z-index: 2000 !important;
+  background: #070e20 !important;
+  border: 1px solid rgba(79, 142, 247, 0.15) !important;
+  border-left: none !important;
+  border-radius: 0 12px 12px 0 !important;
+  box-shadow: 8px 0 40px rgba(0, 0, 0, 0.6),
+              inset -1px 0 0 rgba(79, 142, 247, 0.08) !important;
+  height: calc(100vh - 92px) !important;
+  overflow-y: auto !important;
+  overflow-x: visible !important;
+  min-width: 224px !important;
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(79,142,247,0.22); border-radius: 2px; }
 }
 
-.sidebar-Icons-list {
-  color: var(--sidebaricon-color, #94a3b8);
-  transition: color 0.15s;
-}
+// 13. Compatibility / legacy classes
+.sidebar-item-full-text, .sidebar-item-text { display: none !important; }
+.collapsed { display: none !important; }
+.griddirection { display: flex !important; align-items: center !important; }
+.iconmapping { margin: 0 !important; }
+.outlooksidebarfontsize { display: none !important; }
+.iconsidebarheight { min-height: 44px !important; height: 44px !important; }
+.second-item { margin-top: 0 !important; }
+.expand-panel-name { font-size: inherit; font-weight: 500; }
 
 // ─── Tabs / Second-Level Nav ───────────────────────────────────────────────────
 .tabsContainer {
@@ -854,9 +1014,9 @@ mat-nav-list.dashboard {
 .sidebartextdefault            { color: var(--base-color, #0094ff); }
 .sidebartexticonhovercolor:hover { color: var(--sidebartexticonhover-color, #00A3E0) !important; }
 
-.sidebar-item-container.sidebar-border         { border-left: 0.4vw solid #0052cc !important; }
-.sidebar-item-container.sidebar-borderconfig   { border-left: 0.4vw solid var(--sidebarhighlight-color, #00A3E0) !important; }
-.sidebar-item-container.config                 { border-left: 0.4vw solid var(--sidebarhighlight-color, #00A3E0) !important; }
+.sidebar-item-container.sidebar-border         { border-left: 3px solid var(--sidebarhighlight-color, #4f8ef7) !important; background: rgba(79,142,247,0.12) !important; }
+.sidebar-item-container.sidebar-borderconfig   { border-left: 3px solid var(--sidebarhighlight-color, #00A3E0) !important; background: rgba(0,163,224,0.12) !important; }
+.sidebar-item-container.config                 { border-left: 3px solid var(--sidebarhighlight-color, #00A3E0) !important; background: rgba(0,163,224,0.12) !important; }
 .sidebar-background                            { border-bottom: 0.2vw solid #0094ff; }
 .sidebar-backgroundconfig                      { border-bottom: 0.2vw solid var(--sidebarhighlight-color, #00A3E0); }
 
@@ -891,14 +1051,21 @@ body.header-dark-theme {
     background: transparent !important;
   }
 
-  mat-sidenav.parentsidenav {
-    background-color: rgba(8, 15, 34, 0.98) !important;
+  mat-sidenav.parentsidenav { background: transparent !important; border-right: none !important; }
+  mat-nav-list.dashboard {
+    background: #060d1e !important;
     border-right: 1px solid rgba(79, 142, 247, 0.12) !important;
   }
-
-  .sidebar-item-container:hover { background: rgba(79, 142, 247, 0.08) !important; }
-  .sidebar-Icons-list { color: #94a3b8; }
-  .sidebarbgcolor { background-color: rgba(8, 15, 34, 0.98) !important; }
+  mat-nav-list.dashboard::before { background: linear-gradient(90deg, #4f8ef7 0%, #6366f1 60%, transparent 100%); }
+  .sidebar-item-container:hover { background: rgba(79, 142, 247, 0.06) !important; }
+  .sidebar-item-container.sidebar-border, .sidebar-item-container.config {
+    background: rgba(79, 142, 247, 0.1) !important;
+    border-left-color: #4f8ef7 !important;
+    .sidebar-Icons-list { color: #6eaeff !important; }
+    .sidebar-nav-label { color: #deeeff !important; opacity: 1 !important; font-weight: 600 !important; }
+  }
+  .sidebar-Icons-list { color: rgba(100, 155, 245, 0.6) !important; }
+  .sidebarbgcolor { background-color: transparent !important; }
   .sidebar-background { border-bottom-color: #4f8ef7; }
 
   .top-nav-bar.top-nav-dark {
@@ -941,15 +1108,83 @@ body.header-light-theme {
     background: transparent !important;
   }
 
-  mat-sidenav.parentsidenav {
-    background-color: #003057 !important;
-    border-right: none !important;
+  mat-sidenav.parentsidenav { background: transparent !important; border-right: none !important; }
+
+  // Light sidebar — product images look natural, icons readable with dark text
+  mat-nav-list.dashboard {
+    background: #f1f5f9 !important;
+    border-right: 1px solid rgba(99, 102, 241, 0.12) !important;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.06) !important;
+
+    &:hover {
+      box-shadow: 4px 0 20px rgba(0,0,0,0.1), 2px 0 0 rgba(79,70,229,0.08) !important;
+    }
+  }
+  mat-nav-list.dashboard::before {
+    background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 60%, transparent 100%);
+    opacity: 0.9;
   }
 
-  .sidebar-item-container:hover { background: rgba(0,163,224,0.12) !important; }
-  .sidebar-Icons-list { color: #94a3b8; }
-  .sidebarbgcolor { background-color: #003057 !important; }
-  .sidebar-background { border-bottom-color: #00A3E0; }
+  // Backdrop pill — very faint on light bg
+  .sidebar-itemIcon::before { background: rgba(0,0,0,0.04) !important; }
+
+  .sidebar-item-container:hover {
+    background: rgba(79, 70, 229, 0.06) !important;
+    border-left-color: rgba(79, 70, 229, 0.4) !important;
+  }
+  .sidebar-item-container:hover .sidebar-itemIcon::before {
+    background: rgba(79, 70, 229, 0.1) !important;
+    box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.22) !important;
+  }
+  .sidebar-item-container:hover .sidebar-Icons-list {
+    color: #4f46e5 !important;
+    transform: scale(1.1) !important;
+  }
+  .sidebar-item-container:hover .sidebar-nav-label { color: #1e1b4b !important; }
+
+  // Active state
+  .sidebar-item-container.sidebar-border, .sidebar-item-container.config {
+    background: rgba(79, 70, 229, 0.08) !important;
+    border-left-color: #4f46e5 !important;
+    .sidebar-itemIcon::before {
+      background: rgba(79, 70, 229, 0.13) !important;
+      box-shadow: 0 0 0 1.5px rgba(79, 70, 229, 0.35),
+                  0 2px 12px rgba(79, 70, 229, 0.15) !important;
+    }
+    .sidebar-Icons-list { color: #4f46e5 !important; transform: scale(1.1) !important; }
+    .sidebar-nav-label { color: #1e1b4b !important; opacity: 1 !important; font-weight: 600 !important; }
+    .sidebar-itemImg, .sidebar-product-img { opacity: 1 !important; transform: scale(1.06) !important; }
+  }
+
+  // Default icon and label colours on light background
+  .sidebar-Icons-list { color: rgba(71, 85, 105, 0.65) !important; }
+  .sidebar-nav-label { color: rgba(51, 65, 85, 0.75) !important; }
+
+  // SVG icons on light sidebar
+  .sidebar-svg-iconcolor svg, .sidebar-svg-iconcolor path,
+  .sidebar-svg-iconcolordefault svg, .sidebar-svg-iconcolordefault path {
+    fill: rgba(71, 85, 105, 0.6) !important;
+  }
+  .sidebar-item-container:hover .sidebar-svg-iconcolor svg,
+  .sidebar-item-container:hover .sidebar-svg-iconcolordefault svg,
+  .sidebar-item-container:hover .sidebar-svg-iconcolor path,
+  .sidebar-item-container:hover .sidebar-svg-iconcolordefault path {
+    fill: #4f46e5 !important;
+  }
+  .sidebar-item-container.sidebar-border .sidebar-svg-iconcolor svg,
+  .sidebar-item-container.config .sidebar-svg-iconcolor svg,
+  .sidebar-item-container.sidebar-border .sidebar-svg-iconcolor path,
+  .sidebar-item-container.config .sidebar-svg-iconcolor path {
+    fill: #4f46e5 !important;
+  }
+
+  .sidebarbgcolor { background-color: #f1f5f9 !important; }
+  .sidebar-background { border-bottom-color: #4f46e5; }
+  .sidebar-menu-popup {
+    background: #f8fafc !important;
+    border-color: rgba(99,102,241,0.15) !important;
+    box-shadow: 8px 0 32px rgba(0,0,0,0.12), inset -1px 0 0 rgba(99,102,241,0.08) !important;
+  }
 
   .top-nav-bar.top-nav-light {
     background: #003057;

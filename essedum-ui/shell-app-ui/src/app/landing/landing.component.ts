@@ -131,7 +131,7 @@ export class LandingComponent implements OnInit, AfterViewInit {
   offsetY = 0;
   essedum_title:string="ESSEDUM";
   isDark: boolean = true;
-  showTopNav: boolean = true;
+  showTopNav: boolean = false;
 
   @HostListener("window:resize", ["$event"])
   onResize(event) {
@@ -3697,7 +3697,7 @@ if ((roleChanged || portfolioChanged || projectChanged) && !navigationInProgress
     if (this.showSidebarMenuList) {
       return "150px";
     } else {
-      return "65px";
+      return "64px";
     }
   }
 }
