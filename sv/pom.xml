@@ -66,8 +66,8 @@
 		<org.modelmapper.modelmapper.version>${modelmapper.version}</org.modelmapper.modelmapper.version>
 		<com.openpojo.openpojo.version>${openpojo.version}</com.openpojo.openpojo.version>
 		<org.apache.commons.commons-collections4.version>4.4</org.apache.commons.commons-collections4.version>
-		<org.apache.poi.poi-ooxml.version>5.2.2</org.apache.poi.poi-ooxml.version>
-		<org.apache.poi.poi.version>5.2.2</org.apache.poi.poi.version>
+		<org.apache.poi.poi-ooxml.version>5.4.0</org.apache.poi.poi-ooxml.version>
+		<org.apache.poi.poi.version>5.4.0</org.apache.poi.poi.version>
 		<io.jsonwebtoken.jjwt-impl.version>${jjwt.version}</io.jsonwebtoken.jjwt-impl.version>
 		<io.jsonwebtoken.jjwt-api.version>${jjwt.version}</io.jsonwebtoken.jjwt-api.version>
 		<io.jsonwebtoken.jjwt-jackson.version>${jjwt.version}</io.jsonwebtoken.jjwt-jackson.version>
@@ -75,8 +75,8 @@
 		<io.projectreactor.netty.reactor-netty-http.version>1.1.13</io.projectreactor.netty.reactor-netty-http.version>
 		<com.azure.azure-core.version>1.54.1</com.azure.azure-core.version>
 		<com.azure.azure-storage-blob.version>12.29.0</com.azure.azure-storage-blob.version>
-		<io.netty.netty-codec-http2.version>4.1.115.Final</io.netty.netty-codec-http2.version>
-		<io.netty.netty-handler.version>4.1.108.Final</io.netty.netty-handler.version>
+		<io.netty.netty-codec-http2.version>4.1.132.Final</io.netty.netty-codec-http2.version>
+		<io.netty.netty-handler.version>4.1.118.Final</io.netty.netty-handler.version>
 		<ch.qos.logback.logback-classic.version>1.5.12</ch.qos.logback.logback-classic.version>
 		<ch.qos.logback.logback-core.version>1.5.12</ch.qos.logback.logback-core.version>
 		<com.googlecode.json-simple.json-simple.version>${json-simple.version}</com.googlecode.json-simple.json-simple.version>
@@ -86,8 +86,8 @@
 		<org.eclipse.jgit.org.eclipse.jgit.version>5.13.4.202507202350-r</org.eclipse.jgit.org.eclipse.jgit.version>
 		<org.mockito.mockito-all.version>2.0.2-beta</org.mockito.mockito-all.version>
 		<org.springframework.spring-webmvc.version>6.1.14</org.springframework.spring-webmvc.version>
-		<org.springframework.spring-web.version>6.1.14</org.springframework.spring-web.version>
-		<org.apache.tomcat.embed.tomcat-embed-core.version>10.1.47</org.apache.tomcat.embed.tomcat-embed-core.version>
+		<org.springframework.spring-web.version>6.1.21</org.springframework.spring-web.version>
+		<org.apache.tomcat.embed.tomcat-embed-core.version>10.1.54</org.apache.tomcat.embed.tomcat-embed-core.version>
 		<com.lfn.ai.comm-lib-util.version>${project.version}</com.lfn.ai.comm-lib-util.version>
 		<com.lfn.iamp-lib-usm.version>${project.version}</com.lfn.iamp-lib-usm.version>
 		<com.lfn.icip.icip-lib-evt.version>${project.version}</com.lfn.icip.icip-lib-evt.version>
@@ -113,7 +113,7 @@
 		<net.java.dev.jna.jna-platform.version>5.6.0</net.java.dev.jna.jna-platform.version>
 		<org.jsoup.jsoup.version>1.15.3</org.jsoup.jsoup.version>
 		<org.apache.httpcomponents.httpclient.version>4.5.14</org.apache.httpcomponents.httpclient.version>
-		<com.squareup.okhttp3.okhttp.version>4.9.0</com.squareup.okhttp3.okhttp.version>
+		<com.squareup.okhttp3.okhttp.version>4.9.2</com.squareup.okhttp3.okhttp.version>
 		<io.gsonfire.gson-fire.version>1.8.5</io.gsonfire.gson-fire.version>
 		<com.squareup.okhttp3.logging-interceptor.version>4.9.0</com.squareup.okhttp3.logging-interceptor.version>
 		<org.apache.tika.tika-core.version>${tika.version}</org.apache.tika.tika-core.version>
@@ -141,9 +141,9 @@
 	    <aws.sdk.s3.version>2.20.23</aws.sdk.s3.version>
         <aws.sdk.utils.version>2.35.6</aws.sdk.utils.version>
 	    <aws.java.sdk.sagemaker.version>1.12.158</aws.java.sdk.sagemaker.version>
-	    <aws.java.sdk.s3.version>1.11.923</aws.java.sdk.s3.version>	    
+	    <aws.java.sdk.s3.version>1.12.261</aws.java.sdk.s3.version>
 	    <lucene.version>8.11.1</lucene.version>
-	    <protobuf-java.version>3.24.4</protobuf-java.version>
+	    <protobuf-java.version>3.25.5</protobuf-java.version>
 	    <junit.jupiter.version>5.10.1</junit.jupiter.version>
 	    <nimbus-jose-jwt.version>9.37.2</nimbus-jose-jwt.version>	    
 	    <pdfbox.version>3.0.3</pdfbox.version>
@@ -159,7 +159,7 @@
 	    <google-auth.version>1.24.1</google-auth.version>
 	    <lucene-analyzers-common.version>8.9.0</lucene-analyzers-common.version>	    
         <aws-java-sdk.version>1.11.163</aws-java-sdk.version>
-        <minio.version>8.2.0</minio.version>       
+        <minio.version>8.6.0</minio.version>
 	    <commons-fileupload.version>1.6.0</commons-fileupload.version>
 	    <jakarta.interceptor-api.version>2.1.0</jakarta.interceptor-api.version>
 	    <spring-mock.version>2.0.4</spring-mock.version>
