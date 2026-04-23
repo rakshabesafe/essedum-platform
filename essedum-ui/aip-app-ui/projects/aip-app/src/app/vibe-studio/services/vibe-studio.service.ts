@@ -571,6 +571,7 @@ export class VibeStudioService implements OnDestroy {
       })
       .subscribe({
         next: (resp) => {
+          this.triggerPushToGitHub(sessionId);
           const pathsToFetch = this.extractFilePathsFromListApps(resp);
           if (pathsToFetch.length > 0) {
             this.fetchFilesFromServer(sessionId, pathsToFetch, done);
@@ -812,6 +813,21 @@ export class VibeStudioService implements OnDestroy {
     } catch {
       // non-fatal — never disrupts the existing generation flow
     }
+  }
+
+  /**
+   * Calls POST /sessions/{sessionId}/push-to-github after list-apps succeeds.
+   * Fire-and-forget — does not block the file-fetching flow.
+   */
+  private triggerPushToGitHub(sessionId: string): void {
+    const url = `${this.baseUrl}/service/v1/vibe-coding/sessions/${sessionId}/push-to-github`;
+    const project = JSON.parse(sessionStorage.getItem('project') || '{}');
+    const body: any = { org: project?.name || 'leo1311' };
+    this.http.post<any>(url, body, { headers: this.getHttpHeaders() as any })
+      .subscribe({
+        next: () => {},
+        error: () => {},
+      });
   }
 
   /**
