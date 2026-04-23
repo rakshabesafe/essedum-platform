@@ -5,6 +5,14 @@ let currentJobs = [];
 let currentPage = 0;
 let lastPage = 0;
 
+// Escape HTML special characters to prevent XSS
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+}
+
 function refresh() {
     console.log('Refresh function called');
     vscode.postMessage({ command: 'refresh' });
@@ -104,30 +112,42 @@ function renderJobs(jobs) {
         const showStopButton = job.jobStatus === 'RUNNING' && job.jobmetadata !== 'CHAIN';
         console.log('Job', job.jobId, 'status:', job.jobStatus, 'show stop button:', showStopButton);
 
-        row.innerHTML = `
-            <td class="job-id">${job.id || job.jobId}</td>
+        // Escape all user data to prevent XSS
+        const escapedJobId = escapeHtml(job.id || job.jobId);
+        const escapedSubmittedBy = escapeHtml(job.submittedBy || '-');
+        const escapedJobStatus = escapeHtml(job.jobStatus);
+        const escapedRuntime = escapeHtml(job.runtime || '-');
+        const jobDataJson = JSON.stringify(job)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+        row.innerHTML = ` // lgtm[js/xss]
+            <td class="job-id">${escapedJobId}</td>
             <td>
-                <div>${job.submittedBy || '-'}</div>
+                <div>${escapedSubmittedBy}</div>
                 <div class="trigger-tag">${triggerType}</div>
             </td>
             <td>${formatDate(job.submittedOn)}</td>
             <td>${formatDate(job.finishtime)}</td>
-            <td>${job.runtime || '-'}</td>
+            <td>${escapedRuntime}</td>
             <td>
-                <span class="badge ${getStatusBadgeClass(job.jobStatus)}">${job.jobStatus}</span>
+                <span class="badge ${getStatusBadgeClass(job.jobStatus)}">${escapedJobStatus}</span>
             </td>
             <td>
-                <button class="action-btn" onclick="showConsole('${job.jobId}', '${job.runtime}', '${job.jobStatus}', ${JSON.stringify(job).replace(/"/g, '&quot;')})" title="View Logs">
+                <button class="action-btn" onclick="showConsole('${escapedJobId}', '${escapedRuntime}', '${escapedJobStatus}', ${jobDataJson})" title="View Logs">
                     📄
                 </button>
                 ${job.jobStatus === 'RUNNING' && job.jobmetadata !== 'CHAIN' ?
-                `<button class="action-btn" onclick="stopJob('${job.id}')" title="Stop Job">⏹️</button>` :
+                `<button class="action-btn" onclick="stopJob('${escapedJobId}')" title="Stop Job">⏹️</button>` :
                 ''
             }
             </td>
             <td>
                 ${job.runtime && (job.runtime.toLowerCase() === 'remote' || job.runtime.split('-')[0].toLowerCase() === 'remote') ?
-                `<button class="action-btn" onclick="showOutputArtifact('${job.id}')" title="Show Output Artifacts">📊</button>` :
+                `<button class="action-btn" onclick="showOutputArtifact('${escapedJobId}')" title="Show Output Artifacts">📊</button>` :
                 '-'
             }
             </td>

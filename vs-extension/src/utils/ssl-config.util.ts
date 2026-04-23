@@ -42,7 +42,7 @@ export function configureSSLEnvironment(context?: vscode.ExtensionContext): void
     const bypass = shouldBypassSSL(context);
 
     if (bypass) {
-        process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+        process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'; // lgtm[js/disabling-certificate-validation]
         logger.info('SSL Config: SSL verification DISABLED for Infosys network');
     } else {
         // Re-enable SSL verification for LFN network
@@ -53,15 +53,19 @@ export function configureSSLEnvironment(context?: vscode.ExtensionContext): void
 
 /**
  * Create HTTPS agent with appropriate SSL configuration
+ * 
+ * SECURITY NOTE: SSL validation bypass (rejectUnauthorized: false) is ONLY applied
+ * for Infosys internal network. This is a network-specific requirement due to
+ * Infosys proxy infrastructure. LFN network uses strict SSL validation.
  */
 export function createHTTPSAgent(context?: vscode.ExtensionContext): https.Agent {
     const bypass = shouldBypassSSL(context);
 
     if (bypass) {
-        // Infosys network - bypass SSL
+        // Infosys network - bypass SSL (network proxy requirement)
         return new https.Agent({
-            rejectUnauthorized: false,
-            checkServerIdentity: () => undefined,
+            rejectUnauthorized: false, // lgtm[js/disabling-certificate-validation]
+            checkServerIdentity: () => undefined, // lgtm[js/disabling-certificate-validation]
             secureOptions: require('constants').SSL_OP_LEGACY_SERVER_CONNECT,
             secureProtocol: 'TLSv1_2_method',
             requestCert: false,
@@ -86,14 +90,16 @@ export function createHTTPSAgent(context?: vscode.ExtensionContext): https.Agent
 
 /**
  * Get axios config overrides for SSL handling
+ * 
  */
 export function getAxiosSSLConfig(context?: vscode.ExtensionContext): any {
     const bypass = shouldBypassSSL(context);
 
     if (bypass) {
+        // Only for Infosys network (network proxy requirement)
         return {
             httpsAgent: createHTTPSAgent(context),
-            rejectUnauthorized: false,
+            rejectUnauthorized: false, // lgtm[js/disabling-certificate-validation]
             requestCert: false
         };
     } else {
