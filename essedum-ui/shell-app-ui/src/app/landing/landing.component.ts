@@ -132,6 +132,9 @@ export class LandingComponent implements OnInit, AfterViewInit {
   essedum_title:string="ESSEDUM";
   isDark: boolean = true;
   showTopNav: boolean = false;
+  hoveredLabel: string = '';
+  submenuTop: number = 55;
+  private submenuHideTimer: any = null;
 
   @HostListener("window:resize", ["$event"])
   onResize(event) {
@@ -1143,6 +1146,41 @@ export class LandingComponent implements OnInit, AfterViewInit {
     sessionStorage.setItem("CacheDashConstant", "true");
     this.removeFilters();
   }
+  handleSidebarItemClick(event: MouseEvent, item: any): void {
+    this.toggleActive(event, item.label);
+    if (item.children && item.children.length) {
+      this.showTabs(item);
+    } else {
+      this.hoveredLabel = '';
+      this.viewtabsonload();
+    }
+  }
+
+  selectSubmenuChild(child: any): void {
+    this.hoveredLabel = '';
+    this.Highlight(child);
+  }
+
+  onSidebarItemEnter(event: MouseEvent, item: any): void {
+    if (!item.children || !item.children.length) return;
+    clearTimeout(this.submenuHideTimer);
+    this.hoveredLabel = item.label;
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    this.submenuTop = rect.top;
+  }
+
+  onSidebarItemLeave(): void {
+    this.submenuHideTimer = setTimeout(() => { this.hoveredLabel = ''; }, 180);
+  }
+
+  onSubmenuEnter(): void {
+    clearTimeout(this.submenuHideTimer);
+  }
+
+  onSubmenuLeave(): void {
+    this.submenuHideTimer = setTimeout(() => { this.hoveredLabel = ''; }, 150);
+  }
+
   cleartabs() {
     sessionStorage.removeItem("bccbreadcrumbdashid");
     sessionStorage.removeItem("bccbreadcrumb");

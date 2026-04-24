@@ -35,6 +35,7 @@ export class LoginComponent implements OnInit {
   userUnauthorizedMsg: string;
   userUnauthorizedAlert: boolean = false;
 
+  isDark: boolean = true;
   messageService: any;
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
@@ -66,6 +67,13 @@ export class LoginComponent implements OnInit {
     document.documentElement.style.setProperty("--base-color", sessionStorage.getItem("theme"));
     document.documentElement.style.setProperty("--font-type", sessionStorage.getItem("font"));
     sessionStorage.removeItem("isExpaned")
+
+    // Initialize theme
+    this.isDark = !document.body.classList.contains('header-light-theme');
+    if (!document.body.classList.contains('header-dark-theme') && !document.body.classList.contains('header-light-theme')) {
+      document.body.classList.add('header-dark-theme');
+      this.isDark = true;
+    }
 
     let activeProfiles: any;
     try {
@@ -188,8 +196,19 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  toggleTheme() {
+    this.isDark = !this.isDark;
+    if (this.isDark) {
+      document.body.classList.remove('header-light-theme');
+      document.body.classList.add('header-dark-theme');
+    } else {
+      document.body.classList.remove('header-dark-theme');
+      document.body.classList.add('header-light-theme');
+    }
+  }
+
   showResetPopup() {
- 
+
   }
   goToRegUser() {
     this.router.navigate(['./registerNewUser'])

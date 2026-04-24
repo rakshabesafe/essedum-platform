@@ -214,6 +214,7 @@
                 </app-sidebar-menu-text>
 </div>
                 <!-- Sidenav Icons menu bar -->
+                <ng-container *ngFor="let item of sidebarMenu; let i = index">
                 <div class="a-height sidebar-item-container" [class.sidebar-border]="
                     item.label == highlightedLabel &&
                     sidebarhighlightcolor != true
@@ -222,19 +223,17 @@
                     sidebarhighlightcolor == true
                   " [class.second-item]="i === 1" [ngClass]="{ sidebarhovercolor: sidebarhovercolor == true }" [ngStyle]="{
                     'margin-top': i != 0 ? sidebarItemMarginTop : '',
-                
+
                     height:
                       iconsidebarrole == selectedrole.name
                         ? sidebarMenuHeight
                         : ''
                   }" [class.iconsidebarheight]="
                     iconsidebarrole == selectedrole.name
-                  " *ngFor="let item of sidebarMenu; let i = index" (click)="
-                    toggleActive($event, item.label);
-                    item.children && item.children.length
-                      ? showTabs(item)
-                      : viewtabsonload()
-                  " [routerLink]="item.url">
+                  " (click)="handleSidebarItemClick($event, item)"
+                  (mouseenter)="onSidebarItemEnter($event, item)"
+                  (mouseleave)="onSidebarItemLeave()"
+                  [routerLink]="item.url">
                   <div class="sidebar-item-inner">
                     <div class="sidebar-itemIcon" style="text-align: -webkit-center"
                       [class.iconmapping]="iconsidebarrole == selectedrole.name" [ngStyle]="{
@@ -389,6 +388,23 @@
                     <span class="sidebar-nav-label">{{ item.label }}</span>
                   </div>
                 </div>
+                <!-- Sidebar submenu flyout panel — hover-triggered -->
+                <div *ngIf="item.children && item.children.length > 0 && item.label === hoveredLabel"
+                     class="sidebar-submenu-panel"
+                     [ngStyle]="{'top': submenuTop + 'px', 'max-height': 'calc(100vh - ' + submenuTop + 'px - 44px)'}"
+                     (mouseenter)="onSubmenuEnter()"
+                     (mouseleave)="onSubmenuLeave()">
+                  <div class="sidebar-submenu-title">{{ item.label }}</div>
+                  <div *ngFor="let child of item.children"
+                       class="sidebar-submenu-item"
+                       [class.sidebar-submenu-item--active]="child.label === seclevelhighlighted"
+                       [routerLink]="child.url"
+                       (click)="selectSubmenuChild(child)">
+                    <span class="sidebar-submenu-item-dot" *ngIf="child.label === seclevelhighlighted"></span>
+                    <span class="sidebar-submenu-item-label">{{ child.label }}</span>
+                  </div>
+                </div>
+                </ng-container>
               </mat-nav-list>
             </mat-sidenav>
             <!-- righside container starts-->
@@ -631,7 +647,7 @@
           </a>
         </nav>
 
-        <div style="
+        <div class="legacy-header-controls" style="
             display: flex;
             align-items: center;
             justify-content: flex-end;
