@@ -23,3 +23,42 @@
 .panel.right { flex: 1; }
 .panel-divider { width: 5px; flex-shrink: 0; cursor: col-resize; background: rgba(79,142,247,0.08); }
 .panel-divider:hover { background: rgba(79,142,247,0.3); }
+
+// ── Dark theme overrides ──────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
+  .vibe-header { border-bottom-color: rgba(79,142,247,0.12); }
+  .vibe-header .header-left h1 { color: #e2e8f0; }
+  .vibe-header .header-left i { color: #4f8ef7; }
+  .new-session-btn { color: #4f8ef7; background: rgba(79,142,247,0.1); border-color: rgba(79,142,247,0.3); }
+  .picker-hero h2 { color: #e2e8f0; }
+  .picker-hero p { color: #b8cce0; }
+  .picker-card { background: rgba(255,255,255,0.04); border-color: rgba(79,142,247,0.15); }
+  .picker-card:hover { background: rgba(79,142,247,0.1); border-color: rgba(79,142,247,0.5); }
+  .picker-card-icon { background: rgba(79,142,247,0.12); }
+  .picker-card-label { color: #e2e8f0; }
+  .vibe-panels { border-color: rgba(79,142,247,0.1); background: rgba(8,15,34,0.4); }
+  .panel.left { border-right-color: rgba(79,142,247,0.1); }
+  .panel-divider { background: rgba(79,142,247,0.08); &:hover { background: rgba(79,142,247,0.3); } }
+}
+
+// ── Light theme overrides ─────────────────────────────────────────────────────
+:host-context(body.header-light-theme) {
+  .vibe-header {
+    border-bottom-color: rgba(99,102,241,0.12);
+    .header-left h1 { color: #0f172a; }
+    .header-left i { color: #4f46e5; }
+  }
+  .new-session-btn { color: #4f46e5; background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.25); }
+  .picker-hero h2 { color: #0f172a; }
+  .picker-hero p  { color: #64748b; }
+  .picker-card {
+    background: rgba(255,255,255,0.7);
+    border-color: rgba(99,102,241,0.15);
+    &:hover { background: rgba(99,102,241,0.06); border-color: rgba(99,102,241,0.4); }
+  }
+  .picker-card-icon { background: rgba(99,102,241,0.1); }
+  .picker-card-label { color: #1e293b; }
+  .vibe-panels { border-color: rgba(99,102,241,0.12); background: #ffffff; }
+  .panel.left { border-right-color: rgba(99,102,241,0.1); }
+  .panel-divider { background: rgba(99,102,241,0.07); &:hover { background: rgba(99,102,241,0.18); } }
+}
