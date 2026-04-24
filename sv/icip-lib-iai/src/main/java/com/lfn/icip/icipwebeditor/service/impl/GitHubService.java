@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import com.lfn.icip.dataset.util.SsrfProtectionUtil;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -116,13 +118,13 @@ public class GitHubService {
 
 		Git git;
 
-		File gitFile = new File(gitPath + repoName + "/.git");
+		File gitFile = PathValidationUtil.validatePath(gitPath, repoName + "/.git");
 		if (!gitFile.exists()) {
-			Files.createDirectories(Paths.get(gitPath + repoName));
+			Files.createDirectories(PathValidationUtil.validatePath(gitPath, repoName).toPath());
 		}
 
 		if (!gitFile.exists()) {
-			File gitRepoPath = new File(gitPath + repoName);
+			File gitRepoPath = PathValidationUtil.validatePath(gitPath, repoName);
 			git = Git.init().setDirectory(gitRepoPath).call();
 			StoredConfig config = git.getRepository().getConfig();
 
@@ -143,7 +145,7 @@ public class GitHubService {
 		} else {
 
 			FileRepositoryBuilder builder = new FileRepositoryBuilder();
-			Repository repository = builder.setGitDir(new File(gitPath + repoName + "/.git")).readEnvironment() // scan
+			Repository repository = builder.setGitDir(PathValidationUtil.validatePath(gitPath, repoName + "/.git")).readEnvironment() // scan
 																												// environment
 																												// GIT_*
 																												// variables
@@ -172,13 +174,13 @@ public class GitHubService {
 
 		Git git;
 
-		File gitFile = new File(gitPathStore + repoName + "/.git");
+		File gitFile = PathValidationUtil.validatePath(gitPathStore, repoName + "/.git");
 		if (!gitFile.exists()) {
-			Files.createDirectories(Paths.get(gitPathStore + repoName));
+			Files.createDirectories(PathValidationUtil.validatePath(gitPathStore, repoName).toPath());
 		}
 
 		if (!gitFile.exists()) {
-			File gitRepoPath = new File(gitPathStore + repoName);
+			File gitRepoPath = PathValidationUtil.validatePath(gitPathStore, repoName);
 			git = Git.init().setDirectory(gitRepoPath).call();
 			StoredConfig config = git.getRepository().getConfig();
 
@@ -199,7 +201,7 @@ public class GitHubService {
 		} else {
 
 			FileRepositoryBuilder builder = new FileRepositoryBuilder();
-			Repository repository = builder.setGitDir(new File(gitPathStore + repoName + "/.git")).readEnvironment() // scan
+			Repository repository = builder.setGitDir(PathValidationUtil.validatePath(gitPathStore, repoName + "/.git")).readEnvironment() // scan
 					// environment
 					// GIT_*
 					// variables
@@ -258,10 +260,10 @@ public class GitHubService {
 
 		String repoName = url.split("/")[url.split("/").length - 1].split("[.]")[0];
 
-		File pythonFile = new File(gitPath + repoName + "/" + pipelineName + "/" + filename);
+		File pythonFile = PathValidationUtil.validatePath(gitPath, repoName + "/" + pipelineName + "/" + filename);
 
 		if (!pythonFile.exists()) {
-			Files.createDirectories(Paths.get(gitPath + repoName + "/" + pipelineName));
+			Files.createDirectories(PathValidationUtil.validatePath(gitPath, repoName + "/" + pipelineName).toPath());
 		}
 
 		if (!pythonFile.exists())
@@ -307,7 +309,7 @@ public class GitHubService {
 		String repoName = url.split("/")[url.split("/").length - 1].split("[.]")[0];
 
 		String pythonFile = null;
-		File scriptPath = new File(gitPath + "/" + repoName + "/" + pipelineName);
+		File scriptPath = PathValidationUtil.validatePath(gitPath, repoName + "/" + pipelineName);
 		if (!scriptPath.exists())
 			return null;
 		File[] files = scriptPath.listFiles();
@@ -334,7 +336,7 @@ public class GitHubService {
 
 
 		try {
-			File scriptPath = new File(gitPath + "/" + repoName + "/" + pipelineName);
+			File scriptPath = PathValidationUtil.validatePath(gitPath, repoName + "/" + pipelineName);
              if(scriptPath.exists()) {
 			File[] files = scriptPath.listFiles();
 			for (File file : files) {
@@ -366,13 +368,13 @@ public class GitHubService {
 		Boolean result = pull(git);
 		String scriptPath = constantsService.getByKeys("icip.pipelineScript.directory", "Core").getValue();
 		scriptPath = scriptPath + org + "/" + pipelineName + "/";
-		File folder = new File(scriptPath);
+		File folder = PathValidationUtil.validatePath(scriptPath);
 		String url = constantsService.getByKeys("icip.git.repo.store.url", org).getValue();
 		String repoName = url.split("/")[url.split("/").length - 1].split("[.]")[0];
 		if (folder.exists() && folder.isDirectory()) {
 			Path source = Paths.get(scriptPath);
-			Path destination = Paths.get(gitPathStore + repoName + "/" + pipelineName + "/");
-			File destinationFolder = new File(destination.toString());
+			Path destination = PathValidationUtil.validatePath(gitPathStore, repoName + "/" + pipelineName + "/").toPath();
+			File destinationFolder = destination.toFile();
 
 			if (!destinationFolder.exists()) {
 				Files.createDirectories(Paths.get(destinationFolder.getAbsolutePath()));
@@ -440,13 +442,15 @@ public class GitHubService {
 			String region = s3ConnectionDetails.optString("Region");
 			URL endpointUrl = null;
 			try {
-				endpointUrl = new URL(s3ConnectionDetails.optString("url"));
+				endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(s3ConnectionDetails.optString("url"));
 			} catch (MalformedURLException e1) {
 				log.error("URL not correct: {}", e1.getMessage());
+			} catch (IllegalArgumentException e1) {
+				log.error("SSRF validation failed: {}", e1.getMessage());
 			}
 			TrustManager[] trustAllCerts = getTrustAllCerts();
 			SSLContext sslContext = getSslContext(trustAllCerts);
-			HostnameVerifier myVerifier = (hostname, session) -> true;
+			HostnameVerifier myVerifier = com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE;
 			ClientConfiguration clientConfiguration = new ClientConfiguration();
 			ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, myVerifier);
 			clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
@@ -476,7 +480,7 @@ public class GitHubService {
 	}
 
 	public static void uploadFolder(AmazonS3 s3Client, String bucketName, String folderPath, String s3FolderPath) {
-		File folder = new File(folderPath);
+		File folder = PathValidationUtil.validatePath(folderPath);
 		uploadDirectory(s3Client, bucketName, folder, s3FolderPath);
 
 	}
@@ -532,9 +536,9 @@ public class GitHubService {
 			if (repoBranch == null || repoBranch.isEmpty()) {
 				repoBranch = "master";
 			}
-			File gitRepoPath = new File(cloneDirectoryPath);
+			File gitRepoPath = PathValidationUtil.validatePath(cloneDirectoryPath);
 			if (!gitRepoPath.exists()) {
-				Files.createDirectories(Paths.get(cloneDirectoryPath));
+				Files.createDirectories(gitRepoPath.toPath());
 			}
 			Git git;
 			git = Git.init().setDirectory(gitRepoPath).call();
@@ -574,8 +578,7 @@ public class GitHubService {
 					.setRemote("origin").setRemoteBranchName(repoBranch).call();
 			return git;
 		} catch (Exception e) {
-			log.error("Error due to : {}", e.getMessage());
-			e.printStackTrace();
+			log.error("Error due to : {}", e.getMessage(), e);
 			return null;
 		}
 	}

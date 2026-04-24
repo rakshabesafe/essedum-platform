@@ -50,7 +50,7 @@ public class SecretManagerController {
 				return ResponseEntity.status(500).body(resolved.getErrorMessage());
 			}
 		} catch (KeyException e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 
 	}
@@ -88,7 +88,7 @@ public class SecretManagerController {
 			String response = asmSevice.addSecret(secret);
 			return ResponseEntity.status(200).body(response);
 		} catch (EssedumException | KeyAlreadyExistsException e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 	}
 
@@ -105,7 +105,7 @@ public class SecretManagerController {
 			String response = asmSevice.updateSecret(secret);
 			return ResponseEntity.status(200).body(response);
 		} catch (KeyException e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 	}
 
@@ -119,7 +119,7 @@ public class SecretManagerController {
 			String response = asmSevice.deleteSecret(secret);
 			return ResponseEntity.status(200).body(response);
 		} catch (KeyException e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 	}
 	@GetMapping("/count")

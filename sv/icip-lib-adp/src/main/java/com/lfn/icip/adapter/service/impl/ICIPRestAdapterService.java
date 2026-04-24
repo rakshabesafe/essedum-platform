@@ -22,6 +22,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -163,11 +164,11 @@ public class ICIPRestAdapterService {
 		}
 		String filePath = String.format("%s%s%s/%s", folderPath, s, fileid, chunkIndex);
 		String directoryPath = String.format("%s%s%s", folderPath, s, fileid);
-		Path path = Paths.get(filePath);
+		Path path = PathValidationUtil.validateAndGetPath(filePath);
 		try {
 			/* Clean files at Specified Directory Path */
 			Files.createDirectories(path.getParent());
-			File directory = new File(directoryPath);
+			File directory = PathValidationUtil.validatePath(directoryPath);
 			FileUtils.cleanDirectory(directory);
 
 			/* Copy file to server path */

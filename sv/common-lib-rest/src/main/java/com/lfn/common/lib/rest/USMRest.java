@@ -45,8 +45,7 @@ public class USMRest {
 				return result;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			log.info(e.getMessage());
+			log.error("Error fetching extension key", e);
 		}
 		
 		return null;

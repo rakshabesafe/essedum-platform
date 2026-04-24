@@ -94,6 +94,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import com.lfn.icip.dataset.util.SsrfProtectionUtil;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -1686,15 +1688,17 @@ return Flux.just(datasetRepository.findById((id)).get()).defaultIfEmpty(new ICIP
 		String region = connectionDetails.optString("Region");
 		URL endpointUrl = null;
 		try {
-			endpointUrl = new URL(connectionDetails.optString("url"));
+			endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
 			logger.info("endpointUrl " + endpointUrl);
 		} catch (MalformedURLException e1) {
 			logger.error("Upload DATASOURCE URL not correct" + e1.getMessage());
+		} catch (IllegalArgumentException e1) {
+			logger.error("SSRF validation failed: " + e1.getMessage());
 		}
 		TrustManager[] trustAllCerts = getTrustAllCerts();
 		SSLContext sslContext = getSslContext(trustAllCerts);
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
-		ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+		ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
 		JSONObject attr = new JSONObject(dataset.getAttributes());
 		String bucketName = attr.optString("bucket");
@@ -1707,7 +1711,7 @@ return Flux.just(datasetRepository.findById((id)).get()).defaultIfEmpty(new ICIP
 			objectKey = attr.optString("object");
 		logger.info("objectKey " + objectKey);
 		String uploadFile = attr.optString("uploadFile");
-		File localFilePath = new File(uploadFile);
+		File localFilePath = PathValidationUtil.validatePath(uploadFile);
 		BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 		AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withClientConfiguration(clientConfiguration)
 				.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpointUrl.toString(), region))

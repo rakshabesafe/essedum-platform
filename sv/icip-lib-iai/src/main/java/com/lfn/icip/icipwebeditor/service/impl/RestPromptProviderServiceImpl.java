@@ -56,6 +56,7 @@ import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.model.output.Response;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import com.lfn.icip.dataset.util.GroovySandboxUtil;
 
 @Service("restchatmodel")
 public class RestPromptProviderServiceImpl implements ICIPPromptChatModel {
@@ -213,7 +214,7 @@ public class RestPromptProviderServiceImpl implements ICIPPromptChatModel {
 			Binding binding = new Binding();
 			binding.setProperty("response", resp);
 	
-			GroovyShell shell = new GroovyShell(binding);
+			GroovyShell shell = GroovySandboxUtil.createSandboxedShell(binding);
 			Object transformedResult = shell.evaluate(new StringReader(transformScript));
 	
 			resp = transformedResult.toString();

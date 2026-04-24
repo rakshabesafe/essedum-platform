@@ -1,5 +1,6 @@
 import eventlet
 eventlet.monkey_patch()
+import eventlet.tpool
 
 import os
 import boto3
@@ -564,7 +565,10 @@ def handle_pipeline_trigger(data):
             # Normalize any DNS or NodePort references to ClusterIP
             base_repo = base_repo.replace("192.168.28.41:32000", "10.104.220.183:5000")
             base_repo = base_repo.replace("registry.container-registry.svc.cluster.local:5000", "10.104.220.183:5000")
-            image_tag = f"{base_repo}:v1-{uniq_tag}"            # e.g., registry.container-registry.svc.cluster.local:5000/test-adk-app:v1-20251217-1905
+            # Use the already-sanitized deploy_name as the image name to avoid invalid reference format
+            # (e.g. if target_image_tag contains a leading dash from an unsanitized alias)
+            registry = base_repo.rsplit("/", 1)[0]  # e.g., 10.104.220.183:5000
+            image_tag = f"{registry}/{deploy_name}:v1-{uniq_tag}"
 
 
         # 3) UNZIP
@@ -600,6 +604,11 @@ def handle_pipeline_trigger(data):
 
         log_to_client(f"Project root detected at {build_context_path}", step="PREP")
 
+        # Fix Dockerfile CMD if it references a missing entry point file
+        fix_dockerfile_cmd(build_context_path)
+
+        # Detect the app port from EXPOSE or common Python patterns
+        app_port = detect_app_port(build_context_path)
 
         # 5) --- HANDLE SECRETS / ENV ---
         env_file_path = os.path.join(build_context_path, ".env")
@@ -628,16 +637,20 @@ def handle_pipeline_trigger(data):
             ]
 
             process = subprocess.Popen(
-                build_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1
+                build_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0
             )
 
-            for line in iter(process.stdout.readline, ""):
-                if line:
-                    socketio.emit("build_log", {"log": line.rstrip()})
+            while True:
+                line = eventlet.tpool.execute(process.stdout.readline)
+                if not line:  # EOF
+                    break
+                decoded = line.decode("utf-8", errors="replace").rstrip()
+                if decoded:
+                    socketio.emit("build_log", {"log": decoded})
                 eventlet.sleep(0)  # yield to eventlet so pings are processed
 
             process.stdout.close()
-            return_code = process.wait()
+            return_code = eventlet.tpool.execute(process.wait)
 
             if return_code != 0:
                 raise Exception("Docker build failed. Check build logs.")
@@ -747,16 +760,20 @@ def handle_pipeline_trigger(data):
             ]
 
             process = subprocess.Popen(
-                cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0
             )
 
-            for line in iter(process.stdout.readline, ""):
-                if line:
-                    socketio.emit("build_log", {"log": line.rstrip()})
+            while True:
+                line = eventlet.tpool.execute(process.stdout.readline)
+                if not line:  # EOF
+                    break
+                decoded = line.decode("utf-8", errors="replace").rstrip()
+                if decoded:
+                    socketio.emit("build_log", {"log": decoded})
                 eventlet.sleep(0)  # yield to eventlet so pings are processed
 
             process.stdout.close()
-            return_code = process.wait()
+            return_code = eventlet.tpool.execute(process.wait)
 
             if return_code != 0:
                 raise Exception("Buildctl failed. Check build logs.")
@@ -798,7 +815,7 @@ def handle_pipeline_trigger(data):
                         "Deployment not found. Creating new deployment...", step="DEPLOY"
                     )
                     deployment_obj = create_deployment_object(
-                        deploy_name, image_tag, target_namespace, secret_to_use
+                        deploy_name, image_tag, target_namespace, secret_to_use, app_port
                     )
                     k8s_apps.create_namespaced_deployment(
                         namespace=target_namespace, body=deployment_obj
@@ -813,7 +830,7 @@ def handle_pipeline_trigger(data):
                 # Optional: patch to correct targetPort if needed
                 k8s_core.patch_namespaced_service(
                     name=deploy_name, namespace=target_namespace,
-                    body={"spec": {"ports": [{"name":"http","port":80,"targetPort":5000}],
+                    body={"spec": {"ports": [{"name":"http","port":80,"targetPort":app_port}],
                                    "selector": {"app": deploy_name}}}
                 )
 
@@ -824,7 +841,7 @@ def handle_pipeline_trigger(data):
                         metadata=client.V1ObjectMeta(name=deploy_name, namespace=target_namespace),
                         spec=client.V1ServiceSpec(
                             selector={"app": deploy_name},
-                            ports=[client.V1ServicePort(port=80, target_port=5000)],
+                            ports=[client.V1ServicePort(port=80, target_port=app_port)],
                             type="ClusterIP"
                         )
                     )
@@ -905,7 +922,61 @@ def wait_for_container_ready(docker_client, container_name, timeout_seconds=120)
     return False
 
 
-def create_deployment_object(name, image, namespace, secret_name=None):
+def fix_dockerfile_cmd(build_context_path):
+    """If the Dockerfile CMD references a Python file that doesn't exist, replace it with the actual entry point."""
+    import re as _re
+    dockerfile = os.path.join(build_context_path, "Dockerfile")
+    if not os.path.exists(dockerfile):
+        return
+    with open(dockerfile) as f:
+        content = f.read()
+    # Find CMD ["python", "somefile.py"] or CMD python somefile.py
+    m = _re.search(r'CMD\s+(?:\["python[^"]*",\s*"([^"]+\.py)"\]|python\S*\s+(\S+\.py))', content)
+    if not m:
+        return
+    referenced = m.group(1) or m.group(2)
+    if os.path.exists(os.path.join(build_context_path, referenced)):
+        return  # file exists, nothing to fix
+    # Find the actual entry point
+    for candidate in ("app.py", "main.py", "run.py", "server.py"):
+        if os.path.exists(os.path.join(build_context_path, candidate)):
+            new_content = content.replace(referenced, candidate)
+            with open(dockerfile, "w") as f:
+                f.write(new_content)
+            return
+
+
+def detect_app_port(build_context_path, default=8000):
+    """Detect the port the app listens on from EXPOSE in Dockerfile or Python source."""
+    import re as _re
+    dockerfile = os.path.join(build_context_path, "Dockerfile")
+    if os.path.exists(dockerfile):
+        with open(dockerfile) as f:
+            for line in f:
+                m = _re.match(r'^\s*EXPOSE\s+(\d+)', line.strip(), _re.IGNORECASE)
+                if m:
+                    return int(m.group(1))
+    # Scan Python files for common port patterns
+    for fname in ("app.py", "main.py", "run.py", "server.py"):
+        fpath = os.path.join(build_context_path, fname)
+        if not os.path.exists(fpath):
+            continue
+        with open(fpath) as f:
+            content = f.read()
+        for pattern in [
+            r'PORT\s*=\s*(\d+)',
+            r'port\s*=\s*(\d+)',
+            r'app\.run\([^)]*port\s*=\s*(\d+)',
+            r'HTTPServer\(\s*\(\s*[^,]+,\s*(\d+)',
+            r'server_address\s*=\s*\(\s*[^,]+,\s*(\d+)',
+        ]:
+            m = _re.search(pattern, content)
+            if m:
+                return int(m.group(1))
+    return default
+
+
+def create_deployment_object(name, image, namespace, secret_name=None, app_port=8000):
     """Creates a V1Deployment object for the runner"""
 
     env_from = []
@@ -919,10 +990,10 @@ def create_deployment_object(name, image, namespace, secret_name=None):
         name="app-container",
         image=image,
         image_pull_policy="Always",
-        ports=[client.V1ContainerPort(container_port=5000)],
+        ports=[client.V1ContainerPort(container_port=app_port)],
         env_from=env_from,
         readiness_probe=client.V1Probe(
-            tcp_socket=client.V1TCPSocketAction(port=5000),
+            tcp_socket=client.V1TCPSocketAction(port=app_port),
             period_seconds=10,
             timeout_seconds=5,
             failure_threshold=6

@@ -26,8 +26,42 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class RegularExpressionUtil {
 
+	/** Maximum allowed length for a regex pattern to prevent ReDoS. */
+	private static final int MAX_REGEX_LENGTH = 500;
+
+	/** Pattern to detect potentially dangerous regex constructs (nested quantifiers causing catastrophic backtracking). */
+	private static final Pattern DANGEROUS_REGEX_PATTERN = Pattern.compile(
+			"(\\(.+\\))(\\*|\\+|\\{\\d+,\\d*\\})(\\*|\\+|\\{\\d+,\\d*\\})"
+	);
+
+	/**
+	 * Validates that a regex pattern is safe to compile and use.
+	 * Rejects patterns that are too long or contain dangerous constructs.
+	 *
+	 * @param regex the regex pattern to validate
+	 * @return true if the pattern is safe, false otherwise
+	 */
+	private static boolean isSafeRegex(String regex) {
+		if (regex == null || regex.isEmpty()) {
+			return false;
+		}
+		if (regex.length() > MAX_REGEX_LENGTH) {
+			log.warn("Regex pattern rejected: exceeds maximum length of {}", MAX_REGEX_LENGTH);
+			return false;
+		}
+		if (DANGEROUS_REGEX_PATTERN.matcher(regex).find()) {
+			log.warn("Regex pattern rejected: contains potentially dangerous nested quantifiers");
+			return false;
+		}
+		return true;
+	}
+
 	public static boolean matchInputForRegex(String inputTobeVerified , String regEx) {
 		try {
+		  if (!isSafeRegex(regEx)) {
+			  log.warn("Unsafe regex pattern rejected: {}", regEx);
+			  return false;
+		  }
 		  if(inputTobeVerified.matches(regEx)) {
 			  log.debug("input matched {} with regex {} ",inputTobeVerified, regEx);
 			  return true;
@@ -47,12 +81,15 @@ public class RegularExpressionUtil {
 
 	 public static boolean verifyRegEx(String regex) throws Exception {
 	 try {
+		 if (!isSafeRegex(regex)) {
+			 throw new PatternSyntaxException("Regex pattern rejected: unsafe or too long", regex, -1);
+		 }
 		 Pattern.compile(regex);
 		 return false;
 	 } catch (PatternSyntaxException e) {
 		 log.info("Pattern failed to be verified {}, error is {}" , regex, e.getDescription());
 		 throw e;
 	 }
- }
+  }
 
 }

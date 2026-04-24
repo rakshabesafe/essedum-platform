@@ -139,7 +139,7 @@ public class ICIPAppsController {
 			String response = appService.getPresignedUrl(fileName, org);
 			return new ResponseEntity<String>(response, new HttpHeaders(), HttpStatus.OK);
 		} catch (Exception e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 
 	}
@@ -153,7 +153,7 @@ public class ICIPAppsController {
 			String response = appService.uploadToActiveServer(objectKey, uploadFile, org);
 			return ResponseEntity.status(200).body(response);
 		} catch (Exception e) {
-			return ResponseEntity.status(500).body(e.getMessage());
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 
 	}

@@ -495,7 +495,7 @@ public class ICIPRemoteSagemakerJob extends ICIPCommonJobServiceUtil implements 
 		String region = connectionDetails.optString("Region");
 		TrustManager[] trustAllCerts = getTrustAllCerts();
 		SSLContext sslContext = getSslContext(trustAllCerts);
-		HostnameVerifier myVerifier = (hostname, session) -> true;
+		HostnameVerifier myVerifier = com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE;
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
 		ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, myVerifier);
 		clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
@@ -572,7 +572,8 @@ public class ICIPRemoteSagemakerJob extends ICIPCommonJobServiceUtil implements 
 				return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
-			throw new EssedumException(e.getMessage());
+			logger.error("Sagemaker job execution failed", e);
+			throw new EssedumException("Sagemaker job execution failed");
 
 		}
 

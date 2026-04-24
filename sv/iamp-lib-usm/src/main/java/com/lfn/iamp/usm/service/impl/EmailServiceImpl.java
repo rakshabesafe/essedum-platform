@@ -66,7 +66,7 @@ public class EmailServiceImpl {
 	                        .setSslContext(SSLContextBuilder.create()
 	                                .loadTrustMaterial(acceptingTrustStrategy)
 	                                .build())
-	                        .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+	                        .setHostnameVerifier(javax.net.ssl.HttpsURLConnection.getDefaultHostnameVerifier())
 	                        .build())
 	                .build())
 	        .build();
