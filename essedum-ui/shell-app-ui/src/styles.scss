@@ -473,39 +473,80 @@ mat-drawer.example-sidenav {
   display: block;
 }
 
-// Theme toggle button
+// ─── Header right controls container ──────────────────────────────────────────
+.header-right-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 6px;
+  flex-shrink: 0;
+}
+
+// Theme toggle button — pill style, enterprise look
 .theme-toggle-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  padding: 4px 10px;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 100px;
+  padding: 0 14px 0 10px;
+  height: 30px;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 11.5px;
   font-weight: 500;
-  transition: background 0.2s, border-color 0.2s;
+  letter-spacing: 0.25px;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
   flex-shrink: 0;
   &:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
   }
 }
-.theme-toggle-icon { font-size: 13px; line-height: 1; }
-.theme-toggle-label { font-size: 11px; line-height: 1; }
+.theme-toggle-icon { font-size: 14px; line-height: 1; }
+.theme-toggle-label { font-size: 11px; font-weight: 500; line-height: 1; letter-spacing: 0.3px; }
 
 // User / header right area
 .headerMobile { display: flex; align-items: center; gap: 4px; }
 .userMobile { display: flex; align-items: center; }
 
-.user-profile-btn { cursor: pointer; margin-left: 4px; flex-shrink: 0; }
-.user-btn-height { height: 36px; min-width: 36px; }
-.user-btn-span-height {
-  width: 28px; height: 28px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50%; font-size: 11px; font-weight: 700;
+.user-profile-btn {
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0 !important;
+  min-width: 0 !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+}
+.user-btn-height { height: 34px; min-width: 34px; }
+
+// Enterprise user avatar circle — gradient with initials
+.user-avatar-initial {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f8ef7 0%, #7c4dff 100%);
+  color: #fff !important;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.user-profile-btn:hover .user-avatar-initial {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.28);
+  transform: scale(1.06);
 }
 
 .uname1, .uname2 {
@@ -515,7 +556,7 @@ mat-drawer.example-sidenav {
 }
 
 .dash-icon-color { color: var(--base-color, #0094ff); }
-.imageView { border-radius: 50%; width: 32px; height: 32px; object-fit: cover; }
+.imageView { border-radius: 50%; width: 32px; height: 32px; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); }
 .projectArrow { min-width: 200px; }
 .overflow-hidden { overflow: hidden; }
 
@@ -1266,6 +1307,28 @@ body.header-light-theme {
   .top-nav-item.top-nav-item-active { color: #fff; border-bottom-color: #00A3E0; }
 
   .tabsContainer { background-color: #f8fafc !important; }
+
+  // Light theme header controls — header bar is #003057 so dark-on-dark still applies
+  .theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.88);
+    &:hover {
+      background: rgba(255, 255, 255, 0.17);
+      border-color: rgba(0, 163, 224, 0.5);
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(0, 163, 224, 0.15);
+    }
+  }
+
+  .user-avatar-initial {
+    background: linear-gradient(135deg, #00A3E0 0%, #0070b8 100%);
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+  .user-profile-btn:hover .user-avatar-initial {
+    border-color: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 0 0 3px rgba(0, 163, 224, 0.3);
+  }
 }
 
 // ─── Responsive ────────────────────────────────────────────────────────────────

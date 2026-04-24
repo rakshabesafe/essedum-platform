@@ -28,6 +28,85 @@
             <span class="responsive-title" style="margin-left: 8px;">{{essedumTitle}}</span>
 
           </div>
+
+          <!-- TOP-RIGHT: theme toggle + user avatar -->
+          <div class="header-right-controls">
+            <button class="theme-toggle-btn" (click)="toggleTheme()" [matTooltip]="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+              <span class="theme-toggle-icon">{{ isDark ? '🌙' : '☀️' }}</span>
+              <span class="theme-toggle-label">{{ isDark ? 'Dark' : 'Light' }}</span>
+            </button>
+
+            <button mat-icon-button="" [matMenuTriggerFor]="menu" (click)="getSession()" [matTooltip]="user.user_f_name"
+              class="userMobile selector-3-80 user-profile-btn user-btn-height">
+              <span *ngIf="!profileimage"
+                [ngClass]="umargin ? 'uname1' : 'uname2'"
+                class="selector-3-82 user-avatar-initial">{{ uname | uppercase }}</span>
+              <img *ngIf="profileimage" class="imageView img-responsive selector-3-83" [src]="profileimage" alt="userimg" />
+            </button>
+
+            <mat-menu #menu="matMenu" class="projectArrow selector-3-84 overflow-hidden">
+              <div mat-menu-item="" style="cursor: default" class="selector-3-85" [style.height]="detailsPopupHeight">
+                <span class="selector-3-86"> Welcome </span>
+                <span class="selector-3-87">
+                  <b class="selector-3-88">{{ user && user.user_f_name }}</b>
+                </span>
+              </div>
+              <div mat-menu-item="" *ngIf="portfoliodata?.length >= 1" (click)="$event.stopPropagation()"
+                [style.height]="detailsPopupHeight" class="selector-3-89">
+                <div class="dropdownrole selector-3-90" *ngIf="portfoliodata.length >= 1">
+                  <span class="dropdownrole roleheading selector-3-91">Portfolio:</span>
+                  <mat-form-field class="selector-3-92">
+                    <mat-select id="Portfolio1" [compareWith]="compareObjects" (ngModelChange)="onSelection($event)"
+                      [(ngModel)]="selectedportfolio" name="Portfolio" #Portfolio="ngModel" class="option1 selector-3-93">
+                      <mat-option class="option1 selector-3-94" *ngFor="let item of portfoliodata; trackBy: trackByMethod"
+                        [value]="item" [style.height]="matOptionHeight">{{ item.portfolioName }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div mat-menu-item="" *ngIf="projectList.length >= 1" (click)="$event.stopPropagation()"
+                [style.height]="detailsPopupHeight" class="selector-3-95">
+                <div class="dropdownrole selector-3-96" *ngIf="projectList.length >= 1">
+                  <span *ngIf="role1" class="dropdownrole roleheading selector-3-97">Customer:</span>
+                  <span *ngIf="!role1" class="dropdownrole roleheading selector-3-98">Project:</span>
+                  <mat-form-field class="selector-3-100">
+                    <mat-select id="project" [compareWith]="compareObjects" (ngModelChange)="valuechangeproject1($event)"
+                      [(ngModel)]="selectedproject" name="role" #role="ngModel" class="option1 selector-3-101">
+                      <mat-option class="option1 selector-3-102" *ngFor="let item of projectList; trackBy: trackByMethod"
+                        [value]="item" [style.height]="matOptionHeight">{{ item.projectdisplayname }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div mat-menu-item="" *ngIf="roleList?.length >= 1" (click)="$event.stopPropagation()"
+                [style.height]="detailsPopupHeight" class="selector-3-103">
+                <div class="dropdownrole selector-3-104" *ngIf="roleList.length >= 1">
+                  <span class="dropdownrole roleheading selector-3-105">Role:</span>
+                  <mat-form-field class="selector-3-106">
+                    <mat-select id="role" [compareWith]="compareObjects"
+                      (ngModelChange)="valuechangerole($event); clearsession()" [(ngModel)]="selectedrole" name="role"
+                      #role="ngModel" class="option1 selector-3-107" panelClass="matOptionPopup">
+                      <mat-option class="option1 selector-3-108" *ngFor="let item of roleList; trackBy: trackByMethod"
+                        [value]="item" [style.height]="matOptionHeight" id="role-{{ item.name }}">{{ item.name }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="button-container" style="display: flex">
+                <button id="home-btn-logout" mat-menu-item="" (click)="logout()" class="selector-3-112"
+                  [style.height]="detailsPopupHeight">
+                  <i class="fa fa-power-off selector-3-113" aria-hidden="true"></i>
+                  <span class="selector-3-114">&nbsp;Logout</span>
+                </button>
+                <button *ngIf="showProfilePresent()" mat-menu-item (click)="toggleProfileInfo()"
+                  [style.height]="detailsPopupHeight" style="color: var(--base-color)">
+                  <i class="fa fa-user" aria-hidden="true" style="color: var(--base-color)"></i>
+                  <span style="color: var(--base-color)">&nbsp;Profile</span>
+                </button>
+              </div>
+              <hr style="margin: 0px" class="selector-3-115" />
+            </mat-menu>
+          </div>
         </div>
         <!--header ends -->
 
@@ -663,126 +742,9 @@
 
           </div>
 
-        
-          <button class="theme-toggle-btn" (click)="toggleTheme()" [matTooltip]="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
-            <span class="theme-toggle-icon">{{ isDark ? '🌙' : '☀️' }}</span>
-            <span class="theme-toggle-label">{{ isDark ? 'Dark' : 'Light' }}</span>
-          </button>
-
-          <button mat-icon-button="" [matMenuTriggerFor]="menu" (click)="getSession()" [matTooltip]="user.user_f_name"
-            class="userMobile selector-3-80 user-profile-btn
-            user-btn-height">
-            <span *ngIf="!profileimage" style="background-color: white; padding: 0.4em"
-              [ngClass]="umargin ? 'uname1' : 'uname2'" [ngStyle]="{
-                color:
-                  bgColorType == 2
-                    ? '#8626C3'
-                    : headercolor
-                    ? headercolor
-                    : 'var(--base-color)',
-              }" class="selector-3-82 dash-icon-color user-btn-span-height">{{ uname | uppercase }}
-            </span>
-            <img *ngIf="profileimage" class="imageView img-responsive selector-3-83" [src]="profileimage"
-              alt="userimg" />
-          </button>
-          <mat-menu #menu="matMenu" class="projectArrow selector-3-84 overflow-hidden">
-            <div mat-menu-item="" style="cursor: default" class="selector-3-85" [style.height]="detailsPopupHeight">
-              <span class="selector-3-86"> Welcome </span>
-              <span class="selector-3-87">
-                <b class="selector-3-88">{{ user && user.user_f_name }}</b>
-              </span>
-            </div>
-            <div mat-menu-item="" *ngIf="portfoliodata?.length >= 1" (click)="$event.stopPropagation()"
-              [style.height]="detailsPopupHeight" class="selector-3-89">
-              <div class="dropdownrole selector-3-90" *ngIf="portfoliodata.length >= 1">
-                <span class="dropdownrole roleheading selector-3-91">
-                  Portfolio:
-                </span>
-                <mat-form-field class="selector-3-92">
-                  <mat-select id="Portfolio1" [compareWith]="compareObjects" (ngModelChange)="onSelection($event)"
-                    [(ngModel)]="selectedportfolio" name="Portfolio" #Portfolio="ngModel" class="option1 selector-3-93">
-                    <mat-option class="option1 selector-3-94" *ngFor="let item of portfoliodata; trackBy: trackByMethod"
-                      [value]="item" [style.height]="matOptionHeight">
-                      {{ item.portfolioName }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </div>
-            <div mat-menu-item="" *ngIf="projectList.length >= 1" (click)="$event.stopPropagation()"
-              [style.height]="detailsPopupHeight" class="selector-3-95">
-              <div class="dropdownrole selector-3-96" *ngIf="projectList.length >= 1">
-                <span *ngIf="role1" class="dropdownrole roleheading selector-3-97">
-                  Customer:
-                </span>
-                <span *ngIf="!role1" class="dropdownrole roleheading selector-3-98">
-                  Project:
-                </span>
-                <mat-form-field class="selector-3-100">
-                  <mat-select id="project" [compareWith]="compareObjects" (ngModelChange)="valuechangeproject1($event)"
-                    [(ngModel)]="selectedproject" name="role" #role="ngModel" class="option1 selector-3-101">
-                    <mat-option class="option1 selector-3-102" *ngFor="let item of projectList; trackBy: trackByMethod"
-                      [value]="item" [style.height]="matOptionHeight">
-                      {{ item.projectdisplayname }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </div>
-            <div mat-menu-item="" *ngIf="roleList?.length >= 1" (click)="$event.stopPropagation()"
-              [style.height]="detailsPopupHeight" class="selector-3-103">
-              <div class="dropdownrole selector-3-104" *ngIf="roleList.length >= 1">
-                <span class="dropdownrole roleheading selector-3-105">
-                  Role:
-                </span>
-                <mat-form-field class="selector-3-106">
-                  <mat-select id="role" [compareWith]="compareObjects"
-                    (ngModelChange)="valuechangerole($event); clearsession()" [(ngModel)]="selectedrole" name="role"
-                    #role="ngModel" class="option1 selector-3-107" panelClass="matOptionPopup">
-                    <mat-option class="option1 selector-3-108" *ngFor="let item of roleList; trackBy: trackByMethod"
-                      [value]="item" [style.height]="matOptionHeight" id="role-{{ item.name }}">
-                      {{ item.name }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </div>
-            <!-- <button *ngIf="profileCheck && demouserFlag && logout_status" mat-menu-item=""
-              [style.height]="detailsPopupHeight" (click)="resetPassword()" class="selector-3-109">
-              <i class="fa fa-key selector-3-110" aria-hidden="true"></i>
-              <span class="selector-3-111">&nbsp;Reset Password</span>
-            </button> -->
-
-            <div class="button-container" style="display: flex">
-              <button id="home-btn-logout" mat-menu-item="" (click)="logout()" class="selector-3-112"
-                [style.height]="detailsPopupHeight">
-                <i class="fa fa-power-off selector-3-113" aria-hidden="true"></i>
-                <span class="selector-3-114">&nbsp;Logout</span>
-              </button>
-
-              <button *ngIf="showProfilePresent()" mat-menu-item (click)="toggleProfileInfo()"
-                [style.height]="detailsPopupHeight" style="color: var(--base-color)">
-                <i class="fa fa-user" aria-hidden="true" style="color: var(--base-color)"></i>
-                <span style="color: var(--base-color)">&nbsp;Profile</span>
-              </button>
-            </div>
-            <hr style="margin: 0px" class="selector-3-115" />
-          </mat-menu>
         </div>
       </div>
       <!--main header ends-->
-      <button mat-icon-button="" draggable="true" (dragstart)="onDragStartChat($event)"
-        (dragend)="onDragEndChat($event)" id="aipButton" *ngIf="aip_chatbot && !showChatBot" style="
-          padding-left: 2.5vh;
-          cursor: pointer;
-          font-size: 16px;
-          position: fixed;
-          border-radius: 40%;
-          z-index: 100;
-          background: #c0c0c080 url(assets/images/Chatbot.png) no-repeat center
-            center;
-        " [style.right]="iconPosition.right" [style.bottom]="iconPosition.bottom" (click)="loadAipChatbot()"
-        [matBadgeHidden]="notificationslength >= '0'" [ngStyle]="{ color: !backgroundcolor ? 'white' : 'white' }"
-        [matBadge]="notificationslength" matBadgeColor="warn" matBadgeSize="small" mat-icon-button="">
-        <i [ngStyle]="{ color: headericoncolor }" aria-hidden="true"></i>
-      </button>
       <app-chat-aip *ngIf="showChatBot" [chat_title]="chat_title" [selectedInstance]="selectedInstance"
         (closeChatbot)="closeChatbot($event)"></app-chat-aip>
       <span *ngIf="cortex_chatbot">
