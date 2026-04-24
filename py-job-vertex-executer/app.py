@@ -230,10 +230,12 @@ def terminate_task(task_id):
 @app.route('/execute/<task_id>/getLog', methods=['GET'])
 def get_task_log(task_id):
     try:
-        task_folder=str(task_id)
-        log_file=r'/temp/Jobs/'+task_folder+'/log.txt'
-        
-        with open(log_file,'r', encoding='utf-8', errors='ignore') as f:
+        base_dir = os.path.realpath('/temp/Jobs')
+        log_file = os.path.realpath(os.path.join(base_dir, str(task_id), 'log.txt'))
+        if not log_file.startswith(base_dir + os.sep):
+            return jsonify({'error': 'Not found'}), 404
+
+        with open(log_file, 'r', encoding='utf-8', errors='ignore') as f:
             log=f.read()
         
         result={
@@ -249,9 +251,9 @@ def get_task_log(task_id):
 @app.route('/execute/getLog', methods=['GET'])
 def get_log():
     try:
-        log_file='logfile.log'
-        
-        with open(log_file,'r', encoding='utf-8', errors='ignore') as f:
+        log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logfile.log')
+
+        with open(log_file, 'r', encoding='utf-8', errors='ignore') as f:
             log=f.read()
         
         result={
