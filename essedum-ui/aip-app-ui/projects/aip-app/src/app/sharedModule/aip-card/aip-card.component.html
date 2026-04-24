@@ -1,6 +1,22 @@
 <mat-card class="mat-mdc-card mdc-card lfx-c-card lfx-c-card--hover h-100" appearance="outlined"
     (mouseenter)="card.hover = true" (mouseleave)="card.hover = false">
 
+    <!-- Shimmer sweep layer (CSS animates on hover) -->
+    <div class="card-shimmer-sweep" aria-hidden="true"></div>
+
+    <!-- Large faded type icon in card body (decorative) -->
+    <div class="card-bg-icon" aria-hidden="true">
+        <mat-icon *ngIf="servicev1 === 'connections'">device_hub</mat-icon>
+        <mat-icon *ngIf="servicev1 === 'model'">psychology</mat-icon>
+        <mat-icon *ngIf="servicev1 === 'pipeline'">account_tree</mat-icon>
+        <mat-icon *ngIf="servicev1 === 'pipelineagent'">smart_toy</mat-icon>
+        <mat-icon *ngIf="servicev1 === 'adapters'">extension</mat-icon>
+        <mat-icon *ngIf="servicev1 === 'instances'">memory</mat-icon>
+        <mat-icon *ngIf="servicev1 === 'Datasets'">storage</mat-icon>
+        <mat-icon *ngIf="servicev1 === 'agent'">auto_awesome</mat-icon>
+        <mat-icon *ngIf="servicev1 === 'agent-directory'">folder_shared</mat-icon>
+    </div>
+
     <!-- ── Main header: title LEFT  +  type badge RIGHT ── -->
     <div class="card-main-header">
 
@@ -9,7 +25,8 @@
                 {{ getTitle() | titlecase }}
             </h2>
             <p class="card-main-date lfx-u-ellipsis">
-                {{ getDate() | date : "fullDate" }}
+                <mat-icon class="date-icon">schedule</mat-icon>
+                {{ getDate() | date : "mediumDate" }}
             </p>
         </div>
 
@@ -17,26 +34,40 @@
         <div class="card-badge-group">
 
             <span *ngIf="servicev1 === 'connections'" class="card-type-badge badge-connection">
-                {{ getCategory() | uppercase }}
+                <mat-icon class="badge-icon">device_hub</mat-icon>{{ getCategory() | uppercase }}
             </span>
 
             <span *ngIf="servicev1 === 'agent-directory'" class="card-type-badge badge-agent-dir">
-                {{ getCategory() | uppercase }}
+                <mat-icon class="badge-icon">folder_shared</mat-icon>{{ getCategory() | uppercase }}
             </span>
 
-            <span *ngIf="servicev1 === 'model'" class="card-type-badge badge-model">Model</span>
+            <span *ngIf="servicev1 === 'model'" class="card-type-badge badge-model">
+                <mat-icon class="badge-icon">psychology</mat-icon>Model
+            </span>
 
-            <span *ngIf="servicev1 === 'pipeline'" class="card-type-badge badge-pipeline">Pipeline</span>
+            <span *ngIf="servicev1 === 'pipeline'" class="card-type-badge badge-pipeline">
+                <mat-icon class="badge-icon">account_tree</mat-icon>Pipeline
+            </span>
 
-            <span *ngIf="servicev1 === 'pipelineagent'" class="card-type-badge badge-pipeline">Agent Pipeline</span>
+            <span *ngIf="servicev1 === 'pipelineagent'" class="card-type-badge badge-pipeline">
+                <mat-icon class="badge-icon">smart_toy</mat-icon>Agent Pipeline
+            </span>
 
-            <span *ngIf="servicev1 === 'adapters'" class="card-type-badge badge-adapter">Adapter</span>
+            <span *ngIf="servicev1 === 'adapters'" class="card-type-badge badge-adapter">
+                <mat-icon class="badge-icon">extension</mat-icon>Adapter
+            </span>
 
-            <span *ngIf="servicev1 === 'instances'" class="card-type-badge badge-instance">Instance</span>
+            <span *ngIf="servicev1 === 'instances'" class="card-type-badge badge-instance">
+                <mat-icon class="badge-icon">memory</mat-icon>Instance
+            </span>
 
-            <span *ngIf="servicev1 === 'Datasets'" class="card-type-badge badge-dataset">Dataset</span>
+            <span *ngIf="servicev1 === 'Datasets'" class="card-type-badge badge-dataset">
+                <mat-icon class="badge-icon">storage</mat-icon>Dataset
+            </span>
 
-            <span *ngIf="servicev1 === 'agent'" class="card-type-badge badge-agent">Agent</span>
+            <span *ngIf="servicev1 === 'agent'" class="card-type-badge badge-agent">
+                <mat-icon class="badge-icon">auto_awesome</mat-icon>Agent
+            </span>
 
             <!-- Action icons for specific service types -->
             <mat-icon *ngIf="servicev1 === 'model'"

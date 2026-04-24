@@ -1671,6 +1671,32 @@ body.header-light-theme {
   padding: 16px 0; gap: 4px;
 }
 
+// ── Pagination — compact, enterprise ──────────────────────────────────────────
+.pages-details { display: inline-flex; align-items: center; gap: 1px; background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+.pagination-arrow { color: #94a3b8 !important; border-radius: 6px !important; font-size: 18px !important; width: 28px !important; height: 28px !important; line-height: 28px !important; transition: color 0.12s, background 0.12s !important;
+  &.active  { color: #4f46e5 !important; background: rgba(99,102,241,0.07) !important; }
+  &.disabled { color: #cbd5e1 !important; pointer-events: none !important; background: none !important; }
+}
+.pg { min-width: 28px !important; height: 28px !important; border-radius: 6px !important; font-size: 12px !important; font-weight: 500 !important; color: #64748b !important; transition: background 0.12s, color 0.12s !important;
+  &.hover { background: rgba(99,102,241,0.07) !important; color: #4f46e5 !important; }
+  &.selected-page { background: #4f46e5 !important; color: #fff !important; font-weight: 600 !important; box-shadow: none !important; }
+}
+
+body.header-dark-theme {
+  .pagination-arrow { color: #475569 !important;
+    &.active  { color: #818cf8 !important; background: rgba(99,102,241,0.1) !important; }
+    &.disabled { color: #2d3a55 !important; }
+  }
+  .pg { color: #475569 !important;
+    &.hover { background: rgba(99,102,241,0.1) !important; color: #a5b4fc !important; }
+    &.selected-page { background: #4f46e5 !important; color: #fff !important; }
+  }
+}
+body.header-light-theme {
+  .pagination-arrow { color: #94a3b8 !important; }
+  .pg { color: #64748b !important; }
+}
+
 // ── Empty state ────────────────────────────────────────────────────────────────
 app-aip-empty-state { display: block !important; width: 100% !important; }
 
@@ -2448,14 +2474,80 @@ body.header-light-theme .lfn-footer {
 
 // ── Dark theme overrides ───────────────────────────────────────────────────────
 body.header-dark-theme {
-  .lfx-c-card.mat-mdc-card {
-    background: rgba(13,22,48,0.88) !important;
-    border-color: rgba(79,142,247,0.15) !important;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.45), 0 1px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04) !important;
-    &::before { background: linear-gradient(90deg,#4f8ef7 0%,#7c3aed 45%,#06b6d4 100%) !important; }
-    &:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(79,142,247,0.2) !important; }
+  // ── Card base ────────────────────────────────────────────────────────────────
+  aip-card {
+    --mdc-outlined-card-container-color: rgba(10,16,40,0.96) !important;
+    --mdc-elevated-card-container-color: rgba(10,16,40,0.96) !important;
   }
-  .lfx-c-card__action-hover { background: rgba(8,15,34,0.96) !important; border-top-color: rgba(79,142,247,0.1) !important; }
+  .lfx-c-card.mat-mdc-card {
+    background: rgba(10,16,40,0.96) !important;
+    border-color: rgba(99,102,241,0.18) !important;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+    &::before { background: linear-gradient(90deg,#818cf8 0%,#a78bfa 50%,#22d3ee 100%) !important; box-shadow: 0 1px 16px rgba(129,140,248,0.45) !important; }
+    &:hover {
+      border-color: rgba(129,140,248,0.38) !important;
+      box-shadow: 0 22px 52px rgba(0,0,0,0.65), 0 0 0 1px rgba(129,140,248,0.25), inset 0 1px 0 rgba(255,255,255,0.07) !important;
+      &::before { box-shadow: 0 2px 24px rgba(129,140,248,0.65) !important; }
+    }
+  }
+
+  // ── Card text + background icon ───────────────────────────────────────────────
+  .card-main-title { color: #e2e8f0 !important; }
+  .card-main-date  { color: #64748b !important; }
+  .lfx-c-card.mat-mdc-card:hover .card-main-title { color: #a5b4fc !important; }
+  .card-bg-icon mat-icon { color: #818cf8 !important; opacity: 0.14 !important; font-size: 44px !important; width: 44px !important; height: 44px !important; transform: none; }
+  .lfx-c-card.mat-mdc-card:hover .card-bg-icon mat-icon { opacity: 0.2 !important; transform: scale(1.08) !important; }
+
+  // ── Badges (dark — solid bright colors, icon-friendly) ─────────────────────
+  .card-type-badge { box-shadow: none !important; border-radius: 8px !important; }
+  .badge-model, .badge-pipeline {
+    background: rgba(109,40,217,0.55) !important; color: #ede9fe !important;
+    border: 1px solid rgba(167,139,250,0.5) !important;
+  }
+  .badge-adapter {
+    background: rgba(29,78,216,0.55) !important; color: #dbeafe !important;
+    border: 1px solid rgba(96,165,250,0.5) !important;
+  }
+  .badge-instance {
+    background: rgba(15,118,110,0.55) !important; color: #ccfbf1 !important;
+    border: 1px solid rgba(45,212,191,0.5) !important;
+  }
+  .badge-dataset {
+    background: rgba(5,150,105,0.55) !important; color: #d1fae5 !important;
+    border: 1px solid rgba(52,211,153,0.5) !important;
+  }
+  .badge-agent {
+    background: rgba(146,64,14,0.65) !important; color: #fef3c7 !important;
+    border: 1px solid rgba(251,191,36,0.5) !important;
+  }
+  .badge-agent-dir {
+    background: rgba(7,89,133,0.65) !important; color: #cffafe !important;
+    border: 1px solid rgba(34,211,238,0.5) !important;
+  }
+  .badge-connection {
+    background: rgba(51,65,85,0.65) !important; color: #e2e8f0 !important;
+    border: 1px solid rgba(148,163,184,0.4) !important;
+  }
+
+  // ── Action bar ───────────────────────────────────────────────────────────────
+  .lfx-c-card__action-hover { background: rgba(8,12,28,0.98) !important; border-top-color: rgba(99,102,241,0.1) !important; backdrop-filter: none !important; }
+  .card-action-icon { color: #475569 !important; &:hover { color: #a5b4fc !important; background: rgba(99,102,241,0.12) !important; } }
+  .aip-more-actions-icon { color: #475569 !important; &:hover, &.aip-icon-hover { color: #a5b4fc !important; background: rgba(99,102,241,0.1) !important; } }
+  .lfx-c-avatar { color: #a5b4fc !important; background: rgba(99,102,241,0.18) !important; border-color: rgba(129,140,248,0.3) !important; }
+  .view-details-btn {
+    background: rgba(129,140,248,0.18) !important;
+    color: #c7d2fe !important;
+    border: 1px solid rgba(129,140,248,0.35) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    &:hover { background: rgba(129,140,248,0.28) !important; color: #e0e7ff !important; border-color: rgba(129,140,248,0.55) !important; }
+  }
+  .skill-badge { background: rgba(7,89,133,0.5) !important; color: #cffafe !important; border-color: rgba(34,211,238,0.4) !important; border-radius: 8px !important; }
+  .skill-badge-more { background: rgba(51,65,85,0.4) !important; color: #94a3b8 !important; border-color: rgba(100,116,139,0.3) !important; }
+  .small-count { color: #64748b !important; }
+  .aip-menu-icon { color: #818cf8 !important; }
+  .aip-menu-delete { color: #f87171 !important; }
+
   .lfx-card-header h3, .lfx-card-header .card-title { color: #e2e8f0 !important; }
   .lfx-app-description { color: #b8cce0 !important; }
   .aip-panel-shadow { background: rgba(10,18,40,0.92) !important; border-color: rgba(79,142,247,0.1) !important; }
@@ -2491,12 +2583,85 @@ body.header-dark-theme {
 }
 
 body.header-light-theme {
-  .lfx-c-card.mat-mdc-card {
-    background: #ffffff !important;
-    border-color: rgba(99,102,241,0.18) !important;
-    box-shadow: 0 2px 16px rgba(99,102,241,0.1), 0 1px 4px rgba(0,0,0,0.05) !important;
-    &:hover { box-shadow: 0 8px 28px rgba(99,102,241,0.2) !important; }
+  // ── Card base ────────────────────────────────────────────────────────────────
+  aip-card {
+    --mdc-outlined-card-container-color: rgba(255,255,255,0.97) !important;
+    --mdc-elevated-card-container-color: rgba(255,255,255,0.97) !important;
   }
+  .lfx-c-card.mat-mdc-card {
+    background: rgba(255,255,255,0.97) !important;
+    border-color: rgba(226,232,240,0.8) !important;
+    box-shadow: 0 2px 12px rgba(99,102,241,0.08), 0 1px 4px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,1) !important;
+    &::before { background: linear-gradient(90deg,#6366f1 0%,#8b5cf6 50%,#06b6d4 100%) !important; box-shadow: 0 1px 10px rgba(99,102,241,0.35) !important; }
+    &:hover {
+      background: rgba(255,255,255,1) !important;
+      border-color: rgba(139,92,246,0.3) !important;
+      box-shadow: 0 20px 50px rgba(99,102,241,0.16), 0 8px 20px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1) !important;
+    }
+  }
+
+  // ── Card text + background icon ───────────────────────────────────────────────
+  .card-main-title { color: #0f172a !important; }
+  .card-main-date  { color: #94a3b8 !important; }
+  .lfx-c-card.mat-mdc-card:hover .card-main-title { color: #4f46e5 !important; }
+  .card-bg-icon mat-icon { color: #6366f1 !important; opacity: 0.15 !important; font-size: 44px !important; width: 44px !important; height: 44px !important; transform: none; }
+  .lfx-c-card.mat-mdc-card:hover .card-bg-icon mat-icon { opacity: 0.22 !important; transform: scale(1.08) !important; }
+
+  // ── Badges (light — solid saturated colors, icon-friendly) ─────────────────
+  .card-type-badge { border-radius: 8px !important; box-shadow: none !important; }
+  .badge-connection  {
+    background: #dbeafe !important; color: #1e40af !important;
+    border: 1px solid #93c5fd !important;
+  }
+  .badge-model       {
+    background: #ede9fe !important; color: #5b21b6 !important;
+    border: 1px solid #c4b5fd !important;
+  }
+  .badge-agent       {
+    background: #fef3c7 !important; color: #92400e !important;
+    border: 1px solid #fcd34d !important;
+  }
+  .badge-agent-dir   {
+    background: #cffafe !important; color: #0e7490 !important;
+    border: 1px solid #67e8f9 !important;
+  }
+  .badge-pipeline    {
+    background: #ede9fe !important; color: #4338ca !important;
+    border: 1px solid #a5b4fc !important;
+  }
+  .badge-adapter     {
+    background: #dbeafe !important; color: #1e40af !important;
+    border: 1px solid #93c5fd !important;
+  }
+  .badge-instance    {
+    background: #ccfbf1 !important; color: #065f46 !important;
+    border: 1px solid #6ee7b7 !important;
+  }
+  .badge-dataset     {
+    background: #d1fae5 !important; color: #065f46 !important;
+    border: 1px solid #6ee7b7 !important;
+  }
+
+  // ── Action bar ───────────────────────────────────────────────────────────────
+  .lfx-c-card__action-hover { background: rgba(250,249,255,0.98) !important; border-top-color: rgba(99,102,241,0.08) !important; }
+  .card-action-icon { color: #94a3b8 !important; &:hover { color: #4f46e5 !important; background: rgba(99,102,241,0.1) !important; } }
+  .aip-more-actions-icon { color: #94a3b8 !important; &:hover, &.aip-icon-hover { color: #4f46e5 !important; background: rgba(99,102,241,0.08) !important; } }
+  .lfx-c-avatar { color: #4f46e5 !important; background: rgba(99,102,241,0.1) !important; border-color: rgba(99,102,241,0.2) !important; }
+  .view-details-btn {
+    background: #4f46e5 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(79,70,229,0.3) !important;
+    &:hover { background: #4338ca !important; box-shadow: 0 4px 14px rgba(79,70,229,0.45) !important; }
+  }
+  .skill-badge { background: #cffafe !important; color: #0e7490 !important; border-color: #67e8f9 !important; border-radius: 8px !important; }
+  .skill-badge-more { background: #f1f5f9 !important; color: #64748b !important; border-color: #cbd5e1 !important; }
+  .small-count { color: #64748b !important; }
+  .card-actions-hover { border-top: none !important; }
+  .aip-menu-icon { color: #64748b !important; }
+  .aip-menu-delete { color: #ef4444 !important; }
+
   .lfx-c-card__action-hover { background: rgba(248,250,252,0.98) !important; }
   .lfx-card-header h3 { color: #1e293b !important; }
   .ds-card { background: rgba(255,255,255,0.85) !important; border-color: rgba(99,102,241,0.15) !important; }
@@ -2512,23 +2677,6 @@ body.header-light-theme {
   .lfx-c-badge { background: #DBEAFE !important; color: #1E40AF !important; border-color: #93C5FD !important; }
   .title-jobs { color: #0A1628 !important; }
   .secondary-color { color: #4A5568 !important; }
-  // Card internals - light theme text overrides
-  .card-main-title { color: #0A1628 !important; }
-  .card-main-date { color: #4A5568 !important; }
-  .view-details-btn { background: rgba(79,70,229,0.1) !important; color: #4F46E5 !important; border-color: rgba(79,70,229,0.3) !important; }
-  .badge-connection  { background: #DBEAFE !important; color: #1E40AF !important; border-color: #93C5FD !important; }
-  .badge-model       { background: #F3E8FF !important; color: #6B21A8 !important; border-color: #D8B4FE !important; }
-  .badge-agent       { background: #D1FAE5 !important; color: #065F46 !important; border-color: #6EE7B7 !important; }
-  .badge-agent-dir   { background: #CFFAFE !important; color: #0E7490 !important; border-color: #67E8F9 !important; }
-  .badge-pipeline    { background: #FEF3C7 !important; color: #92400E !important; border-color: #FCD34D !important; }
-  .badge-adapter     { background: #DBEAFE !important; color: #1E40AF !important; border-color: #93C5FD !important; }
-  .badge-instance    { background: #D1FAE5 !important; color: #065F46 !important; border-color: #6EE7B7 !important; }
-  .badge-dataset     { background: #CFFAFE !important; color: #0E7490 !important; border-color: #67E8F9 !important; }
-  .skill-badge       { background: #CFFAFE !important; color: #0E7490 !important; border-color: #67E8F9 !important; }
-  .skill-badge-more  { background: #DBEAFE !important; color: #1E40AF !important; border-color: #93C5FD !important; }
-  .small-count       { color: #4A5568 !important; }
-  .card-actions-hover { border-top-color: rgba(99,102,241,0.1) !important; }
-  .aip-more-actions-icon { color: #64748b !important; &:hover { color: #4F46E5 !important; } }
 
   // ── aip-header light theme ────────────────────────────────────────────────
   .lfx-header { border-bottom-color: rgba(99,102,241,0.12) !important; }

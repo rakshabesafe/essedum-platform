@@ -33,17 +33,7 @@ export class AipPaginationComponent {
     this.changePage.emit(input);
   }
 
-  getButtonStyle(i: number, idx: number) {
-    if (i == this.pageNumber) {
-      return {
-        color: '#FFFFFF',
-        background: '#0052CC 0% 0% no-repeat padding-box',
-        cursor: 'unset',
-      };
-    } else {
-      return {
-        color: this.hoverStates[idx] ? '#0094ff' : '#737373',
-      };
-    }
+  getButtonStyle(_i: number, _idx: number) {
+    return {};
   }
 }
