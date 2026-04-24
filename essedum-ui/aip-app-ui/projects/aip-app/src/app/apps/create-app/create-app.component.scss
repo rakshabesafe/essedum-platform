@@ -2,77 +2,86 @@
 
 .lfx-l-level2-middle-col, .p-4 { width: 100% !important; box-sizing: border-box !important; }
 
+// ── Material deep overrides ───────────────────────────────────────────────────
+:host ::ng-deep mat-form-field,
+:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled {
+  background: rgba(255,255,255,0.055) !important;
+  border-radius: 10px 10px 0 0 !important;
+  transition: background 0.18s !important;
+}
+:host ::ng-deep .mdc-text-field--filled:hover { background: rgba(255,255,255,0.09) !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: rgba(79,142,247,0.09) !important; }
+:host ::ng-deep .mdc-floating-label { color: #7a9cbf !important; font-size: 13px !important; }
+:host ::ng-deep .mdc-floating-label--float-above { color: #7eb8ff !important; font-size: 11px !important; letter-spacing: 0.3px !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
+:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.2) !important; }
+:host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
+:host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e2e8f0 !important; }
+:host ::ng-deep .mat-mdc-select-placeholder { color: #4d6882 !important; }
+:host ::ng-deep .mat-mdc-select-arrow { color: #4d6882 !important; }
+
+// ── Panel header ──────────────────────────────────────────────────────────────
 header {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  padding: 16px 20px !important;
+  padding: 16px 24px !important;
+  background: rgba(79,142,247,0.05) !important;
   border-bottom: 1px solid rgba(79,142,247,0.1) !important;
 
   h2 {
-    font-size: 18px !important;
+    font-size: 17px !important;
     font-weight: 700 !important;
     color: #e2e8f0 !important;
     margin: 0 !important;
+    letter-spacing: -0.3px !important;
   }
 
   .close-icon {
     font-size: 20px !important;
     width: 20px !important;
     height: 20px !important;
-    cursor: pointer;
-    color: #b8cce0 !important;
-    transition: color 0.15s;
+    cursor: pointer !important;
+    color: #4d6882 !important;
+    transition: color 0.15s !important;
     &:hover { color: #4f8ef7 !important; }
   }
 }
 
-main { padding: 20px !important; }
+// ── Body ──────────────────────────────────────────────────────────────────────
+main { padding: 20px 24px !important; }
 
-:host ::ng-deep mat-form-field,
-:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
-:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
-:host ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.05) !important; border-radius: 8px 8px 0 0 !important; }
-:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #b8cce0 !important; font-size: 13px !important; }
-:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
-:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.25) !important; }
-:host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
-:host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e2e8f0 !important; }
-
+// ── Layout rows ───────────────────────────────────────────────────────────────
 .col-12 { width: 100% !important; max-width: 100% !important; padding: 0 !important; margin-bottom: 8px; }
 
-.dialog-actions, .form-actions {
-  display: flex !important;
-  justify-content: flex-end !important;
-  gap: 8px !important;
-  padding: 16px 0 0 !important;
-  border-top: 1px solid rgba(79,142,247,0.08) !important;
-}
+// ── Upload / drop zone ────────────────────────────────────────────────────────
+.logo-upload-card {
+  background: rgba(79,142,247,0.04) !important;
+  border: 1.5px dashed rgba(79,142,247,0.28) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  box-shadow: none !important;
+  transition: border-color 0.18s, background 0.18s !important;
 
-button[mat-raised-button][color="primary"],
-button[mat-flat-button][color="primary"],
-button.save-button, button.update-button {
-  background: linear-gradient(135deg, #4f8ef7 0%, #6366f1 100%) !important;
-  color: #fff !important;
-  border-radius: 8px !important;
-  font-weight: 600 !important;
-  font-size: 13px !important;
-  padding: 7px 22px !important;
-  box-shadow: 0 2px 12px rgba(79,142,247,0.35) !important;
-  transition: box-shadow 0.15s !important;
+  &:hover {
+    background: rgba(79,142,247,0.07) !important;
+    border-color: rgba(79,142,247,0.52) !important;
+  }
 }
-button.cancel-button {
-  background: rgba(255,255,255,0.06) !important;
-  color: #b8cce0 !important;
-  border: 1px solid rgba(79,142,247,0.25) !important;
-  border-radius: 8px !important;
-  font-size: 13px !important;
-  padding: 7px 22px !important;
-}
+.upload-header { display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 8px !important; }
+.upload-label { font-size: 10px !important; font-weight: 700 !important; color: #4d6882 !important; text-transform: uppercase !important; letter-spacing: 1px !important; }
+.upload-icon-wrapper { cursor: pointer !important; color: #4f8ef7 !important; transition: color 0.15s !important; &:hover { color: #7eb8ff !important; } }
+.uploaded-image { max-width: 100% !important; border-radius: 8px !important; margin-top: 8px !important; }
+.file-input { display: none !important; }
+.error-text { color: #f87171 !important; font-size: 11px !important; }
 
+// ── Action bar ────────────────────────────────────────────────────────────────
 footer.action-buttons-container {
-  padding: 16px 20px !important;
+  padding: 14px 24px !important;
   border-top: 1px solid rgba(79,142,247,0.08) !important;
+
   .action-buttons {
     display: flex !important;
     justify-content: flex-end !important;
@@ -80,29 +89,116 @@ footer.action-buttons-container {
   }
 }
 
-.logo-upload-card {
-  background: rgba(79,142,247,0.05) !important;
-  border: 1px dashed rgba(79,142,247,0.3) !important;
-  border-radius: 12px !important;
-  padding: 16px !important;
-  box-shadow: none !important;
+.dialog-actions, .form-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  padding: 14px 0 0 !important;
+  border-top: 1px solid rgba(79,142,247,0.08) !important;
 }
-.upload-header { display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 8px !important; }
-.upload-label { font-size: 11px !important; font-weight: 700 !important; color: #9ab8d0 !important; text-transform: uppercase !important; letter-spacing: 0.6px !important; }
-.upload-icon-wrapper { cursor: pointer !important; color: #4f8ef7 !important; }
-.uploaded-image { max-width: 100% !important; border-radius: 8px !important; margin-top: 8px !important; }
-.file-input { display: none !important; }
-.error-text { color: #f87171 !important; font-size: 11px !important; }
 
-body.header-light-theme {
-  header h2 { color: #0f172a !important; }
-  :host ::ng-deep .mdc-text-field--filled { background: rgba(0,0,0,0.04) !important; }
-  :host ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
-  :host ::ng-deep .mdc-floating-label { color: #4A5568 !important; }
-  :host ::ng-deep mat-select .mat-mdc-select-value-text { color: #0f172a !important; }
-  footer.action-buttons-container { border-top-color: rgba(79,70,229,0.1) !important; }
-  button.cancel-button { background: rgba(0,0,0,0.04) !important; color: #4A5568 !important; border-color: rgba(79,70,229,0.2) !important; }
-  .logo-upload-card { background: rgba(79,70,229,0.04) !important; border-color: rgba(79,70,229,0.2) !important; }
-  .upload-label { color: #4A5568 !important; }
-  .upload-icon-wrapper { color: #4F46E5 !important; }
+// ── Primary button ────────────────────────────────────────────────────────────
+button[mat-raised-button][color="primary"],
+button[mat-flat-button][color="primary"],
+button.save-button, button.update-button {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 8px 26px !important;
+  box-shadow: 0 4px 18px rgba(79,70,229,0.45) !important;
+  letter-spacing: 0.2px !important;
+  transition: box-shadow 0.18s, transform 0.15s !important;
+
+  &:hover:not([disabled]) {
+    box-shadow: 0 6px 28px rgba(79,70,229,0.6) !important;
+    transform: translateY(-1px) !important;
+  }
+  &[disabled] { opacity: 0.4 !important; box-shadow: none !important; transform: none !important; }
+}
+
+// ── Cancel / ghost button ─────────────────────────────────────────────────────
+button[mat-stroked-button], button.cancel-button {
+  background: transparent !important;
+  color: #7a9cbf !important;
+  border: 1px solid rgba(79,142,247,0.25) !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  padding: 8px 20px !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s, color 0.15s !important;
+
+  &:hover:not([disabled]) {
+    border-color: rgba(79,142,247,0.55) !important;
+    color: #c8d8ea !important;
+  }
+}
+
+// ── Light theme ───────────────────────────────────────────────────────────────
+:host-context(body.header-light-theme) {
+  ::ng-deep .mdc-text-field--filled { background: #f1f5f9 !important; }
+  ::ng-deep .mdc-text-field--filled:hover { background: #e8edf5 !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: rgba(99,102,241,0.06) !important; }
+  ::ng-deep .mdc-floating-label { color: #64748b !important; }
+  ::ng-deep .mdc-floating-label--float-above { color: #4f46e5 !important; }
+  ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
+  ::ng-deep mat-select .mat-mdc-select-value-text { color: #0f172a !important; }
+  ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f46e5 !important; }
+
+  header {
+    background: rgba(99,102,241,0.04) !important;
+    border-bottom-color: rgba(99,102,241,0.1) !important;
+    h2 { color: #0f172a !important; }
+    .close-icon { color: #94a3b8 !important; &:hover { color: #4f46e5 !important; } }
+  }
+
+  footer.action-buttons-container { border-top-color: rgba(99,102,241,0.1) !important; }
+  .dialog-actions, .form-actions { border-top-color: rgba(99,102,241,0.1) !important; }
+
+  button[mat-raised-button][color="primary"],
+  button[mat-flat-button][color="primary"],
+  button.save-button, button.update-button {
+    background: #4f46e5 !important;
+    box-shadow: 0 4px 18px rgba(79,70,229,0.35) !important;
+    &:hover:not([disabled]) { box-shadow: 0 6px 28px rgba(79,70,229,0.5) !important; }
+  }
+
+  button[mat-stroked-button], button.cancel-button {
+    color: #64748b !important;
+    border-color: rgba(99,102,241,0.25) !important;
+    &:hover:not([disabled]) { border-color: rgba(99,102,241,0.55) !important; color: #4f46e5 !important; }
+  }
+
+  .logo-upload-card {
+    background: rgba(99,102,241,0.04) !important;
+    border-color: rgba(99,102,241,0.22) !important;
+    &:hover { background: rgba(99,102,241,0.07) !important; border-color: rgba(99,102,241,0.45) !important; }
+  }
+  .upload-label { color: #64748b !important; }
+  .upload-icon-wrapper { color: #4f46e5 !important; &:hover { color: #6366f1 !important; } }
+}
+
+// ── Dark theme explicit ───────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
+  ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.055) !important; }
+  ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; }
+
+  header {
+    background: rgba(79,142,247,0.05) !important;
+    h2 { color: #e2e8f0 !important; }
+  }
+
+  button[mat-raised-button][color="primary"],
+  button[mat-flat-button][color="primary"],
+  button.save-button, button.update-button {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    box-shadow: 0 4px 18px rgba(79,70,229,0.45) !important;
+  }
+
+  button[mat-stroked-button], button.cancel-button {
+    color: #7a9cbf !important;
+    border-color: rgba(79,142,247,0.25) !important;
+  }
 }

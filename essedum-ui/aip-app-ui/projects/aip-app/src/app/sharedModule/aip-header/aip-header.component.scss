@@ -140,3 +140,45 @@
   border: 1px solid rgba(16,185,129,0.25);
   margin-left: 8px;
 }
+
+// ── Light theme ───────────────────────────────────────────────────────────────
+:host-context(body.header-light-theme) {
+  .lfx-header {
+    border-bottom-color: rgba(99,102,241,0.1);
+  }
+  .header-left {
+    h3 { color: #0f172a; }
+    h3.grey-color { color: #64748b; }
+    mat-icon { color: #94a3b8; &.active { color: #4f46e5; } }
+  }
+  .header-actions p { color: #64748b !important; }
+  .action-button {
+    background: rgba(99,102,241,0.06);
+    border-color: rgba(99,102,241,0.15);
+    &:hover {
+      background: rgba(99,102,241,0.1);
+      border-color: rgba(99,102,241,0.35);
+      box-shadow: 0 2px 8px rgba(99,102,241,0.15);
+    }
+    mat-icon { color: #64748b; &.active { color: #4f46e5; } }
+  }
+  .header-search {
+    background: rgba(99,102,241,0.05) !important;
+    border-color: rgba(99,102,241,0.2) !important;
+    mat-icon { color: #94a3b8; &.active { color: #4f46e5; } }
+  }
+  .lfx-panel-input { color: #0f172a; &::placeholder { color: #94a3b8; } }
+}
+
+// ── Dark theme explicit ───────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
+  .lfx-header { border-bottom-color: rgba(79,142,247,0.08); }
+  .header-left h3 { color: #e2e8f0; }
+  .header-left h3.grey-color { color: #b8cce0; }
+  .header-actions p { color: #b8cce0 !important; }
+  .action-button {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(79,142,247,0.12);
+    mat-icon { color: #b8cce0; }
+  }
+}
