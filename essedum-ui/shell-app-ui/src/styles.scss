@@ -855,6 +855,26 @@ button#sidebarexpand { display: none !important; }
   opacity: 1 !important;
 }
 
+// 7b. Inline SVG AI-tool icons — sizing only; colors handled by sidebar-svg-iconcolor / sidebar-svg-iconcolordefault
+.sidebar-ai-icon {
+  width: 22px !important;
+  height: 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  z-index: 1 !important;
+  flex-shrink: 0 !important;
+
+  svg {
+    width: 22px;
+    height: 22px;
+    transition: stroke 0.18s ease, color 0.18s ease, transform 0.2s ease;
+  }
+}
+
+.sidebar-item-container:hover .sidebar-ai-icon svg { transform: scale(1.1); }
+
 // 8. Font Awesome icons — blue-tinted for AI platform feel
 .sidebar-Icons-list {
   font-size: 17px !important;
@@ -1065,6 +1085,56 @@ body.header-dark-theme {
     .sidebar-nav-label { color: #deeeff !important; opacity: 1 !important; font-weight: 600 !important; }
   }
   .sidebar-Icons-list { color: rgba(100, 155, 245, 0.6) !important; }
+
+  // SVG icons on dark sidebar — explicit overrides to match font icon colour (default, hover, active)
+  .sidebar-svg-iconcolor svg, .sidebar-svg-iconcolor path,
+  .sidebar-svg-iconcolor circle, .sidebar-svg-iconcolor rect,
+  .sidebar-svg-iconcolordefault svg, .sidebar-svg-iconcolordefault path,
+  .sidebar-svg-iconcolordefault circle, .sidebar-svg-iconcolordefault rect {
+    fill: rgba(100, 155, 245, 0.6) !important;
+  }
+  .sidebar-item-container:hover .sidebar-svg-iconcolor svg,
+  .sidebar-item-container:hover .sidebar-svg-iconcolor path,
+  .sidebar-item-container:hover .sidebar-svg-iconcolor circle,
+  .sidebar-item-container:hover .sidebar-svg-iconcolor rect,
+  .sidebar-item-container:hover .sidebar-svg-iconcolordefault svg,
+  .sidebar-item-container:hover .sidebar-svg-iconcolordefault path,
+  .sidebar-item-container:hover .sidebar-svg-iconcolordefault circle,
+  .sidebar-item-container:hover .sidebar-svg-iconcolordefault rect {
+    fill: rgba(130, 185, 255, 0.94) !important;
+  }
+  .sidebar-item-container.sidebar-border .sidebar-svg-iconcolor svg,
+  .sidebar-item-container.sidebar-border .sidebar-svg-iconcolor path,
+  .sidebar-item-container.sidebar-border .sidebar-svg-iconcolor circle,
+  .sidebar-item-container.sidebar-border .sidebar-svg-iconcolor rect,
+  .sidebar-item-container.config .sidebar-svg-iconcolor svg,
+  .sidebar-item-container.config .sidebar-svg-iconcolor path,
+  .sidebar-item-container.config .sidebar-svg-iconcolor circle,
+  .sidebar-item-container.config .sidebar-svg-iconcolor rect {
+    fill: #6eaeff !important;
+  }
+
+  // AI-tool icons: override bright-blue svg-iconcolor back to the same muted slate
+  // as dataset/connections FA icons (sidebariconcolor system uses --sidebaricon-color)
+  .sidebar-ai-icon svg,
+  .sidebar-ai-icon svg path,
+  .sidebar-ai-icon svg circle,
+  .sidebar-ai-icon svg rect { fill: var(--sidebaricon-color, #94a3b8) !important; }
+
+  .sidebar-item-container:hover .sidebar-ai-icon svg,
+  .sidebar-item-container:hover .sidebar-ai-icon svg path,
+  .sidebar-item-container:hover .sidebar-ai-icon svg circle,
+  .sidebar-item-container:hover .sidebar-ai-icon svg rect { fill: var(--sidebartexticonhover-color, #7db5ff) !important; }
+
+  .sidebar-item-container.sidebar-border .sidebar-ai-icon svg,
+  .sidebar-item-container.sidebar-border .sidebar-ai-icon svg path,
+  .sidebar-item-container.sidebar-border .sidebar-ai-icon svg circle,
+  .sidebar-item-container.sidebar-border .sidebar-ai-icon svg rect,
+  .sidebar-item-container.config .sidebar-ai-icon svg,
+  .sidebar-item-container.config .sidebar-ai-icon svg path,
+  .sidebar-item-container.config .sidebar-ai-icon svg circle,
+  .sidebar-item-container.config .sidebar-ai-icon svg rect { fill: #6eaeff !important; }
+
   .sidebarbgcolor { background-color: transparent !important; }
   .sidebar-background { border-bottom-color: #4f8ef7; }
 
