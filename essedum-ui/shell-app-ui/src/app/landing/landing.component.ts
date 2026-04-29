@@ -428,7 +428,7 @@ export class LandingComponent implements OnInit, AfterViewInit {
     if (this.isDark) {
       document.body.classList.remove('header-light-theme');
       document.body.classList.add('header-dark-theme');
-      document.documentElement.style.setProperty('--background-colour', '#060c1a');
+      document.documentElement.style.setProperty('--background-colour', '#1e293b');
       document.documentElement.style.setProperty('--text-color', '#e2e8f0');
       localStorage.setItem('aip-header-theme', 'dark');
     } else {
@@ -450,7 +450,7 @@ export class LandingComponent implements OnInit, AfterViewInit {
     } else {
       this.isDark = true;
       document.body.classList.add('header-dark-theme');
-      document.documentElement.style.setProperty('--background-colour', '#060c1a');
+      document.documentElement.style.setProperty('--background-colour', '#1e293b');
       document.documentElement.style.setProperty('--text-color', '#e2e8f0');
     }
 

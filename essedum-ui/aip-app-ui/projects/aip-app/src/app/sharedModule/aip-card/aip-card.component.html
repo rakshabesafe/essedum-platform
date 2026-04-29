@@ -14,7 +14,11 @@
         <mat-icon *ngIf="servicev1 === 'instances'">memory</mat-icon>
         <mat-icon *ngIf="servicev1 === 'Datasets'">storage</mat-icon>
         <mat-icon *ngIf="servicev1 === 'agent'">auto_awesome</mat-icon>
-        <mat-icon *ngIf="servicev1 === 'agent-directory'">folder_shared</mat-icon>
+        <!-- Background icon for agent-directory splits by category -->
+        <ng-container *ngIf="servicev1 === 'agent-directory'">
+            <mat-icon *ngIf="(getCategory() | uppercase) === 'AGENT'">smart_toy</mat-icon>
+            <mat-icon *ngIf="(getCategory() | uppercase) === 'MCPSERVER'">hub</mat-icon>
+        </ng-container>
     </div>
 
     <!-- ── Main header: title LEFT  +  type badge RIGHT ── -->
@@ -37,9 +41,15 @@
                 <mat-icon class="badge-icon">device_hub</mat-icon>{{ getCategory() | uppercase }}
             </span>
 
-            <span *ngIf="servicev1 === 'agent-directory'" class="card-type-badge badge-agent-dir">
-                <mat-icon class="badge-icon">folder_shared</mat-icon>{{ getCategory() | uppercase }}
-            </span>
+            <!-- Agent-directory badge: different icon for AGENT vs MCPSERVER -->
+            <ng-container *ngIf="servicev1 === 'agent-directory'">
+                <span *ngIf="(getCategory() | uppercase) === 'AGENT'" class="card-type-badge badge-agent-dir badge-agent-type">
+                    <mat-icon class="badge-icon badge-icon-large">smart_toy</mat-icon>AGENT
+                </span>
+                <span *ngIf="(getCategory() | uppercase) === 'MCPSERVER'" class="card-type-badge badge-mcp-dir">
+                    <mat-icon class="badge-icon badge-icon-large">hub</mat-icon>MCPSERVER
+                </span>
+            </ng-container>
 
             <span *ngIf="servicev1 === 'model'" class="card-type-badge badge-model">
                 <mat-icon class="badge-icon">psychology</mat-icon>Model
@@ -61,6 +71,14 @@
                 <mat-icon class="badge-icon">memory</mat-icon>Instance
             </span>
 
+            <span *ngIf="servicev1 === 'specs'" class="card-type-badge badge-spec">
+                <mat-icon class="badge-icon">description</mat-icon>Spec
+            </span>
+
+            <span *ngIf="servicev1 === 'schemas'" class="card-type-badge badge-schema">
+                <mat-icon class="badge-icon">schema</mat-icon>Schema
+            </span>
+
             <span *ngIf="servicev1 === 'Datasets'" class="card-type-badge badge-dataset">
                 <mat-icon class="badge-icon">storage</mat-icon>Dataset
             </span>
@@ -78,7 +96,7 @@
             <mat-icon *ngIf="servicev1 === 'agent-directory'"
                 [matTooltip]="'View Details'" matTooltipPosition="above"
                 (click)="$event.stopPropagation(); onViewDetails()"
-                class="card-action-icon">open_in_new</mat-icon>
+                class="view-icon-btn">open_in_new</mat-icon>
 
             <ng-container *ngIf="servicev1 === 'Datasets'">
                 <mat-icon [matTooltip]="'View Details'" matTooltipPosition="above"
@@ -158,15 +176,15 @@
         <div class="d-flex align-items-center" style="gap:10px"
             *ngIf="(getCategory() | uppercase) === 'MCPSERVER'">
             <div class="d-flex align-items-center agent-dir-stat" matTooltip="Tools" matTooltipPosition="above">
-                <img src="assets/img/tools_icon.jpg" alt="tools Icon" style="height:20px; width:22px;" />
+                <mat-icon class="stat-icon stat-icon-tools">build</mat-icon>
                 <span class="small-count">{{ getToolsCount() }}</span>
             </div>
             <div class="d-flex align-items-center agent-dir-stat" matTooltip="Resources" matTooltipPosition="above">
-                <img src="assets/img/resources_icon.jpg" alt="Resources Icon" style="height:20px; width:22px;" />
+                <mat-icon class="stat-icon stat-icon-resources">inventory_2</mat-icon>
                 <span class="small-count">{{ getResourcesCount() }}</span>
             </div>
             <div class="d-flex align-items-center agent-dir-stat" matTooltip="Prompts" matTooltipPosition="above">
-                <img src="assets/img/prompts_icon.jpg" alt="prompts Icon" style="height:20px; width:22px;" />
+                <mat-icon class="stat-icon stat-icon-prompts">chat_bubble</mat-icon>
                 <span class="small-count">{{ getPromptsCount() }}</span>
             </div>
         </div>

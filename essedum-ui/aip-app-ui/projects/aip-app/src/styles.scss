@@ -151,17 +151,7 @@ aip-card {
     box-shadow 0.26s ease,
     border-color 0.26s ease !important;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
-    box-shadow: 0 1px 10px rgba(99, 102, 241, 0.35);
-    z-index: 2;
-    border-radius: 18px 18px 0 0;
-    transition: box-shadow 0.26s ease, height 0.2s ease;
-  }
+  // Top gradient removed per user request
 
   &::after {
     content: '';
@@ -188,15 +178,16 @@ aip-card {
   &:hover {
     transform: translateY(-7px) !important;
     background: rgba(255, 255, 255, 1) !important;
-    border-color: rgba(139, 92, 246, 0.3) !important;
+    border-color: rgba(99, 102, 241, 0.45) !important;
     box-shadow:
-      0 20px 50px rgba(99, 102, 241, 0.16),
-      0 8px 20px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(99, 102, 241, 0.2),
+      0 8px 24px rgba(99, 102, 241, 0.18),
+      0 20px 50px rgba(99, 102, 241, 0.12),
       inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 
     &::before {
-      box-shadow: 0 2px 20px rgba(99, 102, 241, 0.6);
-      height: 4px;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.7), 0 0 50px rgba(139, 92, 246, 0.25);
+      height: 5px;
     }
   }
 }
@@ -1209,14 +1200,14 @@ body.header-dark-theme {
   --mat-sidenav-content-background-color: transparent;
 
   // CSS variables for shell-app-ui sidebar/nav compatibility
-  --background-colour: #060c1a;
-  --bg-color: #0d1530;
+  --background-colour: #1e293b;
+  --bg-color: #0f172a;
   --base-color: #4f8ef7;
   --text-color: #e2e8f0;
-  --text-color-secondary: #94a3b8;
-  --border-color: rgba(79, 142, 247, 0.12);
-  --sidebarbg-color: rgba(8, 15, 34, 0.98);
-  --sidebartext-color: #94a3b8;
+  --text-color-secondary: #cbd5e1;
+  --border-color: rgba(100, 116, 139, 0.2);
+  --sidebarbg-color: rgba(15, 23, 42, 0.98);
+  --sidebartext-color: #cbd5e1;
   --sidebaricon-color: #64748b;
   --sidebarhover-color: rgba(79, 142, 247, 0.08);
   --sidebartexticonhover-color: #7db5ff;
@@ -1247,10 +1238,7 @@ body.header-dark-theme {
     border: 1px solid rgba(99, 102, 241, 0.16) !important;
     box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04) !important;
 
-    &::before {
-      background: linear-gradient(90deg, #818cf8 0%, #a78bfa 50%, #22d3ee 100%) !important;
-      box-shadow: 0 1px 16px rgba(129, 140, 248, 0.45) !important;
-    }
+    // Top gradient removed per user request
     &::after {
       background: radial-gradient(ellipse at 90% 10%, rgba(129,140,248,0.08), transparent 70%) !important;
     }
@@ -1264,12 +1252,14 @@ body.header-dark-theme {
     }
 
     &:hover {
-      border-color: rgba(129, 140, 248, 0.38) !important;
+      transform: translateY(-6px) !important;
+      background: rgba(15, 23, 56, 0.98) !important;
+      border-color: rgba(129, 140, 248, 0.55) !important;
       box-shadow:
-        0 22px 52px rgba(0,0,0,0.65),
-        0 0 0 1px rgba(129,140,248,0.25),
-        inset 0 1px 0 rgba(255,255,255,0.07) !important;
-      &::before { box-shadow: 0 2px 24px rgba(129, 140, 248, 0.65) !important; }
+        0 0 0 1px rgba(129, 140, 248, 0.3),
+        0 8px 32px rgba(129, 140, 248, 0.2),
+        0 24px 56px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
     }
   }
 

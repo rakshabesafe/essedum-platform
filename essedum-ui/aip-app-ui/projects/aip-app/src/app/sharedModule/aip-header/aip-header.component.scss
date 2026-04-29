@@ -6,9 +6,15 @@
   justify-content: space-between !important;
   padding: 18px 0 14px !important;
   width: 100% !important;
-  gap: 12px;
+  gap: 20px;
   border-bottom: 1px solid rgba(79,142,247,0.08);
   margin-bottom: 16px;
+  
+  p {
+    margin: 0;
+    padding-right: 12px;
+    white-space: nowrap;
+  }
 }
 
 .header-left {
@@ -49,19 +55,25 @@
 .header-right {
   display: flex;
   align-items: center;
+  gap: 16px;
   flex-shrink: 0;
 }
 
 .header-actions {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 12px !important;
 
   p {
     font-size: 11px !important;
-    color: #b8cce0 !important;
-    margin: 0 8px 0 0 !important;
+    color: #94a3b8 !important;
+    margin: 0 !important;
     white-space: nowrap;
+    padding: 6px 12px 6px 0;
+    border-right: 1px solid rgba(79,142,247,0.15);
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
   }
 }
 

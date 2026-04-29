@@ -39,6 +39,7 @@ import { AgentDirectoryComponent } from './agent-directory/agent-directory.compo
 import { AgentDirectoryViewComponent } from './agent-directory/agent-directory-view/agent-directory-view.component';
 import { AgentDirectoryEditComponent } from './agent-directory/agent-directory-edit/agent-directory-edit.component';
 import { VibeStudioComponent } from './vibe-studio/vibe-studio/vibe-studio.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 
 const routes: Routes = [
@@ -46,7 +47,17 @@ const routes: Routes = [
     path: '',
     component: AipComponent,
     children: [
-  
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        children: [
+          { path: '', component: DashboardComponent },
+        ]
+      },
       {
         path: 'models',
         children: [

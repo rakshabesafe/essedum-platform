@@ -29,14 +29,15 @@
 
 .aip-card-container {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
-  gap: 24px !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 320px)) !important;
+  gap: 20px !important;
   width: 100% !important;
   padding: 0 0 40px !important;
   box-sizing: border-box;
+  justify-content: start !important;
 
   > * {
-    max-width: none !important;
+    max-width: 320px !important;
     width: 100% !important;
     flex: none !important;
     padding: 0 !important;
@@ -45,6 +46,11 @@
 
 .aip-card-wrapper, .card-wrapper {
   width: 100% !important;
+  max-width: 320px !important;
   height: 100%;
   box-sizing: border-box;
+  overflow: visible !important;
+}
+.aip-card-container {
+  > * { overflow: visible !important; }
 }

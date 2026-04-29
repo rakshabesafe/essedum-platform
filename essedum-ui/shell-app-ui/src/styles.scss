@@ -403,11 +403,13 @@ mat-drawer.example-sidenav {
 .fChild.header-dark .main-toggle,
 .main-header-bg.header-dark .main-toggle {
   background: linear-gradient(180deg, #080f22 0%, #060c1a 100%);
+  border-bottom: 1px solid rgba(79, 142, 247, 0.18) !important;
 }
 
 .fChild.header-light .main-toggle,
 .main-header-bg.header-light .main-toggle {
-  background: #003057;
+//  background: #003057;
+  //border-bottom: 1px solid rgba(0, 163, 224, 0.22) !important;
 }
 
 // ─── Top Header Bar ────────────────────────────────────────────────────────────
@@ -435,14 +437,60 @@ mat-drawer.example-sidenav {
 
 .responsive-title {
   color: rgba(255, 255, 255, 0.9);
-  font-size: 1.35rem;
+  font-size: 2rem;
+  letter-spacing: 1px;
   font-weight: 600;
   font-family: "Roboto", "Segoe UI", sans-serif;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   margin-left: 4px;
+  text-transform: uppercase;
 }
+
+// Light theme override for ESSEDUM title
+.fChild.header-light .responsive-title,
+.main-header-bg.header-light .responsive-title {
+  //color: #0b456e;
+    background: linear-gradient(135deg, #0094ff 0%, #0a142f 100%);
+  letter-spacing: 1px;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+
+  }
+
+
+  
+// Dark theme theme-toggle-btn
+.fChild.header-dark .theme-toggle-btn,
+.main-header-bg.header-dark .theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.82);
+  &:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+  }
+}
+
+// Light theme theme-toggle-btn
+.fChild.header-light .theme-toggle-btn,
+.main-header-bg.header-light .theme-toggle-btn {
+  background: rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  color: #0f172a;
+  &:hover {
+    background: rgba(15, 23, 42, 0.15);
+    border-color: rgba(15, 23, 42, 0.3);
+    color: #0a142f;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
+  }
+}
+
 
 .main-toggle-btn, .sidebarBtn {
   background: none;
@@ -716,27 +764,29 @@ mat-sidenav-content, .mat-sidenav-content, .mat-drawer-content {
   box-sizing: border-box !important;
 }
 
-// Card grid — 3 columns always fit, no overflow
+// Card grid — auto-fill columns (280–320px each), MFE-friendly
 // Broad selector covers both shell container and any MFE-level wrapper
 .aip-card-container,
 #containerDivForScroll.aip-card-container {
   display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 320px)) !important;
   gap: 20px !important;
   flex-direction: unset !important;
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
-  overflow-x: hidden !important;
+  justify-content: start !important;
+  overflow: visible !important;
+  overflow-x: visible !important;
 }
 
-// Force grid children to never exceed their cell
+// Allow grid children to size correctly and show hover effects
 .aip-card-container > *,
 #containerDivForScroll.aip-card-container > * {
   min-width: 0 !important;
-  max-width: 100% !important;
+  max-width: 320px !important;
   box-sizing: border-box !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 // Also clip any inner card wrappers (MFE may nest a wrapper div)
@@ -1028,24 +1078,38 @@ mat-nav-list.dashboard:hover .sidebar-nav-label { opacity: 1 !important; }
 }
 
 // 11. SVG icon colour — blue-tinted default, bright on hover
-.sidebar-svg-iconcolor svg, .sidebar-svg-iconcolor path {
+.sidebar-svg-iconcolor svg, .sidebar-svg-iconcolor path,
+.sidebar-svg-iconcolor circle, .sidebar-svg-iconcolor rect {
   fill: rgba(100, 155, 245, 0.6) !important;
+  color: rgba(100, 155, 245, 0.6) !important;
   transition: fill 0.18s !important;
 }
-.sidebar-svg-iconcolordefault svg, .sidebar-svg-iconcolordefault path {
+.sidebar-svg-iconcolordefault svg, .sidebar-svg-iconcolordefault path,
+.sidebar-svg-iconcolordefault circle, .sidebar-svg-iconcolordefault rect {
   fill: rgba(100, 155, 245, 0.52) !important;
+  color: rgba(100, 155, 245, 0.52) !important;
 }
 .sidebar-item-container:hover .sidebar-svg-iconcolor svg,
 .sidebar-item-container:hover .sidebar-svg-iconcolor path,
+.sidebar-item-container:hover .sidebar-svg-iconcolor circle,
+.sidebar-item-container:hover .sidebar-svg-iconcolor rect,
 .sidebar-item-container:hover .sidebar-svg-iconcolordefault svg,
-.sidebar-item-container:hover .sidebar-svg-iconcolordefault path {
+.sidebar-item-container:hover .sidebar-svg-iconcolordefault path,
+.sidebar-item-container:hover .sidebar-svg-iconcolordefault circle,
+.sidebar-item-container:hover .sidebar-svg-iconcolordefault rect {
   fill: rgba(130, 185, 255, 0.94) !important;
+  color: rgba(130, 185, 255, 0.94) !important;
 }
 .sidebar-item-container.sidebar-border .sidebar-svg-iconcolor svg,
 .sidebar-item-container.sidebar-border .sidebar-svg-iconcolor path,
+.sidebar-item-container.sidebar-border .sidebar-svg-iconcolor circle,
+.sidebar-item-container.sidebar-border .sidebar-svg-iconcolor rect,
 .sidebar-item-container.config .sidebar-svg-iconcolor svg,
-.sidebar-item-container.config .sidebar-svg-iconcolor path {
+.sidebar-item-container.config .sidebar-svg-iconcolor path,
+.sidebar-item-container.config .sidebar-svg-iconcolor circle,
+.sidebar-item-container.config .sidebar-svg-iconcolor rect {
   fill: #6eaeff !important;
+  color: #6eaeff !important;
 }
 
 // 12. Expanded text menu popup (triggered by hamburger)
@@ -1275,23 +1339,23 @@ mat-nav-list.dashboard:hover .sidebar-nav-label { opacity: 1 !important; }
 body.header-dark-theme {
   --mat-sidenav-container-background-color: transparent !important;
   --mat-sidenav-content-background-color: transparent !important;
-  --background-colour: #060c1a;
-  --bg-color: #0d1530;
+  --background-colour: #1e293b;
+  --bg-color: #0f172a;
   --base-color: #4f8ef7;
   --text-color: #e2e8f0;
-  --text-color-secondary: #b8cce0;
-  --border-color: rgba(79, 142, 247, 0.12);
-  --sidebarbg-color: rgba(8, 15, 34, 0.98);
-  --sidebartext-color: #b8cce0;
+  --text-color-secondary: #cbd5e1;
+  --border-color: rgba(100, 116, 139, 0.2);
+  --sidebarbg-color: rgba(15, 23, 42, 0.98);
+  --sidebartext-color: #cbd5e1;
   --sidebaricon-color: #94a3b8;
-  --sidebarhover-color: rgba(79, 142, 247, 0.08);
+  --sidebarhover-color: rgba(79, 142, 247, 0.12);
   --sidebartexticonhover-color: #7db5ff;
   --sidebarhighlight-color: #4f8ef7;
 
-  background: linear-gradient(135deg, #0a0f1e 0%, #0d1530 60%, #0a1628 100%) !important;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 60%, #1e293b 100%) !important;
 
   mat-drawer-container.example-container {
-    background: linear-gradient(135deg, #0a0f1e 0%, #0d1530 60%, #0a1628 100%) !important;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 60%, #1e293b 100%) !important;
     --mat-sidenav-container-background-color: transparent !important;
   }
 
@@ -1344,24 +1408,37 @@ body.header-dark-theme {
 
   // AI-tool icons: override bright-blue svg-iconcolor back to the same muted slate
   // as dataset/connections FA icons (sidebariconcolor system uses --sidebaricon-color)
+  .sidebar-ai-icon,
   .sidebar-ai-icon svg,
   .sidebar-ai-icon svg path,
   .sidebar-ai-icon svg circle,
-  .sidebar-ai-icon svg rect { fill: var(--sidebaricon-color, #94a3b8) !important; }
+  .sidebar-ai-icon svg rect { 
+    fill: var(--sidebaricon-color, #94a3b8) !important; 
+    color: var(--sidebaricon-color, #94a3b8) !important;
+  }
 
+  .sidebar-item-container:hover .sidebar-ai-icon,
   .sidebar-item-container:hover .sidebar-ai-icon svg,
   .sidebar-item-container:hover .sidebar-ai-icon svg path,
   .sidebar-item-container:hover .sidebar-ai-icon svg circle,
-  .sidebar-item-container:hover .sidebar-ai-icon svg rect { fill: var(--sidebartexticonhover-color, #7db5ff) !important; }
+  .sidebar-item-container:hover .sidebar-ai-icon svg rect { 
+    fill: var(--sidebartexticonhover-color, #7db5ff) !important; 
+    color: var(--sidebartexticonhover-color, #7db5ff) !important;
+  }
 
+  .sidebar-item-container.sidebar-border .sidebar-ai-icon,
   .sidebar-item-container.sidebar-border .sidebar-ai-icon svg,
   .sidebar-item-container.sidebar-border .sidebar-ai-icon svg path,
   .sidebar-item-container.sidebar-border .sidebar-ai-icon svg circle,
   .sidebar-item-container.sidebar-border .sidebar-ai-icon svg rect,
+  .sidebar-item-container.config .sidebar-ai-icon,
   .sidebar-item-container.config .sidebar-ai-icon svg,
   .sidebar-item-container.config .sidebar-ai-icon svg path,
   .sidebar-item-container.config .sidebar-ai-icon svg circle,
-  .sidebar-item-container.config .sidebar-ai-icon svg rect { fill: #6eaeff !important; }
+  .sidebar-item-container.config .sidebar-ai-icon svg rect { 
+    fill: #6eaeff !important; 
+    color: #6eaeff !important;
+  }
 
   .sidebarbgcolor { background-color: transparent !important; }
   .sidebar-background { border-bottom-color: #4f8ef7; }
@@ -1635,12 +1712,21 @@ body.header-light-theme {
   border: 1px solid rgba(255,255,255,0.9) !important;
   box-shadow: 0 4px 24px rgba(99,102,241,0.1), 0 1px 6px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.95) !important;
   transition: transform 0.26s cubic-bezier(0.4,0,0.2,1), box-shadow 0.26s ease !important;
-  &::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg,#6366f1 0%,#8b5cf6 45%,#06b6d4 100%);
-    z-index: 2; border-radius: 16px 16px 0 0;
-  }
+  // Top gradient removed per user request
   &:hover { transform: translateY(-3px) !important; box-shadow: 0 12px 32px rgba(99,102,241,0.2), 0 4px 12px rgba(0,0,0,0.1) !important; }
+}
+
+// ── Snackbar / Notification popup — global dark-themed ───────────────────────
+.mat-mdc-snack-bar-container {
+  --mdc-snackbar-container-color: rgba(15,23,42,0.97) !important;
+  --mdc-snackbar-supporting-text-color: #e2e8f0 !important;
+  border: 1px solid rgba(99,102,241,0.3) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(129,140,248,0.15) !important;
+  backdrop-filter: blur(16px) !important;
+  .mdc-snackbar__surface { background: transparent !important; border-radius: 12px !important; padding: 12px 18px !important; }
+  .mdc-snackbar__label { color: #e2e8f0 !important; font-size: 13px !important; font-weight: 500 !important; padding: 0 !important; height: auto !important; }
+  .mat-mdc-button.mat-mdc-snack-bar-action { color: #818cf8 !important; font-weight: 600 !important; }
 }
 
 // Card action bar at bottom
@@ -2067,46 +2153,55 @@ app-aip-empty-state { display: block !important; width: 100% !important; }
   i { font-size: 13px; }
 }
 
-// ── Theme toggle on login page ─────────────────────────────────────────────────
-.login-theme-toggle {
-  position: absolute;
-  top: 18px;
-  right: 22px;
+// ── Shared top header bar (login + logout) ────────────────────────────────────
+.app-topbar {
+  position: relative;
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 100px;
-  padding: 0 14px 0 10px;
-  height: 32px;
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  backdrop-filter: blur(8px);
-  transition: all 0.2s ease;
+  gap: 10px;
+  padding: 0 24px;
+  height: 56px;
+  border-bottom: 1px solid rgba(79, 142, 247, 0.18);
+  background: rgba(8, 15, 34, 0.8);
+  backdrop-filter: blur(16px);
+  flex-shrink: 0;
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.13);
-    border-color: rgba(255, 255, 255, 0.24);
-    color: #fff;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-  }
+  .theme-toggle-btn { margin-left: auto; }
 }
 
-.login-light .login-theme-toggle {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.1);
-  color: rgba(15, 23, 42, 0.7);
-  &:hover {
-    background: rgba(0, 0, 0, 0.1);
-    border-color: rgba(0, 0, 0, 0.18);
-    color: #0f172a;
-  }
+.app-topbar-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
+
+.app-topbar-brand {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #818cf8;
+}
+
+.lfx-l-mainwrapper--login {
+  display: flex;
+  flex-direction: column;
+}
+
+// Fix header border-bottom visibility on login/logout pages
+// (main-header-bg globally sets overflow:hidden which clips the border on .main-toggle)
+.login-header {
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+  height: auto !important;
+  flex: none !important;
+}
+
+.lfx-l-mainwrapper--login .lfx-l-pageoverlay {
+  flex: 1;
+  height: auto !important;
+}
+
 
 // ══════════════════════════════════════════════════════════════════════════════
 // FOOTER — fixed at viewport bottom, always visible across all pages
@@ -2125,8 +2220,12 @@ app-aip-empty-state { display: block !important; width: 100% !important; }
   background: rgba(6, 11, 28, 0.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(79, 142, 247, 0.1);
+  border-top: 1px solid rgba(79, 142, 247, 0.22) !important;
   flex-shrink: 0;
+}
+
+body.header-light-theme .lfn-footer {
+  border-top-color: rgba(0, 163, 224, 0.25) !important;
 }
 
 .lfx-img-div {
@@ -2483,11 +2582,10 @@ body.header-dark-theme {
     background: rgba(10,16,40,0.96) !important;
     border-color: rgba(99,102,241,0.18) !important;
     box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04) !important;
-    &::before { background: linear-gradient(90deg,#818cf8 0%,#a78bfa 50%,#22d3ee 100%) !important; box-shadow: 0 1px 16px rgba(129,140,248,0.45) !important; }
+    // Top gradient removed per user request
     &:hover {
       border-color: rgba(129,140,248,0.38) !important;
       box-shadow: 0 22px 52px rgba(0,0,0,0.65), 0 0 0 1px rgba(129,140,248,0.25), inset 0 1px 0 rgba(255,255,255,0.07) !important;
-      &::before { box-shadow: 0 2px 24px rgba(129,140,248,0.65) !important; }
     }
   }
 
