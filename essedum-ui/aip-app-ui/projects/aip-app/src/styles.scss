@@ -1557,6 +1557,53 @@ body.header-light-theme {
   .aip-daa:hover { background-color: rgba(99,102,241,0.06) !important; }
 
   div h3 { color: #0A1628; }
+
+  // ─── Light Theme Support for Plain mat-mdc-card (without .lfx-c-card wrapper) ───────
+  mat-card.mat-mdc-card:not(.lfx-c-card),
+  .mat-mdc-card:not(.lfx-c-card) {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: rgba(99, 102, 241, 0.15) !important;
+    box-shadow: 0 4px 24px rgba(99,102,241,0.08), 0 1px 6px rgba(0,0,0,0.04) !important;
+    color: #0f172a !important;
+  }
+
+  // Card containers and wrappers
+  .aip-card-wrapper, .card-wrapper, .aip-card-container {
+    background: transparent !important;
+  }
+
+  // Tab group
+  .mat-mdc-tab-group {
+    .mdc-tab__text-label { color: #4A5568 !important; }
+    .mdc-tab--active .mdc-tab__text-label { color: #4F46E5 !important; }
+  }
+
+  // Form fields
+  .mat-mdc-form-field .mdc-text-field--filled { background-color: rgba(99,102,241,0.04) !important; }
+  .mat-mdc-form-field .mdc-floating-label { color: #4A5568 !important; }
+  .mat-mdc-form-field.mat-focused .mdc-floating-label { color: #4F46E5 !important; }
+
+  // Buttons
+  .mat-mdc-button { color: #4F46E5 !important; }
+  .mat-mdc-button:hover { background: rgba(79,70,229,0.06) !important; }
+
+  // Dialogs and overlays
+  .mat-mdc-dialog-container { background: rgba(255, 255, 255, 0.98) !important; }
+  .cdk-overlay-pane:not(.mat-mdc-select-panel-above) .mdc-menu-surface.mat-mdc-select-panel {
+    background: rgba(255,255,255,0.98) !important;
+    border-color: rgba(99,102,241,0.15) !important;
+  }
+
+  // Input elements
+  input[type="text"], input[type="email"], input[type="password"], textarea {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(99, 102, 241, 0.2) !important;
+    color: #0A1628 !important;
+    &::placeholder { color: #94a3b8 !important; }
+  }
+
+  // Ensure all text content is visible
+  p, span, label, div { color: inherit !important; }
 }
 
 // ─── Responsive ─────────────────────────────────────────────────────────────────

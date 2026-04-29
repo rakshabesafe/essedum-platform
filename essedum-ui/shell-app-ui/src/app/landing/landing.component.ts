@@ -441,14 +441,25 @@ export class LandingComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    // Detect if login page already set a theme class on body before localStorage was written
+    const bodyHasLight = document.body.classList.contains('header-light-theme');
+    const bodyHasDark  = document.body.classList.contains('header-dark-theme');
+    if (bodyHasLight && !bodyHasDark) {
+      localStorage.setItem('aip-header-theme', 'light');
+    } else if (bodyHasDark && !bodyHasLight) {
+      localStorage.setItem('aip-header-theme', 'dark');
+    }
+
     const savedTheme = localStorage.getItem('aip-header-theme');
     if (savedTheme === 'light') {
       this.isDark = false;
+      document.body.classList.remove('header-dark-theme');
       document.body.classList.add('header-light-theme');
       document.documentElement.style.setProperty('--background-colour', '#ffffff');
       document.documentElement.style.setProperty('--text-color', '#000000');
     } else {
       this.isDark = true;
+      document.body.classList.remove('header-light-theme');
       document.body.classList.add('header-dark-theme');
       document.documentElement.style.setProperty('--background-colour', '#1e293b');
       document.documentElement.style.setProperty('--text-color', '#e2e8f0');

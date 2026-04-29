@@ -201,9 +201,11 @@ export class LoginComponent implements OnInit {
     if (this.isDark) {
       document.body.classList.remove('header-light-theme');
       document.body.classList.add('header-dark-theme');
+      localStorage.setItem('aip-header-theme', 'dark');
     } else {
       document.body.classList.remove('header-dark-theme');
       document.body.classList.add('header-light-theme');
+      localStorage.setItem('aip-header-theme', 'light');
     }
   }
 
