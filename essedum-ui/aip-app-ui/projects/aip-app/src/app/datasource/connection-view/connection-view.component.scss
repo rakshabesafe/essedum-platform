@@ -209,11 +209,6 @@
     box-shadow: 0 2px 12px rgba(79,70,229,0.3) !important;
   }
 }
-  .save-btn, .test-btn {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-    box-shadow: 0 2px 12px rgba(79,70,229,0.3) !important;
-  }
-}
 
 // ── Dark Theme explicit ───────────────────────────────────────────────────────
 :host-context(body.header-dark-theme) {

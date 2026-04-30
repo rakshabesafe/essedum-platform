@@ -2694,7 +2694,7 @@ body.header-light-theme {
     &::before { background: linear-gradient(90deg,#6366f1 0%,#8b5cf6 50%,#06b6d4 100%) !important; box-shadow: 0 1px 10px rgba(99,102,241,0.35) !important; }
     &:hover {
       background: rgba(255,255,255,1) !important;
-      border-color: rgba(139,92,246,0.3) !important;
+      border-color: #0094ff !important;
       box-shadow: 0 20px 50px rgba(99,102,241,0.16), 0 8px 20px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1) !important;
     }
   }

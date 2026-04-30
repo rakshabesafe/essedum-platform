@@ -1535,7 +1535,7 @@ body.header-light-theme {
     color: #0f172a !important;
 
     &::before { background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 45%, #06b6d4 100%) !important; box-shadow: 0 1px 12px rgba(99,102,241,0.45) !important; }
-    &:hover { background: rgba(255,255,255,0.88) !important; border-color: rgba(99,102,241,0.50) !important; box-shadow: 0 22px 48px rgba(99,102,241,0.14), 0 8px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1) !important; &::before { box-shadow: 0 2px 20px rgba(99,102,241,0.6) !important; } }
+    &:hover { background: rgba(255,255,255,0.88) !important; border-color: rgb(1 5 10 / 80%) !important; box-shadow: 0 22px 48px rgba(99,102,241,0.14), 0 8px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1) !important; &::before { box-shadow: 0 2px 20px rgba(99,102,241,0.6) !important; } }
   }
 
   .card-main-title { color: #1e1b4b !important; }
