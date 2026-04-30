@@ -40,11 +40,12 @@
                     <div class="col-5">
                         <span *ngIf="!customCreate" style="cursor: pointer;">
                             <mat-icon class="aip-led-icons" (click)="routeBackToConnectionList()"
-                                [ngStyle]="{'color': isBackHovered ? '#0094ff' : '#0a142f'}" matTooltip="Back"
+                                [ngStyle]="{'color': isBackHovered ? '#0094ff' : 'inherit'}" matTooltip="Back"
                                 matTooltipPosition="above" (mouseenter)="isBackHovered = true"
                                 (mouseleave)="isBackHovered = false">arrow_back</mat-icon>
                         </span>
-                        <span class="lfx-u-mar-l-8 header-p-title">Connections: </span><span class="header-title">Edit
+                        <span class="lfx-u-mar-l-8 header-p-title">Connections: </span><span
+                            class="header-title">Edit
                             Connection</span>
                     </div>
                     <div class="col-7">
@@ -121,8 +122,8 @@
                                                         <mat-expansion-panel-header [collapsedHeight]="'40px'"
                                                             [expandedHeight]="'40px'">
                                                             <mat-panel-title
-                                                                style="font-weight: 600; color: inherit; transition: color 0.3s, transform 0.3s;"
-                                                                [ngStyle]="{color: isHovered ? '#0052cc' : 'black',transform: isHovered ? 'translateX(12px)' : 'translateX(0)'
+                                                                style="font-weight: 600; transition: color 0.3s, transform 0.3s;"
+                                                                [ngStyle]="{transform: isHovered ? 'translateX(12px)' : 'translateX(0)'
                                                             }" (mouseenter)="isHovered = true"
                                                                 (mouseleave)="isHovered = false">Connection
                                                                 Details</mat-panel-title>

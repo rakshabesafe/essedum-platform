@@ -1564,6 +1564,7 @@ body.header-light-theme {
   .top-nav-bar.top-nav-light {
     background: #003057;
     box-shadow: 0 2px 8px rgba(0,48,87,0.25);
+    border-bottom: 2px solid rgba(99, 102, 241, 0.25);
   }
 
   .top-nav-item { color: rgba(255,255,255,0.85); }
@@ -3599,8 +3600,8 @@ body.header-light-theme {
   .collapse-btn { color: #4A5568 !important; border-color: rgba(99,102,241,0.2) !important; }
 
   // Form field inputs
-  .mdc-text-field--filled:not(.mdc-text-field--disabled) { background-color: rgba(99,102,241,0.04) !important; }
-  .mdc-text-field--filled:hover:not(.mdc-text-field--disabled) { background-color: rgba(99,102,241,0.07) !important; }
+  .mdc-text-field--filled:not(.mdc-text-field--disabled) { background-color: transparent !important; }
+  .mdc-text-field--filled:hover:not(.mdc-text-field--disabled) { background-color: rgba(99,102,241,0.02) !important; }
   .mdc-floating-label { color: #4A5568 !important; }
   .mdc-floating-label--float-above { color: #4F46E5 !important; }
   .mat-mdc-input-element, .mdc-text-field__input { color: #0A1628 !important; }
