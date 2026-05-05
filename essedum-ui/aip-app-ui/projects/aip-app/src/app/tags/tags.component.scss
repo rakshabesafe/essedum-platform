@@ -1,64 +1,127 @@
 :host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
-:host ::ng-deep mat-form-field,
-:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
-:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
-:host ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.05) !important; border-radius: 8px 8px 0 0 !important; }
-:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #b8cce0 !important; font-size: 13px !important; }
-:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
-:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.25) !important; }
-:host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
-
-.tags-container {
-  width: 100%;
-  padding: 16px 0;
-}
-
-.tag-chips-row {
+// ── Layout ────────────────────────────────────────────────────────────────────
+.tags-wrapper {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
+  flex-direction: column;
+  height: 50vh;
 }
 
-.tag-chip {
+.tags-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.tags-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid rgba(79,142,247,0.1);
+  flex-shrink: 0;
+}
+
+// ── Category title ────────────────────────────────────────────────────────────
+.cat-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0 0 8px;
+}
+
+// ── Tag badges ────────────────────────────────────────────────────────────────
+.tagbrdr {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
-  background: rgba(79,142,247,0.12);
-  color: #7eb8ff;
-  border: 1px solid rgba(79,142,247,0.25);
+  background: rgba(79,142,247,0.1);
+  color: #b8cce0;
+  border: 1px solid rgba(79,142,247,0.2);
+  cursor: pointer;
+  margin: 3px 4px;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  text-decoration: none !important;
 
-  mat-icon {
-    font-size: 14px !important;
-    width: 14px !important;
-    height: 14px !important;
-    cursor: pointer;
-    color: #b8cce0;
-    &:hover { color: #f87171; }
+  &:hover {
+    background: rgba(79,142,247,0.2);
+    border-color: rgba(79,142,247,0.4);
+    color: #7eb8ff;
+  }
+
+  &--selected {
+    background: rgba(79,142,247,0.25) !important;
+    border-color: #4f8ef7 !important;
+    color: #7eb8ff !important;
   }
 }
 
-.add-tag-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.tag-label { cursor: pointer; font-size: 13px; }
+
+.show-more-link {
+  color: #4f8ef7;
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: none !important;
+  &:hover { color: #7eb8ff; }
 }
 
-button[mat-icon-button], button[mat-mini-fab] {
-  background: rgba(79,142,247,0.12) !important;
-  color: #4f8ef7 !important;
-  border: 1px solid rgba(79,142,247,0.3) !important;
+// ── Add Tags button — dark default ────────────────────────────────────────────
+.add-tags-btn {
+  background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
   border-radius: 8px !important;
-  width: 36px;
-  height: 36px;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 8px 22px !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 12px rgba(79,142,247,0.35) !important;
+  transition: box-shadow 0.15s, transform 0.12s !important;
+  &:hover { box-shadow: 0 4px 20px rgba(79,142,247,0.52) !important; transform: translateY(-1px) !important; }
+  &[disabled] { opacity: 0.4 !important; cursor: not-allowed !important; box-shadow: none !important; }
 }
 
-body.header-light-theme {
-  .tag-chip { background: rgba(79,70,229,0.08); color: #4f46e5; border-color: rgba(79,70,229,0.2); }
-  :host ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
+// ── Light Theme ───────────────────────────────────────────────────────────────
+:host-context(body.header-light-theme) {
+  .cat-title { color: #1e293b; }
+
+  .tagbrdr {
+    background: rgba(99,102,241,0.07);
+    color: #4A5568;
+    border-color: rgba(99,102,241,0.2);
+    &:hover { background: rgba(99,102,241,0.14); border-color: rgba(99,102,241,0.4); color: #4f46e5; }
+    &--selected { background: rgba(99,102,241,0.18) !important; border-color: #4f46e5 !important; color: #4f46e5 !important; }
+  }
+
+  .tags-footer { border-top-color: rgba(99,102,241,0.1); }
+
+  .add-tags-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    box-shadow: 0 2px 12px rgba(79,70,229,0.3) !important;
+    &:hover { box-shadow: 0 4px 20px rgba(79,70,229,0.48) !important; }
+  }
+
+  .show-more-link { color: #4f46e5; &:hover { color: #3730a3; } }
+}
+
+// ── Dark Theme explicit ───────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
+  .cat-title { color: #e2e8f0; }
+
+  .tagbrdr {
+    background: rgba(79,142,247,0.1);
+    color: #b8cce0;
+    border-color: rgba(79,142,247,0.2);
+    &:hover { background: rgba(79,142,247,0.2); border-color: rgba(79,142,247,0.4); color: #7eb8ff; }
+    &--selected { background: rgba(79,142,247,0.25) !important; border-color: #4f8ef7 !important; color: #7eb8ff !important; }
+  }
+
+  .tags-footer { border-top-color: rgba(79,142,247,0.1); }
+
+  .add-tags-btn {
+    background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+    box-shadow: 0 2px 12px rgba(79,142,247,0.35) !important;
+  }
 }

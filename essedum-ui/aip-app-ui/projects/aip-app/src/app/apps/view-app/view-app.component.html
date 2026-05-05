@@ -8,7 +8,7 @@
                     matTooltipPosition="above" (mouseenter)="isBackHovered = true"
                     (mouseleave)="isBackHovered = false">arrow_back</mat-icon>
             </span>
-            <h2 style="margin: 0%;">App : {{streamItem?.alias}}</h2>
+            <h2 class="page-title" style="margin: 0%;">App : {{streamItem?.alias}}</h2>
         </div>
         <div class="icons-group" style="padding: 0;">
             <mat-icon id="app-settings-btn" data-icon-type="settings-config"
@@ -68,42 +68,26 @@
 
                                 </div>
 
-                                <div class="ml-2 row col-md-12">
-
-                                    <div class="lfx-u-body-sm mt-3 aip-label-color">
-                                        Description
-                                    </div>
-                                    <div class="lfx-u-body-md mt-3" style="min-height: 4rem;">
-                                        <p class="lfx-u-body-md lfx-u-text-neutral-80 lfx-u-line-2">
-
-                                            {{appDescription}}
-                                        </p>
-                                    </div>
+                                <!-- Description -->
+                                <div class="view-field">
+                                    <span class="view-field__label">Description</span>
+                                    <div class="view-field__value">{{appDescription || '—'}}</div>
                                 </div>
-                                <div class="ml-2 row col-md-12">
-                                    <div class="lfx-u-body-sm mt-3 aip-label-color">
-                                        App Tryout Link
-                                    </div>
-                                    <div class="lfx-u-body-md mt-3 flex" style="min-height: 4rem;">
-                                        <p class="lfx-u-body-md lfx-u-text-neutral-80 lfx-u-line-2 w-75">
-                                            {{apptryoutlink}}
-                                        </p>
-                                        <mat-icon class="icons lfx-u-mar-l-32 aip-cursor" matTooltip="Try out link"
-                                            (click)="openInNewTab()">launch</mat-icon>
+
+                                <!-- App Tryout Link -->
+                                <div class="view-field">
+                                    <span class="view-field__label">App Tryout Link</span>
+                                    <div class="view-field__value view-field__value--row">
+                                        <span>{{apptryoutlink || '—'}}</span>
+                                        <mat-icon class="view-field__link-icon" *ngIf="apptryoutlink"
+                                            matTooltip="Open link" (click)="openInNewTab()">launch</mat-icon>
                                     </div>
                                 </div>
 
-                                <div class="ml-2 row col-md-12">
-
-                                    <div class="lfx-u-body-sm mt-3 aip-label-color">
-                                        App Type
-                                    </div>
-                                    <div class="lfx-u-body-md mt-3" style="min-height: 4rem;">
-                                        <p class="lfx-u-body-md lfx-u-text-neutral-80 lfx-u-line-2">
-
-                                            {{appType}}
-                                        </p>
-                                    </div>
+                                <!-- App Type -->
+                                <div class="view-field">
+                                    <span class="view-field__label">App Type</span>
+                                    <div class="view-field__value">{{appType || '—'}}</div>
                                 </div>
                                 <div *ngIf="appType === 'pipeline' || appType === 'chain' || appType === 'video'"
                                     class="ml-2 row col-md-12">
@@ -220,18 +204,17 @@
 <ng-template #content3 let-modal>
     <div style="padding: 1em;">
         <div class="mat-dialog-title" style="display: flex; justify-content: space-between; align-items: center;">
-            <h4 class="lfx-u-header-xl" id="modal-basic-title" style="margin: 0;">Try out link</h4>
+            <h4 class="tryout-modal-title" id="modal-basic-title" style="margin: 0;">Try out link</h4>
             <mat-icon mat-dialog-close>close</mat-icon>
         </div>
-        <div class="mat-dialog-content" style="margin-top: 1em;">
-            <mat-form-field appearance="fill" class="w-100">
+        <div class="mat-dialog-content tryout-form" style="margin-top: 1em;">
+            <mat-form-field appearance="fill" class="w-100 tryout-field">
                 <mat-label>Link</mat-label>
                 <input matInput placeholder="Link" [(ngModel)]="appData.tryoutlink">
             </mat-form-field>
         </div>
         <div class="mat-dialog-actions" style="justify-content: flex-end;">
-            <button mat-flat-button mat-dialog-close color="primary" class="lfx-u-mar-r-8" [disabled]="!editAuth"
-                type="button" (click)="updateUrl()">
+            <button class="tryout-update-btn" [disabled]="!editAuth" type="button" (click)="updateUrl()" mat-dialog-close>
                 Update
             </button>
         </div>

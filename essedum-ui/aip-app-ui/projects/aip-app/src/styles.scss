@@ -70,9 +70,7 @@ div.example-container {
   display: flex;
   flex-direction: column;
 
-  &.top-nav-mode {
-    // top-nav-mode handled by flexbox — no extra offset needed
-  }
+  &.top-nav-mode { padding-top: 0; }
 }
 
 // top-nav-bar layout is handled in shell-app-ui/src/styles.scss
@@ -1190,6 +1188,108 @@ mat-card-actions.card-actions-hover {
 .text-highlight { background-color: #8626c34a; text-decoration: underline; font-size: 1.4rem; font-weight: 900; }
 
 // ─── DARK THEME ────────────────────────────────────────────────────────────────
+// App Details dialog — dark theme (outside body.header-dark-theme so it works globally)
+body.header-dark-theme .app-details-dialog .mat-mdc-dialog-container,
+body.header-dark-theme .app-details-dialog .mdc-dialog__surface {
+  background: #0e1a38 !important;
+  border-radius: 16px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(79,142,247,0.22) !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.06) inset !important;
+}
+
+// ── App Details dialog — no underline (high-specificity selectors beat Material) ─
+.app-details-dialog {
+  // Transparent bg, no hover highlight
+  .mdc-text-field--filled,
+  .mdc-text-field--filled:hover,
+  .mdc-text-field--filled.mdc-text-field--focused {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-bottom: none !important;
+    transition: none !important;
+  }
+  // Direct border-color: transparent on the ripple pseudo-elements — beats CSS var approach
+  .mdc-line-ripple::before,
+  .mdc-line-ripple::after { border-bottom-color: transparent !important; border-color: transparent !important; }
+  .mat-mdc-form-field .mdc-line-ripple,
+  .mat-mdc-form-field.mat-mdc-form-field-type-mat-input .mdc-line-ripple,
+  .mat-mdc-form-field.mat-mdc-form-field-type-mat-select .mdc-line-ripple { display: none !important; }
+  .mdc-text-field--filled .mdc-text-field__ripple { display: none !important; }
+  .mdc-text-field--filled::after,
+  .mdc-text-field--filled::before { display: none !important; }
+  .mat-mdc-form-field-focus-overlay { opacity: 0 !important; background: transparent !important; }
+  .mat-mdc-text-field-wrapper { box-shadow: none !important; }
+  // Zero MDC indicator height via CSS variables
+  .mat-mdc-form-field {
+    --mdc-filled-text-field-container-color: transparent;
+    --mdc-filled-text-field-active-indicator-height: 0px;
+    --mdc-filled-text-field-focus-active-indicator-height: 0px;
+    --mdc-filled-text-field-hover-state-layer-opacity: 0;
+    --mdc-filled-text-field-focus-state-layer-opacity: 0;
+  }
+}
+
+// ── NgbModal (Try out link popup) — no underline, themed title ────────────────
+ngb-modal-window {
+  .mdc-text-field--filled,
+  .mdc-text-field--filled:hover,
+  .mdc-text-field--filled.mdc-text-field--focused {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-bottom: none !important;
+    transition: none !important;
+  }
+  .mat-mdc-form-field .mdc-line-ripple,
+  .mat-mdc-form-field.mat-mdc-form-field-type-mat-input .mdc-line-ripple { display: none !important; }
+  .mat-mdc-form-field .mdc-line-ripple::before,
+  .mat-mdc-form-field .mdc-line-ripple::after { display: none !important; border: none !important; height: 0 !important; }
+  .mdc-text-field--filled .mdc-text-field__ripple { display: none !important; }
+  .mdc-text-field--filled::after,
+  .mdc-text-field--filled::before { display: none !important; }
+  .mat-mdc-form-field-focus-overlay { opacity: 0 !important; }
+  .mat-mdc-text-field-wrapper { box-shadow: none !important; }
+  .mat-mdc-form-field {
+    --mdc-filled-text-field-container-color: transparent;
+    --mdc-filled-text-field-active-indicator-height: 0px;
+    --mdc-filled-text-field-focus-active-indicator-height: 0px;
+  }
+}
+
+// NgbModal — light theme: title visible + input readable
+body.header-light-theme ngb-modal-window {
+  .modal-content { background: #ffffff !important; color: #0f172a !important; }
+  // Title specifically targeted — was #e2e8f0 (white-ish) causing invisibility
+  .tryout-modal-title,
+  .modal-title, h4, h3 { color: #0f172a !important; font-weight: 600; }
+  .mat-dialog-title, .mat-dialog-title * { color: #0f172a !important; }
+  .mat-mdc-input-element { color: #0f172a !important; }
+  .mdc-floating-label { color: #64748b !important; }
+  .mdc-floating-label--float-above { color: #4f46e5 !important; }
+  // Update button in tryout modal
+  .tryout-update-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    color: #fff !important; border: none !important; border-radius: 8px !important;
+    font-size: 13px !important; font-weight: 600 !important; padding: 7px 22px !important;
+  }
+}
+// NgbModal — dark theme
+body.header-dark-theme ngb-modal-window {
+  .modal-content { background: #0e1a38 !important; color: #e2e8f0 !important; border-color: rgba(79,142,247,0.22) !important; }
+  .tryout-modal-title,
+  .modal-title, h4, h3 { color: #e2e8f0 !important; font-weight: 600; }
+  .mat-dialog-title mat-icon { color: #b8cce0 !important; }
+  .mat-mdc-input-element { color: #e2e8f0 !important; }
+  .mdc-floating-label { color: #b8cce0 !important; }
+  .mdc-floating-label--float-above { color: #7eb8ff !important; }
+  .tryout-update-btn {
+    background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+    color: #fff !important; border: none !important; border-radius: 8px !important;
+    font-size: 13px !important; font-weight: 600 !important; padding: 7px 22px !important;
+  }
+}
+
 body.header-dark-theme {
   background: linear-gradient(135deg, #0a0f1e 0%, #0d1530 60%, #0a1628 100%) !important;
   background-attachment: fixed !important;
@@ -1646,6 +1746,16 @@ body.header-light-theme {
 
   // Dialogs and overlays
   .mat-mdc-dialog-container { background: rgba(255, 255, 255, 0.98) !important; }
+
+  // App Details dialog — light theme
+  .app-details-dialog .mat-mdc-dialog-container,
+  .app-details-dialog .mdc-dialog__surface {
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-shadow: 0 16px 48px rgba(99,102,241,0.12), 0 2px 8px rgba(0,0,0,0.06) !important;
+  }
   .cdk-overlay-pane:not(.mat-mdc-select-panel-above) .mdc-menu-surface.mat-mdc-select-panel {
     background: rgba(255,255,255,0.98) !important;
     border-color: rgba(99,102,241,0.15) !important;
@@ -2643,7 +2753,7 @@ aip-root {
 .box-shadow  { box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important; }
 .bottom-padding-20 { padding-bottom: 20px !important; }
 .block        { display: block !important; }
-.active       { }
+.active       { font-weight: 600; }
 
 .checkbox-container, .checkbox-wrapper {
   display: flex; align-items: center; gap: 6px;
@@ -3228,6 +3338,41 @@ body.header-dark-theme {
   .code-text      { color: #94a3b8 !important; }
   .tab-btn.active { color: #e2e8f0 !important; border-bottom-color: #4f8ef7 !important; }
   .markdown-content { color: #cbd5e1 !important; }
+}
+
+// ── mat-select dropdown overlay — dark theme ─────────────────────────────────
+body.header-dark-theme {
+  .mat-mdc-select-panel, .mdc-menu-surface {
+    background: #0f1f40 !important;
+    border: 1px solid rgba(79,142,247,0.28) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.05) inset !important;
+  }
+  // Bright white text for all options
+  .mat-mdc-option .mdc-list-item__primary-text { color: #f0f6ff !important; font-size: 14px !important; font-weight: 400; }
+  .mat-mdc-option { color: #f0f6ff !important; }
+  .mat-mdc-option:hover:not(.mdc-list-item--disabled) { background: rgba(79,142,247,0.15) !important; }
+  .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+    background: rgba(79,142,247,0.22) !important;
+    .mdc-list-item__primary-text { color: #7eb8ff !important; font-weight: 600; }
+  }
+  .mat-mdc-option.mat-mdc-option-active { background: rgba(79,142,247,0.1) !important; }
+}
+
+// ── mat-select dropdown overlay — light theme ─────────────────────────────────
+body.header-light-theme {
+  .mat-mdc-select-panel, .mdc-menu-surface {
+    background: #ffffff !important;
+    border: 1px solid rgba(99,102,241,0.18) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.12) !important;
+  }
+  .mat-mdc-option .mdc-list-item__primary-text { color: #0f172a !important; font-size: 14px !important; }
+  .mat-mdc-option:hover:not(.mdc-list-item--disabled) { background: rgba(99,102,241,0.07) !important; }
+  .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+    background: rgba(99,102,241,0.1) !important;
+    .mdc-list-item__primary-text { color: #4f46e5 !important; font-weight: 600; }
+  }
 }
 
 body.header-light-theme {
