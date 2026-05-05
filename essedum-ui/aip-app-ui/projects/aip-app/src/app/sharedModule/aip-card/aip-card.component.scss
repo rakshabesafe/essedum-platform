@@ -6,6 +6,12 @@
   box-sizing: border-box;
   border-radius: 12px;
   position: relative;
+  overflow: hidden;
+}
+
+/* mat-card clips its own children — move clipping to :host instead */
+::ng-deep .mat-mdc-card {
+  overflow: visible !important;
 }
 
 // ── Card Background & Hover Effects ───────────────────────────────────────────
@@ -211,9 +217,25 @@
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 10px 14px !important;
+  padding: 8px 12px !important;
   margin: 0 !important;
-  min-height: 50px !important;
+  min-height: 48px !important;
+  border-top: 1px solid rgba(99,102,241,0.08) !important;
+}
+
+/* Dataset-specific icon buttons in bottom bar */
+.card-actions-hover button.mat-mdc-icon-button {
+  width: 34px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  transition: background 0.15s, transform 0.15s !important;
+  background: transparent !important;
+  &:hover { background: rgba(99,102,241,0.1) !important; transform: scale(1.1) !important; }
 }
 
 .button-placeholder { min-width: 120px; }
@@ -413,11 +435,22 @@
   .badge-dataset     { background: rgba(22,163,74,0.25) !important;   color: #86efac !important;  border: 1px solid rgba(34,197,94,0.4) !important; box-shadow: 0 2px 6px rgba(22,163,74,0.15) !important; }
 
   .card-action-icon {
-    color: #475569 !important;
-    &:hover { color: #93c5fd !important; background: rgba(147,163,184,0.08) !important; }
+    color: #60a5fa !important;
+    &:hover { color: #93c5fd !important; background: rgba(96,165,250,0.1) !important; }
     &:nth-of-type(1) { color: #22d3ee !important; &:hover { color: #67e8f9 !important; background: rgba(34,211,238,0.12) !important; } }
     &:nth-of-type(2) { color: #fbbf24 !important; &:hover { color: #fcd34d !important; background: rgba(251,191,36,0.12) !important; } }
     &:nth-of-type(3) { color: #f472b6 !important; &:hover { color: #f9a8d4 !important; background: rgba(244,114,182,0.12) !important; } }
+  }
+
+  /* Dataset card bottom icons: copy=teal, edit=blue, delete=red */
+  .card-actions-hover button.mat-mdc-icon-button {
+    background: transparent !important;
+    &:nth-child(1) .card-action-icon { color: #22d3ee !important; }
+    &:nth-child(2) .card-action-icon { color: #818cf8 !important; }
+    &:nth-child(3) .card-action-icon { color: #f87171 !important; }
+    &:nth-child(1):hover { background: rgba(34,211,238,0.12) !important; transform: scale(1.12) !important; }
+    &:nth-child(2):hover { background: rgba(129,140,248,0.12) !important; transform: scale(1.12) !important; }
+    &:nth-child(3):hover { background: rgba(248,113,113,0.12) !important; transform: scale(1.12) !important; }
   }
   .aip-hover-detail { background: rgba(15,23,42,0.97); border-color: rgba(99,102,241,0.2); color: #e2e8f0; }
   .aip-more-actions-icon { color: #3b82f6 !important; &:hover { color: #2563eb !important; background: rgba(59,130,246,0.15) !important; } }
