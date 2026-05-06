@@ -93,6 +93,10 @@ public class GitHubService {
 	@Value("${github.repoUrl:}")
 	private String fallbackRepoUrl;
 
+	/** Default branch name (main or master) */
+	@Value("${github.defaultBranch:main}")
+	private String defaultBranch;
+
 	/** The folder path. */
 	@EssedumProperty("icip.fileuploadDir")
 	private String folderPath;
@@ -174,27 +178,43 @@ public class GitHubService {
 			URIish u = createURIish(url);
 			git.remoteAdd().setName("origin").setUri(u).call();
 
+			// Detect which default branch exists on remote
+			String remoteBranch = detectRemoteDefaultBranch(git);
+			log.info("Detected remote default branch: {}", remoteBranch);
+
 			PullResult response = git.pull()
 					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
-					.setRemote("origin").setRemoteBranchName("master").call();
+					.setRemote("origin").setRemoteBranchName(remoteBranch).call();
 
 			git.lsRemote().setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
 					.setHeads(true).call();
-			git.checkout().setName("master").call();
+			git.checkout().setName(remoteBranch).call();
 
 		} else {
 
 			FileRepositoryBuilder builder = new FileRepositoryBuilder();
-			Repository repository = builder.setGitDir(new File(gitPath + repoName + "/.git")).readEnvironment() // scan
-																												// environment
-																												// GIT_*
-																												// variables
-					.findGitDir() // scan up the file system tree
+			Repository repository = builder.setGitDir(new File(gitPath + repoName + "/.git")).readEnvironment()
+					.findGitDir()
 					.build();
 
 			log.info("Having repository: " + repository.getDirectory());
 
 			git = new Git(repository);
+
+			// If the repo exists but has no HEAD (stale from previous failed init), re-pull
+			if (repository.resolve("HEAD") == null) {
+				log.info("Existing repo has no HEAD. Attempting to pull from remote default branch.");
+				String remoteBranch = detectRemoteDefaultBranch(git);
+				try {
+					git.pull()
+						.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+						.setRemote("origin").setRemoteBranchName(remoteBranch).call();
+					git.checkout().setName(remoteBranch).call();
+					log.info("Successfully pulled and checked out branch: {}", remoteBranch);
+				} catch (Exception e) {
+					log.warn("Could not pull default branch on stale repo: {}", e.getMessage());
+				}
+			}
 
 		}
 		StoredConfig config = git.getRepository().getConfig();
@@ -232,11 +252,11 @@ public class GitHubService {
 
 			PullResult response = git.pull()
 					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
-					.setRemote("origin").setRemoteBranchName("master").call();
+					.setRemote("origin").setRemoteBranchName(defaultBranch).call();
 
 			git.lsRemote().setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
 					.setHeads(true).call();
-			git.checkout().setName("master").call();
+			git.checkout().setName(defaultBranch).call();
 
 		} else {
 
@@ -390,6 +410,24 @@ public class GitHubService {
 			log.error("Error in deleting pipeline script from local repo : {}", e.getMessage());
 		}
 
+	}
+
+	/**
+	 * Detects the default branch on the remote (main vs master).
+	 */
+	private String detectRemoteDefaultBranch(Git git) {
+		try {
+			var refs = git.lsRemote()
+					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+					.setHeads(true).call();
+			boolean hasMain = refs.stream().anyMatch(ref -> ref.getName().equals("refs/heads/main"));
+			boolean hasMaster = refs.stream().anyMatch(ref -> ref.getName().equals("refs/heads/master"));
+			if (hasMain) return "main";
+			if (hasMaster) return "master";
+		} catch (Exception e) {
+			log.warn("Could not detect remote default branch: {}", e.getMessage());
+		}
+		return defaultBranch;
 	}
 
 	private URIish createURIish(String url) throws InvalidRemoteException {
@@ -590,14 +628,14 @@ public class GitHubService {
 			}
 			git.add().addFilepattern("README.md").call();
 			git.commit().setMessage("Initial commit").call();
-			// Push initial commit to origin master
+			// Push initial commit to origin default branch
 			try {
 				git.push()
 					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
 					.setRemote("origin")
 					.setForce(true)
 					.call();
-				log.info("Pushed initial commit to origin/master successfully.");
+				log.info("Pushed initial commit to origin/{} successfully.", defaultBranch);
 			} catch (Exception e) {
 				log.warn("Could not push initial commit: {}", e.getMessage());
 			}
