@@ -256,7 +256,7 @@ button[mat-stroked-button] {
 // ═══════════════════════════════════════════════════════════════════
 //  LIGHT THEME
 // ═══════════════════════════════════════════════════════════════════
-body.header-light-theme {
+:host-context(body.header-light-theme) {
   mat-icon.aip-led-icons, .aip-led-icons { color: #4f46e5 !important; background: rgba(79,70,229,0.07) !important; border-color: rgba(79,70,229,0.28) !important; &:hover { background: rgba(79,70,229,0.14) !important; border-color: rgba(79,70,229,0.55) !important; box-shadow: 0 0 0 6px rgba(79,70,229,0.08) !important; } }
   .description-container, .aip-container, .aip-panel-shadow { background: #ffffff !important; border-color: rgba(79,70,229,0.14) !important; box-shadow: 0 12px 48px rgba(79,70,229,0.1), 0 2px 8px rgba(0,0,0,0.06) !important; &::before { background: linear-gradient(90deg, #6366f1, #06b6d4, #8b5cf6, #4f46e5, #6366f1); } }
   .header-title { background: linear-gradient(120deg, #0f172a, #4f46e5 60%, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
