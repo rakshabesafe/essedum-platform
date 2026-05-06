@@ -575,6 +575,34 @@ public class GitHubService {
 	public Git getGitHubRepositoryForBranch(String org, String branchName)
 			throws InvalidRemoteException, TransportException, GitAPIException, IOException {
 		Git git = getGitHubRepository(org);
+
+		// If HEAD cannot be resolved (empty repo with no commits), create an initial commit
+		if (git.getRepository().resolve("HEAD") == null) {
+			log.info("Repository has no commits (HEAD is null). Creating initial commit before branching.");
+			// Create a placeholder file so we have something to commit
+			String url = resolveRepoUrl(org);
+			String repoName = extractRepoNameFromUrl(url);
+			File readmeFile = new File(gitPath + repoName + "/README.md");
+			if (!readmeFile.exists()) {
+				try (OutputStream os = new FileOutputStream(readmeFile)) {
+					os.write("# Vibe Studio Pipeline Scripts\n".getBytes());
+				}
+			}
+			git.add().addFilepattern("README.md").call();
+			git.commit().setMessage("Initial commit").call();
+			// Push initial commit to origin master
+			try {
+				git.push()
+					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+					.setRemote("origin")
+					.setForce(true)
+					.call();
+				log.info("Pushed initial commit to origin/master successfully.");
+			} catch (Exception e) {
+				log.warn("Could not push initial commit: {}", e.getMessage());
+			}
+		}
+
 		pull(git);
 
 		boolean branchExists = git.getRepository().getRefDatabase().findRef(branchName) != null;
