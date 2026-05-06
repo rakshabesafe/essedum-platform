@@ -1,0 +1,281 @@
+// ═══════════════════════════════════════════════════════════════════
+//  AGENT PIPELINE — Base Styles  ✦  2026 AI Platform
+// ═══════════════════════════════════════════════════════════════════
+@use 'variables' as *;
+
+// -------------------------------------------------------------------
+//  Host & Container Layout
+// -------------------------------------------------------------------
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+// -------------------------------------------------------------------
+//  AIP Container (page-level wrapper)
+// -------------------------------------------------------------------
+.aip-container {
+  padding: 16px 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// -------------------------------------------------------------------
+//  Panel / Card Glass Effect
+// -------------------------------------------------------------------
+.aip-panel, .aip-card {
+  background: $dark-bg-secondary;
+  border: 1px solid $dark-border;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  animation: cardIn 0.35s ease-out;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba($dark-accent, 0.3), transparent);
+  }
+}
+
+// -------------------------------------------------------------------
+//  Section Headers
+// -------------------------------------------------------------------
+.section-header, .panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $dark-border;
+
+  h2, h3, .header-title {
+    color: $dark-text-primary;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.3px;
+  }
+
+  .header-subtitle {
+    color: $dark-text-muted;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+}
+
+// -------------------------------------------------------------------
+//  Primary Button (dataset "next-btn" pattern)
+// -------------------------------------------------------------------
+.btn-primary, .next-btn, .action-btn-primary {
+  background: linear-gradient(135deg, $dark-accent, lighten($dark-accent, 8%));
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba($dark-accent, 0.35);
+  }
+
+  &:active { transform: translateY(0); }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -80%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(#fff, 0.15), transparent);
+    transition: left 0.5s ease;
+  }
+  &:hover::after { left: 160%; }
+}
+
+// -------------------------------------------------------------------
+//  Secondary / Outline Button
+// -------------------------------------------------------------------
+.btn-secondary, .btn-outline {
+  background: transparent;
+  border: 1px solid $dark-border;
+  color: $dark-text-secondary;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $dark-accent;
+    color: $dark-accent;
+    background: rgba($dark-accent, 0.06);
+  }
+
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+// -------------------------------------------------------------------
+//  Status Chips / Badges
+// -------------------------------------------------------------------
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  &.success { background: rgba($editor-success, 0.12); color: $editor-success; }
+  &.error { background: rgba($editor-error, 0.12); color: $editor-error; }
+  &.warning { background: rgba($editor-warning, 0.12); color: $editor-warning; }
+  &.info { background: rgba($editor-prompt, 0.12); color: $editor-prompt; }
+  &.running { background: rgba($dark-accent, 0.12); color: $dark-accent; }
+}
+
+// -------------------------------------------------------------------
+//  Form Field Compact (MDC overrides)
+// -------------------------------------------------------------------
+::ng-deep {
+  .mat-mdc-form-field {
+    .mdc-text-field--filled {
+      background: rgba($dark-accent, 0.04) !important;
+      border: 1px solid $dark-border !important;
+      border-radius: 6px !important;
+      min-height: 40px !important;
+      padding-top: 16px !important;
+    }
+    .mat-mdc-floating-label {
+      top: 7px !important;
+      font-size: 11px !important;
+      color: $dark-text-muted !important;
+    }
+    .mdc-line-ripple, .mdc-line-ripple::before, .mdc-line-ripple::after {
+      display: none !important;
+    }
+    .mat-mdc-input-element {
+      color: $dark-text-primary !important;
+      font-size: 13px !important;
+    }
+  }
+}
+
+// -------------------------------------------------------------------
+//  Mat Tab Group Styling
+// -------------------------------------------------------------------
+::ng-deep {
+  .mat-mdc-tab-group {
+    .mat-mdc-tab-header {
+      border-bottom: 1px solid $dark-border;
+    }
+    .mat-mdc-tab {
+      min-width: 100px;
+      opacity: 0.7;
+      &.mdc-tab--active { opacity: 1; }
+    }
+    .mat-mdc-tab-body-wrapper {
+      flex: 1;
+    }
+    .mdc-tab-indicator__content--underline {
+      border-color: $dark-accent !important;
+    }
+    .mdc-tab__text-label {
+      color: $dark-text-secondary !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+    }
+    .mdc-tab--active .mdc-tab__text-label {
+      color: $dark-accent !important;
+    }
+  }
+}
+
+// -------------------------------------------------------------------
+//  Empty State
+// -------------------------------------------------------------------
+.empty-state, .no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: $dark-text-muted;
+  font-size: 13px;
+  gap: 8px;
+
+  .empty-icon {
+    font-size: 36px;
+    opacity: 0.3;
+    margin-bottom: 4px;
+  }
+}
+
+// -------------------------------------------------------------------
+//  Light Theme Overrides
+// -------------------------------------------------------------------
+:host-context(body.header-light-theme) {
+  .aip-panel, .aip-card {
+    background: #ffffff;
+    border-color: $light-border;
+    &::before { background: linear-gradient(90deg, transparent, rgba($light-accent, 0.2), transparent); }
+  }
+
+  .section-header, .panel-header {
+    border-bottom-color: $light-border;
+    h2, h3, .header-title { color: $light-text-primary; }
+    .header-subtitle { color: $light-text-muted; }
+  }
+
+  .btn-primary, .next-btn, .action-btn-primary {
+    background: linear-gradient(135deg, $light-accent, lighten($light-accent, 8%));
+    &:hover { box-shadow: 0 4px 16px rgba($light-accent, 0.3); }
+  }
+
+  .btn-secondary, .btn-outline {
+    border-color: $light-border;
+    color: $light-text-secondary;
+    &:hover { border-color: $light-accent; color: $light-accent; }
+  }
+
+  .empty-state, .no-data { color: $light-text-muted; }
+
+  ::ng-deep {
+    .mat-mdc-form-field {
+      .mdc-text-field--filled {
+        background: rgba($light-accent, 0.03) !important;
+        border-color: $light-border !important;
+      }
+      .mat-mdc-floating-label { color: $light-text-muted !important; }
+      .mat-mdc-input-element { color: $light-text-primary !important; }
+    }
+
+    .mat-mdc-tab-group {
+      .mat-mdc-tab-header { border-bottom-color: $light-border; }
+      .mdc-tab-indicator__content--underline { border-color: $light-accent !important; }
+      .mdc-tab__text-label { color: $light-text-secondary !important; }
+      .mdc-tab--active .mdc-tab__text-label { color: $light-accent !important; }
+    }
+  }
+}

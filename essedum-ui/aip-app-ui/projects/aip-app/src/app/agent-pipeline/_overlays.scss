@@ -1,0 +1,41 @@
+// ═══════════════════════════════════════════════════════════════════
+//  AGENT PIPELINE — Overlays  ✦  2026 AI Platform
+// ═══════════════════════════════════════════════════════════════════
+@use 'variables' as *;
+
+.aip-panel-shadow {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  animation: fadeUp 0.2s ease-out;
+}
+
+.overlay-panel {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: $dark-bg-secondary;
+  border: 1px solid $dark-border;
+  border-radius: 12px;
+  padding: 24px;
+  z-index: 1000;
+  min-width: 400px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: cardIn 0.3s ease-out;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+}
+
+:host-context(body.header-light-theme) {
+  .aip-panel-shadow {
+    background: rgba(0, 0, 0, 0.3);
+  }
+  .overlay-panel {
+    background: #ffffff;
+    border-color: $light-border;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
+  }
+}
