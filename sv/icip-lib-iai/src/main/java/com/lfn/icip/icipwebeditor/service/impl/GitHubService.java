@@ -88,7 +88,11 @@ public class GitHubService {
 
 	@Value("${proxy.httpProxyConfiguration.proxyPort}")
 	String proxyPort;
-	
+
+	/** Fallback GitHub repo URL from application properties */
+	@Value("${github.repoUrl:}")
+	private String fallbackRepoUrl;
+
 	/** The folder path. */
 	@EssedumProperty("icip.fileuploadDir")
 	private String folderPath;
@@ -107,12 +111,50 @@ public class GitHubService {
 	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(GitHubService.class);
 
+	/**
+	 * Resolves the GitHub repo URL for a given org.
+	 * Tries constantsService first, falls back to github.repoUrl property.
+	 */
+	public String resolveRepoUrl(String org) {
+		try {
+			var constant = constantsService.getByKeys("icip.git.repo.studio.url", org);
+			if (constant != null && constant.getValue() != null && !constant.getValue().isEmpty()) {
+				return constant.getValue();
+			}
+		} catch (Exception ex) {
+			log.warn("Could not resolve repo URL from constantsService for org: {}. Error: {}", org, ex.getMessage());
+		}
+		if (fallbackRepoUrl != null && !fallbackRepoUrl.isEmpty()) {
+			log.info("Using fallback GitHub repo URL from application properties: {}", fallbackRepoUrl);
+			return fallbackRepoUrl;
+		}
+		return null;
+	}
+
+	/**
+	 * Extracts repo name from a full repo URL.
+	 */
+	private String extractRepoNameFromUrl(String url) {
+		return url.split("/")[url.split("/").length - 1].split("[.]")[0];
+	}
+
+	/**
+	 * Checks if GitHub is configured and available for the given org.
+	 */
+	public boolean isGitHubAvailable(String org) {
+		String url = resolveRepoUrl(org);
+		return url != null && !url.isEmpty();
+	}
+
 	public Git getGitHubRepository(String org)
 			throws InvalidRemoteException, TransportException, GitAPIException, IOException {
 
-		String url = constantsService.getByKeys("icip.git.repo.studio.url", org).getValue();
+		String url = resolveRepoUrl(org);
+		if (url == null || url.isEmpty()) {
+			throw new IOException("GitHub repo URL is not configured for org: " + org + ". Please set 'icip.git.repo.studio.url' in constants or 'github.repoUrl' in application properties.");
+		}
 
-		String repoName = url.split("/")[url.split("/").length - 1].split("[.]")[0];
+		String repoName = extractRepoNameFromUrl(url);
 
 		Git git;
 
@@ -524,6 +566,91 @@ public class GitHubService {
 			lastSegment = lastSegment.substring(0, lastSegment.length() - 4);
 		}
 		return lastSegment;
+	}
+
+	/**
+	 * Get or create a Git repository and checkout a pipeline-specific branch.
+	 * Creates the branch from master if it doesn't exist yet.
+	 */
+	public Git getGitHubRepositoryForBranch(String org, String branchName)
+			throws InvalidRemoteException, TransportException, GitAPIException, IOException {
+		Git git = getGitHubRepository(org);
+		pull(git);
+
+		boolean branchExists = git.getRepository().getRefDatabase().findRef(branchName) != null;
+		boolean remoteBranchExists = git.lsRemote()
+				.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+				.setHeads(true).call().stream()
+				.anyMatch(ref -> ref.getName().equals("refs/heads/" + branchName));
+
+		if (remoteBranchExists && !branchExists) {
+			git.checkout().setCreateBranch(true).setName(branchName)
+					.setStartPoint("origin/" + branchName).call();
+		} else if (!branchExists) {
+			git.checkout().setCreateBranch(true).setName(branchName).call();
+		} else {
+			git.checkout().setName(branchName).call();
+		}
+
+		// Pull latest for this branch
+		try {
+			git.pull().setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+					.setRemote("origin").setRemoteBranchName(branchName).call();
+		} catch (Exception e) {
+			log.warn("Could not pull branch {}: {}", branchName, e.getMessage());
+		}
+
+		return git;
+	}
+
+	/**
+	 * Save file content to GitHub on a pipeline-specific branch.
+	 */
+	public void saveFileToGitHubBranch(byte[] content, String pipelineName, String org,
+			String filename, String branchName)
+			throws IOException, GitAPIException {
+		Git git = getGitHubRepositoryForBranch(org, branchName);
+
+		String url = resolveRepoUrl(org);
+		String repoName = extractRepoNameFromUrl(url);
+
+		log.info("[GitHubService] Preparing to push file to GitHub => Repo URL: {}, Repo Name: {}, Branch: {}, Pipeline: {}, File: {}",
+				url, repoName, branchName, pipelineName, filename);
+
+		File targetDir = new File(gitPath + repoName + "/" + pipelineName);
+		if (!targetDir.exists()) {
+			Files.createDirectories(targetDir.toPath());
+		}
+
+		File targetFile = new File(targetDir, filename);
+		try (OutputStream os = new FileOutputStream(targetFile)) {
+			os.write(content);
+		}
+
+		git.add().addFilepattern(pipelineName + "/" + filename).call();
+		git.commit().setMessage("Update " + pipelineName + "/" + filename).call();
+		push(git, "Update " + pipelineName + "/" + filename);
+
+		log.info("[GitHubService] Successfully pushed file to GitHub => Repo: {}, Branch: {}, Path: {}/{}",
+				repoName, branchName, pipelineName, filename);
+	}
+
+	/**
+	 * Fetch file content from a pipeline-specific branch.
+	 */
+	public byte[] fetchFileFromGitHubBranch(String pipelineName, String org,
+			String filename, String branchName)
+			throws IOException, GitAPIException {
+		Git git = getGitHubRepositoryForBranch(org, branchName);
+
+		String url = resolveRepoUrl(org);
+		String repoName = extractRepoNameFromUrl(url);
+
+		File targetFile = new File(gitPath + repoName + "/" + pipelineName + "/" + filename);
+		if (targetFile.exists()) {
+			return Files.readAllBytes(targetFile.toPath());
+		}
+		return null;
 	}
 
 	public Git cloneRepoForDataset(String repoUrl, String personalAccessToken, String cloneDirectoryPath,

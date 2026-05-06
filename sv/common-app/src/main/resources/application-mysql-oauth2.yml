@@ -258,6 +258,9 @@ icip:
   dsurl: ${config.datasourceurl}
   dsuser: ${config.datasourceuser}
   dspass: ${config.datasourcepass}
+  script:
+    github:
+      enabled: true
   datasource:
     driverClassName: ${spring.datasource.driverClassName}
     jdbcUrl: ${spring.datasource.url}
@@ -373,7 +376,8 @@ github:
   gitPathStore : /app/gitRepo/store/
   username: your_username
   password: your_generated_token
- 
+  repoUrl: ${GITHUB_REPO_URL:}
+
 security:
   silentRefreshTimeoutFactor: 0.85
   

@@ -13,6 +13,7 @@ github:
     scope: repo,user
   ssl:
     verify: false
+  repoUrl: ${GITHUB_REPO_URL:https://github.com/satyamaarav/vibe-studio.git}
 
 # How to get GitHub OAuth credentials:
 # 1. Go to: https://github.com/settings/developers
