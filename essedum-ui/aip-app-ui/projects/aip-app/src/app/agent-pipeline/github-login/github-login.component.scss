@@ -1,13 +1,21 @@
+﻿@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
 :host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
 :host ::ng-deep mat-form-field,
 :host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
 :host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
-:host ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.05) !important; border-radius: 8px 8px 0 0 !important; }
-:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #b8cce0 !important; font-size: 13px !important; }
-:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
-:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.25) !important; }
-:host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
+:host ::ng-deep .mdc-text-field--filled {
+  background: rgba(68,128,245,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 6px !important;
+  min-height: 40px !important;
+  padding-top: 16px !important;
+}
+:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #3a5570 !important; font-size: 12px !important; }
+:host ::ng-deep .mdc-floating-label--float-above { color: #4480f5 !important; top: 7px !important; font-size: 11px !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #dde8f5 !important; font-size: 13px !important; }
+:host ::ng-deep .mdc-line-ripple, :host ::ng-deep .mdc-line-ripple::before, :host ::ng-deep .mdc-line-ripple::after { display: none !important; }
 
 .github-login-container {
   width: 100%;
@@ -17,27 +25,39 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  animation: fadeUp 0.35s ease-out;
 }
 
 .github-login-card {
   width: 100%;
-  max-width: 480px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(79,142,247,0.15);
-  border-radius: 16px;
+  max-width: 460px;
+  background: rgba(10,15,30,0.85);
+  border: 1px solid rgba(68,128,245,0.14);
+  border-radius: 12px;
   padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #4480f5, #7c3aed, #4f46e5);
+  }
 
   h2 {
-    font-size: 18px !important;
+    font-size: 17px !important;
     font-weight: 700 !important;
-    color: #e2e8f0 !important;
+    color: #dde8f5 !important;
     margin: 0 0 6px !important;
     text-align: center;
   }
 
   p {
-    font-size: 13px !important;
-    color: #b8cce0 !important;
+    font-size: 12px !important;
+    color: #3a5570 !important;
     text-align: center;
     margin: 0 0 20px !important;
   }
@@ -49,24 +69,62 @@
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
-  background: rgba(255,255,255,0.08) !important;
-  color: #e2e8f0 !important;
-  border: 1px solid rgba(79,142,247,0.25) !important;
-  border-radius: 10px !important;
+  background: rgba(255,255,255,0.06) !important;
+  color: #dde8f5 !important;
+  border: 1px solid rgba(68,128,245,0.14) !important;
+  border-radius: 8px !important;
   padding: 10px 20px !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 
   &:hover {
-    background: rgba(255,255,255,0.12) !important;
-    border-color: rgba(79,142,247,0.4) !important;
+    background: rgba(255,255,255,0.1) !important;
+    border-color: rgba(68,128,245,0.4) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(68,128,245,0.2);
   }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -80%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    transition: left 0.5s ease;
+  }
+  &:hover::after { left: 160%; }
 }
 
-body.header-light-theme {
-  .github-login-card { background: rgba(255,255,255,0.9); border-color: rgba(79,70,229,0.15); h2 { color: #0f172a !important; } }
-  .github-btn { background: rgba(0,0,0,0.04) !important; color: #0f172a !important; border-color: rgba(79,70,229,0.2) !important; }
-  :host ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
+:host-context(body.header-light-theme) {
+  ::ng-deep .mdc-text-field--filled {
+    background: rgba(71,66,220,0.03) !important;
+    border-color: #e2e8f0 !important;
+  }
+  ::ng-deep .mdc-floating-label, ::ng-deep mat-label { color: #64748b !important; }
+  ::ng-deep .mdc-floating-label--float-above { color: #4742dc !important; }
+  ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
+
+  .github-login-card {
+    background: #ffffff;
+    border-color: rgba(71,66,220,0.12);
+    box-shadow: 0 8px 32px rgba(71,66,220,0.08), 0 2px 6px rgba(0,0,0,0.04);
+    &::before { background: linear-gradient(90deg, #4742dc, #7c3aed, #6366f1); }
+    h2 { color: #0f172a !important; }
+    p { color: #94a3b8 !important; }
+  }
+
+  .github-btn {
+    background: rgba(0,0,0,0.02) !important;
+    color: #0f172a !important;
+    border-color: rgba(71,66,220,0.12) !important;
+    &:hover {
+      background: rgba(71,66,220,0.04) !important;
+      border-color: rgba(71,66,220,0.3) !important;
+      box-shadow: 0 4px 12px rgba(71,66,220,0.12);
+    }
+  }
 }

@@ -1,0 +1,219 @@
+// ═══════════════════════════════════════════════════════════════════
+//  AGENT PIPELINE — File Editor / Code Area  ✦  2026 AI Platform
+// ═══════════════════════════════════════════════════════════════════
+@use 'variables' as *;
+
+// -------------------------------------------------------------------
+//  Editor Container
+// -------------------------------------------------------------------
+.file-editor-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: $editor-bg-dark;
+  border-radius: 0 8px 8px 0;
+  overflow: hidden;
+}
+
+// -------------------------------------------------------------------
+//  Editor Controls Bar (top bar with file tabs / actions)
+// -------------------------------------------------------------------
+.editor-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: $editor-gutter;
+  border-bottom: 1px solid $editor-border;
+  min-height: 38px;
+  gap: 8px;
+
+  .file-name, .editor-file-name {
+    color: $editor-text;
+    font-family: $editor-font;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    &::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: $editor-success;
+    }
+
+    &.modified::before { background: $editor-warning; }
+    &.error-state::before { background: $editor-error; }
+  }
+
+  .editor-actions {
+    display: flex;
+    gap: 6px;
+
+    button {
+      background: transparent;
+      border: 1px solid $editor-border;
+      color: $editor-line-num;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-family: $editor-font;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba($editor-prompt, 0.1);
+        border-color: $editor-prompt;
+        color: $editor-prompt;
+      }
+
+      &.save-btn {
+        background: rgba($editor-success, 0.1);
+        border-color: $editor-success;
+        color: $editor-success;
+        &:hover { background: rgba($editor-success, 0.2); }
+      }
+
+      &.delete-btn {
+        &:hover {
+          background: rgba($editor-error, 0.1);
+          border-color: $editor-error;
+          color: $editor-error;
+        }
+      }
+    }
+  }
+}
+
+// -------------------------------------------------------------------
+//  Editor Content — Line Numbers + Textarea
+// -------------------------------------------------------------------
+.editor-content-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.text-editor-container {
+  display: flex;
+  flex: 1;
+  overflow: auto;
+  background: $editor-bg-dark;
+
+  &::-webkit-scrollbar { width: 8px; height: 8px; }
+  &::-webkit-scrollbar-track { background: $editor-bg-dark; }
+  &::-webkit-scrollbar-thumb { background: $editor-border; border-radius: 4px; }
+  &::-webkit-scrollbar-thumb:hover { background: $editor-line-num; }
+}
+
+.line-numbers-column {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  background: $editor-gutter;
+  border-right: 1px solid $editor-border;
+  min-width: 44px;
+  text-align: right;
+  user-select: none;
+  flex-shrink: 0;
+
+  span, .line-num {
+    display: block;
+    padding: 0 10px 0 8px;
+    color: $editor-line-num;
+    font-family: $editor-font;
+    font-size: 12px;
+    line-height: 1.7;
+    height: 20.4px;
+
+    &.active {
+      color: $editor-text;
+      background: rgba($editor-prompt, 0.06);
+    }
+  }
+}
+
+.file-content-editor {
+  flex: 1;
+  resize: none;
+  border: none;
+  outline: none;
+  background: $editor-bg-dark;
+  color: $editor-text;
+  font-family: $editor-font;
+  font-size: 12px;
+  line-height: 1.7;
+  padding: 12px 16px;
+  tab-size: 4;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+
+  &::placeholder {
+    color: $editor-line-num;
+    font-style: italic;
+  }
+
+  &:focus {
+    box-shadow: inset 0 0 0 1px rgba($editor-prompt, 0.2);
+  }
+}
+
+// -------------------------------------------------------------------
+//  File Editor Placeholder (empty state)
+// -------------------------------------------------------------------
+.file-editor-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  background: $editor-bg-dark;
+  color: $editor-line-num;
+  font-family: $editor-font;
+  font-size: 13px;
+  gap: 8px;
+  text-align: center;
+  padding: 40px;
+
+  .placeholder-icon {
+    font-size: 32px;
+    opacity: 0.4;
+  }
+
+  .placeholder-text {
+    color: $editor-line-num;
+    font-size: 12px;
+  }
+}
+
+// -------------------------------------------------------------------
+//  Light Theme — Editor stays dark (terminal feel)
+// -------------------------------------------------------------------
+:host-context(body.header-light-theme) {
+  .file-editor-container {
+    border: 1px solid $light-border;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .editor-controls-bar {
+    background: #f6f8fa;
+    border-bottom-color: $light-border;
+    .file-name, .editor-file-name { color: $light-text-primary; }
+    .editor-actions button {
+      border-color: $light-border;
+      color: $light-text-muted;
+      &:hover { color: $light-accent; border-color: $light-accent; }
+      &.save-btn { color: #1a7f37; border-color: #1a7f37; }
+    }
+  }
+
+  // Keep code area dark for terminal consistency
+  .text-editor-container,
+  .file-content-editor,
+  .file-editor-placeholder { background: $editor-bg-dark; }
+  .line-numbers-column { background: $editor-gutter; }
+}

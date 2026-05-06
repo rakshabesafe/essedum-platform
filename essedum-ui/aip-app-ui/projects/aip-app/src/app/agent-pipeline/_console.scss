@@ -1,0 +1,151 @@
+// ═══════════════════════════════════════════════════════════════════
+//  AGENT PIPELINE — Console / Terminal  ✦  2026 AI Platform
+// ═══════════════════════════════════════════════════════════════════
+@use 'variables' as *;
+
+// -------------------------------------------------------------------
+//  Console Container — Terminal Aesthetic
+// -------------------------------------------------------------------
+.console-container {
+  background: $editor-bg-dark;
+  border-radius: 8px;
+  border: 1px solid $editor-border;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: $editor-font;
+  animation: fadeUp 0.3s ease-out;
+}
+
+.console-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: $editor-gutter;
+  border-bottom: 1px solid $editor-border;
+  min-height: 36px;
+
+  .console-title, span, h4 {
+    color: $editor-line-num;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-family: $editor-font;
+    margin: 0;
+  }
+
+  .console-actions, .header-actions {
+    display: flex;
+    gap: 6px;
+
+    button, .action-btn {
+      background: transparent;
+      border: 1px solid $editor-border;
+      color: $editor-line-num;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: $editor-font;
+
+      &:hover {
+        background: rgba($editor-prompt, 0.1);
+        border-color: $editor-prompt;
+        color: $editor-prompt;
+      }
+    }
+  }
+
+  // Traffic light dots
+  &::before {
+    content: '';
+    display: inline-flex;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #f85149;
+    box-shadow: 14px 0 0 #f0883e, 28px 0 0 #3fb950;
+    margin-right: 14px;
+    flex-shrink: 0;
+  }
+}
+
+.console-output {
+  padding: 12px 16px;
+  overflow-y: auto;
+  max-height: 320px;
+  min-height: 120px;
+  background: $editor-bg-dark;
+  flex: 1;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: $editor-border; border-radius: 3px; }
+  &::-webkit-scrollbar-thumb:hover { background: $editor-line-num; }
+}
+
+.console-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 2px 0;
+  line-height: 1.6;
+  font-size: 12px;
+  animation: fadeUp 0.15s ease-out;
+
+  &.error { .console-text { color: $editor-error; } }
+  &.success { .console-text { color: $editor-success; } }
+  &.warning { .console-text { color: $editor-warning; } }
+  &.info { .console-text { color: $editor-prompt; } }
+}
+
+.console-prompt {
+  color: $editor-prompt;
+  font-weight: 700;
+  font-size: 12px;
+  user-select: none;
+  min-width: 12px;
+  font-family: $editor-font;
+
+  &::after {
+    content: ' $';
+    color: $editor-keyword;
+  }
+}
+
+.console-text {
+  color: $editor-text;
+  font-family: $editor-font;
+  font-size: 12px;
+  word-break: break-word;
+  flex: 1;
+}
+
+// Typing cursor at end of last line
+.console-output .console-line:last-child .console-text::after {
+  content: '▋';
+  color: $editor-prompt;
+  animation: cursorBlink 1s step-end infinite;
+  margin-left: 2px;
+}
+
+// -------------------------------------------------------------------
+//  Light Theme Console — Keep dark bg, lighter surround
+// -------------------------------------------------------------------
+:host-context(body.header-light-theme) {
+  .console-container {
+    border-color: $light-border;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .console-header {
+    background: #f6f8fa;
+    border-bottom-color: $light-border;
+    .console-title, span, h4 { color: $light-text-muted; }
+    &::before { box-shadow: 14px 0 0 #f0883e, 28px 0 0 #3fb950; }
+  }
+  // Keep console output dark for terminal feel
+  .console-output { background: $editor-bg-dark; }
+  .console-line, .console-prompt, .console-text { /* stays dark-themed */ }
+}
