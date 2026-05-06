@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
 /* You can add global styles to this file, and also import other style files */
 $text-primary-80: #333333;
@@ -51,7 +51,7 @@ $font-700: 700;
 // }
 
 .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-  background-color: transparent !important;
+  background-color: transparent; /* removed !important so component ::ng-deep can override */
 }
 
 .mat-mdc-select-panel {
@@ -91,7 +91,8 @@ $font-700: 700;
 }
 
 .form-control {
-  font-size: 1.5rem;
+  font-size: 13px !important;
+  height: auto !important;
 }
 
 .mdc-tab .mdc-tab__ripple::after {
@@ -163,8 +164,9 @@ app-footer .container-fluid {
 }
 
 .mat-mdc-tab .mdc-tab__text-label {
-  font-size: 1.2rem;
+  font-size: 12.5px !important;
   font-weight: 600;
+  letter-spacing: 0.1px;
 }
 
 .mat-mdc-tab-header-pagination-controls-enabled .mat-mdc-tab-header-pagination {
@@ -249,7 +251,8 @@ app-footer .container-fluid {
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
-  height: 72px;
+  height: auto !important;
+  min-height: 46px;
 }
 
 ::ng-deep .mat-mdc-tab-body-content {
@@ -597,6 +600,91 @@ body.header-light-theme .header-tabs-toggle {
 .headerMobile { display: flex; align-items: center; gap: 4px; }
 .userMobile { display: flex; align-items: center; }
 
+// ── Dropdown panel (CDK overlay) — dark theme ──────────────────────
+body.header-dark-theme .mat-mdc-select-panel,
+body.header-dark-theme .cdk-overlay-pane .mat-mdc-select-panel {
+  background: rgba(10, 20, 52, 0.97) !important;
+  border: 1px solid rgba(79, 142, 247, 0.22) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(79, 142, 247, 0.1) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+// ── Dropdown options — dark theme ──────────────────────────────────
+body.header-dark-theme .mat-mdc-option .mdc-list-item__primary-text {
+  color: #c8d8ea !important;
+  font-size: 13.5px !important;
+}
+body.header-dark-theme .mat-mdc-option:hover .mdc-list-item__primary-text,
+body.header-dark-theme .mat-mdc-option:focus .mdc-list-item__primary-text {
+  color: #7eb8ff !important;
+}
+body.header-dark-theme .mat-mdc-option:hover,
+body.header-dark-theme .mat-mdc-option:focus {
+  background: rgba(79, 142, 247, 0.1) !important;
+}
+body.header-dark-theme .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text {
+  color: #7eb8ff !important;
+}
+body.header-dark-theme .mat-mdc-option.mdc-list-item--selected {
+  background: rgba(79, 142, 247, 0.14) !important;
+}
+// Override global black selected option color (line ~109 in this file)
+body.header-dark-theme mat-primary .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) .mdc-list-item__primary-text {
+  color: #7eb8ff !important;
+}
+
+// ── Dropdown panel — light theme ───────────────────────────────────
+body.header-light-theme .mat-mdc-select-panel,
+body.header-light-theme .cdk-overlay-pane .mat-mdc-select-panel {
+  background: #ffffff !important;
+  border: 1px solid rgba(79, 70, 229, 0.18) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 40px rgba(79, 70, 229, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+body.header-light-theme .mat-mdc-option .mdc-list-item__primary-text { color: #1e293b !important; }
+body.header-light-theme .mat-mdc-option:hover { background: rgba(79, 70, 229, 0.06) !important; }
+body.header-light-theme .mat-mdc-option:hover .mdc-list-item__primary-text { color: #4f46e5 !important; }
+body.header-light-theme .mat-mdc-option.mdc-list-item--selected { background: rgba(79, 70, 229, 0.1) !important; }
+body.header-light-theme .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text { color: #4f46e5 !important; }
+
+
+// ── Dark theme: floating label / mat-label text ────────────────────
+body.header-dark-theme .mdc-floating-label:not(.mdc-floating-label--float-above) {
+  color: #4d6882 !important;
+}
+body.header-dark-theme .mdc-floating-label--float-above {
+  color: #7eb8ff !important;
+}
+body.header-dark-theme .mat-mdc-input-element {
+  color: #dde6f0 !important;
+}
+body.header-dark-theme .mat-mdc-select-value-text {
+  color: #dde6f0 !important;
+}
+body.header-dark-theme .mat-mdc-select-placeholder {
+  color: #3e5570 !important;
+}
+
+// ── Dark theme: mat-expansion-panel (REST config) ──────────────────
+body.header-dark-theme mat-expansion-panel {
+  background: rgba(10, 20, 52, 0.85) !important;
+  border: 1px solid rgba(79, 142, 247, 0.14) !important;
+}
+body.header-dark-theme mat-expansion-panel-header {
+  background: rgba(8, 14, 36, 0.7) !important;
+}
+body.header-dark-theme mat-panel-title {
+  color: #7eb8ff !important;
+}
+body.header-dark-theme mat-panel-description {
+  color: #4d6882 !important;
+}
+body.header-dark-theme .mat-expansion-indicator::after {
+  color: #4d6882 !important;
+  border-color: #4d6882 !important;
+}
+
 .user-profile-btn {
   cursor: pointer;
   flex-shrink: 0;
@@ -639,6 +727,7 @@ body.header-light-theme .header-tabs-toggle {
   display: flex; align-items: center; justify-content: center;
 }
 
+// ═══════════════════════════════════════════════════════════════════
 .dash-icon-color { color: var(--base-color, #0094ff); }
 .imageView { border-radius: 50%; width: 32px; height: 32px; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); }
 .projectArrow { min-width: 200px; }
@@ -4148,4 +4237,65 @@ body.header-dark-theme {
   .mat-style-label { color: #7a9cbf !important; }
   .back-icon { color: #7a9cbf !important; &:hover { color: #4f8ef7 !important; } }
   .dialog-buttons { border-top-color: rgba(79,142,247,0.1); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GLOBAL MDC FORM FIELD FIXES — applies to all remote/lazy-loaded components
+// Fixes: bottom line indicator, subscript height, form-control font-size
+// These rules have no !important competitors earlier, so they win naturally.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Kill the MDC active-indicator bottom-line for ALL components globally
+.mdc-line-ripple,
+.mdc-line-ripple::before,
+.mdc-line-ripple::after {
+  display: none !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  border-bottom: none !important;
+}
+
+// Remove the pseudo-element bottom border on MDC filled fields
+.mdc-text-field--filled::after {
+  border-bottom: none !important;
+}
+
+// Compact the subscript wrapper (eliminating the extra gap below fields)
+.mat-mdc-form-field-subscript-wrapper {
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+// Remove the grey focus-overlay wash on hover/focus
+.mat-mdc-form-field-focus-overlay {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+// ── Disabled MDC filled field — fix white text in dark mode
+.mdc-text-field--filled.mdc-text-field--disabled {
+  background-color: rgba(255,255,255,0.025) !important;
+}
+.mdc-text-field--disabled .mdc-text-field__input,
+.mat-mdc-input-element:disabled,
+input[disabled] {
+  color: rgba(100,140,180,0.55) !important;
+  -webkit-text-fill-color: rgba(100,140,180,0.55) !important;
+}
+.mdc-text-field--disabled .mdc-floating-label,
+.mdc-text-field--disabled .mat-mdc-floating-label {
+  color: rgba(71,99,126,0.55) !important;
+}
+
+// Compact tab groups (override global `height: 76%` and `margin-top: 12px`)
+.mat-mdc-tab-group {
+  height: auto !important;
+  min-height: 0 !important;
+  margin-top: 0 !important;
+}
+
+// Allow tab body to scroll naturally
+.mat-mdc-tab-body-content {
+  height: auto !important;
+  overflow: auto !important;
 }

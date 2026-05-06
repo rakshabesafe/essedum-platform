@@ -2,7 +2,7 @@
     <div class="clearfix js-bodywrapper" id="mainCtr">
         <div class="aip-main-content" id="mainrightCnt">
             <!-- Header Section -->
-            <div class="aip-content">
+            <div class="aip-content" [class.has-empty-state]="records">
                 <!-- Header -->
                 <app-aip-header [cardTitle]="cardTitle" [lastRefreshedTime]="lastRefreshedTime"
                     [showAddButton]="createAuth" (search)="filterz($event)" (refresh)="refreshComplete()"
@@ -14,6 +14,11 @@
                         dataSourceList: dataSourceList
                     }" (tagSelected)="tagSelectedEvent($event)" (filterStatusChange)="onFilterStatusChange($event)">
                 </app-aip-filter>
+
+                <!-- Empty state (inside same card) -->
+                <div class="model-empty-shell" *ngIf="records">
+                    <app-aip-empty-state class="model-empty-state"></app-aip-empty-state>
+                </div>
             </div>
 
 
@@ -29,9 +34,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Empty state -->
-            <app-aip-empty-state *ngIf="records"></app-aip-empty-state>
 
             <!-- Pagination -->
             <app-aip-pagination *ngIf="records!=true" [pageNumber]="pageNumber" [noOfPages]="noOfPages"
