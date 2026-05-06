@@ -1,32 +1,202 @@
 :host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
-:host ::ng-deep mat-form-field,
-:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
-
-.aip-container { padding: 16px 24px !important; width: 100% !important; box-sizing: border-box !important; }
-.lfx-l-level2-middle-ctr { display: flex !important; gap: 20px !important; flex-wrap: wrap !important; width: 100% !important; }
-.lfx-l-level2-middle-col { flex: 1 !important; min-width: 0 !important; }
-.lfx-l-level2-right-col { width: 280px !important; flex-shrink: 0 !important; }
-
-:host ::ng-deep .tabs-left-aligned .mat-mdc-tab-header { padding: 0 !important; }
+// ── Tab theming (dark default) ────────────────────────────────────────────────
+:host ::ng-deep .mat-mdc-tab-group {
+  --mdc-tab-indicator-active-indicator-color: #4f8ef7;
+  --mat-tab-header-active-label-text-color: #4f8ef7;
+  --mat-tab-header-inactive-label-text-color: #7a9cbf;
+  --mat-tab-header-active-hover-label-text-color: #7eb8ff;
+  --mat-tab-header-inactive-hover-label-text-color: #b8cce0;
+  --mat-tab-header-active-focus-label-text-color: #4f8ef7;
+  --mat-tab-header-active-ripple-color: rgba(79,142,247,0.12);
+  --mat-tab-header-inactive-ripple-color: rgba(79,142,247,0.08);
+}
+:host ::ng-deep .mat-mdc-tab-header { border-bottom: 1px solid rgba(79,142,247,0.12) !important; }
 :host ::ng-deep .mat-mdc-tab-body-content { padding: 0 !important; overflow: visible !important; }
 
-// Tab content
+// ── Layout ────────────────────────────────────────────────────────────────────
+.aip-container {
+  display: flex !important;
+  gap: 20px !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  padding: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+// Main card takes remaining space
+mat-card.lfx-schema-card {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+}
+
+.lfx-l-level2-right-col {
+  width: 260px !important;
+  flex: 0 0 260px !important;
+  min-width: 200px !important;
+}
+
+// ── Tab content padding ───────────────────────────────────────────────────────
 .tab_content { padding: 20px 24px !important; }
 .container-fluid.row { padding: 0 !important; margin: 0 !important; }
 .col-md-12 { width: 100% !important; max-width: 100% !important; padding: 0 !important; }
 .col-md-6 { width: 50% !important; flex: 0 0 50% !important; padding: 0 8px !important; }
+.row { display: flex !important; flex-wrap: wrap !important; margin: 0 !important; }
 
-// Text hierarchy
-.lfx-u-body-sm { font-size: 10px !important; font-weight: 700 !important; color: #9ab8d0 !important; text-transform: uppercase !important; letter-spacing: 0.8px !important; margin-bottom: 6px !important; display: block !important; }
+// ── Text hierarchy (dark default) ─────────────────────────────────────────────
+.lfx-u-body-sm {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #7a9cbf !important;
+  margin-bottom: 6px !important;
+  display: block !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
 .lfx-u-body-xl { font-size: 14px !important; color: #b8cce0 !important; line-height: 1.7 !important; }
 .lfx-u-body-md { font-size: 14px !important; color: #e2e8f0 !important; line-height: 1.6 !important; }
+.aip-desc-ellipsis { color: #b8cce0 !important; font-size: 13px !important; line-height: 1.6 !important; }
 
-// Avatar row
-.flex.mt-2.align-items-center { display: flex !important; align-items: center !important; margin-top: 8px !important; }
+.aip-line {
+  border: none !important;
+  border-top: 1px solid rgba(79,142,247,0.12) !important;
+  margin: 20px 0 16px !important;
+}
 
-body.header-light-theme {
-  .lfx-u-body-sm { color: #4A5568 !important; }
+// ── Avatar ────────────────────────────────────────────────────────────────────
+.lfx-c-avatar {
+  background: linear-gradient(135deg, #4f8ef7 0%, #6366f1 100%) !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  flex-shrink: 0 !important;
+}
+
+// ── Related components panel ──────────────────────────────────────────────────
+.aip-related-list {
+  border-radius: 8px !important;
+  padding: 4px !important;
+  transition: background 0.15s !important;
+  &:hover { background: rgba(79,142,247,0.08) !important; cursor: pointer !important; }
+}
+.aip-related-component-ellipsis {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-size: 13px !important;
+  color: #e2e8f0 !important;
+}
+.lfx-c-nav__nomar.lfx-u-header-xl.lfx-u-text-neutral-80 { font-size: 13px !important; color: #e2e8f0 !important; }
+.aip-related-badge { font-size: 10px !important; }
+
+// Related Components header — solid blue strip (matches original design)
+.customHeader {
+  background: linear-gradient(90deg, #1565c0 0%, #1976d2 100%) !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  padding: 14px 24px !important;
+  letter-spacing: 0.3px !important;
+}
+
+.aip-scroll-hover { max-height: 380px !important; overflow-y: auto !important; }
+.aip-scroll-hover::-webkit-scrollbar { width: 4px !important; }
+.aip-scroll-hover::-webkit-scrollbar-track { background: transparent !important; }
+.aip-scroll-hover::-webkit-scrollbar-thumb { background: rgba(79,142,247,0.3) !important; border-radius: 2px !important; }
+
+// ── mat-card glass (dark default) ─────────────────────────────────────────────
+mat-card, .mat-mdc-card {
+  background: rgba(8,14,36,0.92) !important;
+  border: 1px solid rgba(79,142,247,0.18) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  position: relative !important;
+}
+mat-card::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #4f8ef7 0%, #7c3aed 55%, #a855f7 100%);
+  flex-shrink: 0;
+}
+
+// ── mat-menu ─────────────────────────────────────────────────────────────────
+:host ::ng-deep .mat-mdc-menu-panel {
+  background: rgba(8,14,36,0.97) !important;
+  border: 1px solid rgba(79,142,247,0.2) !important;
+  border-radius: 10px !important;
+}
+:host ::ng-deep .mat-mdc-menu-item { color: #e2e8f0 !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-menu-item:hover { background: rgba(79,142,247,0.1) !important; }
+
+// ── Light theme ───────────────────────────────────────────────────────────────
+:host-context(body.header-light-theme) {
+  ::ng-deep .mat-mdc-tab-group {
+    --mdc-tab-indicator-active-indicator-color: #4f46e5;
+    --mat-tab-header-active-label-text-color: #4f46e5;
+    --mat-tab-header-inactive-label-text-color: #64748b;
+    --mat-tab-header-active-hover-label-text-color: #4f46e5;
+    --mat-tab-header-inactive-hover-label-text-color: #334155;
+  }
+  ::ng-deep .mat-mdc-tab-header { border-bottom-color: rgba(99,102,241,0.12) !important; }
+
+  .lfx-u-body-sm { color: #64748b !important; }
   .lfx-u-body-xl { color: #334155 !important; }
   .lfx-u-body-md { color: #0f172a !important; }
+  .aip-desc-ellipsis { color: #4A5568 !important; }
+  .aip-line { border-top-color: rgba(99,102,241,0.1) !important; }
+  .aip-related-list:hover { background: rgba(99,102,241,0.06) !important; }
+  .aip-related-component-ellipsis { color: #0f172a !important; }
+  .lfx-c-nav__nomar.lfx-u-header-xl.lfx-u-text-neutral-80 { color: #0f172a !important; }
+  .aip-scroll-hover::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3) !important; }
+  // Keep customHeader blue in light theme too
+  .customHeader {
+    background: linear-gradient(90deg, #1565c0 0%, #1976d2 100%) !important;
+    color: #ffffff !important;
+  }
+
+  mat-card, .mat-mdc-card {
+    background: #ffffff !important;
+    border-color: rgba(99,102,241,0.16) !important;
+    box-shadow: 0 8px 40px rgba(99,102,241,0.12), 0 2px 8px rgba(0,0,0,0.06) !important;
+  }
+  mat-card::before { background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 55%, #a855f7 100%); }
+
+  ::ng-deep .mat-mdc-menu-panel {
+    background: #ffffff !important;
+    border-color: rgba(99,102,241,0.15) !important;
+  }
+  ::ng-deep .mat-mdc-menu-item { color: #0f172a !important; }
+  ::ng-deep .mat-mdc-menu-item:hover { background: rgba(99,102,241,0.08) !important; }
+}
+
+// ── Dark theme explicit ───────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
+  ::ng-deep .mat-mdc-tab-group {
+    --mdc-tab-indicator-active-indicator-color: #4f8ef7;
+    --mat-tab-header-active-label-text-color: #4f8ef7;
+    --mat-tab-header-inactive-label-text-color: #7a9cbf;
+  }
+
+  .lfx-u-body-sm { color: #7a9cbf !important; }
+  .lfx-u-body-xl { color: #b8cce0 !important; }
+  .lfx-u-body-md { color: #e2e8f0 !important; }
+  .aip-desc-ellipsis { color: #b8cce0 !important; }
+  .aip-line { border-top-color: rgba(79,142,247,0.12) !important; }
+  .aip-related-list:hover { background: rgba(79,142,247,0.08) !important; }
+  .aip-related-component-ellipsis { color: #e2e8f0 !important; }
+
+  mat-card, .mat-mdc-card {
+    background: rgba(8,14,36,0.92) !important;
+    border-color: rgba(79,142,247,0.18) !important;
+  }
 }

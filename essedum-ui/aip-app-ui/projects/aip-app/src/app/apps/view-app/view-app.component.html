@@ -208,9 +208,9 @@
             <mat-icon mat-dialog-close>close</mat-icon>
         </div>
         <div class="mat-dialog-content tryout-form" style="margin-top: 1em;">
-            <mat-form-field appearance="fill" class="w-100 tryout-field">
+            <mat-form-field appearance="fill" class="full-width" floatLabel="always">
                 <mat-label>Link</mat-label>
-                <input matInput placeholder="Link" [(ngModel)]="appData.tryoutlink">
+                <input matInput placeholder="Paste your link..." [(ngModel)]="appData.tryoutlink">
             </mat-form-field>
         </div>
         <div class="mat-dialog-actions" style="justify-content: flex-end;">

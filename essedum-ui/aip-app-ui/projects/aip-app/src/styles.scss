@@ -3400,3 +3400,211 @@ body.header-light-theme {
   .secondary-color { color: #4A5568 !important; }
   .lfx-c-datagrid__title-area { border-bottom-color: rgba(99,102,241,0.15) !important; }
 }
+
+// ─── Table inputs + JSON editor — global theme overrides ─────────────────────
+// Strategy: Override Bootstrap 5 CSS custom properties (--bs-*) at the table
+// scope so Bootstrap's own var() resolution picks up the themed values.
+// This is more reliable than direct property overrides against var() values.
+
+body.header-dark-theme {
+  // Override Bootstrap CSS variables at the table scope — cascades into .form-control
+  table.table {
+    --bs-body-bg: #1a2744;
+    --bs-body-color: #e2e8f0;
+    --bs-border-color: rgba(79, 142, 247, 0.25);
+    --bs-table-color: #c8d8ea;
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+    --bs-table-striped-color: #c8d8ea;
+    --bs-table-active-bg: rgba(79, 142, 247, 0.08);
+    --bs-table-hover-bg: rgba(79, 142, 247, 0.06);
+    background: rgba(8, 14, 36, 0.5) !important;
+    border: 1px solid rgba(79, 142, 247, 0.18) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+  }
+
+  // Table inputs — explicit overrides for non-variable bg
+  table.table input,
+  table.table input[type="text"],
+  table.table input.form-control {
+    background: #1e2d4a !important;
+    background-color: #1e2d4a !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(79, 142, 247, 0.25) !important;
+    border-radius: 6px !important;
+    padding: 5px 8px !important;
+    &:focus { border-color: #4f8ef7 !important; outline: none !important; box-shadow: 0 0 0 2px rgba(79,142,247,0.2) !important; }
+    &::placeholder { color: #5a7899 !important; }
+  }
+
+  // Table structure
+  table.table thead th {
+    background-color: rgba(79, 142, 247, 0.15) !important;
+    color: #7eb8ff !important;
+    border-bottom-color: rgba(79, 142, 247, 0.25) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.6px !important;
+    text-transform: uppercase !important;
+    padding: 10px 12px !important;
+  }
+  table.table tbody td {
+    border-bottom-color: rgba(79, 142, 247, 0.08) !important;
+    padding: 8px 12px !important;
+    vertical-align: middle !important;
+  }
+  table.table tbody tr:last-child td { border-bottom: none !important; }
+  table.table tbody tr:hover td { background-color: rgba(79, 142, 247, 0.06) !important; }
+
+  // Action icons in tables (delete/add)
+  table.table .aip-led-icons,
+  table.table .icon-color { color: #7eb8ff !important; cursor: pointer !important; }
+
+  // JSON editor — dark (already works via component SCSS, this is backup)
+  .cipJSONEditor .jsoneditor,
+  .jsoneditor {
+    border: 1px solid rgba(79, 142, 247, 0.28) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+  }
+  .cipJSONEditor .jsoneditor-menu,
+  .jsoneditor-menu { background: linear-gradient(90deg, #4f8ef7 0%, #7c3aed 100%) !important; border-bottom: none !important; }
+  .cipJSONEditor .jsoneditor-tree,
+  .cipJSONEditor .jsoneditor-text,
+  .cipJSONEditor .jsoneditor-outer,
+  .jsoneditor-tree, .jsoneditor-text, .jsoneditor-outer { background: rgba(6,12,32,0.98) !important; color: #e2e8f0 !important; }
+  .jsoneditor-field { color: #7eb8ff !important; }
+  .jsoneditor-value { color: #c8d8ea !important; }
+  .jsoneditor-value.jsoneditor-string { color: #86efac !important; }
+  .jsoneditor-value.jsoneditor-number { color: #fbbf24 !important; }
+  .jsoneditor-statusbar { background: rgba(255,255,255,0.04) !important; color: #7a9cbf !important; }
+  .ace_editor { background: rgba(6,12,32,0.98) !important; color: #e2e8f0 !important; font-size: 13px !important; }
+  .ace_gutter { background: rgba(2,6,20,0.95) !important; color: #4d6882 !important; }
+  .ace_string { color: #86efac !important; }
+  .ace_numeric { color: #fbbf24 !important; }
+  .ace_variable, .ace_keyword { color: #7eb8ff !important; }
+  .ace_line { color: #e2e8f0 !important; }
+}
+
+body.header-light-theme {
+  // Override Bootstrap CSS variables at table scope
+  table.table {
+    --bs-body-bg: #f8fafc;
+    --bs-body-color: #0f172a;
+    --bs-border-color: rgba(99, 102, 241, 0.2);
+    --bs-table-color: #1e293b;
+    --bs-table-bg: #ffffff;
+    --bs-table-striped-bg: #f8fafc;
+    --bs-table-striped-color: #1e293b;
+    --bs-table-hover-bg: rgba(99, 102, 241, 0.06);
+    background: #ffffff !important;
+    border: 1px solid rgba(99, 102, 241, 0.18) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+  }
+
+  // Table inputs — explicit light bg
+  table.table input,
+  table.table input[type="text"],
+  table.table input.form-control {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    border-radius: 6px !important;
+    padding: 5px 8px !important;
+    &:focus { border-color: #4f46e5 !important; outline: none !important; box-shadow: 0 0 0 2px rgba(99,102,241,0.15) !important; }
+    &::placeholder { color: #94a3b8 !important; }
+  }
+
+  // Table structure
+  table.table thead th {
+    background-color: rgba(99, 102, 241, 0.08) !important;
+    color: #4f46e5 !important;
+    border-bottom-color: rgba(99, 102, 241, 0.2) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.6px !important;
+    text-transform: uppercase !important;
+    padding: 10px 12px !important;
+  }
+  table.table tbody td {
+    border-bottom-color: rgba(99, 102, 241, 0.08) !important;
+    color: #1e293b !important;
+    padding: 8px 12px !important;
+    vertical-align: middle !important;
+  }
+  table.table tbody tr:last-child td { border-bottom: none !important; }
+  table.table tbody tr:hover td { background-color: rgba(99, 102, 241, 0.06) !important; }
+
+  table.table .aip-led-icons,
+  table.table .icon-color { color: #4f46e5 !important; cursor: pointer !important; }
+
+  // JSON editor — light theme
+  .cipJSONEditor .jsoneditor,
+  .jsoneditor {
+    border: 2px solid rgba(99, 102, 241, 0.35) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.1) !important;
+  }
+  .cipJSONEditor .jsoneditor-menu,
+  .jsoneditor-menu {
+    background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%) !important;
+    background-color: #4f46e5 !important;
+    border-bottom: none !important;
+    color: #ffffff !important;
+  }
+  .cipJSONEditor .jsoneditor-menu > button,
+  .cipJSONEditor .jsoneditor-menu > .jsoneditor-modes > button,
+  .jsoneditor-menu > button,
+  .jsoneditor-menu > .jsoneditor-modes > button {
+    color: #ffffff !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    opacity: 1 !important;
+  }
+  .cipJSONEditor .jsoneditor-menu > button:hover,
+  .cipJSONEditor .jsoneditor-menu > .jsoneditor-modes > button:hover,
+  .jsoneditor-menu > button:hover,
+  .jsoneditor-menu > .jsoneditor-modes > button:hover {
+    background-color: rgba(255,255,255,0.2) !important;
+    color: #ffffff !important;
+  }
+  .cipJSONEditor .jsoneditor-menu .jsoneditor-poweredBy,
+  .jsoneditor-menu .jsoneditor-poweredBy { color: rgba(255,255,255,0.65) !important; }
+  .cipJSONEditor .jsoneditor-tree,
+  .cipJSONEditor .jsoneditor-text,
+  .cipJSONEditor .jsoneditor-outer,
+  .jsoneditor-tree, .jsoneditor-text, .jsoneditor-outer { background: #ffffff !important; color: #0f172a !important; }
+  .jsoneditor-field { color: #4f46e5 !important; font-weight: 600 !important; }
+  .jsoneditor-value { color: #1e293b !important; }
+  .jsoneditor-value.jsoneditor-string { color: #15803d !important; }
+  .jsoneditor-value.jsoneditor-number { color: #b45309 !important; }
+  .jsoneditor-separator { color: #64748b !important; }
+  .jsoneditor-statusbar { background: #f8fafc !important; color: #64748b !important; border-top: 1px solid rgba(99,102,241,0.1) !important; }
+  // ACE editor — use .ace-jsoneditor prefix (library's own theme class) for higher specificity
+  .ace-jsoneditor.ace_editor,
+  .ace_editor { background-color: #ffffff !important; background: #ffffff !important; color: #0f172a !important; font-size: 13px !important; }
+  .ace-jsoneditor .ace_scroller { background-color: #ffffff !important; }
+  .ace-jsoneditor .ace_gutter,
+  .ace_gutter { background: #f1f5f9 !important; background-color: #f1f5f9 !important; color: #64748b !important; border-right: 1px solid rgba(99,102,241,0.15) !important; }
+  .ace-jsoneditor .ace_gutter-active-line,
+  .ace_gutter-active-line { background-color: rgba(99,102,241,0.06) !important; }
+  .ace-jsoneditor .ace_marker-layer .ace_active-line,
+  .ace_active-line { background: rgba(99,102,241,0.04) !important; }
+  .ace-jsoneditor .ace_cursor,
+  .ace_cursor { color: #4f46e5 !important; border-left-color: #4f46e5 !important; }
+  .ace-jsoneditor .ace_marker-layer .ace_selection,
+  .ace_selection { background: rgba(99,102,241,0.15) !important; }
+  .ace-jsoneditor .ace_string,
+  .ace_string { color: #15803d !important; }
+  .ace-jsoneditor .ace_constant.ace_numeric,
+  .ace_numeric { color: #b45309 !important; }
+  .ace-jsoneditor .ace_variable,
+  .ace-jsoneditor .ace_keyword,
+  .ace_variable, .ace_keyword { color: #4f46e5 !important; }
+  .ace-jsoneditor .ace_text-layer,
+  .ace_text-layer { color: #0f172a !important; }
+}
