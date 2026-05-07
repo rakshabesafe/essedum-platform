@@ -2842,6 +2842,144 @@ body.header-light-theme {
   background: transparent;
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// GLOBAL FIX: Bootstrap table-striped white rows in dark mode
+// These override Bootstrap's global .table-striped > tbody > tr:nth-of-type(odd)
+// which sets --bs-table-accent-bg and cannot be beaten by component-scoped styles.
+// ══════════════════════════════════════════════════════════════════════════════
+body.header-dark-theme {
+  app-app-config, app-user-secrets {
+    .table-striped > tbody > tr,
+    .table-striped > tbody > tr > td,
+    .table-striped > tbody > tr > th,
+    .table-striped > tbody > tr:nth-of-type(odd),
+    .table-striped > tbody > tr:nth-of-type(even),
+    .table-striped > tbody > tr:nth-of-type(odd) > *,
+    .table-striped > tbody > tr:nth-of-type(even) > * {
+      background: transparent !important;
+      background-color: transparent !important;
+      --bs-table-accent-bg: transparent !important;
+      --bs-table-striped-bg: transparent !important;
+      --bs-table-bg: transparent !important;
+      color: #c9d1d9 !important;
+    }
+
+    .table-striped > tbody > tr:hover,
+    .table-striped > tbody > tr:hover > td {
+      background: rgba(88,166,255,0.04) !important;
+    }
+
+    .form-control,
+    input.form-control,
+    input[type="text"],
+    input[type="password"],
+    .table td input,
+    .table td .form-control {
+      background: rgba(13,17,23,0.9) !important;
+      background-color: rgba(13,17,23,0.9) !important;
+      border: 1px solid rgba(88,166,255,0.2) !important;
+      border-radius: 6px !important;
+      color: #e6edf3 !important;
+      -webkit-text-fill-color: #e6edf3 !important;
+      font-size: 13px !important;
+      padding: 6px 10px !important;
+      &:focus {
+        border-color: #58a6ff !important;
+        box-shadow: 0 0 0 3px rgba(88,166,255,0.12) !important;
+      }
+      &::placeholder {
+        color: #484f58 !important;
+        -webkit-text-fill-color: #484f58 !important;
+      }
+    }
+
+    mat-card, .mat-mdc-card {
+      background: rgba(13,17,23,0.6) !important;
+      border: 1px solid rgba(88,166,255,0.1) !important;
+    }
+
+    .table thead tr th {
+      color: #8b949e !important;
+      background: rgba(88,166,255,0.04) !important;
+      border-bottom-color: rgba(88,166,255,0.12) !important;
+    }
+
+    .table tbody tr td {
+      color: #c9d1d9 !important;
+      -webkit-text-fill-color: #c9d1d9 !important;
+    }
+
+    span {
+      color: #c9d1d9 !important;
+      -webkit-text-fill-color: #c9d1d9 !important;
+    }
+
+    mat-icon {
+      color: #8b949e !important;
+      &:hover { color: #58a6ff !important; }
+    }
+
+    button[mat-raised-button] {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #6366f1 100%) !important;
+      color: #fff !important;
+      border: none !important;
+      box-shadow: 0 2px 12px rgba(79,70,229,0.4) !important;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Argument Dialog Panel — compact, clean overlay styling
+// ══════════════════════════════════════════════════════════════════════════════
+.argument-dialog-panel {
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+  }
+  .mat-mdc-dialog-surface,
+  .mdc-dialog__surface {
+    border-radius: 14px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    max-height: none !important;
+  }
+  .mdc-dialog__content {
+    padding: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .mdc-dialog__actions {
+    padding: 0 !important;
+    min-height: auto !important;
+  }
+  .mdc-dialog__title {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .mdc-dialog__title::before {
+    display: none !important;
+  }
+}
+
+body.header-dark-theme .argument-dialog-panel {
+  .mat-mdc-dialog-surface,
+  .mdc-dialog__surface {
+    background: linear-gradient(165deg, #1c2333 0%, #141b2a 100%) !important;
+    border: 1px solid rgba(88, 166, 255, 0.15) !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(88, 166, 255, 0.08), 0 0 80px rgba(88, 166, 255, 0.05) !important;
+  }
+}
+
+body.header-light-theme .argument-dialog-panel {
+  .mat-mdc-dialog-surface,
+  .mdc-dialog__surface {
+    background: #ffffff !important;
+    border: 1px solid rgba(71, 66, 220, 0.1) !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(71, 66, 220, 0.06) !important;
+  }
+}
+
 .messages-area {
   flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px;
   scrollbar-width: thin;
