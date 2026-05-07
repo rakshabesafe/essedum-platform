@@ -17,8 +17,8 @@
                 </button>
             </div>
         </div>
-        <mat-card>
-            <div class="lfx-u-pad-t-32 lfx-u-pad-lr-24">
+        <div class="pipeline-form-body">
+                <div class="lfx-u-pad-t-32 lfx-u-pad-lr-24">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 lfx-u-mar-b-16">
                         <mat-form-field appearance="fill" class="w-100">
@@ -59,36 +59,28 @@
                     <div class="d-flex justify-content-end lfx-u-mar-b-16">
 
                         <button class="lfx-u-pad-r-16" mat-raised-button
-                            style="background-color: #0a142f; color: white;" [disabled]="false" (click)="closePipelineOpenDialog()"
-                            onmouseover="this.style.backgroundColor='#0094ff'; this.style.color='white';"
-                            onmouseout="this.style.backgroundColor='#0a142f'; this.style.color='white';">
+                            [disabled]="false" (click)="closePipelineOpenDialog()">
                             Cancel
                         </button>
-                        <button  *ngIf="!edit && !data?.copy" mat-raised-button style="background-color: #0a142f; color: white;" [disabled]="false"
-                            (click)="saveDetails()"
-                            onmouseover="this.style.backgroundColor='#0094ff'; this.style.color='white';"
-                            onmouseout="this.style.backgroundColor='#0a142f'; this.style.color='white';">
+                        <button  *ngIf="!edit && !data?.copy" mat-raised-button [disabled]="false"
+                            (click)="saveDetails()">
                             Save
                         </button>
                          <div class="align-items-center d-flex" *ngIf="edit">
-                            <button mat-raised-button style="background-color: #0a142f; color: white;" [disabled]="false"
-                            (click)="editDetails()"
-                            onmouseover="this.style.backgroundColor='#0094ff'; this.style.color='white';"
-                            onmouseout="this.style.backgroundColor='#0a142f'; this.style.color='white';">
+                            <button mat-raised-button [disabled]="false"
+                            (click)="editDetails()">
                             Update
                         </button>
                          </div>
                          <div class="align-items-center d-flex" *ngIf="data?.copy">
-                            <button mat-raised-button style="background-color: #0a142f; color: white;" [disabled]="false"
-                            (click)="saveDetails()"
-                            onmouseover="this.style.backgroundColor='#0094ff'; this.style.color='white';"
-                            onmouseout="this.style.backgroundColor='#0a142f'; this.style.color='white';">
+                            <button mat-raised-button [disabled]="false"
+                            (click)="saveDetails()">
                             Copy
                         </button>
                          </div>
                     </div>
                 </div>
             </div>
-        </mat-card>
+        </div>
     </div>
 </div>

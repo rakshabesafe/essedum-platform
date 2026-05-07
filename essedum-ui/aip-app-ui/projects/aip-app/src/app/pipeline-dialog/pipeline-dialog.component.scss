@@ -1,25 +1,35 @@
 :host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
-// ── Material deep overrides ───────────────────────────────────────────────────
+// ── Material deep overrides (borderless) ─────────────────────────────────────
 :host ::ng-deep mat-form-field,
-:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
-:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
-:host ::ng-deep .mdc-text-field--filled {
-  background: rgba(255,255,255,0.055) !important;
-  border-radius: 10px 10px 0 0 !important;
-  transition: background 0.18s !important;
-}
-:host ::ng-deep .mdc-text-field--filled:hover { background: rgba(255,255,255,0.09) !important; }
-:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: rgba(79,142,247,0.09) !important; }
-:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #7a9cbf !important; font-size: 13px !important; }
-:host ::ng-deep .mdc-floating-label--float-above { color: #7eb8ff !important; }
-:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
-:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.2) !important; }
-:host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
-:host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e2e8f0 !important; }
-:host ::ng-deep .mat-mdc-select-placeholder { color: #4d6882 !important; }
-:host ::ng-deep .mat-mdc-select-arrow { color: #4d6882 !important; }
-:host ::ng-deep mat-error { color: #f87171 !important; font-size: 11px !important; }
+:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; padding: 0 !important; background: transparent !important; overflow: visible !important; }
+:host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
+:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-bottom: 1px solid rgba(88,166,255,0.25) !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; transition: border-color 0.25s ease !important; &::before, &::after { display: none !important; content: none !important; } }
+:host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom-color: rgba(88,166,255,0.5) !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom-color: #58a6ff !important; box-shadow: 0 1px 0 #58a6ff !important; }
+:host ::ng-deep .mat-mdc-form-field-infix { min-height: 44px !important; padding: 18px 0 6px !important; border-top: 0 !important; width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled .mdc-floating-label { top: 7px !important; font-size: 11px !important; }
+:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #8b949e !important; font-size: 12px !important; font-weight: 500 !important; }
+:host ::ng-deep .mdc-floating-label--float-above { color: #58a6ff !important; font-size: 11px !important; font-weight: 600 !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e6edf3 !important; font-size: 14px !important; }
+:host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e6edf3 !important; font-size: 14px !important; }
+:host ::ng-deep .mat-mdc-select-value { font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-select-placeholder { color: #484f58 !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-select-arrow { color: #58a6ff !important; }
+:host ::ng-deep .mat-mdc-form-field-hint { color: #8b949e !important; font-size: 11px !important; }
+:host ::ng-deep mat-error { color: #f85149 !important; font-size: 11px !important; }
+:host ::ng-deep mat-checkbox .mdc-label { color: #e6edf3 !important; font-size: 13px !important; }
+:host ::ng-deep mat-checkbox .mdc-checkbox__background { border-color: #58a6ff !important; border-radius: 4px !important; }
+:host ::ng-deep mat-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background { background-color: #58a6ff !important; border-color: #58a6ff !important; }
+:host ::ng-deep .mdc-line-ripple, :host ::ng-deep .mdc-line-ripple::before, :host ::ng-deep .mdc-line-ripple::after { display: none !important; height: 0 !important; opacity: 0 !important; border-bottom: none !important; }
+:host ::ng-deep .mat-mdc-form-field-focus-overlay { display: none !important; opacity: 0 !important; }
+:host ::ng-deep .mdc-text-field__ripple { display: none !important; }
+:host ::ng-deep .mat-mdc-form-field-subscript-wrapper { min-height: 0 !important; padding: 0 !important; }
+:host ::ng-deep .mat-mdc-form-field-flex { align-items: flex-end !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { opacity: 0.5 !important; border-bottom-color: rgba(88,166,255,0.08) !important; }
+:host ::ng-deep .mdc-text-field--disabled .mat-mdc-input-element,
+:host ::ng-deep .mdc-text-field--disabled input { color: rgba(100,140,180,0.5) !important; -webkit-text-fill-color: rgba(100,140,180,0.5) !important; }
 
 // ── Dialog header ─────────────────────────────────────────────────────────────
 .dialog-header, .modal-header {
@@ -53,13 +63,13 @@
 .lfx-u-sub-header-alias {
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  font-size: 10px !important;
+  gap: 6px !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
-  color: #4d6882 !important;
+  color: #c9d1d9 !important;
   text-transform: uppercase !important;
-  letter-spacing: 1.2px !important;
-  margin-bottom: 8px !important;
+  letter-spacing: 1.1px !important;
+  margin-bottom: 6px !important;
   padding-left: 10px !important;
   position: relative !important;
 
@@ -70,8 +80,8 @@
     top: 50%;
     transform: translateY(-50%);
     width: 3px;
-    height: 14px;
-    background: linear-gradient(180deg, #4f8ef7, #7c3aed);
+    height: 12px;
+    background: linear-gradient(180deg, #58a6ff, #875ef7);
     border-radius: 2px;
   }
 }
@@ -125,45 +135,51 @@ button[mat-button], button[mat-stroked-button] {
 
 // ── Light theme ───────────────────────────────────────────────────────────────
 :host-context(body.header-light-theme) {
-  ::ng-deep .mdc-text-field--filled { background: #f1f5f9 !important; }
-  ::ng-deep .mdc-text-field--filled:hover { background: #e8edf5 !important; }
+  ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
+  ::ng-deep .mdc-text-field--filled { border: none !important; border-bottom: 1px solid #e2e8f0 !important; border-radius: 0 !important; }
+  ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom-color: rgba(71,66,220,0.5) !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom-color: #4742dc !important; box-shadow: 0 1px 0 #4742dc !important; }
   ::ng-deep .mdc-floating-label, ::ng-deep mat-label { color: #64748b !important; }
-  ::ng-deep .mdc-floating-label--float-above { color: #4f46e5 !important; }
-  ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
+  ::ng-deep .mdc-floating-label--float-above { color: #4742dc !important; }
+  ::ng-deep .mat-mdc-input-element { color: #0f172a !important; -webkit-text-fill-color: #0f172a !important; }
   ::ng-deep mat-select .mat-mdc-select-value-text { color: #0f172a !important; }
-  ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f46e5 !important; }
+  ::ng-deep .mat-mdc-select-placeholder { color: #94a3b8 !important; }
+  ::ng-deep .mat-mdc-select-arrow { color: #64748b !important; }
+  ::ng-deep mat-checkbox .mdc-label { color: #1e293b !important; }
+  ::ng-deep mat-checkbox .mdc-checkbox__background { border-color: rgba(71,66,220,0.4) !important; }
 
   .dialog-header, .modal-header {
-    background: rgba(99,102,241,0.04) !important;
-    border-bottom-color: rgba(99,102,241,0.1) !important;
+    background: rgba(71,66,220,0.03) !important;
+    border-bottom-color: rgba(71,66,220,0.1) !important;
     h2, h3 { color: #0f172a !important; }
-    mat-icon { color: #94a3b8 !important; &:hover { color: #4f46e5 !important; } }
+    mat-icon { color: #94a3b8 !important; &:hover { color: #4742dc !important; } }
   }
 
   .lfx-u-sub-header-alias { color: #64748b !important; }
-  .dialog-actions, mat-dialog-actions { border-top-color: rgba(99,102,241,0.1) !important; }
+  .dialog-actions, mat-dialog-actions { border-top-color: rgba(71,66,220,0.09) !important; }
 
   button[mat-raised-button][color="primary"],
   button[mat-flat-button][color="primary"] {
-    background: #4f46e5 !important;
-    box-shadow: 0 4px 18px rgba(79,70,229,0.35) !important;
-    &:hover:not([disabled]) { box-shadow: 0 6px 28px rgba(79,70,229,0.5) !important; }
+    background: linear-gradient(135deg, #4742dc, #7c3aed) !important;
+    box-shadow: 0 4px 18px rgba(71,66,220,0.35) !important;
+    &:hover:not([disabled]) { box-shadow: 0 6px 28px rgba(71,66,220,0.5) !important; }
   }
 
   button[mat-button], button[mat-stroked-button] {
     color: #64748b !important;
-    border-color: rgba(99,102,241,0.25) !important;
-    &:hover:not([disabled]) { color: #4f46e5 !important; border-color: rgba(99,102,241,0.55) !important; }
+    border-color: rgba(71,66,220,0.2) !important;
+    &:hover:not([disabled]) { color: #4742dc !important; border-color: rgba(71,66,220,0.4) !important; }
   }
 }
 
 // ── Dark theme explicit ───────────────────────────────────────────────────────
 :host-context(body.header-dark-theme) {
-  ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.055) !important; }
-  ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; }
+  ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
+  ::ng-deep .mdc-text-field--filled { border: none !important; border-bottom: 1px solid rgba(88,166,255,0.25) !important; border-radius: 0 !important; }
+  ::ng-deep .mat-mdc-input-element { color: #e6edf3 !important; }
 
   .dialog-header, .modal-header {
-    background: rgba(79,142,247,0.05) !important;
-    h2, h3 { color: #e2e8f0 !important; }
+    background: rgba(88,166,255,0.04) !important;
+    h2, h3 { color: #e6edf3 !important; }
   }
 }
