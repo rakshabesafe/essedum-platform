@@ -13,14 +13,14 @@
         <!-- Form fields -->
         <div class="dialog-body">
             <mat-form-field appearance="fill" class="full-width" floatLabel="always">
-                <mat-label>Name<span class="req">*</span></mat-label>
+                <mat-label>Name</mat-label>
                 <input matInput type="text" placeholder="Enter Name..."
                     [(ngModel)]="name" (keypress)="omit_special_char($event)" required />
                 <mat-error *ngIf="errFlag && !name">This field is required</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="fill" class="full-width" floatLabel="always">
-                <mat-label>Type<span class="req">*</span></mat-label>
+                <mat-label>Type</mat-label>
                 <mat-select [(ngModel)]="type" (selectionChange)="changeType()"
                     placeholder="Select Type" required>
                     <mat-option *ngFor="let option of options" [value]="option.value">
