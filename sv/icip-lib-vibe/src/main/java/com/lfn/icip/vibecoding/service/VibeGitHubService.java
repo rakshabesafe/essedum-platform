@@ -72,9 +72,10 @@ public class VibeGitHubService {
      * @param repoUrl   optional override repo URL (null → use default from config)
      */
     @Async
-    public void pushSessionToGitHub(String sessionId, String org, String user, String repoUrl) {
+    public void pushSessionToGitHub(String sessionId, String org, String user, String repoUrl,
+                                      List<String> excludeDirs, List<String> allowedFiles, String pushDir, String branch) {
         String effectiveRepoUrl = (repoUrl != null && !repoUrl.isBlank()) ? repoUrl : props.getRepoUrl();
-        String branchName = props.getBranchPrefix() + sessionId;
+        String branchName = (branch != null && !branch.isBlank()) ? branch : props.getBranchPrefix() + sessionId;
 
         // Upsert config record
         VibeGitHubConfig config = repo.findBySessionIdAndOrg(sessionId, org)
@@ -92,7 +93,7 @@ public class VibeGitHubService {
         config = repo.save(config);
 
         try {
-            String commitSha = doPush(sessionId, effectiveRepoUrl, branchName);
+            String commitSha = doPush(sessionId, effectiveRepoUrl, branchName, excludeDirs, allowedFiles, pushDir);
             config.setCommitSha(commitSha);
             config.setStatus(PushStatus.SUCCESS);
             logger.info("Successfully pushed session {} to branch {} (commit {})", sessionId, branchName, commitSha);
@@ -127,7 +128,8 @@ public class VibeGitHubService {
      * Fetch the list of app names generated in a Goose session, then export each
      * app's content and write it into the given target directory.
      */
-    private void fetchSessionFiles(String sessionId, Path targetDir) throws IOException {
+    private void fetchSessionFiles(String sessionId, Path targetDir,
+                                     List<String> excludeDirs, List<String> allowedFiles, String pushDir) throws IOException {
         // 1. list_apps for this session
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("session_id", sessionId);
@@ -144,21 +146,52 @@ public class VibeGitHubService {
         }
         logger.info("Session {} has {} app(s): {}", sessionId, appNames.size(), appNames);
 
-        // Filter out session ID entries — only push actual folder/app files
+        // Filter out session ID entries and excluded directories
+        List<String> effectiveExcludes = excludeDirs != null ? excludeDirs : List.of();
         List<String> filteredApps = appNames.stream()
                 .filter(name -> !name.equals(sessionId)
                         && !name.startsWith(sessionId + "/")
                         && !name.startsWith(sessionId + "\\"))
+                .filter(name -> {
+                    // Exclude directories in the exclude list
+                    for (String excl : effectiveExcludes) {
+                        if (name.equals(excl) || name.startsWith(excl + "/") || name.startsWith(excl + "\\")) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .filter(name -> {
+                    // If pushDir is specified, only include files under that directory
+                    if (pushDir != null && !pushDir.isBlank()) {
+                        return name.startsWith(pushDir + "/") || name.startsWith(pushDir + "\\") || name.equals(pushDir);
+                    }
+                    return true;
+                })
+                .filter(name -> {
+                    // If allowedFiles list is specified, only include those files
+                    if (allowedFiles != null && !allowedFiles.isEmpty()) {
+                        return allowedFiles.contains(name);
+                    }
+                    return true;
+                })
                 .toList();
 
         if (filteredApps.isEmpty()) {
-            logger.warn("All apps matched session ID '{}'. Falling back to all apps.", sessionId);
-            filteredApps = appNames;
+            logger.warn("All apps filtered out for session '{}'. excludeDirs={}, pushDir={}, allowedFiles count={}. Falling back to all non-session apps.",
+                    sessionId, effectiveExcludes, pushDir, allowedFiles != null ? allowedFiles.size() : 0);
+            filteredApps = appNames.stream()
+                    .filter(name -> !name.equals(sessionId))
+                    .toList();
         } else {
-            logger.info("Filtered apps for push (excluded session ID entries): {}", filteredApps);
+            logger.info("Filtered apps for push: {} (excluded: session={}, dirs={}, pushDir={})",
+                    filteredApps, sessionId, effectiveExcludes, pushDir);
         }
 
         // 2. export each app and write to target directory
+        // Strip pushDir prefix so files are at repo root (e.g. "my-app/src/App.js" → "src/App.js")
+        String prefixToStrip = (pushDir != null && !pushDir.isBlank()) ? pushDir + "/" : null;
+
         for (String appName : filteredApps) {
             ResponseEntity<String> exportResp = vibeCodingService.get("/agent/export_app/" + appName, null);
             if (exportResp == null || !exportResp.getStatusCode().is2xxSuccessful() || exportResp.getBody() == null) {
@@ -166,10 +199,17 @@ public class VibeGitHubService {
                 continue;
             }
 
-            Path appFile = targetDir.resolve(appName);
+            // Strip the push_dir prefix so code lands at repo root
+            String relativePath = appName;
+            if (prefixToStrip != null && relativePath.startsWith(prefixToStrip)) {
+                relativePath = relativePath.substring(prefixToStrip.length());
+            }
+            if (relativePath.isBlank()) continue;
+
+            Path appFile = targetDir.resolve(relativePath);
             Files.createDirectories(appFile.getParent());
             Files.writeString(appFile, exportResp.getBody(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-            logger.info("Wrote app '{}' to {}", appName, appFile);
+            logger.info("Wrote '{}' → {}", appName, appFile);
         }
     }
 
@@ -211,7 +251,8 @@ public class VibeGitHubService {
     // Git operations
     // =========================================================================
 
-    private String doPush(String sessionId, String repoUrl, String branchName)
+    private String doPush(String sessionId, String repoUrl, String branchName,
+                           List<String> excludeDirs, List<String> allowedFiles, String pushDir)
             throws IOException, GitAPIException, URISyntaxException {
 
         // Use a unique temp directory per session to avoid cross-contamination
@@ -256,7 +297,7 @@ public class VibeGitHubService {
 
             if (freshRepo) {
                 // Empty repo — fetch session files directly to repo root, stage, commit, rename branch
-                fetchSessionFiles(sessionId, localRepoPath);
+                fetchSessionFiles(sessionId, localRepoPath, excludeDirs, allowedFiles, pushDir);
 
                 git.add().addFilepattern(".").call();
                 git.commit()
@@ -293,7 +334,7 @@ public class VibeGitHubService {
                 git.add().setUpdate(true).addFilepattern(".").call();
 
                 // Fetch and write session files directly to repo root
-                fetchSessionFiles(sessionId, localRepoPath);
+                fetchSessionFiles(sessionId, localRepoPath, excludeDirs, allowedFiles, pushDir);
                 git.add().addFilepattern(".").call();
             }
 

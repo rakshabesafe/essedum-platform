@@ -68,17 +68,31 @@ public class VibeGitHubController {
         }
 
         String repoUrl = (String) request.get("repoUrl");
+        String pushDir = (String) request.get("push_dir");
+        String branch = (String) request.get("branch");
         String user = getCurrentUser();
 
-        logger.info("Push to GitHub request: session={}, org={}, user={}", sessionId, org, user);
+        @SuppressWarnings("unchecked")
+        List<String> excludeDirs = request.get("exclude_dirs") instanceof List
+                ? (List<String>) request.get("exclude_dirs") : null;
 
-        vibeGitHubService.pushSessionToGitHub(sessionId, org, user, repoUrl);
+        @SuppressWarnings("unchecked")
+        List<String> allowedFiles = request.get("files") instanceof List
+                ? (List<String>) request.get("files") : null;
+
+        String effectiveBranch = (branch != null && !branch.isBlank()) ? branch
+                : vibeGitHubProperties.getBranchPrefix() + sessionId;
+
+        logger.info("Push to GitHub request: session={}, org={}, user={}, branch={}, pushDir={}, excludeDirs={}, files={}",
+                sessionId, org, user, effectiveBranch, pushDir, excludeDirs, allowedFiles != null ? allowedFiles.size() : 0);
+
+        vibeGitHubService.pushSessionToGitHub(sessionId, org, user, repoUrl, excludeDirs, allowedFiles, pushDir, effectiveBranch);
 
         return ResponseEntity.accepted()
                 .body(Map.of(
                         "message", "Push to GitHub initiated",
                         "sessionId", sessionId,
-                        "branchName", vibeGitHubProperties.getBranchPrefix() + sessionId,
+                        "branchName", effectiveBranch,
                         "status", "IN_PROGRESS"
                 ));
     }

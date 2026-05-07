@@ -129,9 +129,9 @@
 
       <!-- Deployment success with result -->
       <div *ngIf="deploymentStatus === 'success' && deploymentResult" class="deployment-result">
-        <ng-container *ngIf="isDeploymentUrl(deploymentResult); else resultText">
+        <ng-container *ngIf="deploymentSafeUrl; else resultText">
           <iframe
-            [src]="sanitizeDeploymentUrl(deploymentResult)"
+            [src]="deploymentSafeUrl"
             class="preview-iframe"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
             title="Deployment Preview"
