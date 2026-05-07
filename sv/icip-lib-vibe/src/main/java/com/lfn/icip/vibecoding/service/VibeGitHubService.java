@@ -200,116 +200,122 @@ public class VibeGitHubService {
     private String doPush(String sessionId, String repoUrl, String branchName)
             throws IOException, GitAPIException, URISyntaxException {
 
-        Path localRepoPath = Paths.get(props.getWorkDir(), sessionId);
+        // Use a unique temp directory per session to avoid cross-contamination
+        Path localRepoPath = Paths.get(props.getWorkDir(), "tmp-vibe-" + sessionId + "-" + System.currentTimeMillis());
         File localRepoDir = localRepoPath.toFile();
         UsernamePasswordCredentialsProvider creds =
                 new UsernamePasswordCredentialsProvider(props.getUsername(), props.getToken());
 
-        Git git;
+        Git git = null;
 
-        // Clone or init
-        if (localRepoDir.exists()) {
-            deleteDirectory(localRepoPath);
-        }
-        Files.createDirectories(localRepoPath);
-
-        // Try clone; if repo is empty, init fresh
-        boolean freshRepo = false;
         try {
-            git = Git.cloneRepository()
-                    .setURI(repoUrl)
-                    .setDirectory(localRepoDir)
-                    .setCredentialsProvider(creds)
-                    .setCloneAllBranches(false)
-                    .call();
-        } catch (Exception cloneEx) {
-            logger.warn("Clone failed (repo may be empty), initialising fresh: {}", cloneEx.getMessage());
-            git = Git.init().setDirectory(localRepoDir).call();
-            StoredConfig cfg = git.getRepository().getConfig();
-            cfg.setBoolean("http", null, "sslVerify", false);
-            cfg.save();
-            git.remoteAdd().setName("origin").setUri(new URIish(repoUrl)).call();
-            freshRepo = true;
-        }
+            // Clone or init
+            if (localRepoDir.exists()) {
+                deleteDirectory(localRepoPath);
+            }
+            Files.createDirectories(localRepoPath);
 
-        String commitMsg = props.getCommitMessageTemplate().replace("{sessionId}", sessionId);
+            // Try clone; if repo is empty, init fresh
+            boolean freshRepo = false;
+            try {
+                git = Git.cloneRepository()
+                        .setURI(repoUrl)
+                        .setDirectory(localRepoDir)
+                        .setCredentialsProvider(creds)
+                        .setCloneAllBranches(false)
+                        .call();
+            } catch (Exception cloneEx) {
+                logger.warn("Clone failed (repo may be empty), initialising fresh: {}", cloneEx.getMessage());
+                if (localRepoDir.exists()) {
+                    deleteDirectory(localRepoPath);
+                }
+                Files.createDirectories(localRepoPath);
+                git = Git.init().setDirectory(localRepoDir).call();
+                StoredConfig cfg = git.getRepository().getConfig();
+                cfg.setBoolean("http", null, "sslVerify", false);
+                cfg.save();
+                git.remoteAdd().setName("origin").setUri(new URIish(repoUrl)).call();
+                freshRepo = true;
+            }
 
-        if (freshRepo) {
-            // Empty repo — fetch session files first, stage, commit, then rename branch
-            Path sessionDir = localRepoPath.resolve(sessionId);
-            Files.createDirectories(sessionDir);
-            fetchSessionFiles(sessionId, sessionDir);
+            String commitMsg = props.getCommitMessageTemplate().replace("{sessionId}", sessionId);
 
-            git.add().addFilepattern(sessionId + "/").call();
-            git.commit()
-                    .setMessage("Initial commit")
-                    .setAuthor(props.getUsername(), props.getUsername() + "@vibe")
-                    .call();
-            git.branchRename().setNewName(branchName).call();
-            logger.info("Fresh repo: created and renamed default branch to '{}'", branchName);
-        } else {
-            // Existing repo — create & checkout new branch
-            git.checkout()
-                    .setCreateBranch(true)
-                    .setName(branchName)
-                    .call();
-            logger.info("Existing repo: created and checked out new branch '{}'", branchName);
+            if (freshRepo) {
+                // Empty repo — fetch session files, stage, commit, rename branch
+                Path sessionDir = localRepoPath.resolve(sessionId);
+                Files.createDirectories(sessionDir);
+                fetchSessionFiles(sessionId, sessionDir);
 
-            // Remove all existing content (pipeline folders etc.) from the working tree & index
-            File[] existingFiles = localRepoDir.listFiles();
-            if (existingFiles != null) {
-                for (File f : existingFiles) {
-                    if (f.getName().equals(".git")) continue;
-                    if (f.isDirectory()) {
-                        deleteDirectory(f.toPath());
-                    } else {
-                        Files.deleteIfExists(f.toPath());
+                git.add().addFilepattern(sessionId + "/").call();
+                git.commit()
+                        .setMessage("Initial commit")
+                        .setAuthor(props.getUsername(), props.getUsername() + "@vibe")
+                        .call();
+                git.branchRename().setNewName(branchName).call();
+                logger.info("Fresh repo: created and renamed default branch to '{}'", branchName);
+            } else {
+                // Existing repo — detect default branch (main/master) and create new branch from it
+                String remoteDefaultBranch = detectRemoteDefaultBranch(git, creds);
+                logger.info("Detected remote default branch: '{}'. Creating new branch '{}' from 'origin/{}'",
+                        remoteDefaultBranch, branchName, remoteDefaultBranch);
+
+                git.checkout()
+                        .setCreateBranch(true)
+                        .setName(branchName)
+                        .setStartPoint("origin/" + remoteDefaultBranch)
+                        .call();
+
+                // Remove all existing content (pipeline folders etc.) from working tree
+                File[] existingFiles = localRepoDir.listFiles();
+                if (existingFiles != null) {
+                    for (File f : existingFiles) {
+                        if (f.getName().equals(".git")) continue;
+                        if (f.isDirectory()) {
+                            deleteDirectory(f.toPath());
+                        } else {
+                            Files.deleteIfExists(f.toPath());
+                        }
                     }
                 }
+                // Stage removals
+                git.add().setUpdate(true).addFilepattern(".").call();
+
+                // Fetch and write ONLY this session's files
+                Path sessionDir = localRepoPath.resolve(sessionId);
+                Files.createDirectories(sessionDir);
+                fetchSessionFiles(sessionId, sessionDir);
+                git.add().addFilepattern(sessionId + "/").call();
             }
-            git.add().addFilepattern(".").call();
-            // Stage removals
-            git.add().setUpdate(true).addFilepattern(".").call();
 
-            // Fetch and write ONLY this session's files
-            Path sessionDir = localRepoPath.resolve(sessionId);
-            Files.createDirectories(sessionDir);
-            fetchSessionFiles(sessionId, sessionDir);
-            git.add().addFilepattern(sessionId + "/").call();
+            // Commit session code
+            RevCommit commit = git.commit()
+                    .setMessage(commitMsg)
+                    .setAuthor(props.getUsername(), props.getUsername() + "@vibe")
+                    .call();
+
+            logger.info("Branch '{}' committed: {}", branchName, commit.getName());
+
+            // Push the new branch
+            git.push()
+                    .setCredentialsProvider(creds)
+                    .setRemote("origin")
+                    .add(branchName)
+                    .call();
+
+            return commit.getName();
+
+        } finally {
+            // Always close git and cleanup temp directory
+            if (git != null) {
+                git.close();
+            }
+            try {
+                deleteDirectory(localRepoPath);
+                logger.info("Cleaned up temp directory: {}", localRepoPath);
+            } catch (IOException e) {
+                logger.warn("Could not clean up local repo dir: {}", localRepoDir);
+            }
         }
-
-        // Verify branch exists
-        boolean branchExists = git.branchList().call().stream()
-                .anyMatch(ref -> ref.getName().endsWith("/" + branchName) || ref.getName().equals(branchName));
-        if (branchExists) {
-            logger.info("Branch '{}' successfully created in local repo", branchName);
-        } else {
-            logger.error("Branch '{}' was NOT found in local repo after creation attempt", branchName);
-        }
-
-        // Commit session code
-        RevCommit commit = git.commit()
-                .setMessage(commitMsg)
-                .setAuthor(props.getUsername(), props.getUsername() + "@vibe")
-                .call();
-
-        // Push the new branch
-        git.push()
-                .setCredentialsProvider(creds)
-                .setRemote("origin")
-                .add(branchName)
-                .call();
-
-        git.close();
-
-        // Cleanup local clone
-        try {
-            deleteDirectory(localRepoPath);
-        } catch (IOException ignored) {
-            logger.warn("Could not clean up local repo dir: {}", localRepoDir);
-        }
-
-        return commit.getName();
     }
 
     private void deleteDirectory(Path dir) throws IOException {
@@ -320,6 +326,25 @@ public class VibeGitHubService {
                         try { Files.delete(p); } catch (IOException ignored) {}
                     });
         }
+    }
+
+    /**
+     * Detects the default branch on the remote (main vs master).
+     * Falls back to "main" if neither can be detected.
+     */
+    private String detectRemoteDefaultBranch(Git git, UsernamePasswordCredentialsProvider creds) {
+        try {
+            var refs = git.lsRemote()
+                    .setCredentialsProvider(creds)
+                    .setHeads(true).call();
+            boolean hasMain = refs.stream().anyMatch(ref -> ref.getName().equals("refs/heads/main"));
+            boolean hasMaster = refs.stream().anyMatch(ref -> ref.getName().equals("refs/heads/master"));
+            if (hasMain) return "main";
+            if (hasMaster) return "master";
+        } catch (Exception e) {
+            logger.warn("Could not detect remote default branch: {}", e.getMessage());
+        }
+        return "main";
     }
 
     private void copyDirectory(Path source, Path target) throws IOException {

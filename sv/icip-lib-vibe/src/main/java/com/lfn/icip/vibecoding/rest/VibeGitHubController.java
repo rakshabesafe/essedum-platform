@@ -53,7 +53,7 @@ public class VibeGitHubController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> pushToGitHub(
-            @PathVariable String sessionId,
+            @PathVariable(value = "sessionId") String sessionId,
             @RequestBody Map<String, Object> request) {
 
         if (!vibeGitHubProperties.isEnabled()) {
@@ -89,8 +89,8 @@ public class VibeGitHubController {
     @GetMapping(value = "/sessions/{sessionId}/github-status",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getGitHubStatus(
-            @PathVariable String sessionId,
-            @RequestParam String org) {
+            @PathVariable(value = "sessionId") String sessionId,
+            @RequestParam(value = "org") String org) {
 
         Optional<VibeGitHubConfig> config = vibeGitHubService.getStatus(sessionId, org);
         if (config.isEmpty()) {

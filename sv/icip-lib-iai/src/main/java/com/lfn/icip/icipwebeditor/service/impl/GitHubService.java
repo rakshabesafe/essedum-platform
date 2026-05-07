@@ -675,73 +675,187 @@ public class GitHubService {
 
 	/**
 	 * Save file content to GitHub on a pipeline-specific branch.
+	 * Uses an isolated temp directory so only the pipeline's files are pushed.
 	 */
 	public void saveFileToGitHubBranch(byte[] content, String pipelineName, String org,
 			String filename, String branchName)
 			throws IOException, GitAPIException {
-		Git git = getGitHubRepositoryForBranch(org, branchName);
-
-		String url = resolveRepoUrl(org);
-		String repoName = extractRepoNameFromUrl(url);
-
-		log.info("[GitHubService] Preparing to push file to GitHub => Repo URL: {}, Repo Name: {}, Branch: {}, Pipeline: {}, File: {}",
-				url, repoName, branchName, pipelineName, filename);
-
-		File targetDir = new File(gitPath + repoName + "/" + pipelineName);
-		if (!targetDir.exists()) {
-			Files.createDirectories(targetDir.toPath());
-		}
-
-		File targetFile = new File(targetDir, filename);
-		try (OutputStream os = new FileOutputStream(targetFile)) {
-			os.write(content);
-		}
-
-		git.add().addFilepattern(pipelineName + "/" + filename).call();
-		git.commit().setMessage("Update " + pipelineName + "/" + filename).call();
-		push(git, "Update " + pipelineName + "/" + filename);
-
-		log.info("[GitHubService] Successfully pushed file to GitHub => Repo: {}, Branch: {}, Path: {}/{}",
-				repoName, branchName, pipelineName, filename);
+		saveFilesToGitHubBranch(
+				java.util.Map.of(filename, content),
+				pipelineName, org, branchName);
 	}
 
 	/**
 	 * Save multiple files to GitHub on a specific branch in a single commit+push.
-	 * Each entry in the map is filePath -> fileContent (bytes).
+	 * Uses a fresh temp clone directory so only the given files end up on the branch.
 	 */
 	public void saveFilesToGitHubBranch(java.util.Map<String, byte[]> files, String pipelineName, String org,
 			String branchName) throws IOException, GitAPIException {
-		Git git = getGitHubRepositoryForBranch(org, branchName);
 
 		String url = resolveRepoUrl(org);
-		String repoName = extractRepoNameFromUrl(url);
-
-		log.info("[GitHubService] Batch push {} files to GitHub => Repo: {}, Branch: {}, Pipeline: {}",
-				files.size(), repoName, branchName, pipelineName);
-
-		for (java.util.Map.Entry<String, byte[]> entry : files.entrySet()) {
-			String filename = entry.getKey();
-			byte[] content = entry.getValue();
-
-			File targetDir = new File(gitPath + repoName + "/" + pipelineName);
-			// Ensure parent directories exist for nested paths
-			File targetFile = new File(targetDir, filename);
-			if (!targetFile.getParentFile().exists()) {
-				Files.createDirectories(targetFile.getParentFile().toPath());
-			}
-
-			try (OutputStream os = new FileOutputStream(targetFile)) {
-				os.write(content);
-			}
-
-			git.add().addFilepattern(pipelineName + "/" + filename).call();
+		if (url == null || url.isEmpty()) {
+			throw new IOException("GitHub repo URL is not configured for org: " + org);
 		}
+		String repoName = extractRepoNameFromUrl(url);
+		UsernamePasswordCredentialsProvider creds =
+				new UsernamePasswordCredentialsProvider(username, password);
 
-		git.commit().setMessage("Update " + files.size() + " files for " + pipelineName).call();
-		push(git, "Update " + files.size() + " files for " + pipelineName);
+		// Use a unique temp directory per pipeline/branch to avoid cross-contamination
+		Path tempDir = Paths.get(gitPath, "tmp-" + pipelineName + "-" + System.currentTimeMillis());
+		File tempDirFile = tempDir.toFile();
 
-		log.info("[GitHubService] Successfully pushed {} files to GitHub => Repo: {}, Branch: {}, Pipeline: {}",
-				files.size(), repoName, branchName, pipelineName);
+		log.info("[GitHubService] Batch push {} files to GitHub using isolated temp dir => Repo: {}, Branch: {}, Pipeline: {}, TempDir: {}",
+				files.size(), repoName, branchName, pipelineName, tempDir);
+
+		Git git = null;
+		try {
+			// 1. Clone the repo into temp directory (shallow, default branch only)
+			boolean freshRepo = false;
+			try {
+				git = Git.cloneRepository()
+						.setURI(url)
+						.setDirectory(tempDirFile)
+						.setCredentialsProvider(creds)
+						.setCloneAllBranches(false)
+						.call();
+				// Disable SSL verification
+				StoredConfig cfg = git.getRepository().getConfig();
+				cfg.setBoolean("http", null, "sslVerify", false);
+				cfg.save();
+			} catch (Exception cloneEx) {
+				log.warn("Clone failed (repo may be empty), initialising fresh: {}", cloneEx.getMessage());
+				if (tempDirFile.exists()) {
+					deleteDirectoryRecursive(tempDir);
+				}
+				Files.createDirectories(tempDir);
+				git = Git.init().setDirectory(tempDirFile).call();
+				StoredConfig cfg = git.getRepository().getConfig();
+				cfg.setBoolean("http", null, "sslVerify", false);
+				cfg.save();
+				try {
+					git.remoteAdd().setName("origin").setUri(new org.eclipse.jgit.transport.URIish(url)).call();
+				} catch (java.net.URISyntaxException e) {
+					throw new IOException("Invalid repo URL: " + url, e);
+				}
+				freshRepo = true;
+			}
+
+			// 2. Detect the remote default branch (main or master)
+			String remoteDefaultBranch = detectRemoteDefaultBranch(git);
+			log.info("Detected remote default branch: '{}' for repo: {}", remoteDefaultBranch, repoName);
+
+			// 3. Check if remote branch already exists
+			boolean remoteBranchExists = false;
+			try {
+				remoteBranchExists = git.lsRemote()
+						.setCredentialsProvider(creds)
+						.setHeads(true).call().stream()
+						.anyMatch(ref -> ref.getName().equals("refs/heads/" + branchName));
+			} catch (Exception e) {
+				log.warn("Could not list remote branches: {}", e.getMessage());
+			}
+
+			if (remoteBranchExists) {
+				// Checkout existing remote branch
+				git.fetch().setCredentialsProvider(creds).setRemote("origin").call();
+				git.checkout().setCreateBranch(true).setName(branchName)
+						.setStartPoint("origin/" + branchName).call();
+				log.info("Checked out existing remote branch '{}'", branchName);
+			} else if (freshRepo) {
+				// Empty repo — need an initial commit before we can branch
+				File readmeFile = new File(tempDirFile, "README.md");
+				Files.writeString(readmeFile.toPath(), "# Pipeline Scripts\n");
+				git.add().addFilepattern("README.md").call();
+				git.commit().setMessage("Initial commit").call();
+				// Push initial commit to default branch
+				try {
+					git.push().setCredentialsProvider(creds).setRemote("origin").setForce(true).call();
+				} catch (Exception e) {
+					log.warn("Could not push initial commit: {}", e.getMessage());
+				}
+				git.checkout().setCreateBranch(true).setName(branchName).call();
+				log.info("Fresh repo: created branch '{}' after initial commit", branchName);
+			} else {
+				// Create new branch explicitly from the remote default branch (main/master)
+				git.checkout()
+						.setCreateBranch(true)
+						.setName(branchName)
+						.setStartPoint("origin/" + remoteDefaultBranch)
+						.call();
+				log.info("Created new branch '{}' from 'origin/{}'", branchName, remoteDefaultBranch);
+
+				// Remove all existing content so only this pipeline's files are on the branch
+				File[] existing = tempDirFile.listFiles();
+				if (existing != null) {
+					for (File f : existing) {
+						if (f.getName().equals(".git")) continue;
+						if (f.isDirectory()) {
+							deleteDirectoryRecursive(f.toPath());
+						} else {
+							Files.deleteIfExists(f.toPath());
+						}
+					}
+				}
+				// Stage removals
+				git.add().setUpdate(true).addFilepattern(".").call();
+			}
+
+			// 3. Write only this pipeline/session's files
+			for (java.util.Map.Entry<String, byte[]> entry : files.entrySet()) {
+				String filename = entry.getKey();
+				byte[] content = entry.getValue();
+
+				File targetFile = new File(tempDirFile, pipelineName + "/" + filename);
+				if (!targetFile.getParentFile().exists()) {
+					Files.createDirectories(targetFile.getParentFile().toPath());
+				}
+				try (OutputStream os = new FileOutputStream(targetFile)) {
+					os.write(content);
+				}
+			}
+
+			// 4. Stage only the pipeline folder
+			git.add().addFilepattern(pipelineName + "/").call();
+
+			// 5. Commit
+			git.commit().setMessage("Update " + files.size() + " files for " + pipelineName).call();
+
+			// 6. Push
+			PushCommand pushCommand = git.push();
+			pushCommand.setCredentialsProvider(creds);
+			pushCommand.setRemote("origin");
+			pushCommand.add(branchName);
+			pushCommand.setForce(true);
+			pushCommand.call();
+
+			log.info("[GitHubService] Successfully pushed {} files to GitHub => Repo: {}, Branch: {}, Pipeline: {}",
+					files.size(), repoName, branchName, pipelineName);
+
+		} finally {
+			// 7. Close git and cleanup temp directory
+			if (git != null) {
+				git.close();
+			}
+			try {
+				deleteDirectoryRecursive(tempDir);
+				log.info("Cleaned up temp directory: {}", tempDir);
+			} catch (IOException e) {
+				log.warn("Could not clean up temp directory {}: {}", tempDir, e.getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Recursively delete a directory.
+	 */
+	private void deleteDirectoryRecursive(Path dir) throws IOException {
+		if (!Files.exists(dir)) return;
+		try (java.util.stream.Stream<Path> walk = Files.walk(dir)) {
+			walk.sorted(java.util.Comparator.reverseOrder())
+					.forEach(p -> {
+						try { Files.delete(p); } catch (IOException ignored) {}
+					});
+		}
 	}
 
 	/**
