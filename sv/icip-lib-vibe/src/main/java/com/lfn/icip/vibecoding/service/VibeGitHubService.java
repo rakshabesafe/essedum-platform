@@ -232,16 +232,15 @@ public class VibeGitHubService {
             freshRepo = true;
         }
 
-        // Fetch generated code from Goose API and write to local repo
-        fetchSessionFiles(sessionId, localRepoPath);
-
-        // Stage all files
-        git.add().addFilepattern(".").call();
-
         String commitMsg = props.getCommitMessageTemplate().replace("{sessionId}", sessionId);
 
         if (freshRepo) {
-            // Empty repo has no HEAD — commit first on default branch, then rename to session branch
+            // Empty repo — fetch session files first, stage, commit, then rename branch
+            Path sessionDir = localRepoPath.resolve(sessionId);
+            Files.createDirectories(sessionDir);
+            fetchSessionFiles(sessionId, sessionDir);
+
+            git.add().addFilepattern(sessionId + "/").call();
             git.commit()
                     .setMessage("Initial commit")
                     .setAuthor(props.getUsername(), props.getUsername() + "@vibe")
@@ -249,12 +248,34 @@ public class VibeGitHubService {
             git.branchRename().setNewName(branchName).call();
             logger.info("Fresh repo: created and renamed default branch to '{}'", branchName);
         } else {
-            // Existing repo — create & checkout new branch, then commit
+            // Existing repo — create & checkout new branch
             git.checkout()
                     .setCreateBranch(true)
                     .setName(branchName)
                     .call();
             logger.info("Existing repo: created and checked out new branch '{}'", branchName);
+
+            // Remove all existing content (pipeline folders etc.) from the working tree & index
+            File[] existingFiles = localRepoDir.listFiles();
+            if (existingFiles != null) {
+                for (File f : existingFiles) {
+                    if (f.getName().equals(".git")) continue;
+                    if (f.isDirectory()) {
+                        deleteDirectory(f.toPath());
+                    } else {
+                        Files.deleteIfExists(f.toPath());
+                    }
+                }
+            }
+            git.add().addFilepattern(".").call();
+            // Stage removals
+            git.add().setUpdate(true).addFilepattern(".").call();
+
+            // Fetch and write ONLY this session's files
+            Path sessionDir = localRepoPath.resolve(sessionId);
+            Files.createDirectories(sessionDir);
+            fetchSessionFiles(sessionId, sessionDir);
+            git.add().addFilepattern(sessionId + "/").call();
         }
 
         // Verify branch exists

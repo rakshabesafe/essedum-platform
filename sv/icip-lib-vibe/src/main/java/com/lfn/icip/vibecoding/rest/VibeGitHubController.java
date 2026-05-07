@@ -105,7 +105,7 @@ public class VibeGitHubController {
     @GetMapping(value = "/github-configs",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<VibeGitHubConfig>> listGitHubConfigs(
-            @RequestParam String org) {
+            @RequestParam(value = "org") String org) {
         return ResponseEntity.ok(vibeGitHubService.listByOrg(org));
     }
 
