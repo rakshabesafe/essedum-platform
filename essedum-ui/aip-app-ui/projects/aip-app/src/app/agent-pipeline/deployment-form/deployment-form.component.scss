@@ -216,17 +216,25 @@
 
 // Sub-tabs with animation
 :host ::ng-deep .deployment-tabs {
+  .mat-mdc-tab-label-container { flex-grow: 0 !important; }
   .mat-mdc-tab-header {
     background: transparent !important;
     border-bottom: 1px solid rgba(88,166,255,0.1) !important;
     margin-bottom: 8px;
   }
-  .mat-mdc-tab-labels { gap: 0; }
+  .mat-mdc-tab-labels { gap: 8px; justify-content: flex-start !important; }
   .mdc-tab {
     min-width: auto !important;
     height: 38px !important;
     padding: 0 16px !important;
-    transition: all 0.3s ease !important;
+    flex: none !important;
+    border-radius: 8px 8px 0 0 !important;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1) !important;
+    &:hover {
+      background: rgba(88,166,255,0.08) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(88,166,255,0.12) !important;
+    }
     .mdc-tab__text-label {
       color: #6e7681 !important;
       font-size: 11px !important;

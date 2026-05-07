@@ -82,14 +82,21 @@ mat-icon.aip-led-icons {
 
 // ── Tabs ──────────────────────────────────────────────────────────
 :host ::ng-deep .mat-mdc-tab-group { width: 100%; height: auto !important; min-height: 0 !important; margin-top: 0 !important; }
+:host ::ng-deep .mat-mdc-tab-label-container { flex-grow: 0 !important; }
 :host ::ng-deep .mat-mdc-tab-header {
   background: rgba(5,10,26,0.55) !important;
   border-bottom: 1px solid rgba(68,128,245,0.1) !important;
   padding: 0 6px !important;
 }
-:host ::ng-deep .mat-mdc-tab-labels { gap: 3px !important; padding: 6px 4px 0 !important; }
+:host ::ng-deep .mat-mdc-tab-labels { gap: 8px !important; padding: 6px 4px 0 !important; justify-content: flex-start !important; }
 :host ::ng-deep .mat-mdc-tab {
-  min-width: 110px !important; height: 40px !important; padding: 0 16px !important;
+  min-width: 110px !important; height: 40px !important; padding: 0 16px !important; flex: none !important;
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1) !important;
+  &:hover {
+    background: rgba(68,128,245,0.12) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(68,128,245,0.15) !important;
+  }
   border-radius: 9px 9px 0 0 !important; transition: all 0.16s !important; opacity: 1 !important;
 }
 :host ::ng-deep .mat-mdc-tab .mdc-tab__text-label { color: #47637e !important; font-size: 12.5px !important; font-weight: 600 !important; transition: color 0.16s !important; }

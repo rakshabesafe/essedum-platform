@@ -24,8 +24,11 @@
 
 // ── Tab group ─────────────────────────────────────────────────────
 :host ::ng-deep mat-tab-group#schema-modal-tabs {
+  .mat-mdc-tab-label-container { flex-grow: 0 !important; }
   .mat-mdc-tab-header { background: rgba(68,128,245,0.04) !important; border-bottom: 1px solid rgba(68,128,245,0.12) !important; }
-  .mat-mdc-tab { color: #8b949e !important; font-size: 13px !important; font-weight: 600 !important; min-width: 100px !important; opacity: 1 !important; }
+  .mat-mdc-tab-labels { justify-content: flex-start !important; gap: 8px !important; }
+  .mat-mdc-tab { color: #8b949e !important; font-size: 13px !important; font-weight: 600 !important; min-width: 100px !important; opacity: 1 !important; flex: none !important; border-radius: 8px 8px 0 0 !important; transition: all 0.25s cubic-bezier(0.4,0,0.2,1) !important; }
+  .mat-mdc-tab:hover { background: rgba(88,166,255,0.1) !important; transform: translateY(-1px) !important; box-shadow: 0 4px 12px rgba(88,166,255,0.12) !important; color: #c9d1d9 !important; }
   .mat-mdc-tab:hover { color: #c9d1d9 !important; }
   .mat-mdc-tab.mdc-tab--active { color: #58a6ff !important; font-weight: 700 !important; }
   .mdc-tab-indicator__content--underline { border-color: #58a6ff !important; border-width: 2.5px !important; box-shadow: 0 0 8px rgba(88,166,255,0.5) !important; }

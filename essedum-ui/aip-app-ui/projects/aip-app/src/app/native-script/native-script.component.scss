@@ -290,16 +290,29 @@
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 :host ::ng-deep .mat-mdc-tab-group {
   .mat-mdc-tab-header { border-bottom: 1px solid rgba(88,166,255,0.1) !important; background: transparent !important; }
-  .mat-mdc-tab-labels { gap: 2px !important; justify-content: flex-start !important; }
+  .mat-mdc-tab-labels { gap: 8px !important; justify-content: flex-start !important; padding: 0 4px !important; }
   .mat-mdc-tab-label-container { flex-grow: 0 !important; }
-  .mat-mdc-tab { min-width: auto !important; max-width: fit-content !important; padding: 0 16px !important; height: 36px !important; flex: none !important; border-radius: 6px 6px 0 0 !important; background: transparent !important; opacity: 0.6 !important; transition: opacity 0.2s, background 0.2s !important;
-    .mdc-tab__text-label { color: #8b949e !important; font-weight: 500 !important; font-size: 12px !important; text-transform: none !important; white-space: nowrap !important; }
-    &:hover { opacity: 0.85 !important; background: rgba(88,166,255,0.04) !important; }
+  .mat-mdc-tab {
+    min-width: auto !important; max-width: fit-content !important; padding: 0 18px !important; height: 38px !important; flex: none !important;
+    border-radius: 8px 8px 0 0 !important; background: transparent !important; opacity: 0.65 !important;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1) !important;
+    position: relative !important;
+    .mdc-tab__text-label { color: #8b949e !important; font-weight: 500 !important; font-size: 12.5px !important; text-transform: none !important; white-space: nowrap !important; transition: all 0.25s !important; }
+    &:hover {
+      opacity: 1 !important;
+      background: rgba(88,166,255,0.08) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(88,166,255,0.12) !important;
+      .mdc-tab__text-label { color: #c9d1d9 !important; }
+    }
   }
-  .mdc-tab--active { opacity: 1 !important; background: rgba(88,166,255,0.06) !important;
+  .mdc-tab--active {
+    opacity: 1 !important; background: rgba(88,166,255,0.1) !important;
+    box-shadow: 0 2px 8px rgba(88,166,255,0.15), inset 0 -2px 0 #58a6ff !important;
     .mdc-tab__text-label { color: #58a6ff !important; font-weight: 700 !important; }
+    &:hover { background: rgba(88,166,255,0.14) !important; box-shadow: 0 4px 16px rgba(88,166,255,0.2), inset 0 -2px 0 #58a6ff !important; }
   }
-  .mdc-tab-indicator__content--underline { border-color: #58a6ff !important; border-width: 2px !important; border-radius: 2px 2px 0 0 !important; }
+  .mdc-tab-indicator__content--underline { border-color: #58a6ff !important; border-width: 2.5px !important; border-radius: 2px 2px 0 0 !important; }
   .mat-mdc-tab-body-wrapper { background: transparent !important; }
 }
 
