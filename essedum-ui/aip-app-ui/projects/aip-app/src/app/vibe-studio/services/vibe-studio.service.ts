@@ -832,23 +832,31 @@ export class VibeStudioService implements OnDestroy {
     const url = `${this.baseUrl}/service/v1/vibe-coding/sessions/${sessionId}/push-to-github`;
     const project = JSON.parse(sessionStorage.getItem('project') || '{}');
 
-    // Derive the top-level app directory from generated files (e.g. "my-react-app")
+    // Derive the top-level app directory from generated files (e.g. "my-react-app").
+    // A valid appDir must contain at least one nested file (i.e. some file path starts with "dir/").
+    // Root-level files like "package.json" are NOT directories.
     const allFiles = this.files$.value;
-    const appDir = allFiles.length
-      ? allFiles[0].path.split('/')[0]
-      : sessionId;
+    const dirCandidates = allFiles
+      .map(f => f.path.split('/'))
+      .filter(parts => parts.length > 1)   // only files inside a folder
+      .map(parts => parts[0]);
+    const appDir = dirCandidates.length ? dirCandidates[0] : null;
 
-    // Only include files that belong to the app folder — exclude session / vibesession files
-    const appFiles = allFiles.filter(f => f.path.startsWith(appDir + '/'));
+    // Only include files that belong to the app folder — exclude session / vibesession / root files
+    const appFiles = appDir
+      ? allFiles.filter(f => f.path.startsWith(appDir + '/'))
+      : allFiles;
     const filePaths = appFiles.map(f => f.path);
 
-    // Branch name: studio/<sessionId> — avoid duplicating sessionId when appDir already equals it
-    const branchSuffix = appDir === sessionId ? sessionId : `${appDir}-${sessionId}`;
+    // Branch name: studio/<sessionId> — append appDir only when it's a real folder name
+    const branchSuffix = appDir && appDir !== sessionId
+      ? `${appDir}-${sessionId}`
+      : sessionId;
 
     const body: any = {
       org: project?.name || 'leo1311',
       branch: `studio/${branchSuffix}`,
-      push_dir: appDir,
+      push_dir: appDir ?? sessionId,
       exclude_dirs: ['vibesession'],
       files: filePaths,
     };
