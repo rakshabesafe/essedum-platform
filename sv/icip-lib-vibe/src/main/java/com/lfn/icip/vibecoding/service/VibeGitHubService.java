@@ -144,8 +144,22 @@ public class VibeGitHubService {
         }
         logger.info("Session {} has {} app(s): {}", sessionId, appNames.size(), appNames);
 
+        // Filter out session ID entries — only push actual folder/app files
+        List<String> filteredApps = appNames.stream()
+                .filter(name -> !name.equals(sessionId)
+                        && !name.startsWith(sessionId + "/")
+                        && !name.startsWith(sessionId + "\\"))
+                .toList();
+
+        if (filteredApps.isEmpty()) {
+            logger.warn("All apps matched session ID '{}'. Falling back to all apps.", sessionId);
+            filteredApps = appNames;
+        } else {
+            logger.info("Filtered apps for push (excluded session ID entries): {}", filteredApps);
+        }
+
         // 2. export each app and write to target directory
-        for (String appName : appNames) {
+        for (String appName : filteredApps) {
             ResponseEntity<String> exportResp = vibeCodingService.get("/agent/export_app/" + appName, null);
             if (exportResp == null || !exportResp.getStatusCode().is2xxSuccessful() || exportResp.getBody() == null) {
                 logger.warn("Could not export app '{}', skipping", appName);

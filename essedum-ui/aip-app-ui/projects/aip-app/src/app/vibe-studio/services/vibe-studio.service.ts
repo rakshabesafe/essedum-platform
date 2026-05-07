@@ -826,16 +826,21 @@ export class VibeStudioService implements OnDestroy {
     const project = JSON.parse(sessionStorage.getItem('project') || '{}');
 
     // Derive the top-level app directory from generated files (e.g. "my-react-app")
-    const files = this.files$.value;
-    const appDir = files.length
-      ? files[0].path.split('/')[0]
+    const allFiles = this.files$.value;
+    const appDir = allFiles.length
+      ? allFiles[0].path.split('/')[0]
       : sessionId;
+
+    // Only include files that belong to the app folder — exclude session / vibesession files
+    const appFiles = allFiles.filter(f => f.path.startsWith(appDir + '/'));
+    const filePaths = appFiles.map(f => f.path);
 
     const body: any = {
       org: project?.name || 'leo1311',
       branch: `studio/${appDir}-${sessionId}`,
       push_dir: appDir,
       exclude_dirs: ['vibesession'],
+      files: filePaths,
     };
     this.http.post<any>(url, body, { headers: this.getHttpHeaders() as any })
       .subscribe({
