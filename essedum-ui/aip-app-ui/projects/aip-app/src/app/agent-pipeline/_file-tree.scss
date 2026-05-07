@@ -33,7 +33,7 @@
   justify-content: space-between;
   padding: 10px 14px;
   background: rgba($dark-accent, 0.04);
-  border-bottom: 1px solid $dark-border;
+  border-bottom: none !important;
   min-height: 40px;
 
   .explorer-title, span, h4 {
@@ -159,7 +159,7 @@
 
   .explorer-header {
     background: #f0f2f5;
-    border-bottom-color: $light-border;
+    border-bottom: none !important;
     .explorer-title, span, h4 { color: $light-text-muted; }
     .explorer-actions button {
       color: $light-text-muted;

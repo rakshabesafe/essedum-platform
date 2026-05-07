@@ -24,7 +24,7 @@
   justify-content: space-between;
   padding: 6px 12px;
   background: $editor-gutter;
-  border-bottom: 1px solid $editor-border;
+  border-bottom: none !important;
   min-height: 38px;
   gap: 8px;
 
@@ -201,7 +201,7 @@
 
   .editor-controls-bar {
     background: #f6f8fa;
-    border-bottom-color: $light-border;
+    border-bottom: none !important;
     .file-name, .editor-file-name { color: $light-text-primary; }
     .editor-actions button {
       border-color: $light-border;

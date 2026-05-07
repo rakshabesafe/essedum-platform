@@ -1,7 +1,7 @@
 :host { display: block !important; width: 100% !important; height: 100%; min-width: 0; box-sizing: border-box; }
 
 .vibe-studio-container { display: flex; flex-direction: column; height: 100%; min-height: calc(100vh - 60px); padding: 16px 20px 0; box-sizing: border-box; }
-.vibe-header { display: flex; align-items: center; justify-content: space-between; height: 48px; flex-shrink: 0; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(79,142,247,0.12); }
+.vibe-header { display: flex; align-items: center; justify-content: space-between; height: 48px; flex-shrink: 0; margin-bottom: 16px; padding-bottom: 12px; border-bottom: none !important; }
 .vibe-header .header-left { display: flex; align-items: center; gap: 10px; }
 .vibe-header .header-left i { font-size: 22px; color: #4f8ef7; }
 .vibe-header .header-left h1 { margin: 0; font-size: 20px; font-weight: 700; color: #e2e8f0; }
@@ -26,7 +26,7 @@
 
 // ── Dark theme overrides ──────────────────────────────────────────────────────
 :host-context(body.header-dark-theme) {
-  .vibe-header { border-bottom-color: rgba(79,142,247,0.12); }
+  .vibe-header { border-bottom: none !important; }
   .vibe-header .header-left h1 { color: #e2e8f0; }
   .vibe-header .header-left i { color: #4f8ef7; }
   .new-session-btn { color: #4f8ef7; background: rgba(79,142,247,0.1); border-color: rgba(79,142,247,0.3); }
@@ -44,7 +44,7 @@
 // ── Light theme overrides ─────────────────────────────────────────────────────
 :host-context(body.header-light-theme) {
   .vibe-header {
-    border-bottom-color: rgba(99,102,241,0.12);
+    border-bottom: none !important;
     .header-left h1 { color: #0f172a; }
     .header-left i { color: #4f46e5; }
   }
