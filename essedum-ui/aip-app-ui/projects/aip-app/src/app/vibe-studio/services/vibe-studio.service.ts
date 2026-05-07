@@ -595,7 +595,19 @@ export class VibeStudioService implements OnDestroy {
   private extractFilePathsFromListApps(resp: any): string[] {
     const pathsToFetch: string[] = [];
 
+    const isSessionApp = (app: any): boolean => {
+      // MCP session apps have uri like "ui://apps/..." or mimeType "text/html;profile=mcp-app"
+      // or carry inline text content with no files — these are NOT source-code apps.
+      if (typeof app.uri === 'string' && app.uri.startsWith('ui://')) return true;
+      if (typeof app.mimeType === 'string' && app.mimeType.includes('mcp-app')) return true;
+      if (typeof app.text === 'string' && !app.files) return true;
+      return false;
+    };
+
     const processApp = (app: any): void => {
+      // Skip MCP / session apps — they should not be fetched or pushed
+      if (isSessionApp(app)) return;
+
       // Derive the app's root directory name from name or path
       let appDir = '';
       if (typeof app.name === 'string' && app.name.trim()) {
