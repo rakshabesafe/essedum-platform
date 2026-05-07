@@ -67,6 +67,12 @@ public class VibeGitHubController {
                     .body(Map.of("error", "Field 'org' is required."));
         }
 
+        // Validate sessionId — reject if it looks like a filename (contains '.')
+        if (sessionId.contains(".")) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Invalid sessionId: '" + sessionId + "'. Session ID should not contain file extensions."));
+        }
+
         String repoUrl = (String) request.get("repoUrl");
         String pushDir = (String) request.get("push_dir");
         String branch = (String) request.get("branch");

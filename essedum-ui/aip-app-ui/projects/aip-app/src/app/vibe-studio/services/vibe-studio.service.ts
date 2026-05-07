@@ -25,6 +25,8 @@ export class VibeStudioService implements OnDestroy {
   /** AbortController for the active fetch-based SSE stream. */
   private replyAbortController: AbortController | null = null;
   private streamingAssistantIndex: number | null = null;
+  /** Guards against duplicate push-to-github calls within a single generation round. */
+  private pushInFlight = false;
 
   readonly sseEvents$         = new Subject<any>();
   readonly status$            = new BehaviorSubject<VibeSessionStatus>('idle');
@@ -79,6 +81,7 @@ export class VibeStudioService implements OnDestroy {
     this.status$.next('generating');
 
     this.cancelReply(); // abort any in-flight reply stream first
+    this.pushInFlight = false; // allow push for this new generation round
 
     this.ensureAgentStarted().then((sessionId) => {
       this.openReplyStream(sessionId, prompt + ' - send all code files generated here');
@@ -822,6 +825,10 @@ export class VibeStudioService implements OnDestroy {
    * Pushes only the studio app folder (excludes vibesession) on a studio/* branch.
    */
   private triggerPushToGitHub(sessionId: string): void {
+    // Guard: only one push per generation round
+    if (this.pushInFlight) return;
+    this.pushInFlight = true;
+
     const url = `${this.baseUrl}/service/v1/vibe-coding/sessions/${sessionId}/push-to-github`;
     const project = JSON.parse(sessionStorage.getItem('project') || '{}');
 
@@ -835,9 +842,12 @@ export class VibeStudioService implements OnDestroy {
     const appFiles = allFiles.filter(f => f.path.startsWith(appDir + '/'));
     const filePaths = appFiles.map(f => f.path);
 
+    // Branch name: studio/<sessionId> — avoid duplicating sessionId when appDir already equals it
+    const branchSuffix = appDir === sessionId ? sessionId : `${appDir}-${sessionId}`;
+
     const body: any = {
       org: project?.name || 'leo1311',
-      branch: `studio/${appDir}-${sessionId}`,
+      branch: `studio/${branchSuffix}`,
       push_dir: appDir,
       exclude_dirs: ['vibesession'],
       files: filePaths,
