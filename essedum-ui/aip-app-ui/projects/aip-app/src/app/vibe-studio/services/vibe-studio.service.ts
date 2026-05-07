@@ -533,10 +533,12 @@ export class VibeStudioService implements OnDestroy {
 
     // Call list_apps after every reply to get all generated files.
     if (this.session.id) {
-      this.listAppsAndFetchFiles(this.session.id, () => {
+      const sid = this.session.id;
+      this.listAppsAndFetchFiles(sid, () => {
         // Emit the complete file list before transitioning to idle
         if (this.files$.value.length) {
           this.generationComplete$.next([...this.files$.value]);
+          this.triggerPushToGitHub(sid);
         }
         if (this.status$.value !== 'live') {
           this.status$.next('idle');
@@ -571,7 +573,6 @@ export class VibeStudioService implements OnDestroy {
       })
       .subscribe({
         next: (resp) => {
-          this.triggerPushToGitHub(sessionId);
           const pathsToFetch = this.extractFilePathsFromListApps(resp);
           if (pathsToFetch.length > 0) {
             this.fetchFilesFromServer(sessionId, pathsToFetch, done);

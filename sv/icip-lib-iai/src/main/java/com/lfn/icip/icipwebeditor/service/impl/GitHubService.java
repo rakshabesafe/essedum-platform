@@ -702,6 +702,45 @@ public class GitHubService {
 	}
 
 	/**
+	 * Save multiple files to GitHub on a specific branch in a single commit+push.
+	 * Each entry in the map is filePath -> fileContent (bytes).
+	 */
+	public void saveFilesToGitHubBranch(java.util.Map<String, byte[]> files, String pipelineName, String org,
+			String branchName) throws IOException, GitAPIException {
+		Git git = getGitHubRepositoryForBranch(org, branchName);
+
+		String url = resolveRepoUrl(org);
+		String repoName = extractRepoNameFromUrl(url);
+
+		log.info("[GitHubService] Batch push {} files to GitHub => Repo: {}, Branch: {}, Pipeline: {}",
+				files.size(), repoName, branchName, pipelineName);
+
+		for (java.util.Map.Entry<String, byte[]> entry : files.entrySet()) {
+			String filename = entry.getKey();
+			byte[] content = entry.getValue();
+
+			File targetDir = new File(gitPath + repoName + "/" + pipelineName);
+			// Ensure parent directories exist for nested paths
+			File targetFile = new File(targetDir, filename);
+			if (!targetFile.getParentFile().exists()) {
+				Files.createDirectories(targetFile.getParentFile().toPath());
+			}
+
+			try (OutputStream os = new FileOutputStream(targetFile)) {
+				os.write(content);
+			}
+
+			git.add().addFilepattern(pipelineName + "/" + filename).call();
+		}
+
+		git.commit().setMessage("Update " + files.size() + " files for " + pipelineName).call();
+		push(git, "Update " + files.size() + " files for " + pipelineName);
+
+		log.info("[GitHubService] Successfully pushed {} files to GitHub => Repo: {}, Branch: {}, Pipeline: {}",
+				files.size(), repoName, branchName, pipelineName);
+	}
+
+	/**
 	 * Fetch file content from a pipeline-specific branch.
 	 */
 	public byte[] fetchFileFromGitHubBranch(String pipelineName, String org,
