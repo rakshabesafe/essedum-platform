@@ -819,11 +819,24 @@ export class VibeStudioService implements OnDestroy {
   /**
    * Calls POST /sessions/{sessionId}/push-to-github after list-apps succeeds.
    * Fire-and-forget — does not block the file-fetching flow.
+   * Pushes only the studio app folder (excludes vibesession) on a studio/* branch.
    */
   private triggerPushToGitHub(sessionId: string): void {
     const url = `${this.baseUrl}/service/v1/vibe-coding/sessions/${sessionId}/push-to-github`;
     const project = JSON.parse(sessionStorage.getItem('project') || '{}');
-    const body: any = { org: project?.name || 'leo1311' };
+
+    // Derive the top-level app directory from generated files (e.g. "my-react-app")
+    const files = this.files$.value;
+    const appDir = files.length
+      ? files[0].path.split('/')[0]
+      : sessionId;
+
+    const body: any = {
+      org: project?.name || 'leo1311',
+      branch: `studio/${appDir}-${sessionId}`,
+      push_dir: appDir,
+      exclude_dirs: ['vibesession'],
+    };
     this.http.post<any>(url, body, { headers: this.getHttpHeaders() as any })
       .subscribe({
         next: () => {},

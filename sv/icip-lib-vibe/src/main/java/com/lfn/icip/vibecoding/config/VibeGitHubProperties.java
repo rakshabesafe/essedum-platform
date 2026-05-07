@@ -33,6 +33,6 @@ public class VibeGitHubProperties {
     private String commitMessageTemplate = "Vibe session {sessionId} — auto-generated code";
 
     /** Branch name prefix. Final branch = prefix + sessionId */
-    private String branchPrefix = "vibe-session/";
+    private String branchPrefix = "studio/";
 }
 

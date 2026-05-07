@@ -241,12 +241,10 @@ public class VibeGitHubService {
             String commitMsg = props.getCommitMessageTemplate().replace("{sessionId}", sessionId);
 
             if (freshRepo) {
-                // Empty repo — fetch session files, stage, commit, rename branch
-                Path sessionDir = localRepoPath.resolve(sessionId);
-                Files.createDirectories(sessionDir);
-                fetchSessionFiles(sessionId, sessionDir);
+                // Empty repo — fetch session files directly to repo root, stage, commit, rename branch
+                fetchSessionFiles(sessionId, localRepoPath);
 
-                git.add().addFilepattern(sessionId + "/").call();
+                git.add().addFilepattern(".").call();
                 git.commit()
                         .setMessage("Initial commit")
                         .setAuthor(props.getUsername(), props.getUsername() + "@vibe")
@@ -280,11 +278,9 @@ public class VibeGitHubService {
                 // Stage removals
                 git.add().setUpdate(true).addFilepattern(".").call();
 
-                // Fetch and write ONLY this session's files
-                Path sessionDir = localRepoPath.resolve(sessionId);
-                Files.createDirectories(sessionDir);
-                fetchSessionFiles(sessionId, sessionDir);
-                git.add().addFilepattern(sessionId + "/").call();
+                // Fetch and write session files directly to repo root
+                fetchSessionFiles(sessionId, localRepoPath);
+                git.add().addFilepattern(".").call();
             }
 
             // Commit session code
