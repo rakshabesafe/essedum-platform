@@ -182,13 +182,17 @@ public class GitHubService {
 			String remoteBranch = detectRemoteDefaultBranch(git);
 			log.info("Detected remote default branch: {}", remoteBranch);
 
-			PullResult response = git.pull()
-					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
-					.setRemote("origin").setRemoteBranchName(remoteBranch).call();
+			try {
+				PullResult response = git.pull()
+						.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+						.setRemote("origin").setRemoteBranchName(remoteBranch).call();
 
-			git.lsRemote().setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
-					.setHeads(true).call();
-			git.checkout().setName(remoteBranch).call();
+				git.lsRemote().setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+						.setHeads(true).call();
+				git.checkout().setName(remoteBranch).call();
+			} catch (Exception e) {
+				log.warn("Could not pull/checkout remote branch '{}'. Remote repo may be empty. Will create initial commit later. Error: {}", remoteBranch, e.getMessage());
+			}
 
 		} else {
 
