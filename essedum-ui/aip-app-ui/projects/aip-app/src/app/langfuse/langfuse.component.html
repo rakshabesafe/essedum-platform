@@ -1,17 +1,17 @@
-<div class="aip-container lfx-u-pad-lr-30" id="mainCtr">
-  <!-- Embedded Langfuse Screen - Always Visible -->
-  <mat-card class="langfuse-embed-card">
-    <div class="iframe-container">
-      <iframe 
-        #langfuseIframeRef
-        id="langfuseIframe"
-        [src]="currentIframeUrl" 
-        width="100%" 
-        height="100%"
-        frameborder="0"
-        loading="lazy"
-        allow="fullscreen; microphone; camera">
-      </iframe>
+<div class="embed-fullscreen">
+  <iframe
+    *ngIf="isUrlConfigured"
+    #langfuseIframeRef
+    id="langfuseIframe"
+    [src]="currentIframeUrl"
+    frameborder="0"
+    allow="fullscreen; microphone; camera">
+  </iframe>
+  <div *ngIf="!isUrlConfigured" class="not-configured">
+    <div class="not-configured-icon">
+      <i class="bi bi-bar-chart-line-fill"></i>
     </div>
-  </mat-card>
+    <h3>Langfuse Not Configured</h3>
+    <p>The Langfuse observability URL has not been configured for this environment. Set <code>langfuseUrl</code> in the environment configuration to enable this integration.</p>
+  </div>
 </div>

@@ -11,6 +11,7 @@ import { environment } from '../../environments/environment';
 export class LangfuseComponent implements OnInit, AfterViewInit {
   // Embedded Langfuse interface URL
   currentIframeUrl: SafeResourceUrl;
+  isUrlConfigured = false;
   private readonly langfuseUrl: string = environment.langfuseUrl;
 
   @ViewChild('langfuseIframeRef') langfuseIframeRef!: ElementRef<HTMLIFrameElement>;
@@ -22,7 +23,10 @@ export class LangfuseComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.currentIframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.langfuseUrl);
+    // Guard against unsubstituted build-time placeholders (e.g. __FE_LANGFUSE_URL__).
+    this.isUrlConfigured = !!(this.langfuseUrl?.startsWith('http'));
+    const url = this.isUrlConfigured ? this.langfuseUrl : 'about:blank';
+    this.currentIframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   ngAfterViewInit(): void {
