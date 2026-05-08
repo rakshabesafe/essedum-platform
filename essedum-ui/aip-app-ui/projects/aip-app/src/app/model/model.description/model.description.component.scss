@@ -56,20 +56,18 @@ mat-icon.aip-led-icons,
 :host ::ng-deep mat-form-field,
 :host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
 :host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
-:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-bottom: 1px solid rgba(88,166,255,0.25) !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; transition: border-color 0.25s ease !important; &::before, &::after { display: none !important; content: none !important; } }
-:host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom-color: rgba(88,166,255,0.5) !important; }
-:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom-color: #58a6ff !important; box-shadow: 0 1px 0 #58a6ff !important; }
+:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
+:host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border: none !important; box-shadow: none !important; }
 :host ::ng-deep .mat-mdc-form-field-infix { min-height: 44px !important; padding: 18px 0 6px !important; border-top: 0 !important; width: 100% !important; }
 :host ::ng-deep .mdc-text-field--filled .mdc-floating-label { top: 7px !important; font-size: 11px !important; }
 :host ::ng-deep .mat-mdc-select-value { font-size: 13px !important; }
 :host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #8b949e !important; font-size: 12px !important; font-weight: 500 !important; }
 :host ::ng-deep .mdc-floating-label--float-above { color: #58a6ff !important; font-size: 11px !important; font-weight: 600 !important; }
 :host ::ng-deep .mat-mdc-input-element { color: #e6edf3 !important; font-size: 14px !important; }
-:host ::ng-deep .mdc-line-ripple,
-:host ::ng-deep .mdc-line-ripple::before,
-:host ::ng-deep .mdc-line-ripple::after { display: none !important; border-bottom: none !important; }
+// .mdc-line-ripple is now styled globally in styles.scss � do not hide it
 :host ::ng-deep .mat-mdc-form-field-subscript-wrapper { min-height: 0 !important; padding: 0 !important; }
-:host ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { opacity: 0.5 !important; border-bottom-color: rgba(88,166,255,0.08) !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { opacity: 0.5 !important; border-bottom: none !important; }
 :host ::ng-deep .mdc-text-field--disabled .mat-mdc-input-element,
 :host ::ng-deep .mdc-text-field--disabled input { color: rgba(100,140,180,0.5) !important; -webkit-text-fill-color: rgba(100,140,180,0.5) !important; }
 :host ::ng-deep .mdc-text-field--disabled .mdc-floating-label { color: rgba(77,104,130,0.5) !important; }
@@ -149,7 +147,7 @@ mat-icon.aip-led-icons,
 // ── Description section divider ───────────────────────────────────
 .description-section {
   padding-bottom: 18px; margin-bottom: 20px;
-  border-bottom: 1px solid rgba(79,142,247,0.09);
+  border-bottom: none !important;
   position: relative;
   &::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 56px; height: 1px; background: linear-gradient(90deg, #4f8ef7, transparent); border-radius: 2px; }
 }
@@ -211,7 +209,7 @@ mat-icon.aip-led-icons,
 
 // ── Tab group (for semantic search results) ───────────────────────
 :host ::ng-deep .mat-mdc-tab-group { height: auto !important; min-height: 0 !important; margin-top: 0 !important; }
-:host ::ng-deep .mat-mdc-tab-header { background: rgba(6,12,32,0.5) !important; border-bottom: 1px solid rgba(79,142,247,0.12) !important; }
+:host ::ng-deep .mat-mdc-tab-header { background: rgba(6,12,32,0.5) !important; border-bottom: none !important; }
 :host ::ng-deep .mat-mdc-tab-labels { padding: 6px 8px 0 !important; gap: 3px !important; }
 :host ::ng-deep .mat-mdc-tab { min-width: 90px !important; height: 38px !important; padding: 0 14px !important; border-radius: 8px 8px 0 0 !important; opacity: 1 !important; transition: all 0.16s !important; }
 :host ::ng-deep .mat-mdc-tab .mdc-tab__text-label { color: #4d6882 !important; font-size: 12px !important; font-weight: 600 !important; transition: color 0.16s !important; }
@@ -282,9 +280,9 @@ button[mat-stroked-button] {
   .lfx-c-avatar { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important; box-shadow: 0 3px 10px rgba(79,70,229,0.3) !important; }
   .aip-line { background: linear-gradient(90deg, rgba(79,70,229,0.24), transparent) !important; }
   .dialog-actions, .form-actions { border-top-color: rgba(79,70,229,0.08) !important; }
-  :host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-bottom: 1px solid #e2e8f0 !important; border-radius: 0 !important; }
-  :host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom-color: rgba(79,70,229,0.5) !important; }
-  :host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom-color: #4f46e5 !important; box-shadow: 0 1px 0 #4f46e5 !important; }
+  :host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-bottom: none !important; border-radius: 0 !important; }
+  :host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
+  :host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom: none !important; box-shadow: none !important; }
   :host ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
   :host ::ng-deep .mdc-floating-label { color: #64748b !important; }
   :host ::ng-deep .mdc-floating-label--float-above { color: #4f46e5 !important; }
@@ -293,7 +291,7 @@ button[mat-stroked-button] {
   :host ::ng-deep .mat-expansion-panel-body { color: #475569 !important; }
   button[mat-raised-button][color="primary"] { background: linear-gradient(135deg, #4f46e5, #7c3aed) !important; }
   button[mat-stroked-button] { color: #64748b !important; border-color: rgba(79,70,229,0.22) !important; &:hover { border-color: rgba(79,70,229,0.48) !important; color: #4f46e5 !important; background: rgba(79,70,229,0.05) !important; } }
-  :host ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { opacity: 0.5 !important; border-bottom-color: rgba(79,70,229,0.08) !important; }
+  :host ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { opacity: 0.5 !important; border-bottom: none !important; }
   :host ::ng-deep .mdc-text-field--disabled .mat-mdc-input-element,
   :host ::ng-deep .mdc-text-field--disabled input { color: #94a3b8 !important; -webkit-text-fill-color: #94a3b8 !important; }
   :host ::ng-deep .mdc-text-field--disabled .mdc-floating-label { color: #94a3b8 !important; }

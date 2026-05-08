@@ -23,7 +23,7 @@
   justify-content: space-between;
   padding: 8px 14px;
   background: $editor-gutter;
-  border-bottom: 1px solid $editor-border;
+  border-bottom: none !important;
   min-height: 36px;
 
   .console-title, span, h4 {
@@ -141,7 +141,7 @@
   }
   .console-header {
     background: #f6f8fa;
-    border-bottom-color: $light-border;
+    border-bottom: none !important;
     .console-title, span, h4 { color: $light-text-muted; }
     &::before { box-shadow: 14px 0 0 #f0883e, 28px 0 0 #3fb950; }
   }

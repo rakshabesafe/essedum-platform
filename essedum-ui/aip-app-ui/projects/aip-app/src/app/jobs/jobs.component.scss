@@ -11,7 +11,7 @@ th {
   color: #8b949e !important;
   text-transform: uppercase !important;
   letter-spacing: 0.5px !important;
-  border-bottom: 1px solid rgba(88,166,255,0.12) !important;
+  border-bottom: none !important;
   background: rgba(88,166,255,0.03) !important;
 }
 td {
@@ -19,7 +19,7 @@ td {
   text-align: left !important;
   font-size: 12px !important;
   color: #c9d1d9 !important;
-  border-bottom: 1px solid rgba(88,166,255,0.06) !important;
+  border-bottom: none !important;
 }
 tr:hover td { background: rgba(88,166,255,0.04) !important; }
 
@@ -127,8 +127,8 @@ mat-icon, .mat-icon {
 
 // ── Light theme ───────────────────────────────────────────────────────────────
 :host-context(body.header-light-theme) {
-  th { color: #64748b !important; border-bottom-color: #e2e8f0 !important; background: rgba(71,66,220,0.03) !important; }
-  td { color: #334155 !important; border-bottom-color: #f1f5f9 !important; }
+  th { color: #64748b !important; border-bottom: none !important; background: rgba(71,66,220,0.03) !important; }
+  td { color: #334155 !important; border-bottom: none !important; }
   tr:hover td { background: rgba(71,66,220,0.03) !important; }
   span[style*="color"], .total-jobs { color: #4742dc !important; }
 

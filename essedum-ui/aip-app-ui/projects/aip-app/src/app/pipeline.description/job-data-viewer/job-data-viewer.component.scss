@@ -5,7 +5,7 @@
   justify-content: flex-end !important;
   align-items: center !important;
   padding: 10px 16px !important;
-  border-bottom: 1px solid rgba(79,142,247,0.1) !important;
+  border-bottom: none !important;
   gap: 8px !important;
 }
 
@@ -32,7 +32,7 @@
   align-items: flex-start;
   gap: 12px;
   padding: 6px 0;
-  border-bottom: 1px solid rgba(88,166,255,0.08);
+  border-bottom: none !important;
 
   h3 {
     font-size: 12px !important;

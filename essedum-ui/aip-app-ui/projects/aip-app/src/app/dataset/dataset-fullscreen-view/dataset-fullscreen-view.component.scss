@@ -35,7 +35,7 @@
   display: flex !important; align-items: center !important; justify-content: space-between !important;
   padding: 14px 22px !important;
   background: rgba(79,142,247,0.06) !important;
-  border-bottom: 1px solid rgba(79,142,247,0.1) !important;
+  border-bottom: none !important;
   animation: slideDown 0.22s ease both !important;
   flex-shrink: 0 !important; gap: 12px !important;
 
@@ -69,7 +69,7 @@
 .fullscreen-toolbar {
   display: flex !important; align-items: center !important; gap: 6px !important;
   padding: 8px 18px !important; background: rgba(79,142,247,0.03) !important;
-  border-bottom: 1px solid rgba(79,142,247,0.08) !important; flex-wrap: wrap !important; flex-shrink: 0 !important;
+  border-bottom: none !important; flex-wrap: wrap !important; flex-shrink: 0 !important;
 }
 .fs-toolbar-btn {
   display: inline-flex !important; align-items: center !important; gap: 5px !important;
@@ -97,14 +97,14 @@
   thead tr th {
     font-size: 10.5px !important; font-weight: 700 !important; color: #4d6882 !important;
     text-transform: uppercase !important; letter-spacing: 0.9px !important;
-    background: rgba(79,142,247,0.07) !important; border-bottom: 1px solid rgba(79,142,247,0.13) !important;
+    background: rgba(79,142,247,0.07) !important; border-bottom: none !important;
     padding: 10px 18px !important; position: sticky; top: 0; z-index: 1; backdrop-filter: blur(8px);
     &:first-child { padding-left: 22px !important; }
     &:last-child  { padding-right: 22px !important; }
   }
 
   tbody tr {
-    border-bottom: 1px solid rgba(79,142,247,0.055) !important; transition: background 0.13s !important;
+    border-bottom: none !important; transition: background 0.13s !important;
     animation: rowIn 0.2s ease both !important;
     &:nth-child(even) { background: rgba(79,142,247,0.016) !important; }
     &:hover { background: rgba(79,142,247,0.07) !important; td { color: #c8d8ea !important; } }
@@ -125,7 +125,7 @@
 // Ticket header area
 .ticket-header {
   display: flex !important; align-items: center !important; gap: 10px !important;
-  padding: 10px 20px !important; border-bottom: 1px solid rgba(79,142,247,0.08) !important;
+  padding: 10px 20px !important; border-bottom: none !important;
   background: rgba(79,142,247,0.025) !important;
   font-size: 13px !important; font-weight: 600 !important; color: #8aaccc !important;
 }

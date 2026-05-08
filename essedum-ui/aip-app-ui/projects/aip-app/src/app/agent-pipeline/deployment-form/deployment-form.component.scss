@@ -1,4 +1,4 @@
-﻿@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 @keyframes slideIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
 @keyframes tabPulse { 0%{opacity:0.7;transform:scale(0.98)} 100%{opacity:1;transform:scale(1)} }
 
@@ -33,11 +33,7 @@
 }
 
 // =============================================================================
-// FORM FIELDS - Only ONE subtle line (via border-bottom on wrapper)
-// =============================================================================
-:host ::ng-deep .mat-mdc-form-field,
-:host ::ng-deep mat-form-field {
-  width: 100% !important;
+// FORM FIELDS - Only ONE subtle line (via border-bottom: none !important;
   margin-bottom: 0 !important;
 }
 
@@ -61,41 +57,30 @@
   width: 100% !important;
 }
 
-// The actual field container - SINGLE clean underline only here
+// The actual field container - no border here, .mdc-line-ripple is the single underline
 :host ::ng-deep .mdc-text-field--filled,
 :host ::ng-deep .mdc-text-field {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
-  border-top: none !important;
-  border-left: none !important;
-  border-right: none !important;
-  border-bottom: 1px solid rgba(88,166,255,0.25) !important;
   border-radius: 0 !important;
   padding: 0 4px !important;
   height: auto !important;
   min-height: auto !important;
   max-height: none !important;
-  transition: border-color 0.25s ease !important;
   box-shadow: none !important;
   overflow: visible !important;
-
-  // Kill any pseudo-element underlines
-  &::before, &::after {
-    display: none !important;
-    content: none !important;
-  }
 }
 
 :host ::ng-deep .mdc-text-field--filled:hover,
 :host ::ng-deep .mdc-text-field:hover {
-  border-bottom-color: rgba(88,166,255,0.5) !important;
+  background: transparent !important;
 }
 
 :host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused,
 :host ::ng-deep .mdc-text-field--focused {
-  border-bottom-color: #58a6ff !important;
-  box-shadow: 0 1px 0 #58a6ff !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 // Label
@@ -193,7 +178,7 @@
 // Disabled
 :host ::ng-deep .mdc-text-field--disabled {
   opacity: 0.5 !important;
-  border-bottom-color: rgba(88,166,255,0.08) !important;
+  border-bottom: none !important;
   .mat-mdc-input-element { -webkit-text-fill-color: #484f58 !important; color: #484f58 !important; }
 }
 
@@ -216,17 +201,25 @@
 
 // Sub-tabs with animation
 :host ::ng-deep .deployment-tabs {
+  .mat-mdc-tab-label-container { flex-grow: 0 !important; }
   .mat-mdc-tab-header {
     background: transparent !important;
-    border-bottom: 1px solid rgba(88,166,255,0.1) !important;
+    border-bottom: none !important;
     margin-bottom: 8px;
   }
-  .mat-mdc-tab-labels { gap: 0; }
+  .mat-mdc-tab-labels { gap: 8px; justify-content: flex-start !important; }
   .mdc-tab {
     min-width: auto !important;
     height: 38px !important;
     padding: 0 16px !important;
-    transition: all 0.3s ease !important;
+    flex: none !important;
+    border-radius: 8px 8px 0 0 !important;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1) !important;
+    &:hover {
+      background: rgba(88,166,255,0.08) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(88,166,255,0.12) !important;
+    }
     .mdc-tab__text-label {
       color: #6e7681 !important;
       font-size: 11px !important;
@@ -286,7 +279,7 @@
   letter-spacing: 1.2px !important;
   margin-bottom: 14px !important;
   padding-bottom: 8px !important;
-  border-bottom: 1px solid rgba(88,166,255,0.08) !important;
+  border-bottom: none !important;
 }
 
 .required-indicator { color: #f85149 !important; }
@@ -401,9 +394,9 @@ button[mat-raised-button]:not([color]):not(.action-button):not(.finish-button) {
   // Fields: lighter underline
   ::ng-deep .mdc-text-field--filled,
   ::ng-deep .mdc-text-field {
-    border-bottom-color: #e2e8f0 !important;
-    &:hover { border-bottom-color: rgba(79,70,229,0.4) !important; }
-    &.mdc-text-field--focused { border-bottom-color: #4f46e5 !important; box-shadow: 0 1px 0 #4f46e5 !important; }
+    border-bottom: none !important;
+    &:hover { border-bottom: none !important; }
+    &.mdc-text-field--focused { border-bottom: none !important; box-shadow: none !important; }
   }
   ::ng-deep .mdc-floating-label { color: #64748b !important; }
   ::ng-deep .mdc-floating-label--float-above { color: #4f46e5 !important; }
@@ -438,14 +431,14 @@ button[mat-raised-button]:not([color]):not(.action-button):not(.finish-button) {
 
   // Tabs with dramatic transition
   ::ng-deep .deployment-tabs {
-    .mat-mdc-tab-header { border-bottom-color: #e2e8f0 !important; }
+    .mat-mdc-tab-header { border-bottom: none !important; }
     .mdc-tab .mdc-tab__text-label { color: #64748b !important; }
     .mdc-tab--active .mdc-tab__text-label { color: #4f46e5 !important; }
     .mdc-tab-indicator__content--underline { border-color: #4f46e5 !important; }
     .mat-mdc-tab-body-content { animation: tabPulse 0.3s ease-out !important; }
   }
 
-  .lfx-u-sub-header-alias { color: #4f46e5 !important; border-bottom-color: #f1f5f9 !important; }
+  .lfx-u-sub-header-alias { color: #4f46e5 !important; border-bottom: none !important; }
 
   ::ng-deep mat-expansion-panel { border-color: #e2e8f0 !important; &:hover { border-color: rgba(79,70,229,0.25) !important; } }
   ::ng-deep mat-panel-title { color: #334155 !important; }

@@ -1,4 +1,4 @@
-﻿// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 //  DATASET VIEW (JSON/TABLE/CODE) — 2026 AI Platform  ✦  Redesign
 // ═══════════════════════════════════════════════════════════════════
 :host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
@@ -24,9 +24,9 @@
 .table {
   width: 100% !important; border-collapse: collapse !important;
 
-  tr:first-child td { font-size: 10px !important; font-weight: 700 !important; color: #47637e !important; text-transform: uppercase !important; letter-spacing: 0.9px !important; background: rgba(68,128,245,0.05) !important; border-bottom: 1px solid rgba(68,128,245,0.11) !important; padding: 10px 15px !important; position: sticky; top: 0; z-index: 1; h5 { margin: 0 !important; font-size: 10px !important; color: inherit !important; font-weight: 700 !important; } }
+  tr:first-child td { font-size: 10px !important; font-weight: 700 !important; color: #47637e !important; text-transform: uppercase !important; letter-spacing: 0.9px !important; background: rgba(68,128,245,0.05) !important; border-bottom: none !important; padding: 10px 15px !important; position: sticky; top: 0; z-index: 1; h5 { margin: 0 !important; font-size: 10px !important; color: inherit !important; font-weight: 700 !important; } }
 
-  tr td { padding: 8px 15px !important; font-size: 12.5px !important; color: #6e9abb !important; border-bottom: 1px solid rgba(68,128,245,0.05) !important; vertical-align: middle !important; transition: color 0.13s !important; animation: rowIn 0.18s ease both !important; &:first-child { padding-left: 18px !important; } &:last-child { padding-right: 18px !important; } }
+  tr td { padding: 8px 15px !important; font-size: 12.5px !important; color: #6e9abb !important; border-bottom: none !important; vertical-align: middle !important; transition: color 0.13s !important; animation: rowIn 0.18s ease both !important; &:first-child { padding-left: 18px !important; } &:last-child { padding-right: 18px !important; } }
 
   tr:hover td { color: #c4d8ec !important; background: rgba(68,128,245,0.04) !important; }
   tr:last-child td { border-bottom: none !important; }

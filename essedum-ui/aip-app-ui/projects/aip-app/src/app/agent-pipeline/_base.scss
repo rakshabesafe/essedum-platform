@@ -53,7 +53,7 @@
   justify-content: space-between;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid $dark-border;
+  border-bottom: none !important;
 
   h2, h3, .header-title {
     color: $dark-text-primary;
@@ -187,7 +187,7 @@
 ::ng-deep {
   .mat-mdc-tab-group {
     .mat-mdc-tab-header {
-      border-bottom: 1px solid $dark-border;
+      border-bottom: none !important;
     }
     .mat-mdc-tab {
       min-width: 100px;
@@ -243,7 +243,7 @@
   }
 
   .section-header, .panel-header {
-    border-bottom-color: $light-border;
+    border-bottom: none !important;
     h2, h3, .header-title { color: $light-text-primary; }
     .header-subtitle { color: $light-text-muted; }
   }
@@ -272,7 +272,7 @@
     }
 
     .mat-mdc-tab-group {
-      .mat-mdc-tab-header { border-bottom-color: $light-border; }
+      .mat-mdc-tab-header { border-bottom: none !important; }
       .mdc-tab-indicator__content--underline { border-color: $light-accent !important; }
       .mdc-tab__text-label { color: $light-text-secondary !important; }
       .mdc-tab--active .mdc-tab__text-label { color: $light-accent !important; }

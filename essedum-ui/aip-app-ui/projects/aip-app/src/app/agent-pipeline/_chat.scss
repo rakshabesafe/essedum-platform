@@ -36,7 +36,7 @@
     align-self: flex-end;
     background: rgba($dark-accent, 0.15);
     color: $dark-text-primary;
-    border-bottom-right-radius: 2px;
+    border-bottom: none !important;
   }
 
   &.assistant {
@@ -44,7 +44,7 @@
     background: $dark-bg-secondary;
     color: $dark-text-secondary;
     border: 1px solid $dark-border;
-    border-bottom-left-radius: 2px;
+    border-bottom: none !important;
   }
 }
 

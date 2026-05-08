@@ -22,7 +22,7 @@
   flex-wrap: wrap !important;
   padding: 12px 18px !important;
   background: rgba(79,142,247,0.04) !important;
-  border-bottom: 1px solid rgba(79,142,247,0.1) !important;
+  border-bottom: none !important;
   border-radius: 16px 16px 0 0 !important;
 }
 
@@ -73,7 +73,7 @@
   thead tr th {
     font-size: 10.5px !important; font-weight: 700 !important; color: #4d6882 !important;
     text-transform: uppercase !important; letter-spacing: 0.9px !important;
-    background: rgba(79,142,247,0.07) !important; border-bottom: 1px solid rgba(79,142,247,0.14) !important;
+    background: rgba(79,142,247,0.07) !important; border-bottom: none !important;
     padding: 11px 16px !important; white-space: nowrap !important;
     position: sticky; top: 0; z-index: 2; backdrop-filter: blur(8px);
     cursor: pointer; user-select: none;
@@ -104,7 +104,7 @@
   }
 
   tbody tr {
-    border-bottom: 1px solid rgba(79,142,247,0.055) !important;
+    border-bottom: none !important;
     transition: background 0.14s ease !important;
     animation: rowIn 0.22s ease both !important;
     &:nth-child(even) { background: rgba(79,142,247,0.018) !important; }
@@ -156,7 +156,7 @@ mat-icon, .mat-icon {
 }
 :host ::ng-deep mat-checkbox.mdc-checkbox .mdc-label { color: #8aaccc !important; font-size: 13px !important; }
 :host ::ng-deep .mat-mdc-form-field-subscript-wrapper { min-height: 0 !important; padding: 0 !important; }
-:host ::ng-deep .mdc-text-field--filled { border-radius: 8px !important; border: 1px solid rgba(79,142,247,0.2) !important; border-bottom: 1px solid rgba(79,142,247,0.2) !important; &::before, &::after { border-bottom: none !important; display: none !important; } }
+:host ::ng-deep .mdc-text-field--filled { border-radius: 8px !important; border: 1px solid rgba(79,142,247,0.2) !important; border-bottom: none !important; &::before, &::after { border-bottom: none !important; display: none !important; } }
 
 // ── Pagination ────────────────────────────────────────────────────
 .pagination-row, .pagination-container {

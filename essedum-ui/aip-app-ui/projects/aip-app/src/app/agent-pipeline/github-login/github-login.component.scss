@@ -1,4 +1,4 @@
-ï»¿@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 
 :host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
@@ -15,8 +15,7 @@
 :host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #3a5570 !important; font-size: 12px !important; }
 :host ::ng-deep .mdc-floating-label--float-above { color: #4480f5 !important; top: 7px !important; font-size: 11px !important; }
 :host ::ng-deep .mat-mdc-input-element { color: #dde8f5 !important; font-size: 13px !important; }
-:host ::ng-deep .mdc-line-ripple, :host ::ng-deep .mdc-line-ripple::before, :host ::ng-deep .mdc-line-ripple::after { display: none !important; }
-
+// .mdc-line-ripple is now styled globally in styles.scss — do not hide it
 .github-login-container {
   width: 100%;
   padding: 24px;
