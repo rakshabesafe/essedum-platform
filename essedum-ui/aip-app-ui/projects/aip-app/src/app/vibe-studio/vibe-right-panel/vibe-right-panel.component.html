@@ -3,9 +3,15 @@
   <!-- ── Empty state ── -->
   <div *ngIf="(status === 'idle' || status === 'error') && !files.length" class="empty-state">
     <div class="empty-content">
-      <i class="bi bi-layout-split"></i>
-      <h3>No Preview</h3>
-      <p>Generated files and app preview will appear here.</p>
+      <div class="empty-icon-wrap">
+        <i class="bi bi-layout-split"></i>
+      </div>
+      <h3>Preview &amp; Codespace</h3>
+      <p>Generated files and your app preview will appear here once you start building.</p>
+      <div class="empty-hints">
+        <div class="empty-hint-chip"><i class="bi bi-file-earmark-code"></i> Code explorer</div>
+        <div class="empty-hint-chip"><i class="bi bi-display"></i> Live preview</div>
+      </div>
     </div>
   </div>
 
@@ -30,12 +36,15 @@
 
       <!-- Sidebar: VS Code explorer -->
       <div class="vsc-sidebar">
-        <div class="explorer-title">CODESPACE</div>
+        <div class="explorer-title">
+          <i class="bi bi-folder2-open"></i>
+          CODESPACE
+        </div>
 
         <!-- Loading spinner before any files -->
         <div *ngIf="status === 'generating' && !files.length" class="tree-loading">
-          <mat-progress-spinner diameter="18" mode="indeterminate"></mat-progress-spinner>
-          <span>Generating</span>
+          <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner>
+          <span>Generating…</span>
         </div>
 
         <!-- File tree -->
@@ -47,12 +56,9 @@
             [style.padding-left]="indentPx(node.depth)"
             (click)="onNodeClick(node)"
           >
-            <!-- Folder toggle arrow (VS Code style rotating triangle) -->
             <span *ngIf="node.isDir" class="vsc-arrow" [class.vsc-arrow-open]="isDirExpanded(node)"></span>
-            <!-- File spacer -->
             <span *ngIf="!node.isDir" class="vsc-arrow vsc-arrow-spacer"></span>
 
-            <!-- Icon -->
             <i *ngIf="node.isDir"
                class="bi tree-icon folder-icon"
                [ngClass]="isDirExpanded(node) ? 'bi-folder2-open' : 'bi-folder2'">
@@ -63,7 +69,6 @@
                [style.color]="getFileIcon(node.fullPath).color">
             </i>
 
-            <!-- Name -->
             <span class="tree-name" [title]="node.fullPath">{{ node.name }}</span>
           </div>
         </div>
@@ -72,7 +77,7 @@
       <!-- Editor: file content with line numbers -->
       <div class="vsc-editor">
 
-        <!-- Breadcrumb / tab header -->
+        <!-- Tab header -->
         <div *ngIf="selectedFile" class="editor-tabs">
           <div class="editor-tab active">
             <i class="bi tree-icon"
@@ -80,13 +85,14 @@
                [style.color]="getFileIcon(selectedFile.path).color">
             </i>
             <span>{{ getFileName(selectedFile.path) }}</span>
+            <span class="tab-close"><i class="bi bi-x"></i></span>
           </div>
         </div>
 
         <!-- Breadcrumb path -->
         <div *ngIf="selectedFile" class="breadcrumb-bar">
           <ng-container *ngFor="let seg of selectedFile.path.split('/'); let last = last; let i = index">
-            <i *ngIf="i === 0" class="bi bi-folder2" style="margin-right:3px;opacity:0.7"></i>
+            <i *ngIf="i === 0" class="bi bi-folder2" style="margin-right:3px;opacity:0.6"></i>
             <span [class.crumb-active]="last">{{ seg }}</span>
             <i *ngIf="!last" class="bi bi-chevron-right crumb-sep"></i>
           </ng-container>
@@ -106,7 +112,9 @@
 
         <!-- No file selected -->
         <div *ngIf="!selectedFile" class="editor-empty">
-          <i class="bi bi-file-earmark-code"></i>
+          <div class="editor-empty-icon">
+            <i class="bi bi-file-earmark-code"></i>
+          </div>
           <p>Select a file from the explorer</p>
         </div>
       </div>
@@ -117,25 +125,46 @@
 
       <!-- Deployment in progress -->
       <div *ngIf="deploymentStatus === 'deploying'" class="preview-empty deployment-ongoing">
-        <mat-progress-spinner diameter="36" mode="indeterminate"></mat-progress-spinner>
-        <p class="deployment-label">Deployment is ongoing...</p>
+        <div class="deploy-spinner-wrap">
+          <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+          <div class="deploy-icon-overlay"><i class="bi bi-rocket-takeoff-fill"></i></div>
+        </div>
+        <p class="deployment-label">Deploying your application…</p>
+        <p class="deployment-sublabel">This may take a moment.</p>
       </div>
 
       <!-- Deployment error -->
       <div *ngIf="deploymentStatus === 'error'" class="preview-empty deployment-error">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        <p>Error occurred during deployment.</p>
+        <div class="error-icon-wrap"><i class="bi bi-exclamation-triangle-fill"></i></div>
+        <p>Deployment failed</p>
+        <p class="error-sublabel">Check logs or try again.</p>
       </div>
 
       <!-- Deployment success with result -->
       <div *ngIf="deploymentStatus === 'success' && deploymentResult" class="deployment-result">
         <ng-container *ngIf="isDeploymentUrl(deploymentResult); else resultText">
-          <iframe
-            [src]="sanitizeDeploymentUrl(deploymentResult)"
-            class="preview-iframe"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            title="Deployment Preview"
-          ></iframe>
+          <div class="browser-chrome">
+            <div class="browser-chrome-bar">
+              <div class="browser-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <div class="browser-url-bar">
+                <i class="bi bi-shield-lock-fill url-lock"></i>
+                <span class="url-text">{{ deploymentResult }}</span>
+              </div>
+              <a [href]="deploymentResult" target="_blank" class="open-external" title="Open in new tab">
+                <i class="bi bi-box-arrow-up-right"></i>
+              </a>
+            </div>
+            <iframe
+              [src]="sanitizeDeploymentUrl(deploymentResult)"
+              class="preview-iframe"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              title="Deployment Preview"
+            ></iframe>
+          </div>
         </ng-container>
         <ng-template #resultText>
           <div class="deployment-result-body">
@@ -146,24 +175,40 @@
 
       <!-- Default empty / no deployment triggered yet -->
       <div *ngIf="deploymentStatus === 'idle' && !previewUrl" class="preview-empty">
-        <div *ngIf="status === 'generating'">
-          <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
-          <p>Generating</p>
+        <div *ngIf="status === 'generating'" class="generating-state">
+          <mat-progress-spinner diameter="36" mode="indeterminate"></mat-progress-spinner>
+          <p>Generating your app…</p>
         </div>
-        <div *ngIf="status !== 'generating'">
-          <i class="bi bi-display"></i>
-          <p>No preview available yet.<br>Switch to <strong>Explorer</strong> to view files.</p>
+        <div *ngIf="status !== 'generating'" class="no-preview-state">
+          <div class="preview-placeholder-icon">
+            <i class="bi bi-display"></i>
+          </div>
+          <p class="no-preview-title">No preview yet</p>
+          <p class="no-preview-sub">Switch to <strong>Codespace</strong> to browse generated files.</p>
         </div>
       </div>
 
       <!-- Legacy iframe preview from previewUrl$ -->
-      <iframe
-        *ngIf="deploymentStatus === 'idle' && previewUrl"
-        [src]="previewUrl"
-        class="preview-iframe"
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-        title="App Preview"
-      ></iframe>
+      <div *ngIf="deploymentStatus === 'idle' && previewUrl" class="browser-chrome">
+        <div class="browser-chrome-bar">
+          <div class="browser-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="browser-url-bar">
+            <i class="bi bi-shield-lock-fill url-lock"></i>
+            <span class="url-text">localhost</span>
+          </div>
+        </div>
+        <iframe
+          [src]="previewUrl"
+          class="preview-iframe"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          title="App Preview"
+        ></iframe>
+      </div>
+
     </div>
 
   </div>
