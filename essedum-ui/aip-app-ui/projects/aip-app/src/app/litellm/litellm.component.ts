@@ -9,6 +9,7 @@ import { environment } from '../../environments/environment';
 export class LitellmComponent implements OnInit, AfterViewInit {
   // Embedded LiteLLM interface URL
   currentIframeUrl: SafeResourceUrl;
+  isUrlConfigured = false;
   private readonly litellmUrl: string = environment.litellmUrl;
 
   @ViewChild('litellmIframeRef') litellmIframeRef!: ElementRef<HTMLIFrameElement>;
@@ -18,7 +19,10 @@ export class LitellmComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.currentIframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.litellmUrl);
+    // Guard against unsubstituted build-time placeholders (e.g. __FE_LITELLM_URL__).
+    this.isUrlConfigured = !!(this.litellmUrl?.startsWith('http'));
+    const url = this.isUrlConfigured ? this.litellmUrl : 'about:blank';
+    this.currentIframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   ngAfterViewInit(): void {
