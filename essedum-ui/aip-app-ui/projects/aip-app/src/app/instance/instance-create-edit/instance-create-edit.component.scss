@@ -88,7 +88,8 @@
 :host ::ng-deep .mat-expansion-panel-body { color: #c8d8ea !important; }
 :host ::ng-deep mat-panel-title { color: #b8cce0 !important; font-size: 13px !important; font-weight: 600 !important; }
 
-// â”€â”€ Main form glass panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Main form glass panel ─────────────────────────────────────────────────────
+// Matches spec create design: glass card, overflow visible, page-level scroll
 .aip-container {
   padding: 3px 26px 24px !important;
   width: 100% !important;
@@ -99,6 +100,17 @@
   box-shadow: 0 20px 60px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.05) inset !important;
   position: relative !important;
   overflow: visible !important;
+}
+// EDIT dialog only — lfx-u-pad-tb-16 is added via [ngClass] when action==='edit'
+.aip-container.lfx-u-pad-tb-16 {
+  max-height: 82vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(79,142,247,0.35) transparent !important;
+  &::-webkit-scrollbar { width: 5px !important; }
+  &::-webkit-scrollbar-track { background: transparent !important; }
+  &::-webkit-scrollbar-thumb { background: rgba(79,142,247,0.35) !important; border-radius: 3px !important; }
 }
 
 // Gradient accent top stripe on .aip-container
@@ -162,12 +174,36 @@ mat-card::before {
   margin-top: 18px !important;
 }
 
-// â”€â”€ Primary button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── save-btn / cancel-btn ─────────────────────────────────────────────────────
+.cancel-btn {
+  background: rgba(255,255,255,0.06) !important;
+  color: #b8cce0 !important;
+  border: 1px solid rgba(79,142,247,0.2) !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 20px !important;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.save-btn {
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 20px !important;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(79,142,247,0.3) !important;
+}
+
+// ── Primary button — matches Agent Directory Update button ────────────────────
 button.action-button[color="primary"],
 button[mat-raised-button][color="primary"],
 button[mat-flat-button][color="primary"],
 .action-button[color="primary"] {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
   color: #ffffff !important;
   border: none !important;
   border-radius: 8px !important;
@@ -233,6 +269,11 @@ button[mat-raised-button]:not([color]):not(.action-button) {
 
 // â”€â”€ Light theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 :host-context(body.header-light-theme) {
+  .aip-container.lfx-u-pad-tb-16 {
+    scrollbar-color: rgba(99,102,241,0.35) transparent !important;
+    &::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.35) !important; }
+  }
+
   ::ng-deep .mat-mdc-form-field {
     --mdc-filled-text-field-active-indicator-color: rgba(99,102,241,0.45);
     --mdc-filled-text-field-hover-active-indicator-color: #4f46e5;
@@ -296,7 +337,8 @@ button[mat-raised-button]:not([color]):not(.action-button) {
     border-color: rgba(99,102,241,0.16) !important;
     box-shadow: 0 8px 40px rgba(99,102,241,0.12), 0 2px 8px rgba(0,0,0,0.06) !important;
     scrollbar-color: rgba(99,102,241,0.35) transparent !important;
-    &::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.35) !important; }
+    &::-webkit-scrollbar { width: 5px !important; }
+    &::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.35) !important; border-radius: 3px !important; }
     &::-webkit-scrollbar-track { background: transparent !important; }
   }
   .aip-container::before {
@@ -318,12 +360,23 @@ button[mat-raised-button]:not([color]):not(.action-button) {
     border-top-color: rgba(99,102,241,0.1) !important;
   }
 
+  .save-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    box-shadow: 0 2px 12px rgba(79,70,229,0.28) !important;
+    &:hover:not([disabled]) { box-shadow: 0 4px 20px rgba(79,70,229,0.45) !important; }
+  }
+  .cancel-btn {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border-color: rgba(99,102,241,0.2) !important;
+    &:hover:not([disabled]) { background: #e2e8f0 !important; }
+  }
   button.action-button[color="primary"],
   button[mat-raised-button][color="primary"],
   button[mat-flat-button][color="primary"] {
-    background: #4f46e5 !important;
-    box-shadow: 0 4px 18px rgba(79,70,229,0.35) !important;
-    &:hover:not([disabled]) { box-shadow: 0 6px 28px rgba(79,70,229,0.5) !important; }
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    box-shadow: 0 2px 12px rgba(79,70,229,0.32) !important;
+    &:hover:not([disabled]) { box-shadow: 0 4px 20px rgba(79,70,229,0.48) !important; }
   }
 
   button[mat-stroked-button], button.cancel-button,

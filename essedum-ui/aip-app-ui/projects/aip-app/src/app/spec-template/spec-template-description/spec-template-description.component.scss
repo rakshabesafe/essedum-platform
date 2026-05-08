@@ -23,7 +23,7 @@
   gap: 20px !important;
   flex-wrap: wrap !important;
   align-items: flex-start !important;
-  padding: 0 !important;
+  padding: 0 24px !important;
   width: 100% !important;
   box-sizing: border-box !important;
 }
@@ -47,6 +47,16 @@ mat-card.lfx-schema-card {
 .col-md-6 { width: 50% !important; flex: 0 0 50% !important; padding: 0 8px !important; }
 .row { display: flex !important; flex-wrap: wrap !important; margin: 0 !important; }
 
+// ── Field display rows — underline per field value (Details tab) ─────────────
+.field-display {
+  padding-bottom: 10px !important;
+  margin-bottom: 16px !important;
+  border-bottom: 1px solid rgba(79,142,247,0.22) !important;
+}
+.field-display .lfx-u-body-sm { margin-bottom: 4px !important; }
+.field-display .lfx-u-body-md,
+.field-display .lfx-u-body-xl { min-height: 28px !important; }
+
 // ── Text hierarchy (dark default) ─────────────────────────────────────────────
 .lfx-u-body-sm {
   font-size: 11px !important;
@@ -69,7 +79,7 @@ mat-card.lfx-schema-card {
 
 // ── Avatar ────────────────────────────────────────────────────────────────────
 .lfx-c-avatar {
-  background: linear-gradient(135deg, #4f8ef7 0%, #6366f1 100%) !important;
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
   color: #fff !important;
   border-radius: 50% !important;
   width: 32px !important;
@@ -166,6 +176,7 @@ mat-card::before {
     background: linear-gradient(90deg, #1565c0 0%, #1976d2 100%) !important;
     color: #ffffff !important;
   }
+  .field-display { border-bottom-color: rgba(99,102,241,0.2) !important; }
 
   mat-card, .mat-mdc-card {
     background: #ffffff !important;

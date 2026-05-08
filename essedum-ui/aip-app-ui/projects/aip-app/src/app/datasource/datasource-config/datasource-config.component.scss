@@ -270,7 +270,7 @@ app-datasource-config .mdc-text-field {
 :host ::ng-deep .mat-mdc-button-base.save-btn {
   --mdc-protected-button-container-color: #4f8ef7 !important;
   --mdc-protected-button-label-text-color: #ffffff !important;
-  background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
   background-color: #4f8ef7 !important;
   color: #ffffff !important;
   border: none !important;
@@ -593,7 +593,7 @@ select.form-control {
   :host ::ng-deep .mat-mdc-button-base.save-btn {
     --mdc-protected-button-container-color: #4f8ef7 !important;
     --mdc-protected-button-label-text-color: #ffffff !important;
-    background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+    background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
     background-color: #4f8ef7 !important;
     color: #ffffff !important;
     border: none !important;

@@ -138,7 +138,7 @@
 
 // Save / Update
 .btn-save {
-  background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
   color: #fff !important; border: none !important; border-radius: 8px !important;
   font-size: 13px !important; font-weight: 600 !important; padding: 7px 22px !important;
   cursor: pointer; box-shadow: 0 2px 12px rgba(79,142,247,0.35) !important;
@@ -215,5 +215,5 @@
   .dialog-title { color: #e2e8f0 !important; }
   .dialog-mode { color: #7eb8ff !important; }
   .btn-cancel { background: rgba(255,255,255,0.06) !important; color: #b8cce0 !important; border-color: rgba(79,142,247,0.2) !important; }
-  .btn-save { background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important; }
+  .btn-save { background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important; }
 }

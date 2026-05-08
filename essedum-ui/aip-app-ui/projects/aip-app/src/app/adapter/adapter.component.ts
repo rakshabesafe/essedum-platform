@@ -483,7 +483,9 @@ export class AdapterComponent implements OnInit {
 
   openedit(content: any): void {
     this.dialog.open(content, {
-      width: '560px',
+      width: '860px',
+      maxWidth: '96vw',
+      maxHeight: '90vh',
       panelClass: 'standard-dialog',
     });
   }

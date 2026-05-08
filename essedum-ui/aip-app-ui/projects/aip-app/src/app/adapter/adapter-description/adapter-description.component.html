@@ -12,7 +12,7 @@
             <mat-tab label="Details" data-tab-id="Implementation-Details">
                 <div class="lfx-u-pad-16">
                     <div>
-                        <div>
+                        <div class="field-display">
                             <div class="lfx-u-body-sm">
                                 Description
                             </div>
@@ -23,17 +23,17 @@
                             </div>
                         </div>
                         <div class="flex mt-4">
-                            <div class="aip-model-type col-md-4">
+                            <div class="field-display aip-model-type col-md-4">
                                 <div class="lfx-u-body-sm ">Connection Name</div>
                                 <div class="lfx-u-body-md mt-3">
                                     {{card?.executiontype}}-{{card?.connectionname}}</div>
                             </div>
-                            <div class="aip-model-type col-md-4">
+                            <div class="field-display aip-model-type col-md-4">
                                 <div class="lfx-u-body-sm ">Spec Name</div>
                                 <div class="lfx-u-body-md mt-3">{{card?.spectemplatedomainname}}
                                 </div>
                             </div>
-                            <div class="aip-model-type col-md-4">
+                            <div class="field-display aip-model-type col-md-4">
                                 <div class="lfx-u-body-sm ">App Organisation</div>
                                 <div class="lfx-u-body-md mt-3">{{card?.organization}}</div>
                             </div>
@@ -43,7 +43,7 @@
                         <hr class="aip-line" />
 
                         <div class="flex">
-                            <div class="aip-createdBy col-md-6">
+                            <div class="field-display aip-createdBy col-md-6">
                                 <div class="lfx-u-body-sm aip-label-color">Created By</div>
                                 <div class="flex mt-2 align-items-center ">
                                     <div class="lfx-c-avatar  lfx-c-avatar--sm" style="margin: 0 2rem 0 0;">
@@ -51,7 +51,7 @@
                                     <div class="lfx-u-body-md">{{card?.createdby}}</div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="field-display col-md-6">
                                 <div class="lfx-u-body-sm aip-label-color">Created On</div>
                                 <div class="lfx-u-body-md  mt-3">{{card?.createdon}}</div>
                             </div>

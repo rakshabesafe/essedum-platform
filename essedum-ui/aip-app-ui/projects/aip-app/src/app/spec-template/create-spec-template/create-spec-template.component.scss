@@ -75,7 +75,8 @@
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #4f8ef7 0%, #7c3aed 55%, #a855f7 100%);
+    background: linear-gradient(90deg, #0094ff 0%, #0a142f 55%, #0a142f 100%);
+ // background: linear-gradient(90deg, #4f8ef7 0%, #7c3aed 55%, #a855f7 100%);
   z-index: 10;
   pointer-events: none;
 }
@@ -109,30 +110,8 @@
   margin-top: 18px !important;
 }
 
-// ── Primary button ────────────────────────────────────────────────────────────
-button.action-button[color="primary"],
-button[mat-raised-button][color="primary"],
-button[mat-flat-button][color="primary"],
-.action-button[color="primary"] {
-  background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
-  color: #ffffff !important;
-  border: none !important;
-  border-radius: 8px !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  padding: 7px 22px !important;
-  box-shadow: 0 2px 12px rgba(79,142,247,0.35) !important;
-  letter-spacing: 0.2px !important;
-  transition: box-shadow 0.15s, transform 0.12s !important;
-
-  &:hover:not([disabled]) {
-    box-shadow: 0 4px 20px rgba(79,142,247,0.5) !important;
-    transform: translateY(-1px) !important;
-  }
-  &[disabled] { opacity: 0.4 !important; box-shadow: none !important; transform: none !important; }
-}
-
-// ── Cancel / ghost button ─────────────────────────────────────────────────────
+// ── save-btn / cancel-btn ─────────────────────────────────────────────────────
+.cancel-btn,
 button[mat-stroked-button],
 button.cancel-button,
 button[mat-raised-button]:not([color]):not(.action-button) {
@@ -142,13 +121,26 @@ button[mat-raised-button]:not([color]):not(.action-button) {
   border-radius: 8px !important;
   font-size: 13px !important;
   font-weight: 600 !important;
-  padding: 7px 20px !important;
-  box-shadow: none !important;
-  transition: background 0.15s, border-color 0.15s !important;
-  &:hover:not([disabled]) {
-    background: rgba(255,255,255,0.1) !important;
-    border-color: rgba(79,142,247,0.4) !important;
-  }
+  padding: 6px 20px !important;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.save-btn,
+button.action-button[color="primary"],
+button[mat-raised-button][color="primary"],
+button[mat-flat-button][color="primary"],
+.action-button[color="primary"] {
+  background: linear-gradient(90deg, #0094ff 0%, #0a142f 55%, #0a142f 100%);
+
+ // background: linear-gradient(135deg, #0094ff 0%, #0a142f 100%)!important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 20px !important;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(79,142,247,0.3) !important;
 }
 
 // ── Light theme ───────────────────────────────────────────────────────────────
@@ -237,20 +229,22 @@ button[mat-raised-button]:not([color]):not(.action-button) {
 
   .dialog-actions, .action-button-container, .form-actions { border-top-color: rgba(99,102,241,0.1) !important; }
 
+  .save-btn,
   button.action-button[color="primary"],
   button[mat-raised-button][color="primary"],
   button[mat-flat-button][color="primary"] {
     background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-    box-shadow: 0 2px 12px rgba(79,70,229,0.3) !important;
-    &:hover:not([disabled]) { box-shadow: 0 4px 20px rgba(79,70,229,0.48) !important; }
+    box-shadow: 0 2px 12px rgba(79,70,229,0.28) !important;
+    &:hover:not([disabled]) { box-shadow: 0 4px 20px rgba(79,70,229,0.45) !important; }
   }
 
+  .cancel-btn,
   button[mat-stroked-button], button.cancel-button,
   button[mat-raised-button]:not([color]):not(.action-button) {
-    background: rgba(99,102,241,0.06) !important;
-    color: #4f46e5 !important;
-    border-color: rgba(99,102,241,0.22) !important;
-    &:hover:not([disabled]) { background: rgba(99,102,241,0.12) !important; border-color: rgba(99,102,241,0.4) !important; }
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border-color: rgba(99,102,241,0.2) !important;
+    &:hover:not([disabled]) { background: #e2e8f0 !important; }
   }
 }
 
@@ -284,7 +278,7 @@ button[mat-raised-button]:not([color]):not(.action-button) {
   button.action-button[color="primary"],
   button[mat-raised-button][color="primary"],
   button[mat-flat-button][color="primary"] {
-    background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+    background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
     box-shadow: 0 2px 12px rgba(79,142,247,0.35) !important;
   }
 

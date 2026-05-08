@@ -1850,6 +1850,24 @@ body.header-light-theme {
 
 app-footer .container-fluid { font-size: var(--footerTextSize) !important; }
 
+// ── Dialog scroll — standard-dialog panelClass ────────────────────────────────
+// max-height MUST be set on the surface — without it the surface grows unboundedly
+// and overflow-y: auto never triggers a scrollbar.
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mat-mdc-dialog-surface,
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mdc-dialog__surface {
+  max-height: 88vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(79,142,247,0.35) transparent !important;
+}
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mat-mdc-dialog-surface::-webkit-scrollbar,
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mdc-dialog__surface::-webkit-scrollbar { width: 5px; }
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mat-mdc-dialog-surface::-webkit-scrollbar-thumb,
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mdc-dialog__surface::-webkit-scrollbar-thumb { background: rgba(79,142,247,0.35); border-radius: 3px; }
+body.header-light-theme .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mat-mdc-dialog-surface::-webkit-scrollbar-thumb,
+body.header-light-theme .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mdc-dialog__surface::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.35); }
+
 // ══════════════════════════════════════════════════════════════════════════════
 // LAYOUT WIDTH FIXES — prevents narrow content columns
 // ══════════════════════════════════════════════════════════════════════════════
