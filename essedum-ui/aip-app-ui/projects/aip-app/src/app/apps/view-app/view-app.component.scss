@@ -194,23 +194,23 @@ hr:not(.aip-line) { display: none !important; }
   .lfx-u-body-md { color: #0f172a !important; }
   .aip-line { border-top-color: rgba(79,70,229,0.1) !important; }
   .lfx-u-header-lg { color: #4A5568 !important; }
-  .icons { color: #4f46e5 !important; &:hover { color: #3730a3 !important; } }
-  .aip-daa { color: #4f46e5 !important; text-decoration: none !important; }
-  .lfx-u-mar-lr-8 mat-icon { color: #4f46e5 !important; }
+  .icons { color: #234f99 !important; &:hover { color: #0a1d61 !important; } }
+  .aip-daa { color: #234f99 !important; text-decoration: none !important; }
+  .lfx-u-mar-lr-8 mat-icon { color: #234f99 !important; }
 
   .view-field {
     border-bottom-color: rgba(99,102,241,0.12);
     &__label { color: #64748b; }
     &__value { color: #0f172a; }
-    &__link-icon { color: #4f46e5; &:hover { color: #3730a3; } }
+    &__link-icon { color: #234f99; &:hover { color: #0a1d61; } }
   }
   .lfx-u-body-md p, .lfx-u-body-md a { text-decoration: none !important; color: #0f172a !important; }
   // Fix tryout title invisible on white background
   .tryout-modal-title { color: #0f172a !important; }
-  .tryout-update-btn { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important; box-shadow: 0 2px 12px rgba(79,70,229,0.3) !important; }
+  .tryout-update-btn { background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important; box-shadow: 0 2px 12px rgba(35,79,153,0.35) !important; }
   :host ::ng-deep .lfx-u-header-xl { color: #0f172a !important; text-decoration: none !important; }
   // Icons group top-right
-  .icons-group button mat-icon { color: #4f46e5 !important; }
+  .icons-group button mat-icon { color: #234f99 !important; }
 
   // Light theme field-row dividers
   .ml-2.row.col-md-12 { border-bottom-color: rgba(99,102,241,0.14) !important; }

@@ -15,6 +15,7 @@ export class LogoutComponent implements OnInit {
 
   display: string = "";
   isDark: boolean = true;
+  essedumTitle: string = 'ESSEDUM';
   hide1: boolean = true;
   hide2: boolean = true;
   hide3: boolean = true;

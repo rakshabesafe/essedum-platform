@@ -1,4 +1,4 @@
-:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+﻿:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
 // ── Form fields — transparent with line-ripple (matches spec create/edit) ────
 :host ::ng-deep mat-form-field,
@@ -292,7 +292,7 @@
 }
 :host ::ng-deep .cipJSONEditor .jsoneditor-menu,
 :host ::ng-deep .jsoneditor-menu {
-  background: linear-gradient(90deg, #4f8ef7 0%, #7c3aed 100%) !important;
+  background: linear-gradient(90deg, #4f8ef7 0%, #0a1d61 100%) !important;
   border-bottom: none !important;
 }
 :host ::ng-deep .jsoneditor-menu button { color: #fff !important; opacity: 0.9; &:hover { opacity: 1; } }
@@ -451,7 +451,7 @@ button[mat-flat-button][color="primary"],
     box-shadow: 0 2px 12px rgba(0,0,0,0.25) !important;
   }
   ::ng-deep .cipJSONEditor .jsoneditor-menu,
-  ::ng-deep .jsoneditor-menu { background: linear-gradient(90deg, #4f8ef7 0%, #7c3aed 100%) !important; border-bottom: none !important; }
+  ::ng-deep .jsoneditor-menu { background: linear-gradient(90deg, #4f8ef7 0%, #0a1d61 100%) !important; border-bottom: none !important; }
   ::ng-deep .jsoneditor-menu button { color: #fff !important; }
   ::ng-deep .cipJSONEditor .jsoneditor-tree,
   ::ng-deep .cipJSONEditor .jsoneditor-text,
@@ -505,27 +505,33 @@ button[mat-flat-button][color="primary"],
     background: rgba(8,14,36,0.96) !important;
     border-color: rgba(79,142,247,0.18) !important;
   }
+
+  .cancel-btn {
+    background: rgba(79,142,247,0.12) !important;
+    color: #7eb8ff !important;
+    border-color: rgba(79,142,247,0.4) !important;
+  }
 }
 
 // ── Light theme ──────────────────────────────────────────────────────────────
 :host-context(body.header-light-theme) {
   .save-btn {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-    box-shadow: 0 2px 12px rgba(79,70,229,0.28) !important;
+    background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+    box-shadow: 0 2px 12px rgba(35,79,153,0.35) !important;
     &:hover:not([disabled]) { box-shadow: 0 4px 20px rgba(79,70,229,0.45) !important; }
   }
   .cancel-btn {
-    background: #f1f5f9 !important;
-    color: #475569 !important;
+    background: rgba(35,79,153,0.06) !important;
+    color: #234f99 !important;
     border-color: rgba(99,102,241,0.2) !important;
-    &:hover:not([disabled]) { background: #e2e8f0 !important; }
+    &:hover:not([disabled]) { background: rgba(99,102,241,0.12) !important; }
   }
   .dialog-actions { background: rgba(255,255,255,0.98) !important; }
 
   ::ng-deep .mat-mdc-form-field {
-    --mdc-filled-text-field-active-indicator-color: rgba(99,102,241,0.45);
-    --mdc-filled-text-field-hover-active-indicator-color: #4f46e5;
-    --mdc-filled-text-field-focus-active-indicator-color: #4f46e5;
+    --mdc-filled-text-field-active-indicator-color: rgba(35,79,153,0.45);
+    --mdc-filled-text-field-hover-active-indicator-color: #234f99;
+    --mdc-filled-text-field-focus-active-indicator-color: #234f99;
     --mdc-filled-text-field-container-color: transparent;
   }
   ::ng-deep .mdc-line-ripple { display: none !important; }
@@ -534,20 +540,20 @@ button[mat-flat-button][color="primary"],
   ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; box-shadow: none !important; }
   ::ng-deep .mat-mdc-form-field-focus-overlay { opacity: 0 !important; background: transparent !important; }
   ::ng-deep .mdc-floating-label { color: #64748b !important; }
-  ::ng-deep .mdc-floating-label--float-above { color: #4f46e5 !important; }
+  ::ng-deep .mdc-floating-label--float-above { color: #234f99 !important; }
   ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
   ::ng-deep textarea.mat-mdc-input-element { color: #0f172a !important; resize: none !important; }
   ::ng-deep mat-select .mat-mdc-select-value-text { color: #0f172a !important; }
   ::ng-deep .mat-mdc-select-placeholder { color: #94a3b8 !important; }
   ::ng-deep .mat-mdc-select-arrow {
-    color: #4f46e5 !important;
+    color: #234f99 !important;
     border: none !important;
     background: none !important;
     svg { display: block !important; }
   }
-  ::ng-deep .mat-mdc-form-field:has(mat-select) .mdc-text-field--filled { border-bottom: 1px solid rgba(99,102,241,0.45) !important; }
-  ::ng-deep .mat-mdc-form-field:has(mat-select) .mdc-text-field--filled:hover { border-bottom-color: #4f46e5 !important; }
-  ::ng-deep .mat-mdc-form-field:has(mat-select).mat-focused .mdc-text-field--filled { border-bottom: 2px solid #4f46e5 !important; }
+  ::ng-deep .mat-mdc-form-field:has(mat-select) .mdc-text-field--filled { border-bottom: 1px solid rgba(35,79,153,0.45) !important; }
+  ::ng-deep .mat-mdc-form-field:has(mat-select) .mdc-text-field--filled:hover { border-bottom-color: #234f99 !important; }
+  ::ng-deep .mat-mdc-form-field:has(mat-select).mat-focused .mdc-text-field--filled { border-bottom: 2px solid #234f99 !important; }
   ::ng-deep .mat-mdc-form-field-hint { color: #64748b !important; }
   ::ng-deep mat-error { color: #dc2626 !important; }
 
@@ -555,10 +561,10 @@ button[mat-flat-button][color="primary"],
 
   // Tabs
   ::ng-deep .mat-mdc-tab-group {
-    --mdc-tab-indicator-active-indicator-color: #4f46e5;
-    --mat-tab-header-active-label-text-color: #4f46e5;
+    --mdc-tab-indicator-active-indicator-color: #234f99;
+    --mat-tab-header-active-label-text-color: #234f99;
     --mat-tab-header-inactive-label-text-color: #64748b;
-    --mat-tab-header-active-hover-label-text-color: #4f46e5;
+    --mat-tab-header-active-hover-label-text-color: #234f99;
     --mat-tab-header-inactive-hover-label-text-color: #334155;
   }
   ::ng-deep .mat-mdc-tab-header { border-bottom-color: rgba(99,102,241,0.12) !important; }
@@ -571,26 +577,26 @@ button[mat-flat-button][color="primary"],
     --bs-table-color: #1e293b;
     --bs-table-striped-bg: #f8fafc;
     --bs-table-striped-color: #1e293b;
-    --bs-table-hover-bg: rgba(99,102,241,0.06);
-    --bs-table-border-color: rgba(99,102,241,0.1);
+    --bs-table-hover-bg: rgba(35,79,153,0.06);
+    --bs-table-border-color: rgba(35,79,153,0.1);
   }
   ::ng-deep table.table thead th {
     background: rgba(99,102,241,0.08) !important;
-    color: #4f46e5 !important;
+    color: #234f99 !important;
     border-bottom: 1px solid rgba(99,102,241,0.2) !important;
   }
   ::ng-deep table.table thead th[style*="color: #0094ff"],
-  ::ng-deep table.table thead th[style*="color:#0094ff"] { color: #4f46e5 !important; }
+  ::ng-deep table.table thead th[style*="color:#0094ff"] { color: #234f99 !important; }
   ::ng-deep table.table tbody tr { background: transparent !important; }
   ::ng-deep table.table tbody td { color: #1e293b !important; background: transparent !important; border-bottom: 1px solid rgba(99,102,241,0.08) !important; }
   ::ng-deep table.table-striped > tbody > tr:nth-of-type(odd) > * { background-color: #f8fafc !important; color: #1e293b !important; --bs-table-accent-bg: #f8fafc; }
   ::ng-deep table.table-striped > tbody > tr:nth-of-type(even) > * { background-color: #ffffff !important; color: #1e293b !important; --bs-table-accent-bg: #ffffff; }
-  ::ng-deep table.table tbody tr:hover > td { background: rgba(99,102,241,0.06) !important; }
+  ::ng-deep table.table tbody tr:hover > td { background: rgba(35,79,153,0.06) !important; }
 
   ::ng-deep .aip-led-icons,
   ::ng-deep .aip-led-icons.icon-color,
   ::ng-deep .icon-color {
-    color: #4f46e5 !important;
+    color: #234f99 !important;
     &:hover { color: #4338ca !important; }
   }
 
@@ -598,15 +604,15 @@ button[mat-flat-button][color="primary"],
     background: #f8fafc !important;
     color: #0f172a !important;
     border-color: rgba(99,102,241,0.2) !important;
-    &:focus { border-color: #4f46e5 !important; box-shadow: 0 0 0 2px rgba(99,102,241,0.12) !important; }
+    &:focus { border-color: #234f99 !important; box-shadow: 0 0 0 2px rgba(99,102,241,0.12) !important; }
     &::placeholder { color: #94a3b8 !important; }
   }
 
   // Slide toggle
   ::ng-deep .mat-mdc-slide-toggle {
-    --mdc-switch-selected-track-color: #4f46e5;
-    --mdc-switch-selected-hover-track-color: #4f46e5;
-    --mdc-switch-selected-focus-track-color: #4f46e5;
+    --mdc-switch-selected-track-color: #234f99;
+    --mdc-switch-selected-hover-track-color: #234f99;
+    --mdc-switch-selected-focus-track-color: #234f99;
     --mdc-switch-unselected-track-color: rgba(15,23,42,0.15);
     --mdc-switch-unselected-handle-color: #64748b;
   }
@@ -619,13 +625,13 @@ button[mat-flat-button][color="primary"],
     background: #f8fafc !important;
     color: #0f172a !important;
     border-color: rgba(99,102,241,0.2) !important;
-    &:focus { border-color: #4f46e5 !important; box-shadow: 0 0 0 2px rgba(99,102,241,0.12) !important; }
+    &:focus { border-color: #234f99 !important; box-shadow: 0 0 0 2px rgba(99,102,241,0.12) !important; }
   }
 
   .file-upload { color: #334155 !important; }
   .upload-btn {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-    box-shadow: 0 2px 8px rgba(79,70,229,0.3) !important;
+    background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+    box-shadow: 0 2px 8px rgba(35,79,153,0.35) !important;
   }
 
   .lfx-u-header-xl { color: #334155 !important; }
@@ -638,9 +644,9 @@ button[mat-flat-button][color="primary"],
   button.action-button[color="primary"],
   button[mat-raised-button][color="primary"],
   button[mat-flat-button][color="primary"] {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-    box-shadow: 0 2px 12px rgba(79,70,229,0.3) !important;
-    &:hover:not([disabled]) { box-shadow: 0 4px 20px rgba(79,70,229,0.48) !important; }
+    background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+    box-shadow: 0 2px 12px rgba(35,79,153,0.35) !important;
+    &:hover:not([disabled]) { box-shadow: 0 4px 20px rgba(35,79,153,0.5) !important; }
   }
 
   // JSON editor — light
@@ -651,11 +657,11 @@ button[mat-flat-button][color="primary"],
     border: 2px solid rgba(99,102,241,0.35) !important;
     border-radius: 10px !important;
     overflow: hidden !important;
-    box-shadow: 0 2px 12px rgba(99,102,241,0.1) !important;
+    box-shadow: 0 2px 12px rgba(35,79,153,0.1) !important;
   }
   ::ng-deep .cipJSONEditor .jsoneditor-menu,
   ::ng-deep .jsoneditor-menu {
-    background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%) !important;
+    background: linear-gradient(90deg, #234f99 0%, #0a1d61 100%) !important;
     border-bottom: none !important;
   }
   ::ng-deep .jsoneditor-menu button,
@@ -667,7 +673,7 @@ button[mat-flat-button][color="primary"],
   ::ng-deep .jsoneditor-tree,
   ::ng-deep .jsoneditor-text,
   ::ng-deep .jsoneditor-outer { background: #ffffff !important; color: #0f172a !important; }
-  ::ng-deep .jsoneditor-field { color: #4f46e5 !important; font-weight: 600 !important; }
+  ::ng-deep .jsoneditor-field { color: #234f99 !important; font-weight: 600 !important; }
   ::ng-deep .jsoneditor-value { color: #1e293b !important; }
   ::ng-deep .jsoneditor-value.jsoneditor-string { color: #15803d !important; }
   ::ng-deep .jsoneditor-value.jsoneditor-number { color: #b45309 !important; }
@@ -678,11 +684,11 @@ button[mat-flat-button][color="primary"],
   ::ng-deep .cipJSONEditor .ace_gutter,
   ::ng-deep .ace_gutter { background: #f1f5f9 !important; color: #64748b !important; border-right: 1px solid rgba(99,102,241,0.15) !important; }
   ::ng-deep .ace_active-line { background: rgba(99,102,241,0.04) !important; }
-  ::ng-deep .ace_cursor { color: #4f46e5 !important; }
+  ::ng-deep .ace_cursor { color: #234f99 !important; }
   ::ng-deep .ace_selection { background: rgba(99,102,241,0.15) !important; }
   ::ng-deep .ace_string { color: #15803d !important; }
   ::ng-deep .ace_numeric { color: #b45309 !important; }
-  ::ng-deep .ace_variable, ::ng-deep .ace_keyword { color: #4f46e5 !important; }
+  ::ng-deep .ace_variable, ::ng-deep .ace_keyword { color: #234f99 !important; }
   ::ng-deep .ace_line { color: #0f172a !important; }
 
   // Select panel
@@ -693,8 +699,8 @@ button[mat-flat-button][color="primary"],
     box-shadow: 0 8px 24px rgba(99,102,241,0.15) !important;
   }
   ::ng-deep .mat-mdc-option { color: #0f172a !important; }
-  ::ng-deep .mat-mdc-option.mdc-list-item--selected { background: rgba(99,102,241,0.1) !important; color: #4f46e5 !important; }
-  ::ng-deep .mat-mdc-option:hover { background: rgba(99,102,241,0.06) !important; }
+  ::ng-deep .mat-mdc-option.mdc-list-item--selected { background: rgba(35,79,153,0.1) !important; color: #234f99 !important; }
+  ::ng-deep .mat-mdc-option:hover { background: rgba(35,79,153,0.06) !important; }
 
   // Scrollbar
   .aip-container {

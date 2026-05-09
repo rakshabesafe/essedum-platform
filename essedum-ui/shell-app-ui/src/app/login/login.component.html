@@ -4,8 +4,8 @@
   <div class="main-header-bg login-header" [ngClass]="{'header-dark': isDark, 'header-light': !isDark}">
     <div class="responsive-main-toggle">
       <div style="display:flex;align-items:center;gap:8px;">
-        <img src="assets/img/essedum_icon_small.png" alt="ESSEDUM" class="essedum-logo responsive-logo-img" />
-        <span class="responsive-title">ESSEDUM</span>
+        <img src="assets/img/essedum_icon_small.png" [alt]="essedumTitle" class="essedum-logo responsive-logo-img" />
+        <span class="responsive-title">{{ essedumTitle }}</span>
       </div>
       <div class="header-right-controls">
         <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
@@ -22,9 +22,9 @@
       <!-- Logo section -->
       <div class="login-logo-area">
         <div class="login-logo-icon-wrap">
-          <img src="assets/img/essedum_icon_small.png" alt="ESSEDUM" class="login-essedum-icon" />
+          <img src="assets/img/essedum_icon_small.png" [alt]="essedumTitle" class="login-essedum-icon" />
         </div>
-        <div class="logo-common">ESSEDUM</div>
+        <div class="logo-common">{{ essedumTitle }}</div>
       </div>
 
       <!-- Login card -->

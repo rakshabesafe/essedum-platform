@@ -419,15 +419,15 @@
   }
 
   .section-title { color: #4A5568 !important; }
-  .count { color: #4f46e5; background: rgba(99,102,241,0.1); }
+  .count { color: #234f99; background: rgba(35,79,153,0.1); }
   .value { color: #0f172a !important; }
   .section-divider { background: rgba(0,0,0,0.07); }
 
-  .collapse-btn { color: #64748b; &:hover { color: #4f46e5; } }
+  .collapse-btn { color: #64748b; &:hover { color: #234f99; } }
 
   .copy-icon-btn, .copy-icon-btn-inline, .icon-btn {
     color: #64748b;
-    &:hover { color: #4f46e5; }
+    &:hover { color: #234f99; }
   }
 
   .json-code-box {
@@ -438,7 +438,7 @@
 
   .skill-badge {
     background: rgba(99,102,241,0.08);
-    color: #4f46e5;
+    color: #234f99;
     border-color: rgba(99,102,241,0.2);
   }
 
@@ -450,25 +450,25 @@
 
   .type-badge {
     background: rgba(99,102,241,0.08);
-    color: #4f46e5;
+    color: #234f99;
     border-color: rgba(99,102,241,0.2);
   }
 
   .domain-item {
     background: rgba(255,255,255,0.8);
-    border-color: rgba(99,102,241,0.1);
+    border-color: rgba(35,79,153,0.1);
     .domain-name { color: #1e293b; }
     .domain-description { color: #64748b; }
   }
 
   .locators-table, .parameters-table {
-    thead tr { background: rgba(99,102,241,0.06) !important; }
+    thead tr { background: rgba(35,79,153,0.06) !important; }
     th { color: #4A5568; border-bottom-color: rgba(99,102,241,0.15); }
     td { color: #0f172a; border-bottom-color: rgba(99,102,241,0.07); }
     tbody tr:hover td { background: rgba(99,102,241,0.04); }
   }
 
-  .url-link { color: #4f46e5; &:hover { color: #3730a3; } }
+  .url-link { color: #234f99; &:hover { color: #0a1d61; } }
 
   .status-badge {
     &.status-published { background: rgba(5,150,105,0.08); color: #059669; border-color: rgba(5,150,105,0.2); }
@@ -478,7 +478,7 @@
 
   .tool-name { color: #1e293b; }
   .tool-description { color: #64748b; }
-  .sortable-header:hover { color: #4f46e5 !important; }
+  .sortable-header:hover { color: #234f99 !important; }
 
   .search-box {
     background: #f8fafc;
@@ -495,8 +495,8 @@
   .signature-field label { color: #4A5568; }
   .signature-value-box {
     background: #f1f5f9;
-    border-color: rgba(99,102,241,0.1);
-    code { color: #4f46e5; }
+    border-color: rgba(35,79,153,0.1);
+    code { color: #234f99; }
   }
 
   .empty-state {
@@ -508,14 +508,14 @@
     nav {
       background: rgba(255,255,255,0.92);
       border-color: rgba(99,102,241,0.12);
-      box-shadow: 0 2px 8px rgba(99,102,241,0.06);
+      box-shadow: 0 2px 8px rgba(35,79,153,0.06);
     }
     .nav-item {
       color: #4A5568;
-      &:hover { color: #4f46e5; background: rgba(99,102,241,0.06); }
+      &:hover { color: #234f99; background: rgba(35,79,153,0.06); }
       &.active {
-        color: #4f46e5;
-        border-left-color: #4f46e5;
+        color: #234f99;
+        border-left-color: #234f99;
         background: rgba(99,102,241,0.08);
       }
     }

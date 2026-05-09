@@ -44,67 +44,73 @@
               <img *ngIf="profileimage" class="imageView img-responsive selector-3-83" [src]="profileimage" alt="userimg" />
             </button>
 
-            <mat-menu #menu="matMenu" class="projectArrow selector-3-84 overflow-hidden">
-              <div mat-menu-item="" style="cursor: default" class="selector-3-85" [style.height]="detailsPopupHeight">
-                <span class="selector-3-86"> Welcome </span>
-                <span class="selector-3-87">
-                  <b class="selector-3-88">{{ user && user.user_f_name }}</b>
-                </span>
-              </div>
-              <div mat-menu-item="" *ngIf="portfoliodata?.length >= 1" (click)="$event.stopPropagation()"
-                [style.height]="detailsPopupHeight" class="selector-3-89">
-                <div class="dropdownrole selector-3-90" *ngIf="portfoliodata.length >= 1">
-                  <span class="dropdownrole roleheading selector-3-91">Portfolio:</span>
-                  <mat-form-field class="selector-3-92">
-                    <mat-select id="Portfolio1" [compareWith]="compareObjects" (ngModelChange)="onSelection($event)"
-                      [(ngModel)]="selectedportfolio" name="Portfolio" #Portfolio="ngModel" class="option1 selector-3-93">
-                      <mat-option class="option1 selector-3-94" *ngFor="let item of portfoliodata; trackBy: trackByMethod"
-                        [value]="item" [style.height]="matOptionHeight">{{ item.portfolioName }}</mat-option>
-                    </mat-select>
-                  </mat-form-field>
+            <mat-menu #menu="matMenu" class="projectArrow selector-3-84 profile-menu-panel">
+              <!-- Welcome header -->
+              <div mat-menu-item="" style="cursor: default; pointer-events: none;" class="selector-3-85 profile-menu-welcome">
+                <div class="d-flex align-items-center gap-2 w-100">
+                  <div class="profile-menu-avatar-lg flex-shrink-0">{{ uname | uppercase }}</div>
+                  <div class="d-flex align-items-center gap-1">
+                    <span class="profile-menu-welcome-label">Welcome</span>
+                    <b class="selector-3-88 profile-menu-welcome-name">{{ user && user.user_f_name }}</b>
+                  </div>
                 </div>
               </div>
-              <div mat-menu-item="" *ngIf="projectList.length >= 1" (click)="$event.stopPropagation()"
-                [style.height]="detailsPopupHeight" class="selector-3-95">
-                <div class="dropdownrole selector-3-96" *ngIf="projectList.length >= 1">
-                  <span *ngIf="role1" class="dropdownrole roleheading selector-3-97">Customer:</span>
-                  <span *ngIf="!role1" class="dropdownrole roleheading selector-3-98">Project:</span>
-                  <mat-form-field class="selector-3-100">
-                    <mat-select id="project" [compareWith]="compareObjects" (ngModelChange)="valuechangeproject1($event)"
-                      [(ngModel)]="selectedproject" name="role" #role="ngModel" class="option1 selector-3-101">
-                      <mat-option class="option1 selector-3-102" *ngFor="let item of projectList; trackBy: trackByMethod"
-                        [value]="item" [style.height]="matOptionHeight">{{ item.projectdisplayname }}</mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </div>
+
+              <div class="profile-menu-divider"></div>
+
+              <!-- Portfolio -->
+              <div *ngIf="portfoliodata?.length >= 1" (click)="$event.stopPropagation()" class="profile-menu-field-row">
+                <span class="profile-menu-field-label">Portfolio</span>
+                <mat-form-field class="profile-form-field" appearance="outline" subscriptSizing="dynamic">
+                  <mat-select [compareWith]="compareObjects" [(ngModel)]="selectedportfolio"
+                    (ngModelChange)="onSelection($event)" name="Portfolio" panelClass="profile-select-panel">
+                    <mat-option *ngFor="let item of portfoliodata; trackBy: trackByMethod" [value]="item">
+                      {{ item.portfolioName }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
               </div>
-              <div mat-menu-item="" *ngIf="roleList?.length >= 1" (click)="$event.stopPropagation()"
-                [style.height]="detailsPopupHeight" class="selector-3-103">
-                <div class="dropdownrole selector-3-104" *ngIf="roleList.length >= 1">
-                  <span class="dropdownrole roleheading selector-3-105">Role:</span>
-                  <mat-form-field class="selector-3-106">
-                    <mat-select id="role" [compareWith]="compareObjects"
-                      (ngModelChange)="valuechangerole($event); clearsession()" [(ngModel)]="selectedrole" name="role"
-                      #role="ngModel" class="option1 selector-3-107" panelClass="matOptionPopup">
-                      <mat-option class="option1 selector-3-108" *ngFor="let item of roleList; trackBy: trackByMethod"
-                        [value]="item" [style.height]="matOptionHeight" id="role-{{ item.name }}">{{ item.name }}</mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </div>
+
+              <!-- Project / Customer -->
+              <div *ngIf="projectList.length >= 1" (click)="$event.stopPropagation()" class="profile-menu-field-row">
+                <span class="profile-menu-field-label">{{ role1 ? 'Customer' : 'Project' }}</span>
+                <mat-form-field class="profile-form-field" appearance="outline" subscriptSizing="dynamic">
+                  <mat-select [compareWith]="compareObjects" [(ngModel)]="selectedproject"
+                    (ngModelChange)="valuechangeproject1($event)" name="project" panelClass="profile-select-panel">
+                    <mat-option *ngFor="let item of projectList; trackBy: trackByMethod" [value]="item">
+                      {{ item.projectdisplayname }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
               </div>
-              <div class="button-container" style="display: flex">
-                <button id="home-btn-logout" mat-menu-item="" (click)="logout()" class="selector-3-112"
-                  [style.height]="detailsPopupHeight">
-                  <i class="fa fa-power-off selector-3-113" aria-hidden="true"></i>
-                  <span class="selector-3-114">&nbsp;Logout</span>
+
+              <!-- Role -->
+              <div *ngIf="roleList?.length >= 1" (click)="$event.stopPropagation()" class="profile-menu-field-row">
+                <span class="profile-menu-field-label">Role</span>
+                <mat-form-field class="profile-form-field" appearance="outline" subscriptSizing="dynamic">
+                  <mat-select [compareWith]="compareObjects" [(ngModel)]="selectedrole"
+                    (ngModelChange)="valuechangerole($event); clearsession()" name="role"
+                    panelClass="profile-select-panel matOptionPopup">
+                    <mat-option *ngFor="let item of roleList; trackBy: trackByMethod" [value]="item" [id]="'role-' + item.name">
+                      {{ item.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="profile-menu-divider"></div>
+
+              <!-- Actions -->
+              <div class="profile-menu-actions">
+                <button id="home-btn-logout" mat-menu-item="" (click)="logout()" class="selector-3-112 profile-action-btn">
+                  <i class="fa fa-power-off" aria-hidden="true"></i>
+                  <span>&nbsp;Logout</span>
                 </button>
-                <button *ngIf="showProfilePresent()" mat-menu-item (click)="toggleProfileInfo()"
-                  [style.height]="detailsPopupHeight" style="color: var(--base-color)">
-                  <i class="fa fa-user" aria-hidden="true" style="color: var(--base-color)"></i>
-                  <span style="color: var(--base-color)">&nbsp;Profile</span>
+                <button *ngIf="showProfilePresent()" mat-menu-item (click)="toggleProfileInfo()" class="profile-action-btn profile-action-btn--profile">
+                  <i class="fa fa-user" aria-hidden="true"></i>
+                  <span>&nbsp;Profile</span>
                 </button>
               </div>
-              <hr style="margin: 0px" class="selector-3-115" />
             </mat-menu>
           </div>
         </div>

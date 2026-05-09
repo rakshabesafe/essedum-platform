@@ -590,8 +590,8 @@
   ::ng-deep .mat-mdc-form-field { --mdc-filled-text-field-container-color: transparent; }
   ::ng-deep .mdc-line-ripple { display: none !important; }
   ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple { display: block !important; }
-  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::before { border-bottom-color: rgba(99,102,241,0.45) !important; }
-  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::after { border-bottom-color: #4f46e5 !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::before { border-bottom-color: rgba(35,79,153,0.45) !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::after { border-bottom-color: #234f99 !important; }
   ::ng-deep .mdc-text-field--filled {
     background: transparent !important;
     background-color: transparent !important;
@@ -605,16 +605,16 @@
   ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
   ::ng-deep textarea.mat-mdc-input-element { resize: none !important; }
   ::ng-deep .mdc-floating-label { color: #64748b !important; }
-  ::ng-deep .mdc-floating-label--float-above { color: #4f46e5 !important; }
+  ::ng-deep .mdc-floating-label--float-above { color: #234f99 !important; }
   ::ng-deep mat-select .mat-mdc-select-value-text { color: #0f172a !important; }
   ::ng-deep .mat-mdc-select-placeholder { color: #94a3b8 !important; }
-  ::ng-deep .mat-mdc-select-arrow { color: #4f46e5 !important; }
+  ::ng-deep .mat-mdc-select-arrow { color: #234f99 !important; }
   ::ng-deep mat-error { color: #dc2626 !important; }
   ::ng-deep .mat-mdc-option .mdc-list-item__primary-text { color: #0f172a !important; }
   ::ng-deep .mat-mdc-option:hover:not(.mdc-list-item--disabled) { background: rgba(99,102,241,0.08) !important; }
   ::ng-deep .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
     background: rgba(99,102,241,0.12) !important;
-    .mdc-list-item__primary-text { color: #4f46e5 !important; }
+    .mdc-list-item__primary-text { color: #234f99 !important; }
   }
 
   .header {
@@ -622,17 +622,17 @@
   }
 
   .page-title { color: #0f172a; }
-  .back-btn { color: #64748b; &:hover { color: #4f46e5; } }
+  .back-btn { color: #64748b; &:hover { color: #234f99; } }
 
   .cancel-btn {
-    background: rgba(99,102,241,0.06) !important;
-    color: #4f46e5 !important;
+    background: rgba(35,79,153,0.06) !important;
+    color: #234f99 !important;
     border-color: rgba(99,102,241,0.2) !important;
   }
 
   .save-btn {
     background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
-    box-shadow: 0 2px 12px rgba(79,70,229,0.3) !important;
+    box-shadow: 0 2px 12px rgba(35,79,153,0.35) !important;
   }
 
   .section-card {
@@ -641,7 +641,7 @@
   }
 
   .section-title, .section-title-hoverable { color: #4A5568 !important; }
-  .collapse-btn { color: #64748b; &:hover { color: #4f46e5; } }
+  .collapse-btn { color: #64748b; &:hover { color: #234f99; } }
 
   .required-badge {
     color: #dc2626;
@@ -650,36 +650,36 @@
   }
 
   .info-badge {
-    color: #4f46e5;
+    color: #234f99;
     background: rgba(99,102,241,0.08);
     border-color: rgba(99,102,241,0.2);
   }
 
   .count {
-    color: #4f46e5;
-    background: rgba(99,102,241,0.1);
+    color: #234f99;
+    background: rgba(35,79,153,0.1);
   }
 
   .add-btn {
-    background: rgba(99,102,241,0.1) !important;
-    color: #4f46e5 !important;
+    background: rgba(35,79,153,0.1) !important;
+    color: #234f99 !important;
     border-color: rgba(99,102,241,0.25) !important;
     &:hover { background: rgba(99,102,241,0.18) !important; }
   }
 
   .add-btn-small { @extend .add-btn; }
 
-  .icon-btn { color: #64748b; &:hover { color: #4f46e5; } }
+  .icon-btn { color: #64748b; &:hover { color: #234f99; } }
   .icon-btn-small { @extend .icon-btn; }
 
   .item-chip {
     background: rgba(99,102,241,0.08);
-    color: #4f46e5;
+    color: #234f99;
     border-color: rgba(99,102,241,0.2);
 
     &.skill-badge {
       background: rgba(99,102,241,0.08);
-      color: #4f46e5;
+      color: #234f99;
       border-color: rgba(99,102,241,0.2);
     }
 
@@ -704,7 +704,7 @@
     border-color: rgba(99,102,241,0.2) !important;
     &:focus {
       background: #fff !important;
-      border-color: #4f46e5 !important;
+      border-color: #234f99 !important;
       box-shadow: 0 0 0 2px rgba(99,102,241,0.12) !important;
     }
     option { background: #fff !important; color: #0f172a !important; }
@@ -720,7 +720,7 @@
   }
   .table-bordered, .table-striped {
     border-color: rgba(99,102,241,0.15) !important;
-    td, th { border-color: rgba(99,102,241,0.1) !important; }
+    td, th { border-color: rgba(35,79,153,0.1) !important; }
   }
 
   .remove-btn-icon {
@@ -730,17 +730,17 @@
     &:hover { background: rgba(220,38,38,0.16) !important; border-color: rgba(220,38,38,0.4) !important; }
   }
   .add-btn-icon {
-    color: #4f46e5 !important;
+    color: #234f99 !important;
     background: rgba(99,102,241,0.08) !important;
     border-color: rgba(99,102,241,0.25) !important;
-    &:hover { background: rgba(99,102,241,0.16) !important; border-color: rgba(99,102,241,0.45) !important; }
+    &:hover { background: rgba(99,102,241,0.16) !important; border-color: rgba(35,79,153,0.45) !important; }
   }
 
   ::ng-deep .table > thead > tr > th { color: #4A5568 !important; }
   ::ng-deep .table > tbody > tr > td { color: #0f172a !important; }
 
   .sync-params-table {
-    thead tr { background: rgba(99,102,241,0.06) !important; }
+    thead tr { background: rgba(35,79,153,0.06) !important; }
     .table-header-title {
       color: #4A5568 !important;
       border-bottom-color: rgba(99,102,241,0.15);
@@ -750,9 +750,9 @@
   }
 
   .edit-table {
-    thead tr { background: rgba(99,102,241,0.06); }
+    thead tr { background: rgba(35,79,153,0.06); }
     th { color: #4A5568 !important; border-bottom-color: rgba(99,102,241,0.15); }
-    td { color: #0f172a !important; border-bottom-color: rgba(99,102,241,0.06); }
+    td { color: #0f172a !important; border-bottom-color: rgba(35,79,153,0.06); }
   }
 
   .signature-item, .tool-edit-item, .resource-edit-item, .prompt-edit-item {
@@ -778,12 +778,12 @@
     .nav-item {
       color: #4A5568;
       &:hover {
-        color: #4f46e5;
-        background: rgba(99,102,241,0.06);
+        color: #234f99;
+        background: rgba(35,79,153,0.06);
       }
       &.active {
-        color: #4f46e5;
-        border-left-color: #4f46e5;
+        color: #234f99;
+        border-left-color: #234f99;
         background: rgba(99,102,241,0.08);
       }
     }

@@ -31,6 +31,7 @@ export class LoginComponent implements OnInit {
   subscription: Subscription = new Subscription;
   checkUserProjectRolePortfolio: boolean = false;
   title: string = '';
+  essedumTitle: string = 'ESSEDUM';
   private readonly _destroying$ = new Subject<void>();
   userUnauthorizedMsg: string;
   userUnauthorizedAlert: boolean = false;

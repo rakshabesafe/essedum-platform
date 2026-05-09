@@ -47,5 +47,37 @@
 body.header-light-theme {
   ::ng-deep h2[mat-dialog-title] { color: #0f172a !important; }
   ::ng-deep mat-dialog-content { color: #4A5568 !important; }
-  .cancel-button { background: rgba(0,0,0,0.04) !important; color: #4A5568 !important; border-color: rgba(0,0,0,0.12) !important; }
+  ::ng-deep mat-divider { border-top-color: rgba(35,79,153,0.12) !important; }
+  .dialog-actions { border-top-color: rgba(35,79,153,0.1) !important; }
+  .cancel-button {
+    background: rgba(35,79,153,0.06) !important;
+    color: #234f99 !important;
+    border-color: rgba(35,79,153,0.22) !important;
+    &:hover { background: rgba(35,79,153,0.12) !important; }
+  }
+  .delete-button {
+    background: rgba(220,38,38,0.1) !important;
+    color: #dc2626 !important;
+    border-color: rgba(220,38,38,0.28) !important;
+    &:hover { background: rgba(220,38,38,0.18) !important; }
+  }
+}
+
+body.header-dark-theme {
+  ::ng-deep h2[mat-dialog-title] { color: #e2e8f0 !important; }
+  ::ng-deep mat-dialog-content { color: #b8cce0 !important; }
+  ::ng-deep mat-divider { border-top-color: rgba(79,142,247,0.12) !important; }
+  .dialog-actions { border-top-color: rgba(79,142,247,0.08) !important; }
+  .cancel-button {
+    background: rgba(255,255,255,0.06) !important;
+    color: #b8cce0 !important;
+    border-color: rgba(79,142,247,0.2) !important;
+    &:hover { background: rgba(255,255,255,0.1) !important; }
+  }
+  .delete-button {
+    background: rgba(239,68,68,0.15) !important;
+    color: #f87171 !important;
+    border-color: rgba(239,68,68,0.3) !important;
+    &:hover { background: rgba(239,68,68,0.25) !important; }
+  }
 }
