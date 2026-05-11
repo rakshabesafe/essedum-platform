@@ -59,13 +59,12 @@
   width: 100% !important;
 }
 
-// The actual field container - border-bottom is the single underline
+// The actual field container - let CSS variable --mdc-filled-text-field-active-indicator draw the single underline
 :host ::ng-deep .mdc-text-field--filled,
 :host ::ng-deep .mdc-text-field {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
-  border-bottom: 1px solid #5a80c2 !important;
   border-radius: 0 !important;
   padding: 0 4px !important;
   height: auto !important;
@@ -74,6 +73,7 @@
   box-shadow: none !important;
   overflow: visible !important;
 }
+:host ::ng-deep .mdc-text-field--filled::after { border-bottom: none !important; }
 
 :host ::ng-deep .mdc-text-field--filled:hover,
 :host ::ng-deep .mdc-text-field:hover {
@@ -82,7 +82,7 @@
 
 :host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused,
 :host ::ng-deep .mdc-text-field--focused {
-  border: none !important;
+  background: transparent !important;
   box-shadow: none !important;
 }
 

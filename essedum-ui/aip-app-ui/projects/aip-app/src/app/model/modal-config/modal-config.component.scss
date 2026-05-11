@@ -47,10 +47,14 @@ table { width: 100% !important; border-collapse: collapse !important;
 // -- MDC form field: compact, no bottom line -----------------------
 :host ::ng-deep .mat-mdc-form-field, :host ::ng-deep .mat-mdc-form-field.mat-mdc-form-field { width: 100% !important; font-size: 13px !important; }
 :host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
+:host ::ng-deep .mdc-line-ripple,
+:host ::ng-deep .mdc-line-ripple::before,
+:host ::ng-deep .mdc-line-ripple::after { display: none !important; border-bottom: none !important; }
 :host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
-:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-bottom: 1px solid #5a80c2 !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
+:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
+:host ::ng-deep .mdc-text-field--filled::after { border-bottom: none !important; }
 :host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; }
-:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border: none !important; box-shadow: none !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; box-shadow: none !important; }
 :host ::ng-deep .mat-mdc-form-field-infix { min-height: 44px !important; padding: 18px 0 6px !important; border-top: 0 !important; width: 100% !important; }
 :host ::ng-deep .mdc-text-field--filled .mdc-floating-label { top: 7px !important; font-size: 11px !important; }
 :host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #8b949e !important; font-size: 12px !important; font-weight: 500 !important; }
@@ -128,9 +132,9 @@ button.next-btn, button.test-btn {
   textarea.form-control { color: #0f172a !important; background: rgba(248,250,252,0.97) !important; border-color: rgba(71,66,220,0.18) !important; &:focus { background: rgba(71,66,220,0.06) !important; border-color: rgba(71,66,220,0.42) !important; } }
   button.next-btn, button.test-btn { background: linear-gradient(135deg, #4742dc, #7c3aed) !important; box-shadow: 0 5px 20px rgba(71,66,220,0.42) !important; }
   :host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
-  :host ::ng-deep .mdc-text-field--filled { border: none !important; border-bottom: none !important; border-radius: 0 !important; }
-  :host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
-  :host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom: none !important; box-shadow: none !important; }
+  :host ::ng-deep .mdc-text-field--filled { border: none !important; border-radius: 0 !important; }
+  :host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; }
+  :host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; box-shadow: none !important; }
   :host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #64748b !important; }
   :host ::ng-deep .mdc-floating-label--float-above { color: #4742dc !important; }
   :host ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
