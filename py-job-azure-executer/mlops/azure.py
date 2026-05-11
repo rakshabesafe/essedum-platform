@@ -344,7 +344,7 @@ def projects_datasets_list_list(adapter_instance, project, isCached, isInstance,
   subscriptionId=connections.get('subscriptionId',None)
   resourceGroupName=connections.get('resourceGroupName',None)
   workspaceName=connections.get('workspaceName',None)
-  logger.info(f"Connection params present - subscriptionId: {bool(subscriptionId)}, resourceGroup: {bool(resourceGroupName)}, workspace: {bool(workspaceName)}, api_version: {api_version}")
+  logger.info("Connection parameters retrieved for datasets list request")
   
   url=f"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/data?api-version={api_version}"
   headers = {
