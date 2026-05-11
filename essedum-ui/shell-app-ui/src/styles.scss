@@ -1424,6 +1424,35 @@ mat-nav-list.dashboard:hover .sidebar-nav-label { opacity: 1 !important; }
 .sidebar-menu-open  { margin-left: 170px; width: calc(100% - 30px); transition: margin-left 0.3s, width 0.3s; }
 .sidebar-popup-open { transition: margin-left 0.3s; }
 
+// ─── Loading Indicator — Theme Aware ──────────────────────────────────────────
+.lfx-loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 2.5vmin;
+  margin-top: 45vh;
+  width: 100%;
+  color: var(--text-color, #e2e8f0);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.lfx-loading-spinner {
+  color: var(--base-color, #4f8ef7) !important;
+}
+body.header-dark-theme .lfx-loading-indicator {
+  color: #e2e8f0;
+}
+body.header-dark-theme .lfx-loading-spinner {
+  color: #4f8ef7 !important;
+}
+body.header-light-theme .lfx-loading-indicator {
+  color: #1e293b;
+}
+body.header-light-theme .lfx-loading-spinner {
+  color: #4F46E5 !important;
+}
+
 // ─── Dark Theme Structural Overrides ──────────────────────────────────────────
 body.header-dark-theme {
   --mat-sidenav-container-background-color: transparent !important;
@@ -3105,7 +3134,7 @@ mat-card.lfx-schema-card,
 .mdc-floating-label--float-above { color: #4f8ef7 !important; font-size: 11px !important; }
 .mat-mdc-input-element, .mdc-text-field__input { color: #e2e8f0 !important; font-size: 14px !important; }
 .mat-mdc-select-value-text, .mat-mdc-select-placeholder { color: #e2e8f0 !important; font-size: 14px !important; }
-.mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.2) !important; }
+.mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.55) !important; }
 .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
 .mat-mdc-form-field-hint { color: #b8cce0 !important; font-size: 11px !important; }
 .mat-mdc-form-field-error { font-size: 11px !important; }
@@ -3695,7 +3724,7 @@ body.header-light-theme {
   .mdc-floating-label--float-above { color: #4F46E5 !important; }
   .mat-mdc-input-element, .mdc-text-field__input { color: #0A1628 !important; }
   .mat-mdc-select-value-text, .mat-mdc-select-placeholder { color: #0A1628 !important; }
-  .mdc-line-ripple::before { border-bottom-color: rgba(99,102,241,0.2) !important; }
+  .mdc-line-ripple::before { border-bottom-color: rgba(99,102,241,0.45) !important; }
   .mdc-line-ripple::after { border-bottom-color: #4F46E5 !important; }
   .mat-mdc-form-field-hint { color: #4A5568 !important; }
 
