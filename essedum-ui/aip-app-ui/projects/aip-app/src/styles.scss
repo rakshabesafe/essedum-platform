@@ -3566,29 +3566,30 @@ body.header-light-theme {
   }
   .cipJSONEditor .jsoneditor-menu,
   .jsoneditor-menu {
-    background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%) !important;
-    background-color: #4f46e5 !important;
-    border-bottom: none !important;
-    color: #ffffff !important;
+    background: #e8edf5 !important;
+    background-color: #e8edf5 !important;
+    border-bottom: 1px solid rgba(35,79,153,0.15) !important;
+    color: #234f99 !important;
   }
   .cipJSONEditor .jsoneditor-menu > button,
   .cipJSONEditor .jsoneditor-menu > .jsoneditor-modes > button,
   .jsoneditor-menu > button,
   .jsoneditor-menu > .jsoneditor-modes > button {
-    color: #ffffff !important;
-    background: transparent !important;
+    color: #234f99 !important;
     background-color: transparent !important;
     opacity: 1 !important;
+    filter: brightness(0) !important;
   }
   .cipJSONEditor .jsoneditor-menu > button:hover,
   .cipJSONEditor .jsoneditor-menu > .jsoneditor-modes > button:hover,
   .jsoneditor-menu > button:hover,
   .jsoneditor-menu > .jsoneditor-modes > button:hover {
-    background-color: rgba(255,255,255,0.2) !important;
-    color: #ffffff !important;
+    background-color: rgba(35,79,153,0.1) !important;
+    opacity: 1 !important;
+    filter: brightness(0) !important;
   }
   .cipJSONEditor .jsoneditor-menu .jsoneditor-poweredBy,
-  .jsoneditor-menu .jsoneditor-poweredBy { color: rgba(255,255,255,0.65) !important; }
+  .jsoneditor-menu .jsoneditor-poweredBy { color: rgba(35,79,153,0.5) !important; }
   .cipJSONEditor .jsoneditor-tree,
   .cipJSONEditor .jsoneditor-text,
   .cipJSONEditor .jsoneditor-outer,

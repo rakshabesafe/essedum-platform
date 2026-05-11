@@ -685,8 +685,9 @@
   // JSON editor — light
   ::ng-deep .cipJSONEditor .jsoneditor,
   ::ng-deep .jsoneditor { border-color: rgba(99,102,241,0.22) !important; }
-  ::ng-deep .jsoneditor-menu { background: linear-gradient(90deg, #234f99 0%, #0a1d61 100%) !important; }
-  ::ng-deep .jsoneditor-menu button { color: #ffffff !important; }
+  ::ng-deep .jsoneditor-menu { background: #e8edf5 !important; border-bottom: 1px solid rgba(35,79,153,0.15) !important; color: #234f99 !important; }
+  ::ng-deep .jsoneditor-menu button { color: #234f99 !important; background-color: transparent !important; opacity: 1 !important; filter: brightness(0) !important; }
+  ::ng-deep .jsoneditor-menu button:hover { background-color: rgba(35,79,153,0.1) !important; }
   ::ng-deep .cipJSONEditor .jsoneditor-tree,
   ::ng-deep .cipJSONEditor .jsoneditor-text,
   ::ng-deep .cipJSONEditor .jsoneditor-outer,
