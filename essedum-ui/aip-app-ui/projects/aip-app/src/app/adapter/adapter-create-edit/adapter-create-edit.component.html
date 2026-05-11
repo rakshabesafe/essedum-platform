@@ -68,14 +68,12 @@
         </div>
 
         <div mat-dialog-actions class="dialog-actions">
-
-            <button *ngIf="action==='create'" mat-raised-button color="primary" class="action-button"
+            <button *ngIf="action==='create'" class="save-btn"
                 (click)="createAdapter()"
                 [disabled]="!nameFlag || !createAuth || !data.connectionname || !data.spectemplatedomainname">
                 Create
             </button>
-
-            <button *ngIf="action==='edit'" mat-raised-button class="action-button" (click)="updateAdapter()">
+            <button *ngIf="action==='edit'" class="save-btn" (click)="updateAdapter()">
                 Update
             </button>
         </div>

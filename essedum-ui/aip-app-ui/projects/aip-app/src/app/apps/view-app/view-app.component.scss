@@ -6,9 +6,14 @@
 .lfx-l-level2-middle-ctr { display: flex !important; gap: 20px !important; flex-wrap: wrap !important; }
 .lfx-l-level2-right-col { width: 280px !important; flex-shrink: 0 !important; }
 
-h2 { font-size: 18px !important; font-weight: 700 !important; color: #f1f5f9 !important; margin: 0 !important; }
+// ── Page title — dark default ─────────────────────────────────────────────────
+h2, .page-title { font-size: 18px !important; font-weight: 700 !important; color: #e2e8f0 !important; margin: 0 !important; }
 h3 { font-size: 15px !important; font-weight: 600 !important; color: #e2e8f0 !important; margin: 0 0 16px !important; }
 
+// Back arrow icon
+.aip-led-icons { color: #b8cce0 !important; transition: color 0.15s !important; cursor: pointer !important; }
+
+// ── Overview panel ─────────────────────────────────────────────────────────────
 .aip-panel-shadow {
   background: rgba(8,14,36,0.82) !important;
   border: 1px solid rgba(79,142,247,0.18) !important;
@@ -19,36 +24,23 @@ h3 { font-size: 15px !important; font-weight: 600 !important; color: #e2e8f0 !im
 }
 
 .lfx-u-body-sm {
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  color: #9ab8d0 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.8px !important;
-  margin-bottom: 4px !important;
-  display: block !important;
+  font-size: 10px !important; font-weight: 700 !important; color: #9ab8d0 !important;
+  text-transform: capitalize !important; letter-spacing: 0.8px !important;
+  margin-bottom: 4px !important; display: block !important;
 }
 .lfx-u-body-md { font-size: 14px !important; color: #e2e8f0 !important; line-height: 1.7 !important; }
-
 .aip-line { border: none !important; border-top: 1px solid rgba(79,142,247,0.12) !important; margin: 20px 0 16px !important; }
 
 .lfx-c-avatar {
-  background: linear-gradient(135deg, #4f8ef7 0%, #6366f1 100%) !important;
-  color: #fff !important;
-  border-radius: 50% !important;
-  width: 32px !important;
-  height: 32px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  flex-shrink: 0 !important;
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+  color: #fff !important; border-radius: 50% !important;
+  width: 32px !important; height: 32px !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  font-size: 12px !important; font-weight: 600 !important; flex-shrink: 0 !important;
 }
 
-.icons { color: #4f8ef7 !important; cursor: pointer !important; transition: color 0.15s !important; }
-.icons:hover { color: #7eb8ff !important; }
+.icons { color: #4f8ef7 !important; cursor: pointer !important; transition: color 0.15s !important; &:hover { color: #7eb8ff !important; } }
 .icons-group { display: flex !important; align-items: center !important; gap: 4px !important; }
-
 .lfx-u-header-lg { font-size: 13px !important; font-weight: 700 !important; color: #b8cce0 !important; }
 
 :host ::ng-deep mat-card.mb-3 {
@@ -59,20 +51,202 @@ h3 { font-size: 15px !important; font-weight: 600 !important; color: #e2e8f0 !im
   overflow: hidden !important;
 }
 
-body.header-light-theme {
-  h2 { color: #0f172a !important; }
-  h3 { color: #1e293b !important; }
-  .aip-panel-shadow {
-    background: rgba(255,255,255,0.97) !important;
-    border-color: rgba(79,70,229,0.15) !important;
-    box-shadow: 0 8px 32px rgba(99,102,241,0.08) !important;
+// ── Form-field-style view display (matches create/edit appearance) ─────────────
+.view-field {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0 8px;
+  border-bottom: 1px solid rgba(79,142,247,0.1);
+  margin-bottom: 4px;
+
+  &:last-child { border-bottom: none; }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7a9cbf;
+    text-transform: capitalize;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+    display: block;
   }
+
+  &__value {
+    font-size: 14px;
+    color: #e2e8f0;
+    line-height: 1.6;
+    word-break: break-word;
+    min-height: 24px;
+
+    &--row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  &__link-icon {
+    font-size: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    color: #4f8ef7;
+    cursor: pointer;
+    transition: color 0.15s;
+    flex-shrink: 0;
+    &:hover { color: #7eb8ff; }
+  }
+}
+
+.aip-daa { color: #7eb8ff !important; font-size: 13px !important; font-weight: 500; transition: color 0.15s; text-decoration: none !important; }
+.lfx-u-mar-lr-8 mat-icon { color: #4f8ef7 !important; }
+
+// Remove underlines from all value text in the overview panel
+.lfx-u-body-md p, .lfx-u-body-md a { text-decoration: none !important; }
+p.lfx-u-body-md { text-decoration: none !important; }
+
+// Remove default hr line styles — use our aip-line instead
+hr:not(.aip-line) { display: none !important; }
+
+// ── Connected Artifacts empty-state image — blue tint ────────────────────────
+// Shift the violet/purple SVG to match the blue design system
+.img-color {
+  filter: hue-rotate(200deg) saturate(0.85) brightness(1.1) !important;
+}
+
+// ── View details — form-field style for label/value rows ──────────────────────
+// Labels like "DESCRIPTION", "APP TRYOUT LINK"
+.aip-label-color, .lfx-u-body-sm.aip-label-color {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #7a9cbf !important;
+  text-transform: capitalize !important;
+  letter-spacing: 0.6px !important;
+  margin-bottom: 2px !important;
+}
+// Value rows — give them a bottom underline like a form field
+.ml-2.row.col-md-12 {
+  border-bottom: 1px solid rgba(79,142,247,0.18) !important;
+  padding-bottom: 10px !important;
+  margin-bottom: 4px !important;
+  &:last-of-type { border-bottom: none !important; }
+}
+
+.full-width { width: 100% !important; }
+
+// ── Try-out link modal styles ─────────────────────────────────────────────────
+.tryout-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  margin: 0;
+  text-decoration: none !important;
+}
+
+.tryout-update-btn {
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+  color: #fff !important; border: none !important; border-radius: 8px !important;
+  font-size: 13px !important; font-weight: 600 !important; padding: 7px 22px !important;
+  cursor: pointer; box-shadow: 0 2px 12px rgba(79,142,247,0.35) !important;
+  transition: box-shadow 0.15s, transform 0.12s !important;
+  &:hover { box-shadow: 0 4px 20px rgba(79,142,247,0.5) !important; transform: translateY(-1px) !important; }
+  &[disabled] { opacity: 0.4 !important; cursor: not-allowed !important; box-shadow: none !important; }
+}
+
+// Try-out link form field — modal is rendered outside :host (NgbModal appends to body),
+// so ::ng-deep with :host won't reach it. Use global-scoped ::ng-deep instead.
+::ng-deep .tryout-form .full-width {
+  --mdc-filled-text-field-container-color: transparent;
+  --mdc-filled-text-field-hover-state-layer-opacity: 0;
+  --mdc-filled-text-field-focus-state-layer-opacity: 0;
+
+  .mdc-text-field--filled:not(.mdc-text-field--disabled),
+  .mdc-text-field--filled:hover:not(.mdc-text-field--disabled) {
+    background-color: transparent !important;
+    background: transparent !important;
+  }
+
+  .mat-mdc-form-field-focus-overlay { display: none !important; }
+  .mdc-text-field__ripple { display: none !important; }
+  .mdc-line-ripple { display: none !important; }
+}
+
+// Modal title
+:host ::ng-deep .lfx-u-header-xl { text-decoration: none !important; }
+:host ::ng-deep mat-icon[mat-dialog-close] { cursor: pointer; color: #b8cce0; }
+
+// ── Light Theme — :host-context for proper Angular scoping ───────────────────
+:host-context(body.header-light-theme) {
+  // Title — dark text on light background
+  h2, .page-title { color: #0f172a !important; }
+  h3 { color: #1e293b !important; }
+
+  .aip-led-icons { color: #475569 !important; }
+
+  .aip-panel-shadow {
+    background: #ffffff !important;
+    border-color: rgba(79,70,229,0.15) !important;
+    box-shadow: 0 8px 32px rgba(99,102,241,0.08), 0 1px 0 rgba(0,0,0,0.04) !important;
+  }
+
   .lfx-u-body-sm { color: #4A5568 !important; }
   .lfx-u-body-md { color: #0f172a !important; }
   .aip-line { border-top-color: rgba(79,70,229,0.1) !important; }
   .lfx-u-header-lg { color: #4A5568 !important; }
+  .icons { color: #234f99 !important; &:hover { color: #0a1d61 !important; } }
+  .aip-daa { color: #234f99 !important; text-decoration: none !important; }
+  .lfx-u-mar-lr-8 mat-icon { color: #234f99 !important; }
+
+  .view-field {
+    border-bottom-color: rgba(99,102,241,0.12);
+    &__label { color: #64748b; }
+    &__value { color: #0f172a; }
+    &__link-icon { color: #234f99; &:hover { color: #0a1d61; } }
+  }
+  .lfx-u-body-md p, .lfx-u-body-md a { text-decoration: none !important; color: #0f172a !important; }
+  // Fix tryout title invisible on white background
+  .tryout-modal-title { color: #0f172a !important; }
+  .tryout-update-btn { background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important; box-shadow: 0 2px 12px rgba(35,79,153,0.35) !important; }
+  :host ::ng-deep .lfx-u-header-xl { color: #0f172a !important; text-decoration: none !important; }
+  // Icons group top-right
+  .icons-group button mat-icon { color: #234f99 !important; }
+
+  // Light theme field-row dividers
+  .ml-2.row.col-md-12 { border-bottom-color: rgba(99,102,241,0.14) !important; }
+
+  // Light theme label color
+  .aip-label-color, .lfx-u-body-sm.aip-label-color { color: #64748b !important; }
+
+  // Connected artifacts image — blue in light theme too
+  .img-color { filter: hue-rotate(200deg) saturate(0.8) brightness(0.95) !important; }
+
   :host ::ng-deep mat-card.mb-3 {
-    background: rgba(255,255,255,0.97) !important;
+    background: #ffffff !important;
     border-color: rgba(79,70,229,0.12) !important;
+    box-shadow: 0 4px 16px rgba(99,102,241,0.07) !important;
+  }
+}
+
+// ── Dark Theme explicit ───────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
+  h2, .page-title { color: #e2e8f0 !important; }
+  h3 { color: #e2e8f0 !important; }
+  .aip-led-icons { color: #b8cce0 !important; }
+  .aip-panel-shadow { background: rgba(8,14,36,0.82) !important; border-color: rgba(79,142,247,0.18) !important; }
+  .lfx-u-body-sm { color: #9ab8d0 !important; }
+  .lfx-u-body-md { color: #e2e8f0 !important; }
+  .lfx-u-header-lg { color: #b8cce0 !important; }
+  .tryout-modal-title { color: #e2e8f0 !important; }
+  .icons { color: #4f8ef7 !important; }
+  .icons-group button mat-icon { color: #7eb8ff !important; }
+  .aip-daa { color: #7eb8ff !important; }
+  :host ::ng-deep mat-card.mb-3 { background: rgba(8,14,36,0.82) !important; border-color: rgba(79,142,247,0.18) !important; }
+
+  .view-field {
+    border-bottom-color: rgba(79,142,247,0.1);
+    &__label { color: #7a9cbf; }
+    &__value { color: #e2e8f0; }
+    &__link-icon { color: #4f8ef7; &:hover { color: #7eb8ff; } }
   }
 }

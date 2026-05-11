@@ -70,9 +70,7 @@ div.example-container {
   display: flex;
   flex-direction: column;
 
-  &.top-nav-mode {
-    // top-nav-mode handled by flexbox — no extra offset needed
-  }
+  &.top-nav-mode { padding-top: 0; }
 }
 
 // top-nav-bar layout is handled in shell-app-ui/src/styles.scss
@@ -141,9 +139,9 @@ aip-card {
   background: rgba(255, 255, 255, 0.97) !important;
   backdrop-filter: blur(20px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border: 1px solid rgba(99, 102, 241, 0.18) !important;
+  border: 1px solid rgba(35, 79, 153, 0.18) !important;
   box-shadow:
-    0 2px 12px rgba(99, 102, 241, 0.08),
+    0 2px 12px rgba(35, 79, 153, 0.08),
     0 1px 4px rgba(0, 0, 0, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 1) !important;
   transition:
@@ -158,7 +156,7 @@ aip-card {
     position: absolute;
     top: 4px; right: 0;
     width: 180px; height: 120px;
-    background: radial-gradient(ellipse at 90% 10%, rgba(139, 92, 246, 0.05), transparent 70%);
+    background: radial-gradient(ellipse at 90% 10%, rgba(35, 79, 153, 0.05), transparent 70%);
     z-index: 0;
     pointer-events: none;
     border-radius: 0 18px 0 0;
@@ -178,15 +176,15 @@ aip-card {
   &:hover {
     transform: translateY(-7px) !important;
     background: rgba(255, 255, 255, 1) !important;
-    border-color: rgba(99, 102, 241, 0.45) !important;
+    border-color: rgba(35, 79, 153, 0.45) !important;
     box-shadow:
-      0 0 0 1px rgba(99, 102, 241, 0.2),
-      0 8px 24px rgba(99, 102, 241, 0.18),
-      0 20px 50px rgba(99, 102, 241, 0.12),
+      0 0 0 1px rgba(35, 79, 153, 0.2),
+      0 8px 24px rgba(35, 79, 153, 0.18),
+      0 20px 50px rgba(35, 79, 153, 0.12),
       inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 
     &::before {
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.7), 0 0 50px rgba(139, 92, 246, 0.25);
+      box-shadow: 0 0 20px rgba(35, 79, 153, 0.5), 0 0 50px rgba(10, 29, 97, 0.2);
       height: 5px;
     }
   }
@@ -208,14 +206,14 @@ aip-card {
   font-size: 1.1rem !important;
   font-weight: 700 !important;
   font-family: "Inter", "Roboto", "Segoe UI", sans-serif !important;
-  color: #1e1b4b !important;
+  color: #0f172a !important;
   line-height: 1.35;
   margin: 0 0 5px 0 !important;
   letter-spacing: -0.015em;
   transition: color 0.2s;
 }
 
-.lfx-c-card.mat-mdc-card:hover .card-main-title { color: #4f46e5 !important; }
+.lfx-c-card.mat-mdc-card:hover .card-main-title { color: #234f99 !important; }
 
 .card-main-date {
   font-size: 11px !important;
@@ -252,11 +250,8 @@ aip-card {
 }
 
 // Badge variants — light mode defaults
-.badge-model, .badge-pipeline {
-  background: rgba(139, 92, 246, 0.1);
-  color: #7c3aed;
-  border: 1px solid rgba(139, 92, 246, 0.22);
-}
+.badge-model { background: rgba(139, 92, 246, 0.1); color: #7c3aed; border: 1px solid rgba(139, 92, 246, 0.22); }
+.badge-pipeline { background: rgba(35, 79, 153, 0.1); color: #234f99; border: 1px solid rgba(35, 79, 153, 0.22); }
 .badge-adapter {
   background: rgba(29, 78, 216, 0.1);
   color: #1d4ed8;
@@ -300,7 +295,7 @@ aip-card {
   transition: color 0.15s, background 0.15s;
   position: relative;
   z-index: 1;
-  &:hover { color: #4f46e5; background: rgba(99, 102, 241, 0.1); }
+  &:hover { color: #234f99; background: rgba(35, 79, 153, 0.1); }
 }
 
 .lfx-c-card__action-hover {
@@ -311,7 +306,7 @@ aip-card {
   background: rgba(250, 249, 255, 0.98) !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
-  border-top: 1px solid rgba(99, 102, 241, 0.08) !important;
+  border-top: 1px solid rgba(35, 79, 153, 0.08) !important;
   transition: background 0.2s;
 }
 
@@ -339,21 +334,21 @@ mat-card-actions.card-actions-hover {
   border: none !important;
   cursor: pointer !important;
   font-family: "Inter", "Roboto", sans-serif !important;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 60%, #a78bfa 100%) !important;
-  box-shadow: 0 3px 14px rgba(99, 102, 241, 0.4) !important;
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+  box-shadow: 0 3px 14px rgba(35, 79, 153, 0.4) !important;
   transition: box-shadow 0.2s, transform 0.2s !important;
   padding: 0 14px !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 5px !important;
   &:hover {
-    box-shadow: 0 6px 22px rgba(99, 102, 241, 0.55) !important;
+    box-shadow: 0 6px 22px rgba(35, 79, 153, 0.55) !important;
     transform: translateY(-1px) !important;
   }
 }
 
 .lfx-c-avatar {
-  background: var(--avatar-bg-color, rgba(99, 102, 241, 0.1));
+  background: var(--avatar-bg-color, rgba(35, 79, 153, 0.1));
   border-radius: 50%;
   text-align: center;
   vertical-align: middle;
@@ -365,12 +360,12 @@ mat-card-actions.card-actions-hover {
   font-size: 12px;
   line-height: 30px !important;
   padding: 0;
-  color: #4f46e5;
-  border: 1.5px solid rgba(99, 102, 241, 0.2);
+  color: #234f99;
+  border: 1.5px solid rgba(35, 79, 153, 0.2);
   transition: transform 0.18s, box-shadow 0.18s;
   &:hover {
     transform: scale(1.12);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18), 0 2px 10px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 3px rgba(35, 79, 153, 0.18), 0 2px 10px rgba(35, 79, 153, 0.2);
   }
 }
 
@@ -381,20 +376,20 @@ mat-card-actions.card-actions-hover {
   cursor: pointer;
   color: #94a3b8;
   transition: color 0.15s, background 0.15s;
-  &.aip-icon-hover, &:hover { color: #4f46e5; background: rgba(99, 102, 241, 0.08); }
+  &.aip-icon-hover, &:hover { color: #234f99; background: rgba(35, 79, 153, 0.08); }
 }
 
 .action-icon {
   font-size: 17px; height: 17px; color: #94a3b8; cursor: pointer;
   transition: color 0.15s;
-  &:hover { color: #4f46e5; }
+  &:hover { color: #234f99; }
 }
 
 .agent-dir-stat {
   gap: 3px; padding: 2px 8px; border-radius: 6px;
   cursor: default; transition: background 0.15s;
   img { border-radius: 3px; opacity: 0.75; }
-  &:hover { background: rgba(99, 102, 241, 0.08); img { opacity: 1; } }
+  &:hover { background: rgba(35, 79, 153, 0.08); img { opacity: 1; } }
 }
 
 .small-count {
@@ -438,8 +433,8 @@ mat-card-actions.card-actions-hover {
       font-size: 22px; width: 22px; height: 22px;
       color: #6b7280;
       transition: color 0.2s ease; cursor: pointer; flex-shrink: 0;
-      &.active { color: #4f46e5; }
-      &:hover { color: #4f46e5; }
+      &.active { color: #234f99; }
+      &:hover { color: #234f99; }
     }
 
     h3 {
@@ -458,8 +453,8 @@ mat-card-actions.card-actions-hover {
       font-size: 10px; font-weight: 600;
       text-transform: uppercase; letter-spacing: 0.06em;
       padding: 2px 8px; border-radius: 20px;
-      background: rgba(79, 70, 229, 0.09); color: #4f46e5;
-      border: 1px solid rgba(79, 70, 229, 0.18);
+      background: rgba(35, 79, 153, 0.09); color: #234f99;
+      border: 1px solid rgba(35, 79, 153, 0.18);
     }
   }
 
@@ -477,7 +472,7 @@ mat-card-actions.card-actions-hover {
 
     .lfx-panel {
       background: rgba(248, 250, 252, 0.9);
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(99, 102, 241, 0.16);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(35, 79, 153, 0.16);
       border: none; border-radius: 20px;
       display: flex; align-items: center;
       height: 32px; padding: 0 8px 0 12px;
@@ -485,7 +480,7 @@ mat-card-actions.card-actions-hover {
 
       &:focus-within {
         background: #ffffff;
-        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15), inset 0 0 0 1.5px rgba(79, 70, 229, 0.4);
+        box-shadow: 0 2px 8px rgba(35, 79, 153, 0.15), inset 0 0 0 1.5px rgba(35, 79, 153, 0.4);
       }
 
       .lfx-panel-input {
@@ -499,7 +494,7 @@ mat-card-actions.card-actions-hover {
       mat-icon {
         font-size: 18px; width: 18px; height: 18px;
         color: #94a3b8; transition: color 0.2s ease; cursor: pointer;
-        &.active, &:hover { color: #4f46e5; }
+        &.active, &:hover { color: #234f99; }
       }
     }
 
@@ -507,14 +502,14 @@ mat-card-actions.card-actions-hover {
       display: flex; align-items: center; justify-content: center;
       width: 34px; height: 34px; border-radius: 8px;
       transition: background 0.15s ease; cursor: pointer;
-      &:hover { background: rgba(79, 70, 229, 0.08); }
+      &:hover { background: rgba(35, 79, 153, 0.08); }
 
       mat-icon {
         font-size: 24px; height: 24px; width: 24px;
         cursor: pointer; font-weight: 400; color: #6b7280;
         transition: color 0.2s ease, transform 0.2s ease;
-        &.active { color: #4f46e5; }
-        &:hover { color: #4f46e5; }
+        &.active { color: #234f99; }
+        &:hover { color: #234f99; }
         &.rotate-icon { animation: rotate 0.5s linear infinite; }
       }
     }
@@ -539,10 +534,10 @@ mat-card-actions.card-actions-hover {
   border-radius: 14px;
   margin-top: 4px;
   margin-bottom: 20px;
-  border: 1px solid rgba(99, 102, 241, 0.13);
-  box-shadow: 0 2px 12px rgba(79, 70, 229, 0.07), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(35, 79, 153, 0.13);
+  box-shadow: 0 2px 12px rgba(35, 79, 153, 0.07), 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.25s ease, border-color 0.25s ease;
-  &:hover { box-shadow: 0 4px 20px rgba(79, 70, 229, 0.1), 0 1px 4px rgba(0, 0, 0, 0.06); }
+  &:hover { box-shadow: 0 4px 20px rgba(35, 79, 153, 0.1), 0 1px 4px rgba(0, 0, 0, 0.06); }
   &--expanded { z-index: 100; }
 
   &__header {
@@ -550,15 +545,15 @@ mat-card-actions.card-actions-hover {
     padding: 0 20px; height: 48px;
     background: transparent; border-radius: 14px;
     cursor: pointer; transition: background 0.15s ease;
-    &:hover { background: rgba(79, 70, 229, 0.03); }
+    &:hover { background: rgba(35, 79, 153, 0.03); }
   }
 
   &__icon-container { display: flex; align-items: center; }
 
   &__icon {
     cursor: pointer; font-size: 20px; width: 20px; height: 20px;
-    color: #6366f1; transition: color 0.2s ease, transform 0.2s ease;
-    &:hover { color: #4f46e5; transform: scale(1.1); }
+    color: #234f99; transition: color 0.2s ease, transform 0.2s ease;
+    &:hover { color: #0a1d61; transform: scale(1.1); }
   }
 
   &__title-container { margin: 0 10px; flex: 1; }
@@ -573,18 +568,18 @@ mat-card-actions.card-actions-hover {
   &__toggle-container {
     display: flex; align-items: center; justify-content: center;
     width: 30px; height: 30px; border-radius: 8px; transition: background 0.15s ease;
-    &:hover { background: rgba(79, 70, 229, 0.08); }
+    &:hover { background: rgba(35, 79, 153, 0.08); }
   }
 
   &__toggle-icon {
     color: #94a3b8; font-size: 20px; width: 20px; height: 20px;
     transition: transform 0.3s ease, color 0.2s ease;
-    &:hover { color: #4f46e5; }
+    &:hover { color: #234f99; }
     &--rotated { transform: rotate(180deg); }
   }
 
   &__header--collapsed { border-radius: 14px; }
-  &__header--expanded { border-radius: 14px 14px 0 0; border-bottom: 1px solid rgba(99, 102, 241, 0.1); }
+  &__header--expanded { border-radius: 14px 14px 0 0; border-bottom: 1px solid rgba(35, 79, 153, 0.1); }
 
   &__content {
     padding: 16px 20px 20px;
@@ -621,17 +616,17 @@ mat-card-actions.card-actions-hover {
 .chip-input {
   display: inline-flex; align-items: center; justify-content: space-between;
   min-width: 80px; max-width: 140px; height: 28px; padding: 0 6px 0 10px;
-  background: rgba(79, 70, 229, 0.07); border: 1px solid rgba(79, 70, 229, 0.2);
+  background: rgba(35, 79, 153, 0.07); border: 1px solid rgba(35, 79, 153, 0.2);
   border-radius: 20px; font-family: "Inter", "Roboto", "Segoe UI", sans-serif !important;
-  font-size: 11px; font-weight: 500; color: #4f46e5; transition: all 0.2s ease;
-  &:hover { background: rgba(79, 70, 229, 0.12); border-color: rgba(79, 70, 229, 0.35); }
+  font-size: 11px; font-weight: 500; color: #234f99; transition: all 0.2s ease;
+  &:hover { background: rgba(35, 79, 153, 0.12); border-color: rgba(35, 79, 153, 0.35); }
   .chip-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 4px; }
   .chip-close {
     display: flex; align-items: center; justify-content: center;
     background: transparent; border: none; border-radius: 50%;
     width: 16px; height: 16px; padding: 0; cursor: pointer;
-    color: #7c3aed; opacity: 0.6;
-    &:hover { background-color: rgba(79, 70, 229, 0.15); opacity: 1; }
+    color: #234f99; opacity: 0.6;
+    &:hover { background-color: rgba(35, 79, 153, 0.15); opacity: 1; }
     mat-icon { font-size: 12px; width: 12px; height: 12px; line-height: 12px; }
   }
 }
@@ -648,9 +643,9 @@ mat-card-actions.card-actions-hover {
   background: transparent; border: none; border-radius: 8px;
   width: 32px; height: 32px; display: flex; align-items: center;
   justify-content: center; cursor: pointer; transition: all 0.15s ease; color: #6b7280;
-  &:hover, &.menu-trigger-hovered { background-color: rgba(79, 70, 229, 0.08); color: #4f46e5; }
+  &:hover, &.menu-trigger-hovered { background-color: rgba(35, 79, 153, 0.08); color: #234f99; }
   &:active { transform: scale(0.94); }
-  &:focus { outline: 2px solid rgba(79, 70, 229, 0.25); outline-offset: 2px; }
+  &:focus { outline: 2px solid rgba(35, 79, 153, 0.25); outline-offset: 2px; }
 }
 
 .menu-icon { font-size: 18px; width: 18px; height: 18px; line-height: 18px; }
@@ -661,8 +656,8 @@ mat-card-actions.card-actions-hover {
     .mdc-form-field { font-family: "Inter", "Roboto", "Segoe UI", sans-serif !important; font-size: 13px; color: #374151; }
     .mdc-checkbox { padding: 0; margin-right: 6px; }
     .mdc-checkbox__background { border-color: #9ca3af; border-radius: 4px; }
-    &:hover .mdc-checkbox__background { border-color: #4f46e5; }
-    .mdc-checkbox--selected .mdc-checkbox__background { background-color: #4f46e5; border-color: #4f46e5; }
+    &:hover .mdc-checkbox__background { border-color: #234f99; }
+    .mdc-checkbox--selected .mdc-checkbox__background { background-color: #234f99; border-color: #234f99; }
   }
 }
 
@@ -670,7 +665,7 @@ mat-card-actions.card-actions-hover {
   display: flex; gap: 12px; align-items: center; margin-top: 6px;
   .date-field { flex: 1; min-width: 140px; }
   .mat-mdc-form-field { width: 100%; }
-  .mat-datepicker-toggle { color: #94a3b8; &:hover { color: #4f46e5; } }
+  .mat-datepicker-toggle { color: #94a3b8; &:hover { color: #234f99; } }
 }
 
 // ─── Context Menus ─────────────────────────────────────────────────────────────
@@ -700,9 +695,9 @@ mat-card-actions.card-actions-hover {
   transition: background 0.15s, border-color 0.15s !important;
   .mdc-list-item__primary-text { color: #374151 !important; }
   &:hover:not([disabled]) {
-    background: rgba(99, 102, 241, 0.07) !important;
-    border-left-color: #6366f1 !important;
-    .mdc-list-item__primary-text { color: #1e1b4b !important; }
+    background: rgba(35, 79, 153, 0.07) !important;
+    border-left-color: #234f99 !important;
+    .mdc-list-item__primary-text { color: #0f172a !important; }
   }
 }
 
@@ -719,7 +714,7 @@ mat-card-actions.card-actions-hover {
   .mat-mdc-optgroup-label { font-weight: 600; color: #1e293b; }
 }
 
-.aip-menu-icon   { margin-right: 10px; font-size: 17px; color: #6366f1; }
+.aip-menu-icon   { margin-right: 10px; font-size: 17px; color: #234f99; }
 .aip-menu-delete { color: #ef4444 !important; margin-right: 10px; font-size: 17px; }
 
 // ─── Material Overrides ─────────────────────────────────────────────────────────
@@ -858,15 +853,15 @@ body.header-light-theme {
 .le-c-form-field.mat-mdc-form-field .mat-mdc-form-field-infix { padding: 0.4rem 0 0 !important; }
 
 .mat-mdc-chip {
-  background-color: rgba(79, 70, 229, 0.07) !important;
+  background-color: rgba(35, 79, 153, 0.07) !important;
   font-size: 11px; font-weight: 500;
   font-family: "Inter", "Roboto", "Segoe UI", sans-serif !important;
-  color: #4f46e5 !important;
-  border: 1px solid rgba(79, 70, 229, 0.2) !important;
+  color: #234f99 !important;
+  border: 1px solid rgba(35, 79, 153, 0.2) !important;
   border-radius: 20px !important;
   height: 26px !important; padding: 0 8px !important;
-  .mdc-evolution-chip__text-label { color: #4f46e5 !important; font-size: 11px !important; }
-  &:hover { background-color: rgba(79, 70, 229, 0.12) !important; }
+  .mdc-evolution-chip__text-label { color: #234f99 !important; font-size: 11px !important; }
+  &:hover { background-color: rgba(35, 79, 153, 0.12) !important; }
 }
 
 .mat-mdc-tab-group { display: flex; flex-direction: column; max-width: 100%; height: 76%; margin-top: 12px; }
@@ -1237,7 +1232,7 @@ body.header-light-theme {
 .pagination-arrow {
   font-size: 20px; cursor: pointer; padding: 4px; border-radius: 6px;
   color: #94a3b8; transition: color 0.15s, background 0.15s;
-  &.active { color: #4f46e5; &:hover { background: rgba(79, 70, 229, 0.08); } }
+  &.active { color: #234f99; &:hover { background: rgba(35, 79, 153, 0.08); } }
   &.disabled { color: #e2e8f0; cursor: not-allowed; }
 }
 
@@ -1248,7 +1243,7 @@ body.header-light-theme {
   cursor: pointer; transition: background 0.15s, color 0.15s, box-shadow 0.15s;
   background: #f8fafc; color: #64748b;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(35, 79, 153, 0.1);
 
   &.selected-page {
     background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
@@ -1256,7 +1251,7 @@ body.header-light-theme {
     box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
   }
 
-  &:hover:not(.selected-page) { background: rgba(79, 70, 229, 0.06); color: #4f46e5; border-color: rgba(79, 70, 229, 0.2); }
+  &:hover:not(.selected-page) { background: rgba(35, 79, 153, 0.06); color: #234f99; border-color: rgba(35, 79, 153, 0.2); }
 }
 
 // ─── Animations ─────────────────────────────────────────────────────────────────
@@ -1271,6 +1266,108 @@ body.header-light-theme {
 .text-highlight { background-color: #8626c34a; text-decoration: underline; font-size: 1.4rem; font-weight: 900; }
 
 // ─── DARK THEME ────────────────────────────────────────────────────────────────
+// App Details dialog — dark theme (outside body.header-dark-theme so it works globally)
+body.header-dark-theme .app-details-dialog .mat-mdc-dialog-container,
+body.header-dark-theme .app-details-dialog .mdc-dialog__surface {
+  background: #0e1a38 !important;
+  border-radius: 16px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(79,142,247,0.22) !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.06) inset !important;
+}
+
+// ── App Details dialog — no underline (high-specificity selectors beat Material) ─
+.app-details-dialog {
+  // Transparent bg, no hover highlight
+  .mdc-text-field--filled,
+  .mdc-text-field--filled:hover,
+  .mdc-text-field--filled.mdc-text-field--focused {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-bottom: none !important;
+    transition: none !important;
+  }
+  // Direct border-color: transparent on the ripple pseudo-elements — beats CSS var approach
+  .mdc-line-ripple::before,
+  .mdc-line-ripple::after { border-bottom-color: transparent !important; border-color: transparent !important; }
+  .mat-mdc-form-field .mdc-line-ripple,
+  .mat-mdc-form-field.mat-mdc-form-field-type-mat-input .mdc-line-ripple,
+  .mat-mdc-form-field.mat-mdc-form-field-type-mat-select .mdc-line-ripple { display: none !important; }
+  .mdc-text-field--filled .mdc-text-field__ripple { display: none !important; }
+  .mdc-text-field--filled::after,
+  .mdc-text-field--filled::before { display: none !important; }
+  .mat-mdc-form-field-focus-overlay { opacity: 0 !important; background: transparent !important; }
+  .mat-mdc-text-field-wrapper { box-shadow: none !important; }
+  // Zero MDC indicator height via CSS variables
+  .mat-mdc-form-field {
+    --mdc-filled-text-field-container-color: transparent;
+    --mdc-filled-text-field-active-indicator-height: 0px;
+    --mdc-filled-text-field-focus-active-indicator-height: 0px;
+    --mdc-filled-text-field-hover-state-layer-opacity: 0;
+    --mdc-filled-text-field-focus-state-layer-opacity: 0;
+  }
+}
+
+// ── NgbModal (Try out link popup) — no underline, themed title ────────────────
+ngb-modal-window {
+  .mdc-text-field--filled,
+  .mdc-text-field--filled:hover,
+  .mdc-text-field--filled.mdc-text-field--focused {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-bottom: none !important;
+    transition: none !important;
+  }
+  .mat-mdc-form-field .mdc-line-ripple,
+  .mat-mdc-form-field.mat-mdc-form-field-type-mat-input .mdc-line-ripple { display: none !important; }
+  .mat-mdc-form-field .mdc-line-ripple::before,
+  .mat-mdc-form-field .mdc-line-ripple::after { display: none !important; border: none !important; height: 0 !important; }
+  .mdc-text-field--filled .mdc-text-field__ripple { display: none !important; }
+  .mdc-text-field--filled::after,
+  .mdc-text-field--filled::before { display: none !important; }
+  .mat-mdc-form-field-focus-overlay { opacity: 0 !important; }
+  .mat-mdc-text-field-wrapper { box-shadow: none !important; }
+  .mat-mdc-form-field {
+    --mdc-filled-text-field-container-color: transparent;
+    --mdc-filled-text-field-active-indicator-height: 0px;
+    --mdc-filled-text-field-focus-active-indicator-height: 0px;
+  }
+}
+
+// NgbModal — light theme: title visible + input readable
+body.header-light-theme ngb-modal-window {
+  .modal-content { background: #ffffff !important; color: #0f172a !important; }
+  // Title specifically targeted — was #e2e8f0 (white-ish) causing invisibility
+  .tryout-modal-title,
+  .modal-title, h4, h3 { color: #0f172a !important; font-weight: 600; }
+  .mat-dialog-title, .mat-dialog-title * { color: #0f172a !important; }
+  .mat-mdc-input-element { color: #0f172a !important; }
+  .mdc-floating-label { color: #64748b !important; }
+  .mdc-floating-label--float-above { color: #234f99 !important; }
+  // Update button in tryout modal
+  .tryout-update-btn {
+    background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+    color: #fff !important; border: none !important; border-radius: 8px !important;
+    font-size: 13px !important; font-weight: 600 !important; padding: 7px 22px !important;
+  }
+}
+// NgbModal — dark theme
+body.header-dark-theme ngb-modal-window {
+  .modal-content { background: #0e1a38 !important; color: #e2e8f0 !important; border-color: rgba(79,142,247,0.22) !important; }
+  .tryout-modal-title,
+  .modal-title, h4, h3 { color: #e2e8f0 !important; font-weight: 600; }
+  .mat-dialog-title mat-icon { color: #b8cce0 !important; }
+  .mat-mdc-input-element { color: #e2e8f0 !important; }
+  .mdc-floating-label { color: #b8cce0 !important; }
+  .mdc-floating-label--float-above { color: #7eb8ff !important; }
+  .tryout-update-btn {
+    background: linear-gradient(135deg, #4f8ef7 0%, #7c3aed 100%) !important;
+    color: #fff !important; border: none !important; border-radius: 8px !important;
+    font-size: 13px !important; font-weight: 600 !important; padding: 7px 22px !important;
+  }
+}
+
 body.header-dark-theme {
   background: linear-gradient(135deg, #0a0f1e 0%, #0d1530 60%, #0a1628 100%) !important;
   background-attachment: fixed !important;
@@ -1316,12 +1413,12 @@ body.header-dark-theme {
     background: rgba(10, 16, 40, 0.96) !important;
     backdrop-filter: blur(16px) saturate(140%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
-    border: 1px solid rgba(99, 102, 241, 0.16) !important;
+    border: 1px solid rgba(35, 79, 153, 0.16) !important;
     box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04) !important;
 
     // Top gradient removed per user request
     &::after {
-      background: radial-gradient(ellipse at 90% 10%, rgba(129,140,248,0.08), transparent 70%) !important;
+      background: radial-gradient(ellipse at 90% 10%, rgba(35,79,153,0.08), transparent 70%) !important;
     }
 
     &:hover .card-shimmer-sweep {
@@ -1335,10 +1432,10 @@ body.header-dark-theme {
     &:hover {
       transform: translateY(-6px) !important;
       background: rgba(15, 23, 56, 0.98) !important;
-      border-color: rgba(129, 140, 248, 0.55) !important;
+      border-color: rgba(79, 142, 247, 0.55) !important;
       box-shadow:
-        0 0 0 1px rgba(129, 140, 248, 0.3),
-        0 8px 32px rgba(129, 140, 248, 0.2),
+        0 0 0 1px rgba(79, 142, 247, 0.3),
+        0 8px 32px rgba(79, 142, 247, 0.2),
         0 24px 56px rgba(0, 0, 0, 0.65),
         inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
     }
@@ -1346,7 +1443,7 @@ body.header-dark-theme {
 
   .card-main-title { color: #e2e8f0 !important; }
   .card-main-date  { color: #475569 !important; }
-  .lfx-c-card.mat-mdc-card:hover .card-main-title { color: #a5b4fc !important; }
+  .lfx-c-card.mat-mdc-card:hover .card-main-title { color: #7eb8ff !important; }
 
   .card-type-badge { box-shadow: none !important; border-radius: 20px !important; }
   .badge-model, .badge-pipeline {
@@ -1379,24 +1476,24 @@ body.header-dark-theme {
 
   .card-action-icon {
     color: #475569 !important;
-    &:hover { color: #a5b4fc !important; background: rgba(99,102,241,0.12) !important; }
+    &:hover { color: #7eb8ff !important; background: rgba(79,142,247,0.12) !important; }
   }
   .lfx-c-card__action-hover {
     background: rgba(8, 12, 28, 0.98) !important;
-    border-top-color: rgba(99, 102, 241, 0.1) !important;
+    border-top-color: rgba(35, 79, 153, 0.1) !important;
     backdrop-filter: none !important;
   }
   .lfx-c-avatar {
-    color: #a5b4fc !important;
-    background: rgba(99,102,241,0.14) !important;
-    border-color: rgba(129,140,248,0.25) !important;
-    &:hover { box-shadow: 0 0 0 3px rgba(129,140,248,0.2), 0 2px 10px rgba(99,102,241,0.3) !important; }
+    color: #7eb8ff !important;
+    background: rgba(35,79,153,0.18) !important;
+    border-color: rgba(79,142,247,0.25) !important;
+    &:hover { box-shadow: 0 0 0 3px rgba(79,142,247,0.2), 0 2px 10px rgba(35,79,153,0.3) !important; }
   }
   .aip-more-actions-icon {
     color: #475569 !important;
-    &.aip-icon-hover, &:hover { color: #a5b4fc !important; background: rgba(99,102,241,0.12) !important; }
+    &.aip-icon-hover, &:hover { color: #7eb8ff !important; background: rgba(79,142,247,0.12) !important; }
   }
-  .action-icon { color: #475569 !important; &:hover { color: #a5b4fc !important; } }
+  .action-icon { color: #475569 !important; &:hover { color: #7eb8ff !important; } }
   .skill-badge {
     background: rgba(6,182,212,0.12) !important; color: #22d3ee !important;
     border-color: rgba(6,182,212,0.25) !important;
@@ -1404,7 +1501,7 @@ body.header-dark-theme {
   }
   .skill-badge-more { background: rgba(51,65,85,0.3) !important; color: #64748b !important; }
   .small-count { color: #475569 !important; }
-  .aip-menu-icon   { color: #818cf8 !important; }
+  .aip-menu-icon   { color: #7eb8ff !important; }
   .aip-menu-delete { color: #f87171 !important; }
 
   // Header
@@ -1482,7 +1579,7 @@ body.header-dark-theme {
   .mat-mdc-menu-item {
     color: #cbd5e1 !important;
     .mdc-list-item__primary-text { color: #cbd5e1 !important; }
-    &:hover:not([disabled]) { background: rgba(99,102,241,0.12) !important; border-left-color: #818cf8 !important; .mdc-list-item__primary-text { color: #f1f5f9 !important; } }
+    &:hover:not([disabled]) { background: rgba(35,79,153,0.12) !important; border-left-color: #4f8ef7 !important; .mdc-list-item__primary-text { color: #f1f5f9 !important; } }
   }
   .custom-menu .mat-mdc-menu-panel { background: #0d1b35 !important; border: 1px solid rgba(79,142,247,0.2) !important; box-shadow: 0 8px 28px rgba(0,0,0,0.55) !important; }
   .custom-menu .mat-mdc-menu-item { color: #cbd5e1 !important; &:hover { background-color: rgba(79,142,247,0.1) !important; } }
@@ -1577,10 +1674,10 @@ body.header-light-theme {
   // CSS variables for shell-app-ui sidebar/nav compatibility
   --background-colour: transparent;
   --bg-color: #ffffff;
-  --base-color: #4F46E5;
+  --base-color: #234f99;
   --text-color: #0A1628;
   --text-color-secondary: #4A5568;
-  --border-color: rgba(99, 102, 241, 0.13);
+  --border-color: rgba(35, 79, 153, 0.13);
   --sidebarbg-color: #003057;
   --sidebartext-color: #e2e8f0;
   --sidebaricon-color: #94a3b8;
@@ -1611,21 +1708,21 @@ body.header-light-theme {
     background: rgba(255,255,255,0.72) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-    border: 2px solid rgba(99,102,241,0.30) !important;
-    box-shadow: 0 4px 24px rgba(99,102,241,0.08), 0 1px 6px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+    border: 2px solid rgba(35,79,153,0.30) !important;
+    box-shadow: 0 4px 24px rgba(35,79,153,0.08), 0 1px 6px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.9) !important;
     color: #0f172a !important;
 
-    &::before { background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 45%, #06b6d4 100%) !important; box-shadow: 0 1px 12px rgba(99,102,241,0.45) !important; }
-    &:hover { background: rgba(255,255,255,0.88) !important; border-color: rgb(1 5 10 / 80%) !important; box-shadow: 0 22px 48px rgba(99,102,241,0.14), 0 8px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1) !important; &::before { box-shadow: 0 2px 20px rgba(99,102,241,0.6) !important; } }
+    &::before { background: linear-gradient(90deg, #234f99 0%, #0a1d61 45%, #06b6d4 100%) !important; box-shadow: 0 1px 12px rgba(35,79,153,0.45) !important; }
+    &:hover { background: rgba(255,255,255,0.88) !important; border-color: rgb(1 5 10 / 80%) !important; box-shadow: 0 22px 48px rgba(35,79,153,0.14), 0 8px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1) !important; &::before { box-shadow: 0 2px 20px rgba(35,79,153,0.6) !important; } }
   }
 
-  .card-main-title { color: #1e1b4b !important; }
+  .card-main-title { color: #0f172a !important; }
   .card-main-date  { color: #94a3b8 !important; }
-  .lfx-c-card.mat-mdc-card:hover .card-main-title { color: #4f46e5 !important; }
-  .lfx-c-card__action-hover { background: rgba(248,247,255,0.97) !important; border-top-color: rgba(99,102,241,0.1) !important; }
-  .lfx-c-avatar { color: #4f46e5 !important; background: rgba(99,102,241,0.08) !important; border-color: rgba(99,102,241,0.2) !important; }
-  .aip-more-actions-icon { color: #94a3b8 !important; &.aip-icon-hover, &:hover { color: #4f46e5 !important; background: rgba(99,102,241,0.07) !important; } }
-  .card-action-icon { color: #94a3b8 !important; &:hover { color: #4f46e5 !important; background: rgba(99,102,241,0.07) !important; } }
+  .lfx-c-card.mat-mdc-card:hover .card-main-title { color: #234f99 !important; }
+  .lfx-c-card__action-hover { background: rgba(248,250,255,0.97) !important; border-top-color: rgba(35,79,153,0.1) !important; }
+  .lfx-c-avatar { color: #234f99 !important; background: rgba(35,79,153,0.08) !important; border-color: rgba(35,79,153,0.2) !important; }
+  .aip-more-actions-icon { color: #94a3b8 !important; &.aip-icon-hover, &:hover { color: #234f99 !important; background: rgba(35,79,153,0.07) !important; } }
+  .card-action-icon { color: #94a3b8 !important; &:hover { color: #234f99 !important; background: rgba(35,79,153,0.07) !important; } }
 
   // Header
   .lfx-header {
@@ -1726,6 +1823,16 @@ body.header-light-theme {
 
   // Dialogs and overlays
   .mat-mdc-dialog-container { background: rgba(255, 255, 255, 0.98) !important; }
+
+  // App Details dialog — light theme
+  .app-details-dialog .mat-mdc-dialog-container,
+  .app-details-dialog .mdc-dialog__surface {
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-shadow: 0 16px 48px rgba(99,102,241,0.12), 0 2px 8px rgba(0,0,0,0.06) !important;
+  }
   .cdk-overlay-pane:not(.mat-mdc-select-panel-above) .mdc-menu-surface.mat-mdc-select-panel {
     background: rgba(255,255,255,0.98) !important;
     border-color: rgba(99,102,241,0.15) !important;
@@ -1819,6 +1926,24 @@ body.header-light-theme {
 .successbackground .mat-mdc-dialog-container { background-color: #0b8043; padding: unset; }
 
 app-footer .container-fluid { font-size: var(--footerTextSize) !important; }
+
+// ── Dialog scroll — standard-dialog panelClass ────────────────────────────────
+// max-height MUST be set on the surface — without it the surface grows unboundedly
+// and overflow-y: auto never triggers a scrollbar.
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mat-mdc-dialog-surface,
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mdc-dialog__surface {
+  max-height: 88vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(79,142,247,0.35) transparent !important;
+}
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mat-mdc-dialog-surface::-webkit-scrollbar,
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mdc-dialog__surface::-webkit-scrollbar { width: 5px; }
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mat-mdc-dialog-surface::-webkit-scrollbar-thumb,
+html body .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mdc-dialog__surface::-webkit-scrollbar-thumb { background: rgba(79,142,247,0.35); border-radius: 3px; }
+body.header-light-theme .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mat-mdc-dialog-surface::-webkit-scrollbar-thumb,
+body.header-light-theme .cdk-overlay-container .cdk-overlay-pane.standard-dialog .mdc-dialog__surface::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.35); }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // LAYOUT WIDTH FIXES — prevents narrow content columns
@@ -2723,7 +2848,7 @@ aip-root {
 .box-shadow  { box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important; }
 .bottom-padding-20 { padding-bottom: 20px !important; }
 .block        { display: block !important; }
-.active       { }
+.active       { font-weight: 600; }
 
 .checkbox-container, .checkbox-wrapper {
   display: flex; align-items: center; gap: 6px;
@@ -3448,6 +3573,41 @@ body.header-dark-theme {
   .markdown-content { color: #cbd5e1 !important; }
 }
 
+// ── mat-select dropdown overlay — dark theme ─────────────────────────────────
+body.header-dark-theme {
+  .mat-mdc-select-panel, .mdc-menu-surface {
+    background: #0f1f40 !important;
+    border: 1px solid rgba(79,142,247,0.28) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.05) inset !important;
+  }
+  // Bright white text for all options
+  .mat-mdc-option .mdc-list-item__primary-text { color: #f0f6ff !important; font-size: 14px !important; font-weight: 400; }
+  .mat-mdc-option { color: #f0f6ff !important; }
+  .mat-mdc-option:hover:not(.mdc-list-item--disabled) { background: rgba(79,142,247,0.15) !important; }
+  .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+    background: rgba(79,142,247,0.22) !important;
+    .mdc-list-item__primary-text { color: #7eb8ff !important; font-weight: 600; }
+  }
+  .mat-mdc-option.mat-mdc-option-active { background: rgba(79,142,247,0.1) !important; }
+}
+
+// ── mat-select dropdown overlay — light theme ─────────────────────────────────
+body.header-light-theme {
+  .mat-mdc-select-panel, .mdc-menu-surface {
+    background: #ffffff !important;
+    border: 1px solid rgba(99,102,241,0.18) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.12) !important;
+  }
+  .mat-mdc-option .mdc-list-item__primary-text { color: #0f172a !important; font-size: 14px !important; }
+  .mat-mdc-option:hover:not(.mdc-list-item--disabled) { background: rgba(99,102,241,0.07) !important; }
+  .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+    background: rgba(99,102,241,0.1) !important;
+    .mdc-list-item__primary-text { color: #4f46e5 !important; font-weight: 600; }
+  }
+}
+
 body.header-light-theme {
   .vibe-header    { border-bottom-color: rgba(99,102,241,0.15) !important; }
   .vibe-header .header-left h1 { color: #0A1628 !important; }
@@ -3472,4 +3632,213 @@ body.header-light-theme {
   .title-jobs      { color: #0A1628 !important; }
   .secondary-color { color: #4A5568 !important; }
   .lfx-c-datagrid__title-area { border-bottom-color: rgba(99,102,241,0.15) !important; }
+}
+
+// ─── Table inputs + JSON editor — global theme overrides ─────────────────────
+// Strategy: Override Bootstrap 5 CSS custom properties (--bs-*) at the table
+// scope so Bootstrap's own var() resolution picks up the themed values.
+// This is more reliable than direct property overrides against var() values.
+
+body.header-dark-theme {
+  // Override Bootstrap CSS variables at the table scope — cascades into .form-control
+  table.table {
+    --bs-body-bg: #1a2744;
+    --bs-body-color: #e2e8f0;
+    --bs-border-color: rgba(79, 142, 247, 0.25);
+    --bs-table-color: #c8d8ea;
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+    --bs-table-striped-color: #c8d8ea;
+    --bs-table-active-bg: rgba(79, 142, 247, 0.08);
+    --bs-table-hover-bg: rgba(79, 142, 247, 0.06);
+    background: rgba(8, 14, 36, 0.5) !important;
+    border: 1px solid rgba(79, 142, 247, 0.18) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+  }
+
+  // Table inputs — explicit overrides for non-variable bg
+  table.table input,
+  table.table input[type="text"],
+  table.table input.form-control {
+    background: #1e2d4a !important;
+    background-color: #1e2d4a !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(79, 142, 247, 0.25) !important;
+    border-radius: 6px !important;
+    padding: 5px 8px !important;
+    &:focus { border-color: #4f8ef7 !important; outline: none !important; box-shadow: 0 0 0 2px rgba(79,142,247,0.2) !important; }
+    &::placeholder { color: #5a7899 !important; }
+  }
+
+  // Table structure
+  table.table thead th {
+    background-color: rgba(79, 142, 247, 0.15) !important;
+    color: #7eb8ff !important;
+    border-bottom-color: rgba(79, 142, 247, 0.25) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.6px !important;
+    text-transform: uppercase !important;
+    padding: 10px 12px !important;
+  }
+  table.table tbody td {
+    border-bottom-color: rgba(79, 142, 247, 0.08) !important;
+    padding: 8px 12px !important;
+    vertical-align: middle !important;
+  }
+  table.table tbody tr:last-child td { border-bottom: none !important; }
+  table.table tbody tr:hover td { background-color: rgba(79, 142, 247, 0.06) !important; }
+
+  // Action icons in tables (delete/add)
+  table.table .aip-led-icons,
+  table.table .icon-color { color: #7eb8ff !important; cursor: pointer !important; }
+
+  // JSON editor — dark (already works via component SCSS, this is backup)
+  .cipJSONEditor .jsoneditor,
+  .jsoneditor {
+    border: 1px solid rgba(79, 142, 247, 0.28) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+  }
+  .cipJSONEditor .jsoneditor-menu,
+  .jsoneditor-menu { background: linear-gradient(90deg, #4f8ef7 0%, #7c3aed 100%) !important; border-bottom: none !important; }
+  .cipJSONEditor .jsoneditor-tree,
+  .cipJSONEditor .jsoneditor-text,
+  .cipJSONEditor .jsoneditor-outer,
+  .jsoneditor-tree, .jsoneditor-text, .jsoneditor-outer { background: rgba(6,12,32,0.98) !important; color: #e2e8f0 !important; }
+  .jsoneditor-field { color: #7eb8ff !important; }
+  .jsoneditor-value { color: #c8d8ea !important; }
+  .jsoneditor-value.jsoneditor-string { color: #86efac !important; }
+  .jsoneditor-value.jsoneditor-number { color: #fbbf24 !important; }
+  .jsoneditor-statusbar { background: rgba(255,255,255,0.04) !important; color: #7a9cbf !important; }
+  .ace_editor { background: rgba(6,12,32,0.98) !important; color: #e2e8f0 !important; font-size: 13px !important; }
+  .ace_gutter { background: rgba(2,6,20,0.95) !important; color: #4d6882 !important; }
+  .ace_string { color: #86efac !important; }
+  .ace_numeric { color: #fbbf24 !important; }
+  .ace_variable, .ace_keyword { color: #7eb8ff !important; }
+  .ace_line { color: #e2e8f0 !important; }
+}
+
+body.header-light-theme {
+  // Override Bootstrap CSS variables at table scope
+  table.table {
+    --bs-body-bg: #f8fafc;
+    --bs-body-color: #0f172a;
+    --bs-border-color: rgba(99, 102, 241, 0.2);
+    --bs-table-color: #1e293b;
+    --bs-table-bg: #ffffff;
+    --bs-table-striped-bg: #f8fafc;
+    --bs-table-striped-color: #1e293b;
+    --bs-table-hover-bg: rgba(99, 102, 241, 0.06);
+    background: #ffffff !important;
+    border: 1px solid rgba(99, 102, 241, 0.18) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+  }
+
+  // Table inputs — explicit light bg
+  table.table input,
+  table.table input[type="text"],
+  table.table input.form-control {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    border-radius: 6px !important;
+    padding: 5px 8px !important;
+    &:focus { border-color: #4f46e5 !important; outline: none !important; box-shadow: 0 0 0 2px rgba(99,102,241,0.15) !important; }
+    &::placeholder { color: #94a3b8 !important; }
+  }
+
+  // Table structure
+  table.table thead th {
+    background-color: rgba(99, 102, 241, 0.08) !important;
+    color: #4f46e5 !important;
+    border-bottom-color: rgba(99, 102, 241, 0.2) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.6px !important;
+    text-transform: uppercase !important;
+    padding: 10px 12px !important;
+  }
+  table.table tbody td {
+    border-bottom-color: rgba(99, 102, 241, 0.08) !important;
+    color: #1e293b !important;
+    padding: 8px 12px !important;
+    vertical-align: middle !important;
+  }
+  table.table tbody tr:last-child td { border-bottom: none !important; }
+  table.table tbody tr:hover td { background-color: rgba(99, 102, 241, 0.06) !important; }
+
+  table.table .aip-led-icons,
+  table.table .icon-color { color: #4f46e5 !important; cursor: pointer !important; }
+
+  // JSON editor — light theme
+  .cipJSONEditor .jsoneditor,
+  .jsoneditor {
+    border: 2px solid rgba(99, 102, 241, 0.35) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.1) !important;
+  }
+  .cipJSONEditor .jsoneditor-menu,
+  .jsoneditor-menu {
+    background: #e8edf5 !important;
+    background-color: #e8edf5 !important;
+    border-bottom: 1px solid rgba(35,79,153,0.15) !important;
+    color: #234f99 !important;
+  }
+  .cipJSONEditor .jsoneditor-menu > button,
+  .cipJSONEditor .jsoneditor-menu > .jsoneditor-modes > button,
+  .jsoneditor-menu > button,
+  .jsoneditor-menu > .jsoneditor-modes > button {
+    color: #234f99 !important;
+    background-color: transparent !important;
+    opacity: 1 !important;
+    filter: brightness(0) !important;
+  }
+  .cipJSONEditor .jsoneditor-menu > button:hover,
+  .cipJSONEditor .jsoneditor-menu > .jsoneditor-modes > button:hover,
+  .jsoneditor-menu > button:hover,
+  .jsoneditor-menu > .jsoneditor-modes > button:hover {
+    background-color: rgba(35,79,153,0.1) !important;
+    opacity: 1 !important;
+    filter: brightness(0) !important;
+  }
+  .cipJSONEditor .jsoneditor-menu .jsoneditor-poweredBy,
+  .jsoneditor-menu .jsoneditor-poweredBy { color: rgba(35,79,153,0.5) !important; }
+  .cipJSONEditor .jsoneditor-tree,
+  .cipJSONEditor .jsoneditor-text,
+  .cipJSONEditor .jsoneditor-outer,
+  .jsoneditor-tree, .jsoneditor-text, .jsoneditor-outer { background: #ffffff !important; color: #0f172a !important; }
+  .jsoneditor-field { color: #4f46e5 !important; font-weight: 600 !important; }
+  .jsoneditor-value { color: #1e293b !important; }
+  .jsoneditor-value.jsoneditor-string { color: #15803d !important; }
+  .jsoneditor-value.jsoneditor-number { color: #b45309 !important; }
+  .jsoneditor-separator { color: #64748b !important; }
+  .jsoneditor-statusbar { background: #f8fafc !important; color: #64748b !important; border-top: 1px solid rgba(99,102,241,0.1) !important; }
+  // ACE editor — use .ace-jsoneditor prefix (library's own theme class) for higher specificity
+  .ace-jsoneditor.ace_editor,
+  .ace_editor { background-color: #ffffff !important; background: #ffffff !important; color: #0f172a !important; font-size: 13px !important; }
+  .ace-jsoneditor .ace_scroller { background-color: #ffffff !important; }
+  .ace-jsoneditor .ace_gutter,
+  .ace_gutter { background: #f1f5f9 !important; background-color: #f1f5f9 !important; color: #64748b !important; border-right: 1px solid rgba(99,102,241,0.15) !important; }
+  .ace-jsoneditor .ace_gutter-active-line,
+  .ace_gutter-active-line { background-color: rgba(99,102,241,0.06) !important; }
+  .ace-jsoneditor .ace_marker-layer .ace_active-line,
+  .ace_active-line { background: rgba(99,102,241,0.04) !important; }
+  .ace-jsoneditor .ace_cursor,
+  .ace_cursor { color: #4f46e5 !important; border-left-color: #4f46e5 !important; }
+  .ace-jsoneditor .ace_marker-layer .ace_selection,
+  .ace_selection { background: rgba(99,102,241,0.15) !important; }
+  .ace-jsoneditor .ace_string,
+  .ace_string { color: #15803d !important; }
+  .ace-jsoneditor .ace_constant.ace_numeric,
+  .ace_numeric { color: #b45309 !important; }
+  .ace-jsoneditor .ace_variable,
+  .ace-jsoneditor .ace_keyword,
+  .ace_variable, .ace_keyword { color: #4f46e5 !important; }
+  .ace-jsoneditor .ace_text-layer,
+  .ace_text-layer { color: #0f172a !important; }
 }

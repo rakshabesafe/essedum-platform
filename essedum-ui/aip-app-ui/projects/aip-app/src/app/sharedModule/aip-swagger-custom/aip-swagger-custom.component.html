@@ -148,46 +148,42 @@
                                     </div>
                                 </div>
                             </div>
-                            <div *ngIf="spec.parameters || spec.requestBody" class="exp-header">
-                                <div style="height:50px;padding-top:2%">
-                                    <span style="font-weight: 700;margin: 1.7%;">Name</span>
-                                    <span style="margin-left:20%;">Description</span>
+                            <div *ngIf="spec.parameters || spec.requestBody" class="exp-body">
+                                <div class="param-col-header">
+                                    <span class="param-col-name">Name</span>
+                                    <span class="param-col-desc">Description</span>
                                 </div>
                                 <mat-divider></mat-divider>
                                 <div *ngIf="spec.parameters">
-                                    <div *ngFor=" let param of spec.parameters" style="margin-top: 1%;">
-                                        <span
-                                            style="font-weight:700;margin-left: 1.7%;word-wrap: break-word;color:#3b4151;font-family: 'Roboto', 'Segoe UI', sans-serif !important;font-size: 16px;">{{param.name}}</span>
-
-                                        <span style="margin-left: 16%;">{{param.description}}</span><br>
-
-                                        <div *ngIf="spec['button']=='Try it out'" style="margin-bottom:1%">
+                                    <div *ngFor="let param of spec.parameters" class="param-row">
+                                        <span class="param-name">{{param.name}}</span>
+                                        <span class="param-desc">{{param.description}}</span>
+                                        <div class="param-input-wrap" *ngIf="spec['button']=='Try it out'">
                                             <input type="text" class="param-input" disabled placeholder=""
-                                                value="{{param.name}}" style=" cursor: not-allowed;opacity: 0.5;">
+                                                value="{{param.name}}">
                                         </div>
-                                        <div *ngIf="spec['button'] =='Cancel'" style="margin-bottom:1%">
+                                        <div class="param-input-wrap" *ngIf="spec['button']=='Cancel'">
                                             <input type="text" class="param-input" placeholder="" value="{{param.name}}"
-                                                [(ngModel)]="param['value']" style="opacity: 0.5;">
+                                                [(ngModel)]="param['value']">
                                         </div>
                                     </div>
                                 </div>
-                                <div *ngIf="spec.requestBody && spec.requestType=='POST'">
-                                    <span
-                                        style="font-weight:700;margin-left: 1.7%;word-wrap: break-word;color:#3b4151;font-family: 'Roboto', 'Segoe UI', sans-serif !important;font-size: 16px;">body</span>
-                                    <span style="margin-left: 21%;">{{spec.requestBody.description}}</span><br>
-                                    <div *ngIf="spec.requestBody.content['application/json']">
-                                        <textarea [(ngModel)]="spec.requestBody['value']" disabled
-                                            *ngIf="spec['button']=='Try it out'"
-                                            style="background-color: black;  color: white; height: 100px;margin-left:26%; margin-top:1%; width:60%"></textarea>
-                                        <textarea [(ngModel)]="spec.requestBody['value']"
-                                            *ngIf="spec['button']=='Cancel'"
-                                            style="background-color: white;  height: 100px;margin-left:26%; margin-top:1%; width:60%"></textarea>
+                                <div *ngIf="spec.requestBody && spec.requestType=='POST'" class="param-row">
+                                    <span class="param-name">body</span>
+                                    <span class="param-desc">{{spec.requestBody.description}}</span>
+                                    <div class="param-body-section" *ngIf="spec.requestBody.content['application/json']">
+                                        <textarea class="param-textarea param-textarea--disabled"
+                                            [(ngModel)]="spec.requestBody['value']" disabled
+                                            *ngIf="spec['button']=='Try it out'" rows="5"></textarea>
+                                        <textarea class="param-textarea"
+                                            [(ngModel)]="spec.requestBody['value']"
+                                            *ngIf="spec['button']=='Cancel'" rows="5"></textarea>
                                     </div>
                                     <div *ngIf="spec.requestBody.content['multipart/form-data']">
                                         <input type="file" class="file-input" style="display:none;"
                                             (change)="handleFileInput($event)" #fileUpload>
                                         <div class="file-upload lfx-u-pad-t-4 lfx-u-pad-b-8"
-                                            *ngIf="spec['button']=='Try it out'" style="margin-left:26%;">
+                                            *ngIf="spec['button']=='Try it out'">
                                             <button mat-mini-fab color="primary" class="upload-btn"
                                                 (click)="fileUpload.click()" disabled>
                                                 <mat-icon>attach_file</mat-icon>
@@ -195,7 +191,7 @@
                                             {{fileName || "No file uploaded yet."}}
                                         </div>
                                         <div class="file-upload lfx-u-pad-t-4 lfx-u-pad-b-8"
-                                            *ngIf="spec['button']=='Cancel'" style="margin-left:26%;">
+                                            *ngIf="spec['button']=='Cancel'">
                                             <button mat-mini-fab color="primary" class="upload-btn"
                                                 (click)="fileUpload.click()">
                                                 <mat-icon>attach_file</mat-icon>
@@ -203,8 +199,8 @@
                                             {{fileName || "No file uploaded yet."}}
                                         </div>
                                     </div>
-                                    <div style="margin-left:26%; margin-bottom:1%">
-                                        <select style="max-width: 100%;min-width: 130px;">
+                                    <div class="param-content-type">
+                                        <select class="content-type-select">
                                             <option value="application/json"
                                                 *ngIf="spec.requestBody.content['application/json']">application/json
                                             </option>
@@ -214,15 +210,10 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div *ngIf="!spec.parameters && !spec.requestBody">No Parameters</div>
-                                <div *ngIf="spec['button'] =='Cancel'">
-                                    <button
-                                        style="cursor: pointer;width:96%;padding:8px 40px;color:white;background-color:#4990e2;border-color:#4990e2;margin:1% 2%;"
-                                        (click)="execute(spec)">
-                                        Execute
-                                    </button>
-                                    <button *ngIf="spec['executeFlag']"
-                                        style="cursor: pointer;width:96%;padding:8px 40px;color:black;background-color:whitesmoke;border-color:black;margin:1% 2%;"
+                                <div *ngIf="!spec.parameters && !spec.requestBody" class="no-params">No Parameters</div>
+                                <div *ngIf="spec['button']=='Cancel'" class="execute-section">
+                                    <button class="save-btn" (click)="execute(spec)">Execute</button>
+                                    <button *ngIf="spec['executeFlag']" class="cancel-btn"
                                         (click)="spec['executeFlag']=false">Clear</button>
                                 </div>
                             </div>
@@ -239,8 +230,7 @@
                                             <span style="margin-left:20%;">Details</span>
                                         </div>
                                         <mat-divider></mat-divider>
-                                        <pre *ngIf="spec['executeFlag']"
-                                            style="background-color: black;  color: white;margin-top:1%;height: 450px;margin-left: 8%;">{{response | json}}</pre>
+                                        <pre *ngIf="spec['executeFlag']" class="response-pre">{{response | json}}</pre>
                                     </div>
                                 </div>
                             </div>
@@ -263,8 +253,7 @@
                                             </span>
                                         </div>
                                         <mat-divider></mat-divider>
-                                        <pre
-                                            style="background-color: black;  color: white;margin-top:1%;margin-left: 8%;">{{cURL}}</pre>
+                                        <pre class="response-pre">{{cURL}}</pre>
                                     </div>
                                 </div>
                             </div>
