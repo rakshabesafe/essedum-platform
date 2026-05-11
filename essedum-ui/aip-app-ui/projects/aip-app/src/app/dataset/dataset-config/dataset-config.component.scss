@@ -139,7 +139,7 @@ button.next-btn {
   padding: 0 16px !important;
   height: 52px !important;
   border-radius: 0 !important;
-  transition: background 0.22s ease, border-bottom: none !important;
+  transition: background 0.22s ease;
   &:hover { background: rgba(68,128,245,0.07) !important; border-bottom: none !important; }
   // EXPANDED header — gradient wash
   &[aria-expanded="true"] {
