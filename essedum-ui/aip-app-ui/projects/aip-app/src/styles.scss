@@ -1075,8 +1075,8 @@ body.header-light-theme {
 .aip-header-icon { display: flex; align-items: center; }
 
 .aip-select-adapter-dropDown {
-  border: none; outline: none; -webkit-appearance: none;
-  color: var(--base-color); height: 4rem; -moz-appearance: none;
+  border: none; outline: none; -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  color: var(--base-color); height: 4rem;
   text-align: center; cursor: pointer; border-radius: 0.8rem; width: 5rem;
   background-color: var(--background-colour) !important;
 }
@@ -1127,9 +1127,9 @@ body.header-light-theme {
 .aip-desc-title { text-align: left; letter-spacing: 0rem; color: var(--text-color); opacity: 1; }
 .aip-desc-ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .aip-initiative-desc {
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical;
   overflow: hidden; text-overflow: ellipsis;
-  &:hover { -webkit-line-clamp: inherit; overflow: visible; text-overflow: inherit; word-break: break-word; }
+  &:hover { -webkit-line-clamp: inherit; line-clamp: inherit; overflow: visible; text-overflow: inherit; word-break: break-word; }
 }
 
 .aip-icon_text { text-align: left; font: normal normal normal 1.4rem/2.2rem Roboto; letter-spacing: 0rem; color: var(--text-color); text-transform: capitalize; opacity: 1; display: contents; }
@@ -1191,7 +1191,7 @@ body.header-light-theme {
 .mdc-snackbar__label { padding: 0 !important; height: 0 !important; }
 
 .card-shadow { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important; border-radius: 16px !important; }
-.card-title-wrapper:hover .card-title { -webkit-line-clamp: 2; }
+.card-title-wrapper:hover .card-title { -webkit-line-clamp: 2; line-clamp: 2; }
 
 .input-style { border-bottom: none !important; box-shadow: none !important; outline: none !important; }
 
@@ -2275,7 +2275,7 @@ aip-root {
 .ds-card-desc {
   font-size: 12px; color: #64748b; line-height: 1.5;
   margin-top: 6px;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
@@ -2719,7 +2719,7 @@ aip-root {
 
 .lfx-app-description {
   font-size: 12px; color: #64748b; line-height: 1.5;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .lfx-card-header {
