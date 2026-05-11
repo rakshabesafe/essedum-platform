@@ -6,7 +6,7 @@
 :host ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.05) !important; border-radius: 8px 8px 0 0 !important; }
 :host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #b8cce0 !important; font-size: 13px !important; }
 :host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
-:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.25) !important; }
+:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.55) !important; }
 :host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
 :host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e2e8f0 !important; }
 

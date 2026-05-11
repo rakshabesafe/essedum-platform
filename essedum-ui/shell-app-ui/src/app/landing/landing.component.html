@@ -421,9 +421,9 @@
             <mat-sidenav-content class="selector-3-47" id="containerDivForScroll"
               [style.margin-left]="showTopNav ? '0' : getContentMarginLeft()">
               <ng-container *ngIf="loadingRouteConfig" class="selector-3-48">
-                <div style="font-size: 5vmin; margin-left: 100vh; margin-top: 45vh" class="selector-3-49">
+                <div class="lfx-loading-indicator selector-3-49">
                   Loading
-                  <div class="spinner-border selector-3-50" style="color: #0094ff"></div>
+                  <div class="spinner-border lfx-loading-spinner selector-3-50"></div>
                 </div>
               </ng-container>
               <div *ngIf="!loadingRouteConfig" id="bcc-dashboard-content" class="selector-3-51">
@@ -777,9 +777,9 @@
         <virtual-assistant style="z-index: 99" [language]="'en'" [suggestionBackendUrl]="suggestionBackendUrl"
           [backendUrl]="backendUrl" [appNameInput]="appNameInput"></virtual-assistant></span>
       <ng-container *ngIf="load" class="selector-3-150">
-        <div style="font-size: 2.5vmin; margin-left: 100vh; margin-top: 45vh" class="selector-3-151">
+        <div class="lfx-loading-indicator selector-3-151">
           Loading
-          <div class="spinner-border selector-3-152" style="color: #0094ff"></div>
+          <div class="spinner-border lfx-loading-spinner selector-3-152"></div>
         </div>
       </ng-container>
       <div *ngIf="!load && selectedrole.name == currentrole" style="height: 100%" class="selector-3-153">

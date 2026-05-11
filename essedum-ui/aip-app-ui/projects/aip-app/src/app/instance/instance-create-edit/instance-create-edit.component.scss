@@ -1,6 +1,6 @@
-﻿:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
-// â”€â”€ Material deep overrides (dark default) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Material deep overrides (dark default) ────────────────────────────────────
 :host ::ng-deep mat-form-field,
 :host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
 :host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
@@ -15,7 +15,7 @@
 :host ::ng-deep .mdc-floating-label--float-above { color: #7eb8ff !important; font-size: 11px !important; letter-spacing: 0.3px !important; }
 :host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
 :host ::ng-deep textarea.mat-mdc-input-element { line-height: 1.6 !important; }
-:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.25) !important; }
+:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.55) !important; }
 :host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
 :host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e2e8f0 !important; }
 :host ::ng-deep .mat-mdc-select-placeholder { color: #4d6882 !important; }
@@ -30,7 +30,7 @@
   border: 1px solid rgba(79,142,247,0.25) !important;
 }
 
-// â”€â”€ Expansion panels (datasource form) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Expansion panels (datasource form) ───────────────────────────────────────
 :host ::ng-deep mat-expansion-panel {
   background: rgba(255,255,255,0.04) !important;
   border: 1px solid rgba(79,142,247,0.12) !important;
@@ -46,7 +46,7 @@
 :host ::ng-deep .mat-expansion-panel-body { color: #c8d8ea !important; }
 :host ::ng-deep mat-panel-title { color: #b8cce0 !important; font-size: 13px !important; font-weight: 600 !important; }
 
-// â”€â”€ Main form glass panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Main form glass panel ─────────────────────────────────────────────────────
 .aip-container {
   padding: 3px 26px 24px !important;
   width: 100% !important;
@@ -72,7 +72,7 @@
   pointer-events: none;
 }
 
-// â”€â”€ mat-card (for schema and other nested card contexts) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── mat-card (for schema and other nested card contexts) ──────────────────────
 mat-card, .mat-mdc-card {
   background: rgba(8,14,36,0.92) !important;
   border: 1px solid rgba(79,142,247,0.18) !important;
@@ -90,7 +90,7 @@ mat-card::before {
   flex-shrink: 0;
 }
 
-// â”€â”€ Section sub-labels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Section sub-labels ────────────────────────────────────────────────────────
 .lfx-u-sub-header-alias {
   display: flex !important;
   align-items: center !important;
@@ -119,12 +119,12 @@ mat-card::before {
 
 .required-indicator { color: #f87171 !important; margin-left: 2px !important; }
 
-// â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Layout ────────────────────────────────────────────────────────────────────
 .row { margin: 0 !important; }
 .col-12, .col-lg-12, .col-md-12 { width: 100% !important; max-width: 100% !important; padding: 0 !important; margin-bottom: 4px; }
 .lfx-u-mar-b-16 { margin-bottom: 14px !important; }
 
-// â”€â”€ Action bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Action bar ────────────────────────────────────────────────────────────────
 .dialog-actions, .action-button-container, .form-actions {
   display: flex !important;
   justify-content: flex-end !important;
@@ -135,7 +135,7 @@ mat-card::before {
   margin-top: 18px !important;
 }
 
-// â”€â”€ Primary button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Primary button ────────────────────────────────────────────────────────────
 button.action-button[color="primary"],
 button[mat-raised-button][color="primary"],
 button[mat-flat-button][color="primary"],
@@ -158,7 +158,7 @@ button[mat-flat-button][color="primary"],
   &[disabled] { opacity: 0.4 !important; box-shadow: none !important; transform: none !important; }
 }
 
-// â”€â”€ Cancel / ghost button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Cancel / ghost button ─────────────────────────────────────────────────────
 button[mat-stroked-button],
 button.cancel-button,
 button[mat-raised-button]:not([color]):not(.action-button) {
@@ -177,7 +177,7 @@ button[mat-raised-button]:not([color]):not(.action-button) {
   }
 }
 
-// â”€â”€ Upload zone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Upload zone ───────────────────────────────────────────────────────────────
 .logo-upload-card, .upload-card, .upload-zone {
   background: rgba(79,142,247,0.04) !important;
   border: 1.5px dashed rgba(79,142,247,0.28) !important;
@@ -196,7 +196,7 @@ button[mat-raised-button]:not([color]):not(.action-button) {
 .file-input { display: none !important; }
 .error-text { color: #f87171 !important; font-size: 11px !important; }
 
-// â”€â”€ Section divider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Section divider ───────────────────────────────────────────────────────────
 .section-divider, hr {
   border: none !important;
   height: 1px !important;
@@ -204,7 +204,7 @@ button[mat-raised-button]:not([color]):not(.action-button) {
   margin: 16px 0 !important;
 }
 
-// â”€â”€ Light theme â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Light theme ───────────────────────────────────────────────────────────────
 :host-context(body.header-light-theme) {
   ::ng-deep .mdc-text-field--filled { background: #f1f5f9 !important; }
   ::ng-deep .mdc-text-field--filled:hover { background: #e8edf5 !important; }
@@ -217,7 +217,7 @@ button[mat-raised-button]:not([color]):not(.action-button) {
   ::ng-deep .mat-mdc-select-placeholder { color: #94a3b8 !important; }
   ::ng-deep .mat-mdc-select-arrow { color: #94a3b8 !important; }
   ::ng-deep .mat-mdc-form-field-hint { color: #64748b !important; }
-  ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(99,102,241,0.2) !important; }
+  ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(99,102,241,0.45) !important; }
   ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f46e5 !important; }
   ::ng-deep mat-checkbox .mdc-label { color: #1e293b !important; }
   ::ng-deep mat-radio-button .mdc-label { color: #1e293b !important; }
@@ -282,7 +282,7 @@ button[mat-raised-button]:not([color]):not(.action-button) {
   .upload-icon-wrapper { color: #4f46e5 !important; }
 }
 
-// â”€â”€ Dark theme explicit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Dark theme explicit ───────────────────────────────────────────────────────
 :host-context(body.header-dark-theme) {
   ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.07) !important; }
   ::ng-deep .mdc-text-field--filled:hover { background: rgba(255,255,255,0.11) !important; }

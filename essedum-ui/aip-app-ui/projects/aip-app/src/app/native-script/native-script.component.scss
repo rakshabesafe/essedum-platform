@@ -453,9 +453,9 @@
   justify-content: center !important;
   padding: 40px 20px !important;
   text-align: center !important;
-  mat-icon { font-size: 40px !important; width: 40px !important; height: 40px !important; color: #30363d !important; margin-bottom: 12px !important; }
-  .empty-title { color: #8b949e !important; font-size: 13px !important; margin-bottom: 4px !important; }
-  .empty-subtitle { color: #484f58 !important; font-size: 11px !important; }
+  mat-icon { font-size: 40px !important; width: 40px !important; height: 40px !important; color: #8b949e !important; margin-bottom: 12px !important; }
+  .empty-title { color: #e2e8f0 !important; font-size: 13px !important; margin-bottom: 4px !important; }
+  .empty-subtitle { color: #94a3b8 !important; font-size: 11px !important; }
 }
 
 // ── Code Editor Panel ─────────────────────────────────────────────────────────
@@ -638,6 +638,12 @@ button[mat-button], button[mat-stroked-button] {
 :host-context(body.header-light-theme) {
   .native-script-panel { background: #ffffff !important; border-color: #e2e8f0 !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important; }
   .selector-model-title-head .aip-desc-title { color: #0f172a !important; }
+
+  .empty-state {
+    mat-icon { color: #94a3b8 !important; }
+    .empty-title { color: #334155 !important; }
+    .empty-subtitle { color: #64748b !important; }
+  }
   .selector-model-title-head span[style*="color: #737373"] { color: #64748b !important; }
 
   // Action icon buttons - light theme

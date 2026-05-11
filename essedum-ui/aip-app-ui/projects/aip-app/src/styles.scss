@@ -777,54 +777,80 @@ mat-card-actions.card-actions-hover {
 .mat-mdc-form-field *,
 .mat-mdc-form-field *::before,
 .mat-mdc-form-field *::after,
-.mdc-text-field,
-.mdc-text-field *,
-.mdc-text-field *::before,
-.mdc-text-field *::after {
-  border-bottom: none !important;
-  border-bottom-width: 0 !important;
-  border-bottom-color: transparent !important;
-  border-bottom-style: none !important;
-}
-.mdc-line-ripple,
-.mdc-line-ripple::before,
-.mdc-line-ripple::after,
+// -- Form field underlines: visible in dark/light themes -----------
 .mdc-text-field__ripple,
 .mat-mdc-form-field-focus-overlay {
   display: none !important;
-  height: 0 !important;
-  visibility: hidden !important;
   opacity: 0 !important;
-  border: none !important;
-  border-bottom: none !important;
   background: transparent !important;
+}
+.mdc-line-ripple {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   position: absolute !important;
-  width: 0 !important;
-  overflow: hidden !important;
-  clip: rect(0,0,0,0) !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  overflow: visible !important;
+  clip: auto !important;
   pointer-events: none !important;
 }
-// Also target with higher specificity
+.mdc-line-ripple::before {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  width: auto !important;
+  border-bottom: 1px solid rgba(79,142,247,0.55) !important;
+  transition: border-bottom-color 0.2s ease, border-bottom-width 0.2s ease !important;
+}
+.mdc-line-ripple::after {
+  display: none !important;
+}
+.mdc-text-field--focused .mdc-line-ripple::before {
+  border-bottom: 2px solid #4f8ef7 !important;
+}
+// Higher specificity overrides
 .mat-mdc-form-field .mdc-line-ripple,
+.mdc-text-field--filled .mdc-line-ripple {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+}
 .mat-mdc-form-field .mdc-line-ripple::before,
+.mdc-text-field--filled .mdc-line-ripple::before {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  border-bottom: 1px solid rgba(79,142,247,0.55) !important;
+  transition: border-bottom-color 0.2s ease, border-bottom-width 0.2s ease !important;
+}
 .mat-mdc-form-field .mdc-line-ripple::after,
-.mdc-text-field--filled .mdc-line-ripple,
-.mdc-text-field--filled .mdc-line-ripple::before,
 .mdc-text-field--filled .mdc-line-ripple::after {
   display: none !important;
-  height: 0 !important;
-  border: none !important;
-  border-bottom: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
+}
+.mdc-text-field--focused .mdc-line-ripple::before,
+.mat-mdc-form-field.mat-focused .mdc-line-ripple::before {
+  border-bottom: 2px solid #4f8ef7 !important;
 }
 :root {
-  --mdc-filled-text-field-active-indicator-height: 0px;
-  --mdc-filled-text-field-focus-active-indicator-height: 0px;
-  --mdc-filled-text-field-active-indicator-color: transparent;
-  --mdc-filled-text-field-focus-active-indicator-color: transparent;
-  --mdc-filled-text-field-hover-active-indicator-color: transparent;
+  --mdc-filled-text-field-active-indicator-height: 1px;
+  --mdc-filled-text-field-focus-active-indicator-height: 2px;
+  --mdc-filled-text-field-active-indicator-color: rgba(79,142,247,0.55);
+  --mdc-filled-text-field-focus-active-indicator-color: #4f8ef7;
+  --mdc-filled-text-field-hover-active-indicator-color: rgba(79,142,247,0.7);
   --mat-form-field-focus-state-layer-opacity: 0;
+}
+body.header-light-theme {
+  .mdc-line-ripple::before { border-bottom-color: rgba(99,102,241,0.45) !important; }
+  .mdc-line-ripple::after { display: none !important; }
+  .mdc-text-field--focused .mdc-line-ripple::before { border-bottom: 2px solid #4f46e5 !important; }
+  --mdc-filled-text-field-active-indicator-color: rgba(99,102,241,0.45);
+  --mdc-filled-text-field-focus-active-indicator-color: #4f46e5;
+  --mdc-filled-text-field-hover-active-indicator-color: rgba(99,102,241,0.6);
 }
 .mat-mdc-form-field input:focus,
 .mat-mdc-form-field textarea:focus { outline: none !important; box-shadow: none !important; }

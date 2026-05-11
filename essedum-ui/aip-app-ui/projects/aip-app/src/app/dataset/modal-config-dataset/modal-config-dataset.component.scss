@@ -40,7 +40,7 @@
 
 // -- Attribute table -----------------------------------------------
 table { width: 100% !important; border-collapse: collapse !important;
-  thead tr th { font-size: 10px !important; font-weight: 700 !important; color: #47637e !important; text-transform: uppercase !important; letter-spacing: 0.9px !important; background: rgba(68,128,245,0.05) !important; border-bottom: none !important; padding: 9px 13px !important; white-space: nowrap !important; &:first-child { padding-left: 16px !important; } &:last-child { padding-right: 16px !important; } }
+  thead tr th { font-size: 10px !important; font-weight: 700 !important; color: #47637e !important; text-transform: uppercase !important; letter-spacing: 0.9px !important; background: rgba(52, 111, 229, 0.05) !important; border-bottom: none !important; padding: 9px 13px !important; white-space: nowrap !important; &:first-child { padding-left: 16px !important; } &:last-child { padding-right: 16px !important; } }
   tbody tr { border-bottom: none !important; transition: background 0.13s !important; animation: rowIn 0.18s ease both !important; &:nth-child(even) { background: rgba(68,128,245,0.015) !important; } &:hover { background: rgba(68,128,245,0.045) !important; } &:focus-within { background: rgba(68,128,245,0.065) !important; td { color: #c4d8ec !important; } } &:last-child { border-bottom: none !important; } td { padding: 8px 13px !important; font-size: 12.5px !important; color: #6e9abb !important; vertical-align: middle !important; &:first-child { padding-left: 16px !important; font-weight: 600 !important; color: #6aaaf5 !important; } &:last-child { padding-right: 16px !important; } } }
 }
 
@@ -48,7 +48,7 @@ table { width: 100% !important; border-collapse: collapse !important;
 :host ::ng-deep .mat-mdc-form-field, :host ::ng-deep .mat-mdc-form-field.mat-mdc-form-field { width: 100% !important; font-size: 13px !important; }
 :host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
 :host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
-:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
+:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-bottom: 1px solid #5a80c2 !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
 :host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; }
 :host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border: none !important; box-shadow: none !important; outline: none !important; }
 :host ::ng-deep .mat-mdc-form-field-infix { min-height: 44px !important; padding: 18px 0 6px !important; border-top: 0 !important; width: 100% !important; }
