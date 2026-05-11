@@ -2,7 +2,7 @@
   "name": "essedum",
   "displayName": "Essedum",
   "description": "VS Code extension for Essedum AI Platform",
-  "version": "1.0.40",
+  "version": "1.1.1",
   "publisher": "essedum",
   "license": "MIT",
   "engines": {
@@ -32,14 +32,6 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
-    "chatParticipants": [
-      {
-        "id": "claude-code",
-        "name": "Claude-Code",
-        "description": "AI coding assistant powered by Claude",
-        "isSticky": true
-      }
-    ],
     "commands": [
       {
         "command": "essedum.openSidebar",
@@ -177,7 +169,7 @@
       "essedum-explorer": [
         {
           "id": "essedum-login",
-          "name": "Network Selection",
+          "name": "Environment Selection",
           "type": "webview",
           "when": "!essedum.isAuthenticated",
           "icon": "$(key)"
