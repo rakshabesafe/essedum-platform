@@ -466,31 +466,31 @@ mat-drawer.example-sidenav {
 
 
   
-// Dark theme theme-toggle-btn — bright/white pill (signals: switch to Light)
+// Dark theme theme-toggle-btn
 .fChild.header-dark .theme-toggle-btn,
 .main-header-bg.header-dark .theme-toggle-btn {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  color: #0f172a;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.82);
   &:hover {
-    background: #ffffff;
-    border-color: #ffffff;
-    color: #0a0f1e;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
   }
 }
 
-// Light theme theme-toggle-btn — dark/navy pill (signals: switch to Dark)
+// Light theme theme-toggle-btn
 .fChild.header-light .theme-toggle-btn,
 .main-header-bg.header-light .theme-toggle-btn {
-  background: rgba(10, 20, 48, 0.9);
-  border: 1px solid rgba(10, 20, 48, 0.85);
-  color: #f1f5f9;
+  background: rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  color: #0f172a;
   &:hover {
-    background: #0a142f;
-    border-color: #0a142f;
-    color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(10, 20, 48, 0.14);
+    background: rgba(15, 23, 42, 0.15);
+    border-color: rgba(15, 23, 42, 0.3);
+    color: #0a142f;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
   }
 }
 
@@ -527,28 +527,28 @@ mat-drawer.example-sidenav {
   flex-shrink: 0;
 }
 
-// Theme toggle button — pill style, base fallback (dark context)
+// Theme toggle button — pill style, enterprise look
 .theme-toggle-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 100px;
   padding: 0 14px 0 10px;
   height: 30px;
   cursor: pointer;
-  color: #0f172a;
+  color: rgba(255, 255, 255, 0.82);
   font-size: 11.5px;
   font-weight: 500;
   letter-spacing: 0.25px;
   transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
   flex-shrink: 0;
   &:hover {
-    background: #ffffff;
-    border-color: #ffffff;
-    color: #0a0f1e;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
   }
 }
 .theme-toggle-icon { font-size: 14px; line-height: 1; }
