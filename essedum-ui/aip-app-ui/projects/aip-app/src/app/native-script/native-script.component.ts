@@ -668,8 +668,8 @@ export class NativeScriptComponent implements OnInit, OnChanges {
 
   copyPipeline() {
     const dialogRef = this.dialog.open(PipelineCreateComponent, {
-      height: '80%',
-      width: '60%',
+      width: '460px',
+      maxWidth: '92vw',
       data: {
         sourceToCopy: this.data,
         type: this.streamItem.type,

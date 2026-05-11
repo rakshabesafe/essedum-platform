@@ -366,9 +366,8 @@ export class PipelineComponent implements OnInit, OnChanges {
 
   onAdd(): void {
     const dialogRef = this.dialog.open(PipelineCreateComponent, {
-      height: '80%',
-      width: '60%',
-      minWidth: '60vw',
+      width: '460px',
+      maxWidth: '92vw',
       disableClose: true,
       data: {
         edit: false,
@@ -437,9 +436,8 @@ export class PipelineComponent implements OnInit, OnChanges {
     this.service.getStreamingServices(id).subscribe(
       (pageResponse) => {
         const dialogRef = this.dialog.open(PipelineCreateComponent, {
-          height: '80%',
-          width: '60%',
-          minWidth: '60vw',
+          width: '460px',
+          maxWidth: '92vw',
           disableClose: true,
           data: {
             canvasData: pageResponse,
