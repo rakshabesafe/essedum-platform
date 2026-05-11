@@ -466,32 +466,91 @@ mat-drawer.example-sidenav {
 
 
   
-// Dark theme theme-toggle-btn
-.fChild.header-dark .theme-toggle-btn,
-.main-header-bg.header-dark .theme-toggle-btn {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.82);
-  &:hover {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 255, 255, 0.28);
-    color: #fff;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+// ── Theme toggle switch ───────────────────────────────────────────────────────
+// Sliding pill: left = Light active, right = Dark active (.is-dark class)
+.theme-toggle-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 100px;
+  padding: 3px;
+  height: 30px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  flex-shrink: 0;
+  transition: background 0.22s, box-shadow 0.22s;
+
+  // Sliding pill thumb
+  .tgl-pill {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    border-radius: 100px;
+    transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.22);
   }
+
+  // Labels
+  .tgl-opt {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 0 11px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.25px;
+    white-space: nowrap;
+    transition: color 0.22s;
+    line-height: 1;
+  }
+
+  // Dark mode active — pill slides to right
+  &.is-dark .tgl-pill { transform: translateX(100%); }
+
+  &:focus-visible { outline: 2px solid #4f8ef7; outline-offset: 2px; }
 }
 
-// Light theme theme-toggle-btn
-.fChild.header-light .theme-toggle-btn,
-.main-header-bg.header-light .theme-toggle-btn {
-  background: rgba(15, 23, 42, 0.08);
-  border: 1px solid rgba(15, 23, 42, 0.15);
-  color: #0f172a;
-  &:hover {
-    background: rgba(15, 23, 42, 0.15);
-    border-color: rgba(15, 23, 42, 0.3);
-    color: #0a142f;
-    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
-  }
+// Dark header — navy pill on bright track
+.fChild.header-dark .theme-toggle-switch,
+.main-header-bg.header-dark .theme-toggle-switch {
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+
+  &:hover { background: rgba(255, 255, 255, 0.95); box-shadow: inset 0 0 0 1px #fff; }
+
+  .tgl-pill { background: #0a142f; }
+
+  // Light active (default): light opt on navy pill = white text; dark opt off pill = dim dark
+  .tgl-light { color: #ffffff; }
+  .tgl-dark  { color: rgba(10, 20, 48, 0.38); }
+
+  // Dark active: dark opt on navy pill = white text; light opt off pill = dim dark
+  &.is-dark .tgl-light { color: rgba(10, 20, 48, 0.38); }
+  &.is-dark .tgl-dark  { color: #ffffff; }
+}
+
+// Light header — white track, indigo pill, white text on active pill
+.fChild.header-light .theme-toggle-switch,
+.main-header-bg.header-light .theme-toggle-switch {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.22), 0 1px 4px rgba(0,0,0,0.08);
+
+  &:hover { background: #f8faff; box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.4), 0 2px 8px rgba(79,70,229,0.1); }
+
+  .tgl-pill { background: #4f46e5; box-shadow: 0 2px 8px rgba(79,70,229,0.35); }
+
+  // Light active (default): light opt on indigo pill = white; dark opt off pill = muted slate
+  .tgl-light { color: #ffffff; }
+  .tgl-dark  { color: rgba(79, 70, 229, 0.45); }
+
+  // Dark active: dark opt on indigo pill = white; light opt off pill = muted slate
+  &.is-dark .tgl-light { color: rgba(79, 70, 229, 0.45); }
+  &.is-dark .tgl-dark  { color: #ffffff; }
 }
 
 
@@ -527,32 +586,7 @@ mat-drawer.example-sidenav {
   flex-shrink: 0;
 }
 
-// Theme toggle button — pill style, enterprise look
-.theme-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 100px;
-  padding: 0 14px 0 10px;
-  height: 30px;
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0.25px;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
-  flex-shrink: 0;
-  &:hover {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 255, 255, 0.28);
-    color: #fff;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
-  }
-}
-.theme-toggle-icon { font-size: 14px; line-height: 1; }
-.theme-toggle-label { font-size: 11px; font-weight: 500; line-height: 1; letter-spacing: 0.3px; }
+// .theme-toggle-btn legacy styles removed — replaced by .theme-toggle-switch above
 
 // ── Hide legacy bottom controls bar ──────────────────────────────────────────
 // These controls (calendar, bell, hide/show tab arrows) used to float at the
