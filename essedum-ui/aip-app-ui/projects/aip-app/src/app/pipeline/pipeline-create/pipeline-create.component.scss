@@ -6,8 +6,8 @@
 :host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; padding: 0 !important; background: transparent !important; overflow: visible !important; }
 :host ::ng-deep .mdc-text-field--filled{ background: transparent !important; border: none !important; border-bottom: 1px solid rgba(88,166,255,0.35) !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
 :host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; border: none !important; border-bottom: none!important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
-:host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; }
-:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; box-shadow: none !important; }
+:host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom: none !important; box-shadow: none !important; }
 :host ::ng-deep .mat-mdc-form-field-infix { min-height: 44px !important; padding: 18px 0 6px !important; border-top: 0 !important; width: 100% !important; }
 :host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #8b949e !important; font-size: 12px !important; font-weight: 500 !important; }
 :host ::ng-deep .mdc-floating-label--float-above { color: #58a6ff !important; font-size: 11px !important; font-weight: 600 !important; }
@@ -203,11 +203,9 @@
 
 :host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; padding: 0 !important; background: transparent !important; overflow: visible !important; }
 :host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
-:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-bottom: 1px solid #5a80c2 !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
-:host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; }
-:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
+:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-bottom: 1px solid #26a9f0 !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
 :host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
-:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border: none !important; box-shadow: none !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border: none !important; border-bottom: none !important; box-shadow: none !important; }
 :host ::ng-deep .mat-mdc-form-field-infix { min-height: 44px !important; padding: 18px 0 6px !important; border-top: 0 !important; width: 100% !important; }
 :host ::ng-deep .mdc-text-field--filled .mdc-floating-label { top: 7px !important; font-size: 11px !important; }
 :host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #8b949e !important; font-size: 12px !important; font-weight: 500 !important; }
@@ -354,9 +352,9 @@ mat-error { font-size: 11px !important; }
 // ── Light theme ───────────────────────────────────────────────────────────────
 :host-context(body.header-light-theme) {
   ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
-  ::ng-deep .mdc-text-field--filled { border: none !important; border-bottom: none !important; border-radius: 0 !important; }
+  ::ng-deep .mdc-text-field--filled { border: none !important; border-radius: 0 !important; }
   ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
-  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom: none !important; box-shadow: none !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border: none !important; border-bottom: none !important; box-shadow: none !important; }
   ::ng-deep .mdc-floating-label, ::ng-deep mat-label { color: #64748b !important; }
   ::ng-deep .mdc-floating-label--float-above { color: #4742dc !important; }
   ::ng-deep .mat-mdc-input-element { color: #0f172a !important; -webkit-text-fill-color: #0f172a !important; }
@@ -420,7 +418,9 @@ mat-error { font-size: 11px !important; }
 // ── Dark theme explicit ───────────────────────────────────────────────────────
 :host-context(body.header-dark-theme) {
   ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
-  ::ng-deep .mdc-text-field--filled { border: none !important; border-bottom:  1px solid #5a80c2 !important; border-radius: 0 !important; }
+  ::ng-deep .mdc-text-field--filled { border: none !important; border-bottom: 1px solid #5ab7df !important; border-radius: 0 !important; }
+  ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border: none !important; border-bottom: none !important; box-shadow: none !important; }
   ::ng-deep .mat-mdc-input-element { color: #e6edf3 !important; }
 
   .pipeline-form-body, mat-card, .mat-mdc-card {
