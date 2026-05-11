@@ -31,9 +31,12 @@
 
           <!-- TOP-RIGHT: theme toggle + user avatar -->
           <div class="header-right-controls">
-            <button class="theme-toggle-btn" (click)="toggleTheme()" [matTooltip]="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
-              <span class="theme-toggle-icon">{{ isDark ? '☀️' : '🌙' }}</span>
-              <span class="theme-toggle-label">{{ isDark ? 'Light' : 'Dark' }}</span>
+            <button class="theme-toggle-switch" [class.is-dark]="isDark"
+              (click)="toggleTheme()"
+              [matTooltip]="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+              <span class="tgl-pill"></span>
+              <span class="tgl-opt tgl-light">&#9728; Light</span>
+              <span class="tgl-opt tgl-dark">&#9790; Dark</span>
             </button>
 
             <button mat-icon-button="" [matMenuTriggerFor]="menu" (click)="getSession()" [matTooltip]="user.user_f_name"
