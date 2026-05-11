@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, abort, request, render_template, make_response, g
 import uuid
+import html as html_module
 from utils import *
 from Queue import Queue
 from db import DatabaseOperations, JobNF
@@ -46,6 +47,14 @@ pause_event = Event()
 os.environ['NO_PROXY'] = 'aiplatform.ad.infosys.com'
 os.environ['http_proxy'] = 'http://blrproxy.ad.infosys.com:80'
 os.environ['https_proxy'] = 'http://blrproxy.ad.infosys.com:80'
+
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses to mitigate XSS and MIME-sniffing attacks."""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
 
 @app.before_request
 def create_database():
@@ -162,6 +171,12 @@ def show_tasks():
 @app.route('/execute/<task_id>/getStatus', methods=['GET'])
 def get_task_status(task_id):
     try:
+        # Validate task_id is a well-formed UUID before use
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid task ID'}), 400
+
         task = db_operations.get_job_by_id(task_id)
         if task is None:
             abort(404)
@@ -183,6 +198,12 @@ def get_task_status(task_id):
 @app.route('/execute/<task_id>/stop', methods=['GET'])
 def terminate_task(task_id):
     try:
+        # Validate task_id is a well-formed UUID before use
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid task ID'}), 400
+
         task = db_operations.get_job_by_id(task_id)
         print('task', task)
         if task is None:
@@ -235,8 +256,21 @@ def terminate_task(task_id):
 @app.route('/execute/<task_id>/getLog', methods=['GET'])
 def get_task_log(task_id):
     try:
+        # Validate task_id is a well-formed UUID before using it in path construction
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'logs': {'content': 'Invalid task ID'}}), 400
+
         task_folder=str(task_id)
         log_file=r'/temp/Jobs/'+task_folder+'/log.txt'
+
+        # Validate resolved path to prevent directory traversal
+        log_file_resolved = os.path.realpath(log_file)
+        base_dir_resolved = os.path.realpath('/temp/Jobs')
+        if not log_file_resolved.startswith(base_dir_resolved):
+            logger.warning(f'Potential path traversal attempt detected: {task_id}')
+            return jsonify({'logs': {'content': 'Invalid task ID'}}), 403
         
         with open(log_file,'r', encoding='utf-8', errors='ignore') as f:
             log=f.read()
