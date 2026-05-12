@@ -372,6 +372,7 @@ github:
   gitPathStore : /app/gitRepo/store/
   username: your_username
   password: your_generated_token
+  repoUrl: ${GITHUB_REPO_URL:}
 
 security:
   silentRefreshTimeoutFactor: 0.85
@@ -401,3 +402,12 @@ vibe:
       response-timeout-seconds: 300           # Max wait for Goose response (seconds)
       secret-key: sk-1234                     # X-Secret-Key header for Goose API auth
 
+    working-dir: /home/engne2/essedum/goose
+  github:
+    enabled: false
+    repo-url: https://github.com/your-org/vibe-sessions.git
+    username: your-github-username
+    token: your-github-pat
+    work-dir: /tmp/vibe-github
+    commit-message-template: "Vibe session {sessionId} — auto-generated code"
+    branch-prefix: "vibe-session/"

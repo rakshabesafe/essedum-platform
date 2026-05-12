@@ -2,6 +2,7 @@
 import os
 import asyncio
 import logging
+import posixpath
 from aiohttp import web, ClientSession, ClientTimeout, TCPConnector, WSMsgType
 from yarl import URL  # comes with aiohttp; used to attach query string safely
 
@@ -9,6 +10,27 @@ from yarl import URL  # comes with aiohttp; used to attach query string safely
 NS = os.getenv("TARGET_NAMESPACE", "aipns")
 ALLOWLIST = os.getenv("ALLOWLIST")  # e.g., "runner-service,builder-service"
 ALLOW = set(ALLOWLIST.split(",")) if ALLOWLIST else None
+
+def is_valid_service_name(name: str) -> bool:
+    """
+    Validate that `name` is a safe service identifier.
+
+    We restrict to a DNS-label-like pattern commonly used for Kubernetes
+    service names: 1–63 chars, lowercase letters, digits, and hyphens,
+    starting and ending with an alphanumeric character.
+    This prevents injection of schemes, slashes, or dots that could
+    influence the upstream URL beyond the intended namespace.
+    """
+    if not name:
+        return False
+    if len(name) > 63:
+        return False
+    allowed = set("abcdefghijklmnopqrstuvwxyz0123456789-")
+    if any(ch not in allowed for ch in name):
+        return False
+    if not (name[0].isalnum() and name[-1].isalnum()):
+        return False
+    return True
 
 # hop-by-hop headers must not be forwarded by proxies
 HOP_BY_HOP = {
@@ -28,10 +50,35 @@ def sanitize_headers(headers: web.BaseRequest.headers):
 async def health(_request):
     return web.json_response({"status": "ok"})
 
+def sanitize_subpath(subpath: str) -> str:
+    """
+    Normalize subpath to prevent path traversal attacks.
+    Strips leading slashes and removes '..' / '.' segments so that
+    user-supplied paths cannot escape the intended upstream scope.
+    """
+    if not subpath:
+        return ""
+    # posixpath.normpath resolves '..', '.', and duplicate slashes.
+    # Prepend '/' so normpath treats the input as absolute, then remove it.
+    normalized = posixpath.normpath("/" + subpath)
+    return normalized.lstrip("/")
+
+# Expected host suffix for all upstream targets - computed once at startup
+_CLUSTER_SUFFIX = f".{NS}.svc.cluster.local"
+
 def build_upstream(service: str, subpath: str) -> str:
     """Build upstream URL base for service + subpath."""
     sub = f"/{subpath}" if subpath else "/"
-    return f"http://{service}.{NS}.svc.cluster.local{sub}"
+    return f"http://{service}{_CLUSTER_SUFFIX}{sub}"
+
+def validate_upstream_url(url: URL) -> bool:
+    """
+    Verify the upstream URL host is strictly within the cluster namespace.
+    Prevents SSRF by ensuring user-controlled input cannot redirect
+    requests to arbitrary hosts outside *.{NS}.svc.cluster.local.
+    """
+    host = url.host or ""
+    return host.endswith(_CLUSTER_SUFFIX) and url.scheme == "http"
 
 # -------------------------
 # HTTP proxy (polling etc.)
@@ -40,8 +87,13 @@ async def http_proxy(request: web.Request):
     service = request.match_info.get("service")
     subpath = request.match_info.get("subpath", "")
 
+    if not is_valid_service_name(service):
+        return web.Response(text=f"Invalid service name '{service}'", status=400)
+    
     if ALLOW is not None and service not in ALLOW:
         return web.Response(text=f"Service '{service}' not allowed", status=403)
+
+    subpath = sanitize_subpath(subpath)
 
     # NOTE: For Socket.IO polling, subpath will be "socket.io"
     target = build_upstream(service, subpath)
@@ -52,21 +104,25 @@ async def http_proxy(request: web.Request):
     connector = TCPConnector(ssl=False)
 
     # Preserve query string (EIO=4, transport=polling, t=..., etc.)
-    upstream_url = str(URL(target).with_query(request.rel_url.query))
+    upstream_url = URL(target).with_query(request.rel_url.query)
+
+    # Validate the final upstream URL host is within the expected cluster namespace
+    if not validate_upstream_url(upstream_url):
+        return web.Response(text="Invalid upstream target", status=400)
 
     async with ClientSession(timeout=timeout, connector=connector) as session:
         try:
             async with session.request(
                 method=request.method,
-                url=upstream_url,
+                url=str(upstream_url),
                 headers=headers,
                 data=data,
             ) as resp:
                 out_headers = {k: v for (k, v) in resp.headers.items()}
                 body = await resp.read()
                 return web.Response(body=body, status=resp.status, headers=out_headers)
-        except Exception as e:
-            return web.Response(text=f"Upstream error: {e}", status=502)
+        except Exception:
+            return web.Response(text="Upstream error", status=502)
 
 # ---------------------------------
 # WebSocket proxy (Socket.IO WS)
@@ -86,8 +142,13 @@ async def websocket_proxy(request: web.Request) -> web.StreamResponse:
         service = parts[0]
         subpath = parts[1] if len(parts) > 1 else ""
 
+    if not is_valid_service_name(service):
+        return web.Response(text=f"Invalid service name '{service}'", status=400)
+    
     if ALLOW is not None and service not in ALLOW:
         return web.Response(text=f"Service '{service}' not allowed", status=403)
+
+    subpath = sanitize_subpath(subpath)
 
     # For Socket.IO WS, upstream must be /socket.io
     # (Keep any additional subpath segments after 'socket.io/' if present.)
@@ -98,6 +159,10 @@ async def websocket_proxy(request: web.Request) -> web.StreamResponse:
     base = build_upstream(service, upstream_path)
     # Preserve the original query string (EIO=4&transport=websocket&sid=...)
     upstream_url = URL(base).with_query(request.rel_url.query)
+
+    # Validate the final upstream URL host is within the expected cluster namespace
+    if not validate_upstream_url(upstream_url):
+        return web.Response(text="Invalid upstream target", status=400)
 
     headers = sanitize_headers(request.headers)
 
@@ -143,10 +208,10 @@ async def websocket_proxy(request: web.Request) -> web.StreamResponse:
             # 3) Bridge frames BOTH WAYS (this was previously incorrect)
             await asyncio.gather(client_to_upstream(), upstream_to_client())
 
-        except Exception as e:
+        except Exception:
             # If upstream WS fails, close client WS and surface error
             await ws_client.close()
-            return web.Response(text=f"Upstream WS error: {e}", status=502)
+            return web.Response(text="Upstream WS error", status=502)
 
     return ws_client
 

@@ -360,6 +360,14 @@ public class ICIPFileService {
         List<String> savedFileNames = new ArrayList<>();
         Blob blob = new SerialBlob(bytes);
 
+        // Resolve GitHub availability first (independent of legacy flag)
+        String gitRepoUrl = githubservice.resolveRepoUrl(org);
+        boolean gitHubAvailable = (gitRepoUrl != null && !gitRepoUrl.isEmpty());
+        String branchName = "pipeline/" + com.lfn.ai.comm.lib.util.ICIPUtils.removeSpecialCharacter(name);
+        boolean gitHubPushSuccess = false;
+        String gitHubPushFailReason = null;
+
+        // Check legacy flag
         String remoteScript = null;
         try {
             remoteScript = constantsService.getByKeys("icip.script.github.enabled", org).getValue();
@@ -371,7 +379,8 @@ public class ICIPFileService {
         }
 
         if (remoteScript.equals("true")) {
-            logger.info("Git is enabled");
+            // Legacy GitHub integration (single master branch)
+            logger.info("Legacy Git integration is enabled (icip.script.github.enabled=true)");
             Git git = githubservice.getGitHubRepository(org);
 
             //Pulling latest script from  Git
@@ -395,37 +404,52 @@ public class ICIPFileService {
             streamingServicesService.update(ss);
             logger.info("Updated streaming service JSON for cname: {}", name);
 
-        } else {
-            logger.info("GitHub integration disabled. Proceeding with DB operations...");
+        } else if (gitHubAvailable) {
+            // New: Branch-per-pipeline GitHub integration
+            logger.info("GitHub branch-per-pipeline mode. Repo URL: {}, Branch: {}, org: {}", gitRepoUrl, branchName, org);
 
             // Check fileType to determine how many files to create
             if ("json".equalsIgnoreCase(fileType.trim())) {
                 // For JSON: create only one file
                 logger.info("Creating JSON file: {}", newFileName);
 
+                boolean savedToGitHub = false;
+                try {
+                    githubservice.saveFileToGitHubBranch(bytes, name, org, newFileName, branchName);
+                    logger.info("Saved JSON file to GitHub => Repo: {}, Branch: {}, File: {}/{}", gitRepoUrl, branchName, name, newFileName);
+                    savedToGitHub = true;
+                    gitHubPushSuccess = true;
+                } catch (Exception ex) {
+                    gitHubPushFailReason = ex.getMessage();
+                    logger.info("Failed to save JSON file to GitHub branch. Falling back to DB storage. Error: {}", gitHubPushFailReason, ex);
+                }
+
+                // Save metadata (null filescript) or full content (fallback) in DB
                 List<ICIPNativeScript> existingScripts = nativeScriptService.findByOrgAndName(name, org);
                 boolean updated = false;
 
-                // Update existing JSON file if present
                 for (ICIPNativeScript script : existingScripts) {
                     if (script.getFilename().equalsIgnoreCase(newFileName)) {
-                        logger.info("Updating existing JSON script: {}", newFileName);
-                        script.setFilescript(blob);
+                        logger.info("Updating existing JSON script metadata: {}", newFileName);
+                        script.setFilescript(savedToGitHub ? null : blob);
                         nativeScriptService.save(script);
+                        logger.info("[Metadata] Updated in table 'mlpipelinenativescriptentity' => id: {}, cname: {}, org: {}, filename: {}, filescript={}",
+                                script.getId(), name, org, newFileName, savedToGitHub ? "null (content pushed to GitHub)" : "stored in DB");
                         updated = true;
                         break;
                     }
                 }
 
-                // If not found, create new JSON file
                 if (!updated) {
-                    logger.info("Creating new JSON script: {}", newFileName);
+                    logger.info("Creating new JSON script metadata: {}", newFileName);
                     ICIPNativeScript newScript = new ICIPNativeScript();
                     newScript.setCname(name);
                     newScript.setOrganization(org);
                     newScript.setFilename(newFileName);
-                    newScript.setFilescript(blob);
+                    newScript.setFilescript(savedToGitHub ? null : blob);
                     nativeScriptService.save(newScript);
+                    logger.info("[Metadata] Inserted into table 'mlpipelinenativescriptentity' => cname: {}, org: {}, filename: {}, filescript={}",
+                            name, org, newFileName, savedToGitHub ? "null (content pushed to GitHub)" : "stored in DB");
                 }
 
                 savedFileNames.add(newFileName);
@@ -433,67 +457,193 @@ public class ICIPFileService {
             } else {
                 // For Python: create two files (.py and .ipynb)
                 String ipynbFileName = newFileName.replaceAll("(?i)\\.py$", ".ipynb");
+
+                boolean savedToGitHub = false;
+                try {
+                    githubservice.saveFileToGitHubBranch(bytes, name, org, newFileName, branchName);
+                    logger.info("Saved .py file to GitHub => Repo: {}, Branch: {}, File: {}/{}", gitRepoUrl, branchName, name, newFileName);
+                    savedToGitHub = true;
+                    gitHubPushSuccess = true;
+                } catch (Exception ex) {
+                    gitHubPushFailReason = ex.getMessage();
+                    logger.info("Failed to save .py file to GitHub branch. Falling back to DB storage. Error: {}", gitHubPushFailReason, ex);
+                }
+
                 List<ICIPNativeScript> existingScripts = nativeScriptService.findByOrgAndName(name, org);
-                boolean pyUpdated = false;
-                boolean ipynbUpdated = false;
 
                 if (existingScripts.isEmpty()) {
-                    logger.info("No existing scripts found for cname: {}. Creating both .py and .ipynb files.", name);
-                    // Create missing .py file
-                    if (!pyUpdated) {
-                        logger.info("Creating new .py script: {}", newFileName);
-                        ICIPNativeScript pyScript = new ICIPNativeScript();
-                        pyScript.setCname(name);
-                        pyScript.setOrganization(org);
-                        pyScript.setFilename(newFileName);
-                        pyScript.setFilescript(blob);
-                        nativeScriptService.save(pyScript);
+                    logger.info("No existing scripts found for cname: {}. Creating metadata for both .py and .ipynb files.", name);
+
+                    // Create .py entry in DB
+                    ICIPNativeScript pyScript = new ICIPNativeScript();
+                    pyScript.setCname(name);
+                    pyScript.setOrganization(org);
+                    pyScript.setFilename(newFileName);
+                    pyScript.setFilescript(savedToGitHub ? null : blob);
+                    nativeScriptService.save(pyScript);
+                    logger.info("[Metadata] Inserted .py into table 'mlpipelinenativescriptentity' => cname: {}, org: {}, filename: {}, filescript={}",
+                            name, org, newFileName, savedToGitHub ? "null (content pushed to GitHub)" : "stored in DB");
+
+                    // Create .ipynb default content
+                    String defaultIpynbContent = "{\n" +
+                            " \"cells\": [\n" +
+                            "  {\n" +
+                            "   \"cell_type\": \"code\",\n" +
+                            "   \"execution_count\": null,\n" +
+                            "   \"id\": \"d099134a\",\n" +
+                            "   \"metadata\": {},\n" +
+                            "   \"outputs\": [],\n" +
+                            "   \"source\": [\n" +
+                            "    \"#This is a notebook file for pipeline in ESSEDUM\"\n" +
+                            "   ]\n" +
+                            "  }\n" +
+                            " ],\n" +
+                            " \"metadata\": {\n" +
+                            "  \"language_info\": {\n" +
+                            "   \"name\": \"python\"\n" +
+                            "  }\n" +
+                            " },\n" +
+                            " \"nbformat\": 4,\n" +
+                            " \"nbformat_minor\": 5\n" +
+                            "}";
+
+                    byte[] ipynbBytes = defaultIpynbContent.getBytes(StandardCharsets.UTF_8);
+                    if (savedToGitHub) {
+                        try {
+                            githubservice.saveFileToGitHubBranch(ipynbBytes, name, org, ipynbFileName, branchName);
+                            logger.info("Saved .ipynb file to GitHub => Repo: {}, Branch: {}, File: {}/{}", gitRepoUrl, branchName, name, ipynbFileName);
+                        } catch (Exception ex) {
+                            logger.error("Failed to save .ipynb file to GitHub. Error: {}", ex.getMessage());
+                        }
                     }
 
-                    // Create missing .ipynb file
-                    if (!ipynbUpdated) {
-                        logger.info("Creating missing .ipynb script: {}", ipynbFileName);
+                    // Create .ipynb entry in DB
+                    ICIPNativeScript ipynbScript = new ICIPNativeScript();
+                    ipynbScript.setCname(name);
+                    ipynbScript.setOrganization(org);
+                    ipynbScript.setFilename(ipynbFileName);
+                    ipynbScript.setFilescript(savedToGitHub ? null : new SerialBlob(ipynbBytes));
+                    nativeScriptService.save(ipynbScript);
+                    logger.info("[Metadata] Inserted .ipynb into table 'mlpipelinenativescriptentity' => cname: {}, org: {}, filename: {}, filescript={}",
+                            name, org, ipynbFileName, savedToGitHub ? "null (content pushed to GitHub)" : "stored in DB");
 
-                        // Default Jupyter Notebook content
-                        String defaultIpynbContent = "{\n" +
-                                " \"cells\": [\n" +
-                                "  {\n" +
-                                "   \"cell_type\": \"code\",\n" +
-                                "   \"execution_count\": null,\n" +
-                                "   \"id\": \"d099134a\",\n" +
-                                "   \"metadata\": {},\n" +
-                                "   \"outputs\": [],\n" +
-                                "   \"source\": [\n" +
-                                "    \"#This is a notebook file for pipeline in ESSEDUM\"\n" +
-                                "   ]\n" +
-                                "  }\n" +
-                                " ],\n" +
-                                " \"metadata\": {\n" +
-                                "  \"language_info\": {\n" +
-                                "   \"name\": \"python\"\n" +
-                                "  }\n" +
-                                " },\n" +
-                                " \"nbformat\": 4,\n" +
-                                " \"nbformat_minor\": 5\n" +
-                                "}";
-
-                        Blob ipynbBlob = new SerialBlob(defaultIpynbContent.getBytes(StandardCharsets.UTF_8));
-
-                        ICIPNativeScript ipynbScript = new ICIPNativeScript();
-                        ipynbScript.setCname(name);
-                        ipynbScript.setOrganization(org);
-                        ipynbScript.setFilename(ipynbFileName);
-                        ipynbScript.setFilescript(ipynbBlob);
-                        nativeScriptService.save(ipynbScript);
-                    }
                 } else {
-                    logger.info("Existing scripts found for cname: {}. Checking for updates...", name);
-                    // Update existing files if present
+                    logger.info("Existing scripts found for cname: {}. Updating metadata and syncing to GitHub...", name);
                     for (ICIPNativeScript script : existingScripts) {
                         if (script.getFilename().equalsIgnoreCase(fileName)) {
-                            logger.info("Updating existing script file : {}", fileName);
+                            logger.info("Updating existing script metadata: {}", fileName);
+                            script.setFilescript(savedToGitHub ? null : blob);
+                            nativeScriptService.save(script);
+                            logger.info("[Metadata] Updated in table 'mlpipelinenativescriptentity' => id: {}, cname: {}, org: {}, filename: {}, filescript={}",
+                                    script.getId(), name, org, fileName, savedToGitHub ? "null (content pushed to GitHub)" : "stored in DB");
+                            break;
+                        }
+                    }
+                }
+                savedFileNames.add(newFileName);
+                savedFileNames.add(ipynbFileName);
+            }
+
+            // Update streaming service JSON content to null (content is in GitHub)
+            try {
+                ICIPStreamingServices ss = streamingServicesService.getICIPStreamingServices(name, org);
+                if (ss != null) {
+                    ss.setJsonContent(null);
+                    streamingServicesService.update(ss);
+                    logger.info("Set streaming service jsonContent to null for cname: {}", name);
+                }
+            } catch (Exception ex) {
+                logger.warn("Could not update streaming service jsonContent for cname: {}: {}", name, ex.getMessage());
+            }
+
+        } else {
+            // No GitHub configured at all — store everything in DB
+            logger.info("GitHub is NOT configured for org: {}. Storing all content in DB table 'mlpipelinenativescriptentity'.", org);
+
+            if ("json".equalsIgnoreCase(fileType.trim())) {
+                logger.info("Creating JSON file in DB: {}", newFileName);
+
+                List<ICIPNativeScript> existingScripts = nativeScriptService.findByOrgAndName(name, org);
+                boolean updated = false;
+
+                for (ICIPNativeScript script : existingScripts) {
+                    if (script.getFilename().equalsIgnoreCase(newFileName)) {
+                        logger.info("Updating existing JSON script in DB: {}", newFileName);
+                        script.setFilescript(blob);
+                        nativeScriptService.save(script);
+                        logger.info("[DB] Updated in table 'mlpipelinenativescriptentity' => id: {}, cname: {}, org: {}, filename: {}", script.getId(), name, org, newFileName);
+                        updated = true;
+                        break;
+                    }
+                }
+
+                if (!updated) {
+                    logger.info("Creating new JSON script in DB: {}", newFileName);
+                    ICIPNativeScript newScript = new ICIPNativeScript();
+                    newScript.setCname(name);
+                    newScript.setOrganization(org);
+                    newScript.setFilename(newFileName);
+                    newScript.setFilescript(blob);
+                    nativeScriptService.save(newScript);
+                    logger.info("[DB] Inserted into table 'mlpipelinenativescriptentity' => cname: {}, org: {}, filename: {}", name, org, newFileName);
+                }
+
+                savedFileNames.add(newFileName);
+
+            } else {
+                String ipynbFileName = newFileName.replaceAll("(?i)\\.py$", ".ipynb");
+                List<ICIPNativeScript> existingScripts = nativeScriptService.findByOrgAndName(name, org);
+
+                if (existingScripts.isEmpty()) {
+                    logger.info("Creating both .py and .ipynb files in DB for cname: {}", name);
+
+                    ICIPNativeScript pyScript = new ICIPNativeScript();
+                    pyScript.setCname(name);
+                    pyScript.setOrganization(org);
+                    pyScript.setFilename(newFileName);
+                    pyScript.setFilescript(blob);
+                    nativeScriptService.save(pyScript);
+                    logger.info("[DB] Inserted .py into table 'mlpipelinenativescriptentity' => cname: {}, org: {}, filename: {}", name, org, newFileName);
+
+                    String defaultIpynbContent = "{\n" +
+                            " \"cells\": [\n" +
+                            "  {\n" +
+                            "   \"cell_type\": \"code\",\n" +
+                            "   \"execution_count\": null,\n" +
+                            "   \"id\": \"d099134a\",\n" +
+                            "   \"metadata\": {},\n" +
+                            "   \"outputs\": [],\n" +
+                            "   \"source\": [\n" +
+                            "    \"#This is a notebook file for pipeline in ESSEDUM\"\n" +
+                            "   ]\n" +
+                            "  }\n" +
+                            " ],\n" +
+                            " \"metadata\": {\n" +
+                            "  \"language_info\": {\n" +
+                            "   \"name\": \"python\"\n" +
+                            "  }\n" +
+                            " },\n" +
+                            " \"nbformat\": 4,\n" +
+                            " \"nbformat_minor\": 5\n" +
+                            "}";
+
+                    Blob ipynbBlob = new SerialBlob(defaultIpynbContent.getBytes(StandardCharsets.UTF_8));
+                    ICIPNativeScript ipynbScript = new ICIPNativeScript();
+                    ipynbScript.setCname(name);
+                    ipynbScript.setOrganization(org);
+                    ipynbScript.setFilename(ipynbFileName);
+                    ipynbScript.setFilescript(ipynbBlob);
+                    nativeScriptService.save(ipynbScript);
+                    logger.info("[DB] Inserted .ipynb into table 'mlpipelinenativescriptentity' => cname: {}, org: {}, filename: {}", name, org, ipynbFileName);
+
+                } else {
+                    logger.info("Existing scripts found for cname: {}. Updating in DB...", name);
+                    for (ICIPNativeScript script : existingScripts) {
+                        if (script.getFilename().equalsIgnoreCase(fileName)) {
+                            logger.info("Updating existing script in DB: {}", fileName);
                             script.setFilescript(blob);
                             nativeScriptService.save(script);
+                            logger.info("[DB] Updated in table 'mlpipelinenativescriptentity' => id: {}, cname: {}, org: {}, filename: {}", script.getId(), name, org, fileName);
                             break;
                         }
                     }
@@ -503,7 +653,20 @@ public class ICIPFileService {
             }
         }
 
-        logger.info("Persist operation completed. Returning filenames: {}", savedFileNames);
+        String gitPushStatus;
+        if (!gitHubAvailable) {
+            gitPushStatus = "N/A (not attempted)";
+        } else if (gitHubPushSuccess) {
+            gitPushStatus = "SUCCESS";
+        } else {
+            gitPushStatus = "FAILED - Reason: " + (gitHubPushFailReason != null ? gitHubPushFailReason : "Unknown error");
+        }
+
+        logger.info("Persist operation completed. Returning filenames: {}. GitHub repo URL: {}, Branch: {}, GitHub push: {}, Metadata stored in DB table: 'mlpipelinenativescriptentity'",
+                savedFileNames,
+                gitHubAvailable ? gitRepoUrl : "N/A (GitHub not configured)",
+                gitHubAvailable ? branchName : "N/A",
+                gitPushStatus);
         return savedFileNames;
     }
 
@@ -1004,10 +1167,23 @@ public class ICIPFileService {
 
         }
         if (!(remoteScript.equalsIgnoreCase("true")) || (in == null && remoteScript.equalsIgnoreCase("true"))) {
-            logger.info("File not found in GitHub. Fetching from db...");
+            logger.info("File not found in GitHub legacy path. Fetching from db...");
             ICIPNativeScript binaryFiles = nativeScriptService.findByNameAndOrgAndFile(cname, org, filename);
             if (binaryFiles != null && binaryFiles.getFilescript() != null) {
                 return binaryFiles.getFilescript().getBinaryStream();
+            }
+            // If metadata exists but filescript is null, fetch from GitHub branch
+            if (binaryFiles != null && binaryFiles.getFilescript() == null) {
+                logger.info("Filescript is null in DB. Fetching from GitHub branch for cname: {}", cname);
+                String branchName = "pipeline/" + com.lfn.ai.comm.lib.util.ICIPUtils.removeSpecialCharacter(cname);
+                try {
+                    byte[] content = githubservice.fetchFileFromGitHubBranch(cname, org, filename, branchName);
+                    if (content != null) {
+                        return new java.io.ByteArrayInputStream(content);
+                    }
+                } catch (Exception ex) {
+                    logger.error("Error fetching file from GitHub branch: {}", ex.getMessage());
+                }
             }
         }
         throw new SQLException(FileConstants.INVALID_FILE_NAME);

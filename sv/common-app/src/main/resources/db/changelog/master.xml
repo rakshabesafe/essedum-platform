@@ -97,5 +97,6 @@
 	<include file="db/changelog/312_to_320/312_to_320.xml" context="312to320" />
 
 	<include file="db/changelog/telemetry.xml" context="fresh" />
+	<include file="db/changelog/vibe/vibe_github_config.xml" context="fresh" />
 
 </databaseChangeLog>

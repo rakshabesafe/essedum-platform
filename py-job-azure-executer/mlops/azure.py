@@ -1,5 +1,6 @@
 import json 
 import os
+import re
 import pandas as pd
 import logging
 import shutil
@@ -58,9 +59,9 @@ logger.info("Proxy disabled - all proxy environment variables cleared before req
 
 def token_generate():
   try:
-    logger.info(f"enviromenttest tenant_id :  {os.environ.get('tenant_id')}")
+    logger.info(f"tenant_id present: {bool(os.environ.get('tenant_id'))}")
 
-    logger.info(f"enviromenttest tenant_id :  {os.environ.get('client_secret')}")
+    logger.info(f"client_secret present: {bool(os.environ.get('client_secret'))}")
 
 
     url = f"https://login.microsoftonline.com/{os.environ.get('tenant_id')}/oauth2/token"
@@ -79,7 +80,6 @@ def token_generate():
       return response.text
     else:
       logger.error(f"Token generation failed with status code: {response.status_code}")
-      logger.error(f"Response: {response.text[:200]}")
       return response.text
       
   except Exception as e:
@@ -160,7 +160,11 @@ def projects_datasets_create(adapter_instance, project, isCached, isInstance, co
     file_url = payload.get("path")  # Original file URL
     description = payload.get("description", "")
     version = payload.get("version", "1")
-    
+
+    # Validate dataset_name to prevent path traversal
+    if not dataset_name or not re.match(r'^[a-zA-Z0-9_\-]+$', dataset_name):
+      return {"error": "Invalid dataset name. Only alphanumeric characters, hyphens, and underscores are allowed."}, 400
+
     logger.info(f"Creating MLTable dataset: {dataset_name} from {file_url}")
     
     ml_client = ConnectClient()
@@ -171,6 +175,9 @@ def projects_datasets_create(adapter_instance, project, isCached, isInstance, co
     
     parsed_url = urlparse(file_url)
     filename = os.path.basename(parsed_url.path)
+    # Validate filename to prevent path traversal
+    if not filename or not re.match(r'^[a-zA-Z0-9_\-\.]+$', filename) or '..' in filename:
+      return {"error": "Invalid filename in the provided URL."}, 400
     logger.info(f"Extracted filename: {filename}")
     
     # Create temporary folder for MLTable
@@ -179,12 +186,23 @@ def projects_datasets_create(adapter_instance, project, isCached, isInstance, co
     
     temp_dir = tempfile.mkdtemp()
     mltable_folder = os.path.join(temp_dir, dataset_name)
-    os.makedirs(mltable_folder, exist_ok=True)
+    # Canonical path check: ensure mltable_folder is confined within temp_dir
+    resolved_temp = os.path.realpath(temp_dir)
+    resolved_folder = os.path.realpath(mltable_folder)
+    if not resolved_folder.startswith(resolved_temp + os.sep):
+      shutil.rmtree(temp_dir)
+      return {"error": "Invalid dataset name: path traversal detected"}, 400
+    os.makedirs(resolved_folder, exist_ok=True)
     
-    logger.info(f"Created temporary MLTable folder: {mltable_folder}")
+    logger.info(f"Created temporary MLTable folder: {resolved_folder}")
     
     # Download the CSV file using Azure Storage SDK with authentication
     csv_path = os.path.join(mltable_folder, filename)
+    # Canonical path check: ensure csv_path is confined within mltable_folder
+    resolved_csv = os.path.realpath(csv_path)
+    if not resolved_csv.startswith(resolved_folder + os.sep):
+      shutil.rmtree(temp_dir)
+      return {"error": "Invalid filename: path traversal detected"}, 400
     
     try:
       from azure.storage.blob import BlobServiceClient
@@ -224,20 +242,23 @@ def projects_datasets_create(adapter_instance, project, isCached, isInstance, co
         blob=blob_name
       )
       
-      # Download blob
-      with open(csv_path, 'wb') as download_file:
+      # Download blob — use resolved_csv (canonicalized path) to satisfy taint-tracking
+      with open(resolved_csv, 'wb') as download_file:
         download_stream = blob_client.download_blob()
         download_file.write(download_stream.readall())
       
-      logger.info(f"File downloaded successfully to: {csv_path}")
+      logger.info(f"File downloaded successfully to: {resolved_csv}")
       
     except Exception as download_error:
       logger.error(f"Failed to download file: {str(download_error)}")
       shutil.rmtree(temp_dir)
       return {"error": f"Failed to download file: {str(download_error)}"}, 400
     
-    # Create MLTable YAML file - use relative path
-    mltable_yaml_path = os.path.join(mltable_folder, "MLTable")
+    # Create MLTable YAML file — build from canonicalized folder to prevent path traversal
+    mltable_yaml_path = os.path.realpath(os.path.join(resolved_folder, "MLTable"))
+    if not mltable_yaml_path.startswith(resolved_folder + os.sep) and mltable_yaml_path != os.path.join(resolved_folder, "MLTable"):
+      shutil.rmtree(temp_dir)
+      return {"error": "Invalid MLTable path detected"}, 400
     
     # MLTable YAML content - using relative path to the CSV file
     mltable_yaml_content = f"""paths:
@@ -323,17 +344,14 @@ def projects_datasets_list_list(adapter_instance, project, isCached, isInstance,
   subscriptionId=connections.get('subscriptionId',None)
   resourceGroupName=connections.get('resourceGroupName',None)
   workspaceName=connections.get('workspaceName',None)
-  logger.info(f"Connection params - subscriptionId: {subscriptionId}, resourceGroup: {resourceGroupName}, workspace: {workspaceName}, api_version: {api_version}")
+  logger.info("Connection parameters retrieved for datasets list request")
   
   url=f"https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/data?api-version={api_version}"
-  logger.info(f"Request URL: {url}")
-  
   headers = {
   "Authorization" : "Bearer "+str(Authorization)
   }
-  logger.info("Headers prepared")
   
-  logger.info("Making GET request to Azure Management API...")
+  logger.info("Making GET request to Azure Management API for datasets...")
   response = requests.request("GET", url, headers=headers, verify=False, proxies={'http': None, 'https': None})
   logger.info(f"Response received - Status code: {response.status_code}")
   
@@ -353,7 +371,6 @@ def projects_datasets_list_list(adapter_instance, project, isCached, isInstance,
       return "Internal Server Error(HTTP 500)"
     else:
       logger.error(f"Unexpected response status code: {response.status_code}")
-      logger.error(f"Response body: {response.text[:500]}")
       return f"Request failed with status code:{response.status_code}"
         
   except Exception as e:
@@ -1073,9 +1090,16 @@ def training_train_create(adapter_instance, project, isCached, isInstance, conne
       
       import os
       import shutil
-      
+
+      # Sanitize name to prevent path traversal before using in path construction
+      safe_name = re.sub(r'[^a-zA-Z0-9_\-]', '_', name)
+
       # Create MLTable configuration for CSV file
-      mltable_folder = f"./mltable_{name}"
+      # Canonical path check: ensure mltable_folder stays within the current working directory
+      base_dir = os.path.realpath('.')
+      mltable_folder = os.path.realpath(f"./mltable_{safe_name}")
+      if not mltable_folder.startswith(base_dir + os.sep):
+        return {"error": "Invalid experiment name: path traversal detected"}, 400
       os.makedirs(mltable_folder, exist_ok=True)
       
       # Write MLTable yaml file
@@ -1089,6 +1113,9 @@ transformations:
 """
       
       mltable_yaml_path = os.path.join(mltable_folder, "MLTable")
+      # Canonical path check: ensure yaml path is within mltable_folder
+      if not os.path.realpath(mltable_yaml_path).startswith(mltable_folder + os.sep):
+        return {"error": "Invalid MLTable path: path traversal detected"}, 400
       with open(mltable_yaml_path, 'w') as f:
         f.write(mltable_yaml_content)
       
