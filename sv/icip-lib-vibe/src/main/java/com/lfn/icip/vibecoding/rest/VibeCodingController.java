@@ -174,8 +174,8 @@ public class VibeCodingController {
 
     @GetMapping(value = "/agent/tools", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> agentTools(
-            @RequestParam String session_id,
-            @RequestParam(required = false) String extension_name) {
+            @RequestParam(value = "session_id") String session_id,
+            @RequestParam(value = "extension_name", required = false) String extension_name) {
         logger.info("Agent tools request, session={}", session_id);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("session_id", session_id);
@@ -185,7 +185,7 @@ public class VibeCodingController {
 
     @GetMapping(value = "/agent/list-apps", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> agentListApps(
-            @RequestParam(required = false) String session_id) {
+            @RequestParam(value = "session_id", required = false) String session_id) {
         logger.info("Agent list apps request");
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         if (session_id != null) params.add("session_id", session_id);
@@ -193,7 +193,7 @@ public class VibeCodingController {
     }
 
     @GetMapping(value = "/agent/export-app/{name}", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> agentExportApp(@PathVariable String name) {
+    public ResponseEntity<String> agentExportApp(@PathVariable(value = "name") String name) {
         logger.info("Agent export app request, name={}", name);
         return vibeCodingService.get("/agent/export_app/" + name, null);
     }
@@ -229,7 +229,7 @@ public class VibeCodingController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> sessionReply(
-            @PathVariable String sessionId,
+            @PathVariable(value = "sessionId") String sessionId,
             @RequestBody Map<String, Object> request) {
         logger.info("Session reply request, session={}", sessionId);
         return vibeCodingService.post("/sessions/" + sessionId + "/reply", request);
@@ -242,7 +242,7 @@ public class VibeCodingController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> sessionCancel(
-            @PathVariable String sessionId,
+            @PathVariable(value = "sessionId") String sessionId,
             @RequestBody Map<String, Object> request) {
         logger.debug("Session cancel request, session={} (auto-triggered by frontend)", sessionId);
         return vibeCodingService.post("/sessions/" + sessionId + "/cancel", request);
@@ -253,10 +253,9 @@ public class VibeCodingController {
      */
     @GetMapping(value = "/sessions/{sessionId}/events",
             produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter sessionEvents(@PathVariable String sessionId) {
+    public SseEmitter sessionEvents(@PathVariable(value = "sessionId") String sessionId) {
         logger.info("Session events SSE request, session={}", sessionId);
         return vibeCodingService.sseGet("/sessions/" + sessionId + "/events");
     }
 }
-
 

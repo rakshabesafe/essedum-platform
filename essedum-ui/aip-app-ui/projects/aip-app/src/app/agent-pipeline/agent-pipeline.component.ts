@@ -921,8 +921,8 @@ export class AgentPipelineComponent implements OnInit, OnDestroy {
       
       // Open the pipeline creation dialog with MCP-specific parameters
       const dialogRef = this.dialog.open(PipelineCreateComponent, {
-        width: '600px',
-        height: '500px',
+        width: '460px',
+        maxWidth: '92vw',
         disableClose: true,
         data: {
           interfacetype: 'mcp-pipeline', // MCP-specific interface type
@@ -943,8 +943,8 @@ export class AgentPipelineComponent implements OnInit, OnDestroy {
       
       // Open the pipeline creation dialog with App-specific parameters
       const dialogRef = this.dialog.open(PipelineCreateComponent, {
-        width: '600px',
-        height: '500px',
+        width: '460px',
+        maxWidth: '92vw',
         disableClose: true,
         data: {
           interfacetype: 'app-pipeline', // App-specific interface type
@@ -965,8 +965,8 @@ export class AgentPipelineComponent implements OnInit, OnDestroy {
       
       // Open the pipeline creation dialog with Agent-specific parameters
       const dialogRef = this.dialog.open(PipelineCreateComponent, {
-        width: '600px',
-        height: '500px',
+        width: '460px',
+        maxWidth: '92vw',
         disableClose: true,
         data: {
           interfacetype: 'pipeline-agent', // Agent-specific interface type

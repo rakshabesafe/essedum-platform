@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, abort, request, render_template, make_response, g
 import uuid
+import html as html_module
 from utils import *
 from Queue import Queue
 from db import DatabaseOperations, JobNF
@@ -45,6 +46,14 @@ process_lock = Lock()
 db_operations = DatabaseOperations()
 submitted_futures = {}
 pause_event = Event()
+
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses to mitigate XSS and MIME-sniffing attacks."""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
 
 @app.before_request
 def create_database():
@@ -169,6 +178,12 @@ def show_tasks():
 @app.route('/execute/<task_id>/getStatus', methods=['GET'])
 def get_task_status(task_id):
     try:
+        # Validate task_id is a well-formed UUID before use
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid task ID'}), 400
+
         task = db_operations.get_job_by_id(task_id)
         if task is None:
             abort(404)
@@ -180,7 +195,7 @@ def get_task_status(task_id):
             "pid":task["pid"],
             "task_status": task["status"],
             "log_path": task["logpath"],
-            "output_dir": '/'.join(task["logpath"].split('/')[:-1]) + '/outputs',
+            "output_dir": str(Path(task["logpath"]).parent / 'outputs'),
             "submitted":task["submitted"],
             "started":task["started"],
             "finished":task["finished"],
@@ -195,6 +210,12 @@ def get_task_status(task_id):
 @app.route('/execute/<task_id>/stop', methods=['GET'])
 def terminate_task(task_id):
     try:
+        # Validate task_id is a well-formed UUID before use
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid task ID'}), 400
+
         task = db_operations.get_job_by_id(task_id)
         result=''
         logger.info(f'Terminating task: {task_id}')
@@ -250,6 +271,12 @@ def terminate_task(task_id):
 @app.route('/execute/<task_id>/getLog', methods=['GET'])
 def get_task_log(task_id):
     try:
+        # Validate task_id is a well-formed UUID before using it in path construction
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'logs': {'content': 'Invalid task ID'}}), 400
+
         task_folder=str(task_id)
         log_file = WORKING_DIRECTORY / task_folder / 'log.txt'
         
@@ -293,14 +320,13 @@ def get_task_output_artifacts(task_id):
         
         result={}
 
-        if os.path.exists(output_dir):
-            for file in os.listdir(output_dir):
+        if os.path.exists(output_dir_resolved):
+            for file in os.listdir(output_dir_resolved):
                 if '.' in file:
                     file_path = os.path.join(output_dir, file)
                     
                     # Validate file_path to prevent directory traversal via filename
                     file_path_resolved = os.path.realpath(file_path)
-                    output_dir_resolved = os.path.realpath(output_dir)
                     if not file_path_resolved.startswith(output_dir_resolved):
                         logger.warning(f'Potential path traversal in filename detected: {file}')
                         continue

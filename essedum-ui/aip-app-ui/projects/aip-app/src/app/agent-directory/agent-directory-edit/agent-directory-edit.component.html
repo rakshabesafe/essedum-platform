@@ -27,7 +27,7 @@
             <div id="basic" class="section-card">
                 <div class="section-header-with-collapse">
                     <h2 class="section-title-hoverable" 
-                        [ngStyle]="{color: sectionHoverStates['basic'] ? '#0052cc' : 'black', transform: sectionHoverStates['basic'] ? 'translateX(12px)' : 'translateX(0)'}"
+                        [ngStyle]="{color: sectionHoverStates['basic'] ? '#0052cc' : 'inherit', transform: sectionHoverStates['basic'] ? 'translateX(12px)' : 'translateX(0)'}"
                         (mouseenter)="sectionHoverStates['basic'] = true"
                         (mouseleave)="sectionHoverStates['basic'] = false">
                         {{ sectionTitles.basic }} <span class="required-badge">Required</span>
@@ -88,7 +88,7 @@
             <div id="cid" class="section-card">
                 <div class="section-header-with-collapse">
                     <h2 class="section-title-hoverable"
-                        [ngStyle]="{color: sectionHoverStates['cid'] ? '#0052cc' : 'black', transform: sectionHoverStates['cid'] ? 'translateX(12px)' : 'translateX(0)'}"
+                        [ngStyle]="{color: sectionHoverStates['cid'] ? '#0052cc' : 'inherit', transform: sectionHoverStates['cid'] ? 'translateX(12px)' : 'translateX(0)'}"
                         (mouseenter)="sectionHoverStates['cid'] = true"
                         (mouseleave)="sectionHoverStates['cid'] = false">
                         {{ sectionTitles.cid }}
@@ -116,7 +116,7 @@
             <div id="json-model" class="section-card">
                 <div class="section-header-with-collapse">
                     <h2 class="section-title-hoverable"
-                        [ngStyle]="{color: sectionHoverStates['json-model'] ? '#0052cc' : 'black', transform: sectionHoverStates['json-model'] ? 'translateX(12px)' : 'translateX(0)'}"
+                        [ngStyle]="{color: sectionHoverStates['json-model'] ? '#0052cc' : 'inherit', transform: sectionHoverStates['json-model'] ? 'translateX(12px)' : 'translateX(0)'}"
                         (mouseenter)="sectionHoverStates['json-model'] = true"
                         (mouseleave)="sectionHoverStates['json-model'] = false">
                         {{ sectionTitles.jsonModel }}
@@ -138,7 +138,7 @@
                 <div class="section-header-with-collapse">
                     <div class="section-header-left">
                         <h2 class="section-title-hoverable"
-                            [ngStyle]="{color: sectionHoverStates['modules'] ? '#0052cc' : 'black', transform: sectionHoverStates['modules'] ? 'translateX(12px)' : 'translateX(0)'}"
+                            [ngStyle]="{color: sectionHoverStates['modules'] ? '#0052cc' : 'inherit', transform: sectionHoverStates['modules'] ? 'translateX(12px)' : 'translateX(0)'}"
                             (mouseenter)="sectionHoverStates['modules'] = true"
                             (mouseleave)="sectionHoverStates['modules'] = false">
                             {{ sectionTitles.modules }}
@@ -183,7 +183,7 @@
                 <div class="section-header-with-collapse">
                     <div class="section-header-left">
                         <h2 class="section-title-hoverable"
-                            [ngStyle]="{color: sectionHoverStates['skills'] ? '#0052cc' : 'black', transform: sectionHoverStates['skills'] ? 'translateX(12px)' : 'translateX(0)'}"
+                            [ngStyle]="{color: sectionHoverStates['skills'] ? '#0052cc' : 'inherit', transform: sectionHoverStates['skills'] ? 'translateX(12px)' : 'translateX(0)'}"
                             (mouseenter)="sectionHoverStates['skills'] = true"
                             (mouseleave)="sectionHoverStates['skills'] = false">
                             {{ sectionTitles.skills }}
@@ -228,7 +228,7 @@
                 <div class="section-header-with-collapse">
                     <div class="section-header-left">
                         <h2 class="section-title-hoverable"
-                            [ngStyle]="{color: sectionHoverStates['selectors'] ? '#0052cc' : 'black', transform: sectionHoverStates['selectors'] ? 'translateX(12px)' : 'translateX(0)'}"
+                            [ngStyle]="{color: sectionHoverStates['selectors'] ? '#0052cc' : 'inherit', transform: sectionHoverStates['selectors'] ? 'translateX(12px)' : 'translateX(0)'}"
                             (mouseenter)="sectionHoverStates['selectors'] = true"
                             (mouseleave)="sectionHoverStates['selectors'] = false">
                             {{ sectionTitles.selectors }} <span class="info-badge">Tags/Filters for Routing</span>
@@ -277,7 +277,7 @@
                 <div class="section-header-with-collapse">
                     <div class="section-header-left">
                         <h2 class="section-title-hoverable"
-                            [ngStyle]="{color: sectionHoverStates['domains'] ? '#0052cc' : 'black', transform: sectionHoverStates['domains'] ? 'translateX(12px)' : 'translateX(0)'}"
+                            [ngStyle]="{color: sectionHoverStates['domains'] ? '#0052cc' : 'inherit', transform: sectionHoverStates['domains'] ? 'translateX(12px)' : 'translateX(0)'}"
                             (mouseenter)="sectionHoverStates['domains'] = true"
                             (mouseleave)="sectionHoverStates['domains'] = false">
                             {{ sectionTitles.domains }}
@@ -328,7 +328,7 @@
                 <div class="section-header-with-collapse">
                     <div class="section-header-left">
                         <h2 class="section-title-hoverable"
-                            [ngStyle]="{color: sectionHoverStates['locators'] ? '#0052cc' : 'black', transform: sectionHoverStates['locators'] ? 'translateX(12px)' : 'translateX(0)'}"
+                            [ngStyle]="{color: sectionHoverStates['locators'] ? '#0052cc' : 'inherit', transform: sectionHoverStates['locators'] ? 'translateX(12px)' : 'translateX(0)'}"
                             (mouseenter)="sectionHoverStates['locators'] = true"
                             (mouseleave)="sectionHoverStates['locators'] = false">
                             {{ sectionTitles.locators }}
@@ -352,7 +352,7 @@
                         <tbody>
                             <tr *ngFor="let locator of agentData.locators; let i = index">
                                 <td style="text-align: center" (click)="removeLocator(i)">
-                                    <i class="fa fa-trash fa-2x remove-btn-icon"></i>
+                                    <i class="fa fa-trash remove-btn-icon"></i>
                                 </td>
                                 <td>
                                     <select style="height: 3rem" [(ngModel)]="locator.locator_type" class="form-control">
@@ -368,7 +368,7 @@
                             </tr>
                             <tr>
                                 <td style="text-align: center" (click)="addLocator()">
-                                    <i class="fa fa-plus fa-2x add-btn-icon"></i>
+                                    <i class="fa fa-plus add-btn-icon"></i>
                                 </td>
                                 <td colspan="2"></td>
                             </tr>
@@ -407,7 +407,7 @@
                         <tbody>
                             <tr *ngFor="let extension of agentData.extensions; let i = index">
                                 <td style="text-align: center" (click)="removeExtension(i)">
-                                    <i class="fa fa-trash fa-2x remove-btn-icon"></i>
+                                    <i class="fa fa-trash remove-btn-icon"></i>
                                 </td>
                                 <td>
                                     <input style="height: 3rem" [(ngModel)]="extension.key" class="form-control"
@@ -425,7 +425,7 @@
                             </tr>
                             <tr>
                                 <td style="text-align: center" (click)="addExtension()">
-                                    <i class="fa fa-plus fa-2x add-btn-icon"></i>
+                                    <i class="fa fa-plus add-btn-icon"></i>
                                 </td>
                                 <td colspan="3"></td>
                             </tr>
@@ -443,7 +443,7 @@
                 <div class="section-header-with-collapse">
                     <div class="section-header-left">
                         <h2 class="section-title-hoverable"
-                            [ngStyle]="{color: sectionHoverStates['syncs'] ? '#0052cc' : 'black', transform: sectionHoverStates['syncs'] ? 'translateX(12px)' : 'translateX(0)'}"
+                            [ngStyle]="{color: sectionHoverStates['syncs'] ? '#0052cc' : 'inherit', transform: sectionHoverStates['syncs'] ? 'translateX(12px)' : 'translateX(0)'}"
                             (mouseenter)="sectionHoverStates['syncs'] = true"
                             (mouseleave)="sectionHoverStates['syncs'] = false">
                             {{ sectionTitles.syncs }}
@@ -467,7 +467,7 @@
                         <tbody>
                             <tr *ngFor="let sync of agentData.syncs; let i = index">
                                 <td style="text-align: center" (click)="removeSync(i)">
-                                    <i class="fa fa-trash fa-2x remove-btn-icon"></i>
+                                    <i class="fa fa-trash remove-btn-icon"></i>
                                 </td>
                                 <td>
                                     <input style="height: 3rem" [(ngModel)]="sync.target" class="form-control"
@@ -483,7 +483,7 @@
                             </tr>
                             <tr>
                                 <td style="text-align: center" (click)="addSync()">
-                                    <i class="fa fa-plus fa-2x add-btn-icon"></i>
+                                    <i class="fa fa-plus add-btn-icon"></i>
                                 </td>
                                 <td colspan="2"></td>
                             </tr>
@@ -501,7 +501,7 @@
                 <div class="section-header-with-collapse">
                     <div class="section-header-left">
                         <h2 class="section-title-hoverable"
-                            [ngStyle]="{color: sectionHoverStates['publications'] ? '#0052cc' : 'black', transform: sectionHoverStates['publications'] ? 'translateX(12px)' : 'translateX(0)'}"
+                            [ngStyle]="{color: sectionHoverStates['publications'] ? '#0052cc' : 'inherit', transform: sectionHoverStates['publications'] ? 'translateX(12px)' : 'translateX(0)'}"
                             (mouseenter)="sectionHoverStates['publications'] = true"
                             (mouseleave)="sectionHoverStates['publications'] = false">
                             {{ sectionTitles.publications }}
@@ -525,7 +525,7 @@
                         <tbody>
                             <tr *ngFor="let publication of agentData.publications; let i = index">
                                 <td style="text-align: center" (click)="removePublication(i)">
-                                    <i class="fa fa-trash fa-2x remove-btn-icon"></i>
+                                    <i class="fa fa-trash remove-btn-icon"></i>
                                 </td>
                                 <td>
                                     <input style="height: 3rem" [(ngModel)]="publication.channel" class="form-control"
@@ -541,7 +541,7 @@
                             </tr>
                             <tr>
                                 <td style="text-align: center" (click)="addPublication()">
-                                    <i class="fa fa-plus fa-2x add-btn-icon"></i>
+                                    <i class="fa fa-plus add-btn-icon"></i>
                                 </td>
                                 <td colspan="2"></td>
                             </tr>

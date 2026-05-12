@@ -25,6 +25,8 @@ export class VibeStudioService implements OnDestroy {
   /** AbortController for the active fetch-based SSE stream. */
   private replyAbortController: AbortController | null = null;
   private streamingAssistantIndex: number | null = null;
+  /** Guards against duplicate push-to-github calls within a single generation round. */
+  private pushInFlight = false;
 
   readonly sseEvents$         = new Subject<any>();
   readonly status$            = new BehaviorSubject<VibeSessionStatus>('idle');
@@ -79,6 +81,7 @@ export class VibeStudioService implements OnDestroy {
     this.status$.next('generating');
 
     this.cancelReply(); // abort any in-flight reply stream first
+    this.pushInFlight = false; // allow push for this new generation round
 
     this.ensureAgentStarted().then((sessionId) => {
       this.openReplyStream(sessionId, prompt + ' - send all code files generated here');
@@ -533,10 +536,12 @@ export class VibeStudioService implements OnDestroy {
 
     // Call list_apps after every reply to get all generated files.
     if (this.session.id) {
-      this.listAppsAndFetchFiles(this.session.id, () => {
+      const sid = this.session.id;
+      this.listAppsAndFetchFiles(sid, () => {
         // Emit the complete file list before transitioning to idle
         if (this.files$.value.length) {
           this.generationComplete$.next([...this.files$.value]);
+          this.triggerPushToGitHub(sid);
         }
         if (this.status$.value !== 'live') {
           this.status$.next('idle');
@@ -590,7 +595,19 @@ export class VibeStudioService implements OnDestroy {
   private extractFilePathsFromListApps(resp: any): string[] {
     const pathsToFetch: string[] = [];
 
+    const isSessionApp = (app: any): boolean => {
+      // MCP session apps have uri like "ui://apps/..." or mimeType "text/html;profile=mcp-app"
+      // or carry inline text content with no files — these are NOT source-code apps.
+      if (typeof app.uri === 'string' && app.uri.startsWith('ui://')) return true;
+      if (typeof app.mimeType === 'string' && app.mimeType.includes('mcp-app')) return true;
+      if (typeof app.text === 'string' && !app.files) return true;
+      return false;
+    };
+
     const processApp = (app: any): void => {
+      // Skip MCP / session apps — they should not be fetched or pushed
+      if (isSessionApp(app)) return;
+
       // Derive the app's root directory name from name or path
       let appDir = '';
       if (typeof app.name === 'string' && app.name.trim()) {
@@ -812,6 +829,54 @@ export class VibeStudioService implements OnDestroy {
     } catch {
       // non-fatal — never disrupts the existing generation flow
     }
+  }
+
+  /**
+   * Calls POST /sessions/{sessionId}/push-to-github after list-apps succeeds.
+   * Fire-and-forget — does not block the file-fetching flow.
+   * Pushes only the studio app folder (excludes vibesession) on a studio/* branch.
+   */
+  private triggerPushToGitHub(sessionId: string): void {
+    // Guard: only one push per generation round
+    if (this.pushInFlight) return;
+    this.pushInFlight = true;
+
+    const url = `${this.baseUrl}/service/v1/vibe-coding/sessions/${sessionId}/push-to-github`;
+    const project = JSON.parse(sessionStorage.getItem('project') || '{}');
+
+    // Derive the top-level app directory from generated files (e.g. "my-react-app").
+    // A valid appDir must contain at least one nested file (i.e. some file path starts with "dir/").
+    // Root-level files like "package.json" are NOT directories.
+    const allFiles = this.files$.value;
+    const dirCandidates = allFiles
+      .map(f => f.path.split('/'))
+      .filter(parts => parts.length > 1)   // only files inside a folder
+      .map(parts => parts[0]);
+    const appDir = dirCandidates.length ? dirCandidates[0] : null;
+
+    // Only include files that belong to the app folder — exclude session / vibesession / root files
+    const appFiles = appDir
+      ? allFiles.filter(f => f.path.startsWith(appDir + '/'))
+      : allFiles;
+    const filePaths = appFiles.map(f => f.path);
+
+    // Branch name: studio/<sessionId> — append appDir only when it's a real folder name
+    const branchSuffix = appDir && appDir !== sessionId
+      ? `${appDir}-${sessionId}`
+      : sessionId;
+
+    const body: any = {
+      org: project?.name || 'leo1311',
+      branch: `studio/${branchSuffix}`,
+      push_dir: appDir ?? sessionId,
+      exclude_dirs: ['vibesession'],
+      files: filePaths,
+    };
+    this.http.post<any>(url, body, { headers: this.getHttpHeaders() as any })
+      .subscribe({
+        next: () => {},
+        error: () => {},
+      });
   }
 
   /**

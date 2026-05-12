@@ -103,6 +103,70 @@ export class JobsComponent implements OnInit {
     this.ngOnInit();
   }
 
+  goToPage(pageNum: number) {
+    if (pageNum < 0 || pageNum > this.lastPage || pageNum === this.page) return;
+    this.page = pageNum;
+    this.loadPage();
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const total = this.lastPage + 1;
+    const maxVisible = 5;
+    let start = Math.max(0, this.page - Math.floor(maxVisible / 2));
+    let end = Math.min(total, start + maxVisible);
+    if (end - start < maxVisible) {
+      start = Math.max(0, end - maxVisible);
+    }
+    for (let i = start; i < end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  private loadPage() {
+    if (this.cname) {
+      this.service
+        .fetchInternalJobByName(this.cname, this.page, this.row)
+        .subscribe({
+          next: (resp) => {
+            if (resp && Array.isArray(resp)) {
+              this.jobList = resp;
+              const filteredJobs = this.jobList.filter(
+                (job) =>
+                  job.agenttaskname?.toLowerCase() ===
+                  job.jobmetadata?.taskName?.toLowerCase()
+              );
+              this.sortByLatest(filteredJobs);
+            } else {
+              this.jobList = [];
+            }
+          },
+          error: () => {
+            this.jobList = [];
+            this.service.message('Failed to fetch jobs.', 'error');
+          },
+        });
+    } else {
+      this.service
+        .fetchInternalJobByName2(this.internalJob, this.page, this.row)
+        .subscribe({
+          next: (resp) => {
+            if (resp && Array.isArray(resp)) {
+              this.jobList = resp;
+              this.sortByLatest(this.jobList);
+            } else {
+              this.jobList = [];
+            }
+          },
+          error: () => {
+            this.jobList = [];
+            this.service.message('Failed to fetch jobs.', 'error');
+          },
+        });
+    }
+  }
+
   private isValidJobData(jobData: any): boolean {
     if (!jobData) {
       console.warn('Job data is null or undefined');

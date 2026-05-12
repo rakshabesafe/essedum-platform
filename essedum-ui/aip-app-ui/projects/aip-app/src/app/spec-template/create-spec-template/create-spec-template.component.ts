@@ -30,10 +30,10 @@ export class CreateSpecTemplateComponent implements OnInit {
   regString: any = '';
   regexPatternString: any;
   regexPattern = `^(?!REX)[a-zA-Z0-9_-]+$`;
-  regexPatterForEmptyNames = `^(?!www$)[a-zA-Z0-9_-]+$`;
+  regexPatterForEmptyNames = `^(?!www$)[-a-zA-Z0-9_]+$`;
   regexPatternObj: RegExp;
   regexPatternForExistingNames = `^(?!REX).+$`;
-  regexPatternForValidAlphabets = `^[a-zA-Z0-9_-]+$`;
+  regexPatternForValidAlphabets = `^[-a-zA-Z0-9_]+$`;
   regexPatternForValidAlphabetsObj: RegExp;
   regexPatternForExistingNamesObj: RegExp;
   errMsg: string = 'Name is required field.';

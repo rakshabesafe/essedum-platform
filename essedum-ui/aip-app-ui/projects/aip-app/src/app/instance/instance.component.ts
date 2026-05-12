@@ -665,7 +665,9 @@ export class InstanceComponent implements OnInit, OnChanges {
 
   openedit(content: any): void {
     this.dialog.open(content, {
-      width: '600px',
+      width: '860px',
+      maxWidth: '96vw',
+      maxHeight: '90vh',
       panelClass: 'standard-dialog',
     });
   }

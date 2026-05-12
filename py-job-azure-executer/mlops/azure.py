@@ -192,9 +192,9 @@ def projects_datasets_create(adapter_instance, project, isCached, isInstance, co
     if not resolved_folder.startswith(resolved_temp + os.sep):
       shutil.rmtree(temp_dir)
       return {"error": "Invalid dataset name: path traversal detected"}, 400
-    os.makedirs(mltable_folder, exist_ok=True)
+    os.makedirs(resolved_folder, exist_ok=True)
     
-    logger.info(f"Created temporary MLTable folder: {mltable_folder}")
+    logger.info(f"Created temporary MLTable folder: {resolved_folder}")
     
     # Download the CSV file using Azure Storage SDK with authentication
     csv_path = os.path.join(mltable_folder, filename)
@@ -254,8 +254,11 @@ def projects_datasets_create(adapter_instance, project, isCached, isInstance, co
       shutil.rmtree(temp_dir)
       return {"error": f"Failed to download file: {str(download_error)}"}, 400
     
-    # Create MLTable YAML file - use relative path
-    mltable_yaml_path = os.path.join(mltable_folder, "MLTable")
+    # Create MLTable YAML file — build from canonicalized folder to prevent path traversal
+    mltable_yaml_path = os.path.realpath(os.path.join(resolved_folder, "MLTable"))
+    if not mltable_yaml_path.startswith(resolved_folder + os.sep) and mltable_yaml_path != os.path.join(resolved_folder, "MLTable"):
+      shutil.rmtree(temp_dir)
+      return {"error": "Invalid MLTable path detected"}, 400
     
     # MLTable YAML content - using relative path to the CSV file
     mltable_yaml_content = f"""paths:

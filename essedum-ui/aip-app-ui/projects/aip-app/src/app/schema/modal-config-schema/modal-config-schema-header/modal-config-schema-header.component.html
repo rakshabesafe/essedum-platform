@@ -29,7 +29,7 @@
             </div>
 
             <div class="header-search lfx-panel d-flex" [@searchAnimation]="isSearchVisible ? 'visible' : 'hidden'"
-                [style.display]="isSearchVisible ? 'flex' : 'none'">
+                [style.display]="isSearchVisible ? 'flex' : 'none'" *ngIf="showSearchRefresh">
                 <!-- Input field -->
                 <input type="text" placeholder="Search by Name" class="lfx-panel-input" [(ngModel)]="searchText"
                     (keyup)="onSearch()" (blur)="onInputBlur()" aria-label="Search input">
@@ -40,7 +40,7 @@
             </div>
 
             <!-- Search icon with animation -->
-            <div *ngIf="!isSearchVisible && !isAnimating" class="action-button">
+            <div *ngIf="showSearchRefresh && !isSearchVisible && !isAnimating" class="action-button">
                 <mat-icon [ngClass]="{'active': isSearchHovered}" matTooltip="Search"
                     [matTooltipPosition]="TOOLTIP_POSITION" (mouseenter)="isSearchHovered = true"
                     (mouseleave)="isSearchHovered = false" (click)="toggleSearch($event)" aria-label="Toggle search">
@@ -58,7 +58,7 @@
             </div>
 
             <!-- Refresh button -->
-            <div class="action-button">
+            <div *ngIf="showSearchRefresh" class="action-button">
                 <mat-icon [ngClass]="{'active': isRefreshHovered, 'rotate-icon': isRefreshing}"
                     (click)="onRefreshClick()" matTooltip="Refresh" [matTooltipPosition]="TOOLTIP_POSITION"
                     (mouseenter)="isRefreshHovered = true" (mouseleave)="isRefreshHovered = false"

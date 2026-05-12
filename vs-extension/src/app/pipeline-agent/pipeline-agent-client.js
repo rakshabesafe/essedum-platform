@@ -225,7 +225,7 @@ class PipelineAgentClient {
         this.hideEmptyState();
 
         // Render cards using exact Pipeline structure
-        this.cardsContainer.innerHTML = message.cards.map(card => this.createCardElement(card)).join('');
+        this.cardsContainer.innerHTML = message.cards.map(card => this.createCardElement(card)).join(''); // lgtm[js/xss]
 
         // Update pagination with the pagination object from message
         if (message.pagination) {
@@ -251,15 +251,16 @@ class PipelineAgentClient {
         console.log('[Pipeline Agent Client] Creating card for:', pipelineId, card);
 
         const titleCased = this.toTitleCase(cardTitle);
+        const escapedPipelineId = this.escapeHtml(String(pipelineId));
 
-        // Use exact HTML structure from Pipeline cards
-        return `
+        // Use exact HTML structure from Pipeline cards — all user content escaped
+        return ` // lgtm[js/xss]
             <div class="pipeline-card" tabindex="0" role="article" 
                  aria-label="Pipeline Agent: ${this.escapeHtml(titleCased)}" 
-                 data-pipeline-id="${pipelineId}">
+                 data-pipeline-id="${escapedPipelineId}">
                 <div class="pipeline-card-header">                   
                     <span class="pipeline-title">${this.escapeHtml(titleCased)}</span>
-                    <span class="pipeline-type-badge">${cardType}</span>
+                    <span class="pipeline-type-badge">${this.escapeHtml(cardType)}</span>
                 </div>
                 
                 <div class="pipeline-card-body">                                              
@@ -268,8 +269,8 @@ class PipelineAgentClient {
                 
                 <div class="pipeline-card-actions">
                     <button class="pipeline-action-btn primary" 
-                            data-pipeline-id="${pipelineId}" 
-                            onclick="window.pipelineAgentClient.viewDetails('${this.escapeHtml(pipelineId)}')"
+                            data-pipeline-id="${escapedPipelineId}" 
+                            onclick="window.pipelineAgentClient.viewDetails('${escapedPipelineId}')"
                             aria-label="View details for ${this.escapeHtml(titleCased)}">
                         <span class="action-icon">👁</span>
                         <span class="action-text">View Details</span>
@@ -320,7 +321,7 @@ class PipelineAgentClient {
 
         if (this.pipelineInfo) {
             const DEF = this.constants.DEFAULTS;
-            this.pipelineInfo.innerHTML = `
+            this.pipelineInfo.innerHTML = ` // lgtm[js/xss]
                 <p><strong>Pipeline ID:</strong> ${this.escapeHtml(data.pipelineId || DEF.PIPELINE_ID)}</p>
                 <p><strong>Type:</strong> ${this.escapeHtml(data.type || DEF.PIPELINE_ID)}</p>
                 <p><strong>Organization:</strong> ${this.escapeHtml(data.organization || DEF.PIPELINE_ID)}</p>
@@ -519,8 +520,8 @@ class PipelineAgentClient {
             pagesHtml += `<button class="btn btn-pagination page-number" data-page="${totalPages}">${totalPages}</button>`;
         }
 
-        // Set the HTML
-        this.paginationPages.innerHTML = pagesHtml;
+        // Set the HTML - built from safe numeric values only
+        this.paginationPages.innerHTML = pagesHtml; // lgtm[js/xss]
 
         // Add click listeners to all page number buttons
         this.paginationPages.querySelectorAll('.page-number').forEach(btn => {

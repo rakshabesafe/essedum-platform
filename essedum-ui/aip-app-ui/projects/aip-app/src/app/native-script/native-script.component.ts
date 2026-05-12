@@ -117,6 +117,8 @@ export class NativeScriptComponent implements OnInit, OnChanges {
     isHoveredTag=false;
     defaultRuntimeFromDB: any;
     isBackHovered=false;
+    envCollapsed = true;
+    secretsCollapsed = true;
   constructor(
     @Inject('envi') private baseUrl: string,
     private service: Services,
@@ -666,8 +668,8 @@ export class NativeScriptComponent implements OnInit, OnChanges {
 
   copyPipeline() {
     const dialogRef = this.dialog.open(PipelineCreateComponent, {
-      height: '80%',
-      width: '60%',
+      width: '460px',
+      maxWidth: '92vw',
       data: {
         sourceToCopy: this.data,
         type: this.streamItem.type,
@@ -682,9 +684,10 @@ export class NativeScriptComponent implements OnInit, OnChanges {
 
   displayDialog(button, name, value, type, index, alias) {
     const dialogRef = this.dialog.open(NativeScriptDialogComponent, {
-      height: '50%',
-      width: '60%',
+      width: '480px',
+      maxWidth: '90vw',
       disableClose: false,
+      panelClass: 'argument-dialog-panel',
       data: {
         button: button,
         name: name,

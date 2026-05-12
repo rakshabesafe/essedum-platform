@@ -14,6 +14,8 @@ import { AppOAuthService } from "../../core/auth.service";
 export class LogoutComponent implements OnInit {
 
   display: string = "";
+  isDark: boolean = true;
+  essedumTitle: string = 'ESSEDUM';
   hide1: boolean = true;
   hide2: boolean = true;
   hide3: boolean = true;
@@ -42,6 +44,7 @@ export class LogoutComponent implements OnInit {
     }
     else { this.user = false }
     this.setTheme();
+    this.isDark = !document.body.classList.contains('header-light-theme');
     if (this.router.url.indexOf("logout") != -1) {
       this.display = "logout";
       this.logout();
@@ -50,6 +53,17 @@ export class LogoutComponent implements OnInit {
     else if (this.router.url.includes("autoUserPermission"))
       this.display = "User doesn't have sufficient permission, Please contact administrator";
     else this.display = "error";
+  }
+
+  toggleTheme() {
+    this.isDark = !this.isDark;
+    if (this.isDark) {
+      document.body.classList.remove('header-light-theme');
+      document.body.classList.add('header-dark-theme');
+    } else {
+      document.body.classList.remove('header-dark-theme');
+      document.body.classList.add('header-light-theme');
+    }
   }
 
   setTheme() {

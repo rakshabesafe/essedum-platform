@@ -44,6 +44,17 @@ export class GeneralComponent implements OnInit, OnChanges {
   jsonModelString = '';
   jsonModelLines: string[] = [];
   activeSection = 'about';
+
+  sectionStates: Record<string, boolean> = {
+    about: true, modules: true, skills: true, selectors: true,
+    domains: true, locators: true, syncs: true, publications: true,
+    extensions: true, signatures: true, tools: true, resources: true, prompts: true,
+  };
+
+  toggleSection(id: string): void {
+    this.sectionStates[id] = !this.sectionStates[id];
+  }
+
   aboutDescription =
     'dirctl hub pull baeareia34eoebxwrxakvp1mtqrx3fjzqdklxorpkzyh7eqlzjker6cbcj4';
 

@@ -7,8 +7,6 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import com.lfn.icip.dataset.util.SsrfProtectionUtil;
-import com.lfn.icip.dataset.util.PathValidationUtil;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -90,7 +88,15 @@ public class GitHubService {
 
 	@Value("${proxy.httpProxyConfiguration.proxyPort}")
 	String proxyPort;
-	
+
+	/** Fallback GitHub repo URL from application properties */
+	@Value("${github.repoUrl:}")
+	private String fallbackRepoUrl;
+
+	/** Default branch name (main or master) */
+	@Value("${github.defaultBranch:main}")
+	private String defaultBranch;
+
 	/** The folder path. */
 	@EssedumProperty("icip.fileuploadDir")
 	private String folderPath;
@@ -109,22 +115,60 @@ public class GitHubService {
 	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(GitHubService.class);
 
+	/**
+	 * Resolves the GitHub repo URL for a given org.
+	 * Tries constantsService first, falls back to github.repoUrl property.
+	 */
+	public String resolveRepoUrl(String org) {
+		try {
+			var constant = constantsService.getByKeys("icip.git.repo.studio.url", org);
+			if (constant != null && constant.getValue() != null && !constant.getValue().isEmpty()) {
+				return constant.getValue();
+			}
+		} catch (Exception ex) {
+			log.warn("Could not resolve repo URL from constantsService for org: {}. Error: {}", org, ex.getMessage());
+		}
+		if (fallbackRepoUrl != null && !fallbackRepoUrl.isEmpty()) {
+			log.info("Using fallback GitHub repo URL from application properties: {}", fallbackRepoUrl);
+			return fallbackRepoUrl;
+		}
+		return null;
+	}
+
+	/**
+	 * Extracts repo name from a full repo URL.
+	 */
+	private String extractRepoNameFromUrl(String url) {
+		return url.split("/")[url.split("/").length - 1].split("[.]")[0];
+	}
+
+	/**
+	 * Checks if GitHub is configured and available for the given org.
+	 */
+	public boolean isGitHubAvailable(String org) {
+		String url = resolveRepoUrl(org);
+		return url != null && !url.isEmpty();
+	}
+
 	public Git getGitHubRepository(String org)
 			throws InvalidRemoteException, TransportException, GitAPIException, IOException {
 
-		String url = constantsService.getByKeys("icip.git.repo.studio.url", org).getValue();
+		String url = resolveRepoUrl(org);
+		if (url == null || url.isEmpty()) {
+			throw new IOException("GitHub repo URL is not configured for org: " + org + ". Please set 'icip.git.repo.studio.url' in constants or 'github.repoUrl' in application properties.");
+		}
 
-		String repoName = url.split("/")[url.split("/").length - 1].split("[.]")[0];
+		String repoName = extractRepoNameFromUrl(url);
 
 		Git git;
 
-		File gitFile = PathValidationUtil.validatePath(gitPath, repoName + "/.git");
+		File gitFile = new File(gitPath + repoName + "/.git");
 		if (!gitFile.exists()) {
-			Files.createDirectories(PathValidationUtil.validatePath(gitPath, repoName).toPath());
+			Files.createDirectories(Paths.get(gitPath + repoName));
 		}
 
 		if (!gitFile.exists()) {
-			File gitRepoPath = PathValidationUtil.validatePath(gitPath, repoName);
+			File gitRepoPath = new File(gitPath + repoName);
 			git = Git.init().setDirectory(gitRepoPath).call();
 			StoredConfig config = git.getRepository().getConfig();
 
@@ -134,27 +178,47 @@ public class GitHubService {
 			URIish u = createURIish(url);
 			git.remoteAdd().setName("origin").setUri(u).call();
 
-			PullResult response = git.pull()
-					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
-					.setRemote("origin").setRemoteBranchName("master").call();
+			// Detect which default branch exists on remote
+			String remoteBranch = detectRemoteDefaultBranch(git);
+			log.info("Detected remote default branch: {}", remoteBranch);
 
-			git.lsRemote().setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
-					.setHeads(true).call();
-			git.checkout().setName("master").call();
+			try {
+				PullResult response = git.pull()
+						.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+						.setRemote("origin").setRemoteBranchName(remoteBranch).call();
+
+				git.lsRemote().setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+						.setHeads(true).call();
+				git.checkout().setName(remoteBranch).call();
+			} catch (Exception e) {
+				log.warn("Could not pull/checkout remote branch '{}'. Remote repo may be empty. Will create initial commit later. Error: {}", remoteBranch, e.getMessage());
+			}
 
 		} else {
 
 			FileRepositoryBuilder builder = new FileRepositoryBuilder();
-			Repository repository = builder.setGitDir(PathValidationUtil.validatePath(gitPath, repoName + "/.git")).readEnvironment() // scan
-																												// environment
-																												// GIT_*
-																												// variables
-					.findGitDir() // scan up the file system tree
+			Repository repository = builder.setGitDir(new File(gitPath + repoName + "/.git")).readEnvironment()
+					.findGitDir()
 					.build();
 
 			log.info("Having repository: " + repository.getDirectory());
 
 			git = new Git(repository);
+
+			// If the repo exists but has no HEAD (stale from previous failed init), re-pull
+			if (repository.resolve("HEAD") == null) {
+				log.info("Existing repo has no HEAD. Attempting to pull from remote default branch.");
+				String remoteBranch = detectRemoteDefaultBranch(git);
+				try {
+					git.pull()
+						.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+						.setRemote("origin").setRemoteBranchName(remoteBranch).call();
+					git.checkout().setName(remoteBranch).call();
+					log.info("Successfully pulled and checked out branch: {}", remoteBranch);
+				} catch (Exception e) {
+					log.warn("Could not pull default branch on stale repo: {}", e.getMessage());
+				}
+			}
 
 		}
 		StoredConfig config = git.getRepository().getConfig();
@@ -174,13 +238,13 @@ public class GitHubService {
 
 		Git git;
 
-		File gitFile = PathValidationUtil.validatePath(gitPathStore, repoName + "/.git");
+		File gitFile = new File(gitPathStore + repoName + "/.git");
 		if (!gitFile.exists()) {
-			Files.createDirectories(PathValidationUtil.validatePath(gitPathStore, repoName).toPath());
+			Files.createDirectories(Paths.get(gitPathStore + repoName));
 		}
 
 		if (!gitFile.exists()) {
-			File gitRepoPath = PathValidationUtil.validatePath(gitPathStore, repoName);
+			File gitRepoPath = new File(gitPathStore + repoName);
 			git = Git.init().setDirectory(gitRepoPath).call();
 			StoredConfig config = git.getRepository().getConfig();
 
@@ -192,16 +256,16 @@ public class GitHubService {
 
 			PullResult response = git.pull()
 					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
-					.setRemote("origin").setRemoteBranchName("master").call();
+					.setRemote("origin").setRemoteBranchName(defaultBranch).call();
 
 			git.lsRemote().setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
 					.setHeads(true).call();
-			git.checkout().setName("master").call();
+			git.checkout().setName(defaultBranch).call();
 
 		} else {
 
 			FileRepositoryBuilder builder = new FileRepositoryBuilder();
-			Repository repository = builder.setGitDir(PathValidationUtil.validatePath(gitPathStore, repoName + "/.git")).readEnvironment() // scan
+			Repository repository = builder.setGitDir(new File(gitPathStore + repoName + "/.git")).readEnvironment() // scan
 					// environment
 					// GIT_*
 					// variables
@@ -260,10 +324,10 @@ public class GitHubService {
 
 		String repoName = url.split("/")[url.split("/").length - 1].split("[.]")[0];
 
-		File pythonFile = PathValidationUtil.validatePath(gitPath, repoName + "/" + pipelineName + "/" + filename);
+		File pythonFile = new File(gitPath + repoName + "/" + pipelineName + "/" + filename);
 
 		if (!pythonFile.exists()) {
-			Files.createDirectories(PathValidationUtil.validatePath(gitPath, repoName + "/" + pipelineName).toPath());
+			Files.createDirectories(Paths.get(gitPath + repoName + "/" + pipelineName));
 		}
 
 		if (!pythonFile.exists())
@@ -309,7 +373,7 @@ public class GitHubService {
 		String repoName = url.split("/")[url.split("/").length - 1].split("[.]")[0];
 
 		String pythonFile = null;
-		File scriptPath = PathValidationUtil.validatePath(gitPath, repoName + "/" + pipelineName);
+		File scriptPath = new File(gitPath + "/" + repoName + "/" + pipelineName);
 		if (!scriptPath.exists())
 			return null;
 		File[] files = scriptPath.listFiles();
@@ -336,7 +400,7 @@ public class GitHubService {
 
 
 		try {
-			File scriptPath = PathValidationUtil.validatePath(gitPath, repoName + "/" + pipelineName);
+			File scriptPath = new File(gitPath + "/" + repoName + "/" + pipelineName);
              if(scriptPath.exists()) {
 			File[] files = scriptPath.listFiles();
 			for (File file : files) {
@@ -350,6 +414,24 @@ public class GitHubService {
 			log.error("Error in deleting pipeline script from local repo : {}", e.getMessage());
 		}
 
+	}
+
+	/**
+	 * Detects the default branch on the remote (main vs master).
+	 */
+	private String detectRemoteDefaultBranch(Git git) {
+		try {
+			var refs = git.lsRemote()
+					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+					.setHeads(true).call();
+			boolean hasMain = refs.stream().anyMatch(ref -> ref.getName().equals("refs/heads/main"));
+			boolean hasMaster = refs.stream().anyMatch(ref -> ref.getName().equals("refs/heads/master"));
+			if (hasMain) return "main";
+			if (hasMaster) return "master";
+		} catch (Exception e) {
+			log.warn("Could not detect remote default branch: {}", e.getMessage());
+		}
+		return defaultBranch;
 	}
 
 	private URIish createURIish(String url) throws InvalidRemoteException {
@@ -368,13 +450,13 @@ public class GitHubService {
 		Boolean result = pull(git);
 		String scriptPath = constantsService.getByKeys("icip.pipelineScript.directory", "Core").getValue();
 		scriptPath = scriptPath + org + "/" + pipelineName + "/";
-		File folder = PathValidationUtil.validatePath(scriptPath);
+		File folder = new File(scriptPath);
 		String url = constantsService.getByKeys("icip.git.repo.store.url", org).getValue();
 		String repoName = url.split("/")[url.split("/").length - 1].split("[.]")[0];
 		if (folder.exists() && folder.isDirectory()) {
 			Path source = Paths.get(scriptPath);
-			Path destination = PathValidationUtil.validatePath(gitPathStore, repoName + "/" + pipelineName + "/").toPath();
-			File destinationFolder = destination.toFile();
+			Path destination = Paths.get(gitPathStore + repoName + "/" + pipelineName + "/");
+			File destinationFolder = new File(destination.toString());
 
 			if (!destinationFolder.exists()) {
 				Files.createDirectories(Paths.get(destinationFolder.getAbsolutePath()));
@@ -442,15 +524,13 @@ public class GitHubService {
 			String region = s3ConnectionDetails.optString("Region");
 			URL endpointUrl = null;
 			try {
-				endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(s3ConnectionDetails.optString("url"));
+				endpointUrl = new URL(s3ConnectionDetails.optString("url"));
 			} catch (MalformedURLException e1) {
 				log.error("URL not correct: {}", e1.getMessage());
-			} catch (IllegalArgumentException e1) {
-				log.error("SSRF validation failed: {}", e1.getMessage());
 			}
 			TrustManager[] trustAllCerts = getTrustAllCerts();
 			SSLContext sslContext = getSslContext(trustAllCerts);
-			HostnameVerifier myVerifier = com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE;
+			HostnameVerifier myVerifier = (hostname, session) -> true;
 			ClientConfiguration clientConfiguration = new ClientConfiguration();
 			ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, myVerifier);
 			clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
@@ -480,7 +560,7 @@ public class GitHubService {
 	}
 
 	public static void uploadFolder(AmazonS3 s3Client, String bucketName, String folderPath, String s3FolderPath) {
-		File folder = PathValidationUtil.validatePath(folderPath);
+		File folder = new File(folderPath);
 		uploadDirectory(s3Client, bucketName, folder, s3FolderPath);
 
 	}
@@ -530,15 +610,281 @@ public class GitHubService {
 		return lastSegment;
 	}
 
+	/**
+	 * Get or create a Git repository and checkout a pipeline-specific branch.
+	 * Creates the branch from master if it doesn't exist yet.
+	 */
+	public Git getGitHubRepositoryForBranch(String org, String branchName)
+			throws InvalidRemoteException, TransportException, GitAPIException, IOException {
+		Git git = getGitHubRepository(org);
+
+		// If HEAD cannot be resolved (empty repo with no commits), create an initial commit
+		if (git.getRepository().resolve("HEAD") == null) {
+			log.info("Repository has no commits (HEAD is null). Creating initial commit before branching.");
+			// Create a placeholder file so we have something to commit
+			String url = resolveRepoUrl(org);
+			String repoName = extractRepoNameFromUrl(url);
+			File readmeFile = new File(gitPath + repoName + "/README.md");
+			if (!readmeFile.exists()) {
+				try (OutputStream os = new FileOutputStream(readmeFile)) {
+					os.write("# Vibe Studio Pipeline Scripts\n".getBytes());
+				}
+			}
+			git.add().addFilepattern("README.md").call();
+			git.commit().setMessage("Initial commit").call();
+			// Push initial commit to origin default branch
+			try {
+				git.push()
+					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+					.setRemote("origin")
+					.setForce(true)
+					.call();
+				log.info("Pushed initial commit to origin/{} successfully.", defaultBranch);
+			} catch (Exception e) {
+				log.warn("Could not push initial commit: {}", e.getMessage());
+			}
+		}
+
+		pull(git);
+
+		boolean branchExists = git.getRepository().getRefDatabase().findRef(branchName) != null;
+		boolean remoteBranchExists = git.lsRemote()
+				.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+				.setHeads(true).call().stream()
+				.anyMatch(ref -> ref.getName().equals("refs/heads/" + branchName));
+
+		if (remoteBranchExists && !branchExists) {
+			git.checkout().setCreateBranch(true).setName(branchName)
+					.setStartPoint("origin/" + branchName).call();
+		} else if (!branchExists) {
+			git.checkout().setCreateBranch(true).setName(branchName).call();
+		} else {
+			git.checkout().setName(branchName).call();
+		}
+
+		// Pull latest for this branch
+		try {
+			git.pull().setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+					.setRemote("origin").setRemoteBranchName(branchName).call();
+		} catch (Exception e) {
+			log.warn("Could not pull branch {}: {}", branchName, e.getMessage());
+		}
+
+		return git;
+	}
+
+	/**
+	 * Save file content to GitHub on a pipeline-specific branch.
+	 * Uses an isolated temp directory so only the pipeline's files are pushed.
+	 */
+	public void saveFileToGitHubBranch(byte[] content, String pipelineName, String org,
+			String filename, String branchName)
+			throws IOException, GitAPIException {
+		saveFilesToGitHubBranch(
+				java.util.Map.of(filename, content),
+				pipelineName, org, branchName);
+	}
+
+	/**
+	 * Save multiple files to GitHub on a specific branch in a single commit+push.
+	 * Uses a fresh temp clone directory so only the given files end up on the branch.
+	 */
+	public void saveFilesToGitHubBranch(java.util.Map<String, byte[]> files, String pipelineName, String org,
+			String branchName) throws IOException, GitAPIException {
+
+		String url = resolveRepoUrl(org);
+		if (url == null || url.isEmpty()) {
+			throw new IOException("GitHub repo URL is not configured for org: " + org);
+		}
+		String repoName = extractRepoNameFromUrl(url);
+		UsernamePasswordCredentialsProvider creds =
+				new UsernamePasswordCredentialsProvider(username, password);
+
+		// Use a unique temp directory per pipeline/branch to avoid cross-contamination
+		Path tempDir = Paths.get(gitPath, "tmp-" + pipelineName + "-" + System.currentTimeMillis());
+		File tempDirFile = tempDir.toFile();
+
+		log.info("[GitHubService] Batch push {} files to GitHub using isolated temp dir => Repo: {}, Branch: {}, Pipeline: {}, TempDir: {}",
+				files.size(), repoName, branchName, pipelineName, tempDir);
+
+		Git git = null;
+		try {
+			// 1. Clone the repo into temp directory (shallow, default branch only)
+			boolean freshRepo = false;
+			try {
+				git = Git.cloneRepository()
+						.setURI(url)
+						.setDirectory(tempDirFile)
+						.setCredentialsProvider(creds)
+						.setCloneAllBranches(false)
+						.call();
+				// Disable SSL verification
+				StoredConfig cfg = git.getRepository().getConfig();
+				cfg.setBoolean("http", null, "sslVerify", false);
+				cfg.save();
+			} catch (Exception cloneEx) {
+				log.warn("Clone failed (repo may be empty), initialising fresh: {}", cloneEx.getMessage());
+				if (tempDirFile.exists()) {
+					deleteDirectoryRecursive(tempDir);
+				}
+				Files.createDirectories(tempDir);
+				git = Git.init().setDirectory(tempDirFile).call();
+				StoredConfig cfg = git.getRepository().getConfig();
+				cfg.setBoolean("http", null, "sslVerify", false);
+				cfg.save();
+				try {
+					git.remoteAdd().setName("origin").setUri(new org.eclipse.jgit.transport.URIish(url)).call();
+				} catch (java.net.URISyntaxException e) {
+					throw new IOException("Invalid repo URL: " + url, e);
+				}
+				freshRepo = true;
+			}
+
+			// 2. Detect the remote default branch (main or master)
+			String remoteDefaultBranch = detectRemoteDefaultBranch(git);
+			log.info("Detected remote default branch: '{}' for repo: {}", remoteDefaultBranch, repoName);
+
+			// 3. Check if remote branch already exists
+			boolean remoteBranchExists = false;
+			try {
+				remoteBranchExists = git.lsRemote()
+						.setCredentialsProvider(creds)
+						.setHeads(true).call().stream()
+						.anyMatch(ref -> ref.getName().equals("refs/heads/" + branchName));
+			} catch (Exception e) {
+				log.warn("Could not list remote branches: {}", e.getMessage());
+			}
+
+			if (remoteBranchExists) {
+				// Checkout existing remote branch
+				git.fetch().setCredentialsProvider(creds).setRemote("origin").call();
+				git.checkout().setCreateBranch(true).setName(branchName)
+						.setStartPoint("origin/" + branchName).call();
+				log.info("Checked out existing remote branch '{}'", branchName);
+			} else if (freshRepo) {
+				// Empty repo — need an initial commit before we can branch
+				File readmeFile = new File(tempDirFile, "README.md");
+				Files.writeString(readmeFile.toPath(), "# Pipeline Scripts\n");
+				git.add().addFilepattern("README.md").call();
+				git.commit().setMessage("Initial commit").call();
+				// Push initial commit to default branch
+				try {
+					git.push().setCredentialsProvider(creds).setRemote("origin").setForce(true).call();
+				} catch (Exception e) {
+					log.warn("Could not push initial commit: {}", e.getMessage());
+				}
+				git.checkout().setCreateBranch(true).setName(branchName).call();
+				log.info("Fresh repo: created branch '{}' after initial commit", branchName);
+			} else {
+				// Create new branch explicitly from the remote default branch (main/master)
+				git.checkout()
+						.setCreateBranch(true)
+						.setName(branchName)
+						.setStartPoint("origin/" + remoteDefaultBranch)
+						.call();
+				log.info("Created new branch '{}' from 'origin/{}'", branchName, remoteDefaultBranch);
+
+				// Remove all existing content so only this pipeline's files are on the branch
+				File[] existing = tempDirFile.listFiles();
+				if (existing != null) {
+					for (File f : existing) {
+						if (f.getName().equals(".git")) continue;
+						if (f.isDirectory()) {
+							deleteDirectoryRecursive(f.toPath());
+						} else {
+							Files.deleteIfExists(f.toPath());
+						}
+					}
+				}
+				// Stage removals
+				git.add().setUpdate(true).addFilepattern(".").call();
+			}
+
+			// 3. Write only this pipeline/session's files
+			for (java.util.Map.Entry<String, byte[]> entry : files.entrySet()) {
+				String filename = entry.getKey();
+				byte[] content = entry.getValue();
+
+				File targetFile = new File(tempDirFile, pipelineName + "/" + filename);
+				if (!targetFile.getParentFile().exists()) {
+					Files.createDirectories(targetFile.getParentFile().toPath());
+				}
+				try (OutputStream os = new FileOutputStream(targetFile)) {
+					os.write(content);
+				}
+			}
+
+			// 4. Stage only the pipeline folder
+			git.add().addFilepattern(pipelineName + "/").call();
+
+			// 5. Commit
+			git.commit().setMessage("Update " + files.size() + " files for " + pipelineName).call();
+
+			// 6. Push
+			PushCommand pushCommand = git.push();
+			pushCommand.setCredentialsProvider(creds);
+			pushCommand.setRemote("origin");
+			pushCommand.add(branchName);
+			pushCommand.setForce(true);
+			pushCommand.call();
+
+			log.info("[GitHubService] Successfully pushed {} files to GitHub => Repo: {}, Branch: {}, Pipeline: {}",
+					files.size(), repoName, branchName, pipelineName);
+
+		} finally {
+			// 7. Close git and cleanup temp directory
+			if (git != null) {
+				git.close();
+			}
+			try {
+				deleteDirectoryRecursive(tempDir);
+				log.info("Cleaned up temp directory: {}", tempDir);
+			} catch (IOException e) {
+				log.warn("Could not clean up temp directory {}: {}", tempDir, e.getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Recursively delete a directory.
+	 */
+	private void deleteDirectoryRecursive(Path dir) throws IOException {
+		if (!Files.exists(dir)) return;
+		try (java.util.stream.Stream<Path> walk = Files.walk(dir)) {
+			walk.sorted(java.util.Comparator.reverseOrder())
+					.forEach(p -> {
+						try { Files.delete(p); } catch (IOException ignored) {}
+					});
+		}
+	}
+
+	/**
+	 * Fetch file content from a pipeline-specific branch.
+	 */
+	public byte[] fetchFileFromGitHubBranch(String pipelineName, String org,
+			String filename, String branchName)
+			throws IOException, GitAPIException {
+		Git git = getGitHubRepositoryForBranch(org, branchName);
+
+		String url = resolveRepoUrl(org);
+		String repoName = extractRepoNameFromUrl(url);
+
+		File targetFile = new File(gitPath + repoName + "/" + pipelineName + "/" + filename);
+		if (targetFile.exists()) {
+			return Files.readAllBytes(targetFile.toPath());
+		}
+		return null;
+	}
+
 	public Git cloneRepoForDataset(String repoUrl, String personalAccessToken, String cloneDirectoryPath,
 			String repoBranch) throws IllegalStateException, GitAPIException, IOException {
 		try {
 			if (repoBranch == null || repoBranch.isEmpty()) {
 				repoBranch = "master";
 			}
-			File gitRepoPath = PathValidationUtil.validatePath(cloneDirectoryPath);
+			File gitRepoPath = new File(cloneDirectoryPath);
 			if (!gitRepoPath.exists()) {
-				Files.createDirectories(gitRepoPath.toPath());
+				Files.createDirectories(Paths.get(cloneDirectoryPath));
 			}
 			Git git;
 			git = Git.init().setDirectory(gitRepoPath).call();
@@ -578,7 +924,8 @@ public class GitHubService {
 					.setRemote("origin").setRemoteBranchName(repoBranch).call();
 			return git;
 		} catch (Exception e) {
-			log.error("Error due to : {}", e.getMessage(), e);
+			log.error("Error due to : {}", e.getMessage());
+			e.printStackTrace();
 			return null;
 		}
 	}

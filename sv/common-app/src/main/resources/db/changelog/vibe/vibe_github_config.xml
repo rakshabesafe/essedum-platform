@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="vibe-github-config-001" author="vibe-coding">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="vibe_github_config" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="vibe_github_config">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="session_id" type="VARCHAR(256)">
+                <constraints nullable="false" />
+            </column>
+            <column name="org" type="VARCHAR(256)">
+                <constraints nullable="false" />
+            </column>
+            <column name="repo_url" type="VARCHAR(1024)">
+                <constraints nullable="false" />
+            </column>
+            <column name="branch_name" type="VARCHAR(512)">
+                <constraints nullable="false" />
+            </column>
+            <column name="commit_sha" type="VARCHAR(64)" />
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false" />
+            </column>
+            <column name="error_message" type="VARCHAR(2048)" />
+            <column name="storage_type" type="VARCHAR(32)">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(256)" />
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <createIndex indexName="idx_vibe_ghcfg_session_org" tableName="vibe_github_config" unique="true">
+            <column name="session_id" />
+            <column name="org" />
+        </createIndex>
+
+        <createIndex indexName="idx_vibe_ghcfg_org" tableName="vibe_github_config">
+            <column name="org" />
+        </createIndex>
+
+        <createIndex indexName="idx_vibe_ghcfg_status" tableName="vibe_github_config">
+            <column name="status" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
+

@@ -14,11 +14,18 @@ import { AdapterServices } from '../services/adapter-service';
 import { SemanticSearchResult } from '../DTO/SemanticSearchResult';
 import { SemanticService } from '../services/semantic.services';
 import { TagEventDTO } from '../DTO/tagEventDTO.model';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-dataset',
   templateUrl: './dataset.component.html',
-  styleUrls: ['./dataset.component.scss']
+  styleUrls: ['./dataset.component.scss'],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [style({ opacity: 0 }), animate('180ms', style({ opacity: 1 }))]),
+      transition(':leave', [animate('180ms', style({ opacity: 0 }))]),
+    ]),
+  ],
 })
 export class DatasetComponent implements OnInit, OnChanges {
   @ViewChild('scrollableDiv', { read: ElementRef })
