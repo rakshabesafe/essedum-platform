@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, abort, request, render_template, make_response, g
 import uuid
+import html as html_module
 from utils import *
 from Queue import Queue
 from db import DatabaseOperations, JobNF
@@ -46,6 +47,14 @@ pause_event = Event()
 os.environ['NO_PROXY'] = 'aiplatform.ad.infosys.com'
 os.environ['http_proxy'] = 'http://blrproxy.ad.infosys.com:80'
 os.environ['https_proxy'] = 'http://blrproxy.ad.infosys.com:80'
+
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses to mitigate XSS and MIME-sniffing attacks."""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
 
 @app.before_request
 def create_database():
@@ -162,6 +171,12 @@ def show_tasks():
 @app.route('/execute/<task_id>/getStatus', methods=['GET'])
 def get_task_status(task_id):
     try:
+        # Validate task_id is a well-formed UUID before use
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid task ID'}), 400
+
         task = db_operations.get_job_by_id(task_id)
         if task is None:
             abort(404)
@@ -183,6 +198,12 @@ def get_task_status(task_id):
 @app.route('/execute/<task_id>/stop', methods=['GET'])
 def terminate_task(task_id):
     try:
+        # Validate task_id is a well-formed UUID before use
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid task ID'}), 400
+
         task = db_operations.get_job_by_id(task_id)
         print('task', task)
         if task is None:
@@ -235,8 +256,21 @@ def terminate_task(task_id):
 @app.route('/execute/<task_id>/getLog', methods=['GET'])
 def get_task_log(task_id):
     try:
+        # Validate task_id is a well-formed UUID before using it in path construction
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'logs': {'content': 'Invalid task ID'}}), 400
+
         task_folder=str(task_id)
         log_file=r'/temp/Jobs/'+task_folder+'/log.txt'
+
+        # Validate resolved path to prevent directory traversal
+        log_file_resolved = os.path.realpath(log_file)
+        base_dir_resolved = os.path.realpath('/temp/Jobs')
+        if not log_file_resolved.startswith(base_dir_resolved):
+            logger.warning(f'Potential path traversal attempt detected: {task_id}')
+            return jsonify({'logs': {'content': 'Invalid task ID'}}), 403
         
         with open(log_file,'r', encoding='utf-8', errors='ignore') as f:
             log=f.read()
@@ -384,12 +418,11 @@ def projects_datasets_create():
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_datasets_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -417,12 +450,11 @@ def projects_datasets_list_list():
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_datasets_list_list(adapter_instance, project, isCached, isInstance, connections)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 @app.route('/api/service/v1/datasets/<dataset_id>', methods=['get'])
@@ -449,12 +481,11 @@ def projects_datasets_get(dataset_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_datasets_get(adapter_instance, project, isCached, isInstance, connections, dataset_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 400
 
 
@@ -482,12 +513,11 @@ def projects_datasets_delete(dataset_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_datasets_delete(adapter_instance, project, isCached, isInstance, connections, dataset_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -525,12 +555,11 @@ def projects_datasets_export_create(dataset_id):
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_datasets_export_create(adapter_instance, project, isCached, isInstance, connections, dataset_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -569,12 +598,11 @@ def projects_endpoints_create():
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_endpoints_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -603,12 +631,11 @@ def projects_endpoints_list_list():
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_endpoints_list_lists(adapter_instance, project, isCached, isInstance, connections)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -638,12 +665,11 @@ def projects_endpoints_get(endpoint_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_endpoints_get(adapter_instance, project, isCached, isInstance, connections, endpoint_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -672,12 +698,11 @@ def projects_endpoints_delete(endpoint_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_endpoints_delete(adapter_instance, project, isCached, isInstance, connections, endpoint_id, isOnline)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -719,12 +744,11 @@ def projects_endpoints_deploy_model_create(endpoint_id):
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_endpoints_deploy_model_create(adapter_instance, project, isCached, isInstance, connections, endpoint_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -765,12 +789,11 @@ def projects_endpoints_explain_create(endpoint_id):
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_endpoints_explain_create(adapter_instance, project, isCached, isInstance, connections, endpoint_id, request_body, isOnline)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -810,12 +833,11 @@ def projects_endpoints_infer_create(endpoint_id):
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_endpoints_infer_create(adapter_instance, project, isCached, isInstance, connections, endpoint_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -855,12 +877,11 @@ def projects_endpoints_undeploy_models_create(endpoint_id):
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_endpoints_undeploy_models_create(adapter_instance, project, isCached, isInstance, connections, endpoint_id, request_body, isOnline)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -892,15 +913,11 @@ def projects_models_list():
             return jsonify(result), 400
         logger.info("connection details: [REDACTED]")
         # connection details logging removed (sensitive)
-        result, status_code = aws.projects_models_list(adapter_instance, project, isCached, isInstance, connections)
-        logger.info(f"result: {str(result)}")
-        # print(f"result: {str(result)}")
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        result, status_code = aws.projects_models_list(adapter_instance, project, isCached, isInstance, connections)        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 @app.route('/api/service/v1/models/<model_id>', methods=['get'])
@@ -927,12 +944,11 @@ def projects_models_get(model_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_models_get(adapter_instance, project, isCached, isInstance, connections, model_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -943,7 +959,7 @@ def projects_models_register_create():
     logger.info('model register called')
     
     try:
-        logger.info(f"Request args: {request.args}")
+        logger.info("Processing model register request")
         adapter_instance = request.args.get("adapter_instance", None)
         project = request.args.get("project", None)
         isCached = request.args.get("isCached", None)
@@ -975,13 +991,12 @@ def projects_models_register_create():
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_models_register_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
-        print(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
+        
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1010,12 +1025,11 @@ def projects_models_delete(model_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_models_delete(adapter_instance, project, isCached, isInstance, connections, model_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1052,12 +1066,11 @@ def projects_models_export_create(model_id):
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_models_export_create(adapter_instance, project, isCached, isInstance, connections, model_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1095,12 +1108,11 @@ def training_automl_simplified_create():
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.training_automl_simplified_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1141,8 +1153,7 @@ def training_custom_script_create():
 
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1170,12 +1181,11 @@ def training_istlist():
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.training_istlist(adapter_instance, project, isCached, isInstance, connections)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1213,7 +1223,7 @@ def training_train_create():
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.training_train_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         
         # Log helpful tracking information
         if status_code == 202 and result.get('sourceID'):
@@ -1229,8 +1239,7 @@ def training_train_create():
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1265,12 +1274,11 @@ def training_cancel_list(training_job_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.training_cancel_list(adapter_instance, project, isCached, isInstance, connections, training_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1299,12 +1307,11 @@ def training_delete(training_job_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.training_delete(adapter_instance, project, isCached, isInstance, connections, training_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1334,12 +1341,11 @@ def training_get_list(training_job_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.training_get_list(adapter_instance, project, isCached, isInstance, connections, training_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1381,12 +1387,11 @@ def projects_inferencePipelines_create():
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_inferencePipelines_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1415,12 +1420,11 @@ def projects_inferencePipelines_list_list():
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_inferencePipelines_list_list(adapter_instance, project, isCached, isInstance, connections)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1449,12 +1453,11 @@ def projects_inferencePipelines_delete(inference_job_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_inferencePipelines_delete(adapter_instance, project, isCached, isInstance, connections, inference_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1492,12 +1495,11 @@ def projects_inferencePipelines_cancel(inference_job_id):
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result, status_code = aws.projects_inferencePipelines_cancel(adapter_instance, project, isCached, isInstance, connections, inference_job_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1532,12 +1534,11 @@ def projects_inferencePipelines_get(inference_job_id):
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = aws.projects_inferencePipelines_get(adapter_instance, project, isCached, isInstance, connections, inference_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1548,12 +1549,11 @@ def adapter_function_execute():
         request_body = request.get_json()
         logger.info(f"Request received with keys: {list(request_body.keys()) if isinstance(request_body, dict) else type(request_body).__name__}")
         result = function_execute(request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), 200
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1566,12 +1566,11 @@ def cloudconnect():
         result = aws.cloudconnect(acceskey, secretkey, region)
         if result:
             return jsonify(result), 200
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result)
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
         return jsonify(result), 400
 
 
