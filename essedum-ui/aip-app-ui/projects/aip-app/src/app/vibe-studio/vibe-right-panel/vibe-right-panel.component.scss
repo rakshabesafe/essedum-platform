@@ -121,7 +121,35 @@
   padding: 0 4px;
 }
 
-// ── Code Pane ─────────────────────────────────────────────────────────────────
+// ─── Code / Explorer pane ────────────────────────────────────────────────────
+.code-pane-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.code-edit-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #fff8e1;
+  border-bottom: 1px solid #ffe082;
+  color: #5d4037;
+  font-size: 12px;
+  font-family: "Inter", "Roboto", "Segoe UI", sans-serif;
+  flex-shrink: 0;
+
+  i {
+    font-size: 14px;
+    color: #f9a825;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+}
 .code-pane {
   display: flex;
   flex: 1;
