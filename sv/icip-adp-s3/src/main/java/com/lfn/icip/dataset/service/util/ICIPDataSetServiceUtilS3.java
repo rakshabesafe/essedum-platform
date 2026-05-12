@@ -43,6 +43,8 @@ import com.google.gson.JsonParser;
 import com.lfn.ai.comm.lib.util.annotation.EssedumProperty;
 import com.lfn.ai.comm.lib.util.exceptions.EssedumException;
 import com.lfn.icip.dataset.model.ICIPDataset;
+import com.lfn.icip.dataset.util.SsrfProtectionUtil;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import com.lfn.icip.icipwebeditor.rest.WebSocketController;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -222,7 +224,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             if (sslContext != null) {
                 OkHttpClient customHttpClient = new OkHttpClient.Builder()
                         .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                        .hostnameVerifier((hostname, session) -> true).build();
+                        .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE).build();
                 MinioClient mc = minioClient = MinioClient.builder().endpoint(url).credentials(accessKey, secretKey)
                         .httpClient(customHttpClient).build();
                 boolean found = mc.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
@@ -233,8 +235,8 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 throw new EssedumException(SSL_CONTEXT_ERROR_MESSAGE);
             }
         } catch (Exception e) {
-            logger.info(e.getMessage());
-            throw new EssedumException(e.getMessage());
+            logger.error("MinIO connection failed", e);
+            throw new EssedumException("Failed to connect to storage service");
         }
         return true;
     }
@@ -252,7 +254,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         if (sslContext != null) {
             OkHttpClient customHttpClient = new OkHttpClient.Builder()
                     .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                    .hostnameVerifier((hostname, session) -> true).build();
+                    .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE).build();
 
             String connectStr = String.format(
                     "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
@@ -314,7 +316,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 logger.info("GCS connection successful. Buckets found: {}", blobsList.length());
             } catch (Exception ex) {
                 logger.error("Error listing GCS buckets: {}", ex.getMessage(), ex);
-                throw new EssedumException("Failed to list GCS buckets: " + ex.getMessage(), ex);
+                throw new EssedumException("Failed to list GCS buckets");
             }
             // If uploadFile attribute present, perform upload
             JSONObject attributes = new JSONObject(dataset.getAttributes());
@@ -380,7 +382,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         SSLContext sslContext = getSslContext(trustAllCerts);
         if (sslContext != null) {
             HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+            HttpsURLConnection.setDefaultHostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
         }
 
         return StorageOptions.newBuilder()
@@ -400,10 +402,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 ? uploadFilePath + "/" + attr.optString(OBJECT_KEY)
                 : attr.optString(OBJECT_KEY);
 
-        File localFile = new File(uploadFile);
+        File localFile = PathValidationUtil.validatePath(uploadFile);
         if (!localFile.exists()) {
             logger.error("Local file does not exist: {}", uploadFile);
-            throw new FileNotFoundException("File not found: " + uploadFile);
+            throw new FileNotFoundException("The specified file could not be found");
         }
 
         try {
@@ -412,7 +414,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             SSLContext sslContext = getSslContext(trustAllCerts);
             if (sslContext != null) {
                 HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-                HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+                HttpsURLConnection.setDefaultHostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
             }
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectKey).build();
 
@@ -533,7 +535,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         if (sslContext != null) {
             OkHttpClient customHttpClient = new OkHttpClient.Builder()
                     .sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-                    .hostnameVerifier((hostname, session) -> true).build();
+                    .hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE).build();
             String connectStr = String.format(
                     "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net",
                     accessKey, secretKey);
@@ -627,10 +629,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
 
             logger.info("Uploading file to S3: bucket={}, key={}", bucket, objectKey);
 
-            File file = new File(uploadFile);
+            File file = PathValidationUtil.validatePath(uploadFile);
             if (!file.exists()) {
                 logger.error("Local file does not exist: {}", uploadFile);
-                throw new FileNotFoundException("File not found: " + uploadFile);
+                throw new FileNotFoundException("The specified file could not be found");
             }
 
             PutObjectRequest putRequest = PutObjectRequest.builder()
@@ -863,15 +865,17 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         String region = connectionDetails.optString(REGION_KEY);
         URL endpointUrl = null;
         try {
-            endpointUrl = new URL(connectionDetails.optString("url"));
+            endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
             logger.info("endpointUrl: {}", endpointUrl);
         } catch (MalformedURLException e1) {
             logger.error(UPLOAD_DATASOURCE_URL_ERROR + e1.getMessage());
+        } catch (IllegalArgumentException e1) {
+            logger.error("SSRF validation failed: {}", e1.getMessage());
         }
         TrustManager[] trustAllCerts = getTrustAllCerts();
         SSLContext sslContext = getSslContext(trustAllCerts);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
-        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
         clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
         JSONObject attr = new JSONObject(dataset.getAttributes());
         String bucketName = attr.optString(BUCKET_KEY);
@@ -882,7 +886,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             objectKey = attr.optString("path") + "/" + attr.optString(OBJECT_KEY);
         } else
             objectKey = attr.optString(OBJECT_KEY);
-        File localFilePath = new File(uploadFile);
+        File localFilePath = PathValidationUtil.validatePath(uploadFile);
         BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withClientConfiguration(clientConfiguration)
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpointUrl.toString(), region))
@@ -974,19 +978,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 .tlsTrustManagersProvider(new TlsTrustManagersProvider() {
                     @Override
                     public TrustManager[] trustManagers() {
-                        return new TrustManager[]{
-                                new X509TrustManager() {
-                                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                                    }
-
-                                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                                    }
-
-                                    public X509Certificate[] getAcceptedIssuers() {
-                                        return new X509Certificate[0];
-                                    }
-                                }
-                        };
+                        return getTrustAllCerts();
                     }
                 }).build();
 
@@ -1010,15 +1002,17 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             URL endpointUrl = null;
             String filePath2;
             try {
-                endpointUrl = new URL(connectionDetails.optString("url"));
+                endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
                 logger.info("endpointUrl " + endpointUrl);
             } catch (MalformedURLException e1) {
                 logger.error(UPLOAD_DATASOURCE_URL_ERROR + e1.getMessage());
+            } catch (IllegalArgumentException e1) {
+                logger.error("SSRF validation failed: " + e1.getMessage());
             }
             TrustManager[] trustAllCerts = getTrustAllCerts();
             SSLContext sslContext = getSslContext(trustAllCerts);
             ClientConfiguration clientConfiguration = new ClientConfiguration();
-            ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+            ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
             clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
             JSONObject attribute = new JSONObject(dataset.getAttributes());
             String bucketName = attribute.optString(BUCKET_KEY);
@@ -1071,15 +1065,17 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         String region = connectionDetails.optString(REGION_KEY);
         URL endpointUrl = null;
         try {
-            endpointUrl = new URL(connectionDetails.optString("url"));
+            endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
         } catch (MalformedURLException e1) {
             logger.error("Error occured while fetching FileInfo" + e1.getMessage());
+        } catch (IllegalArgumentException e1) {
+            logger.error("SSRF validation failed: " + e1.getMessage());
         }
         BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         TrustManager[] trustAllCerts = getTrustAllCerts();
         SSLContext sslContext = getSslContext(trustAllCerts);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
-        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+        ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
         clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
         System.setProperty(SDKGlobalConfiguration.DISABLE_CERT_CHECKING_SYSTEM_PROPERTY, "true");
         if (endpointUrl != null) {
@@ -1155,9 +1151,11 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
         String region = connectionDetails.optString(REGION_KEY);
         URL endpointUrl = null;
         try {
-            endpointUrl = new URL(connectionDetails.optString("url"));
+            endpointUrl = SsrfProtectionUtil.validateAndCreateUrl(connectionDetails.optString("url"));
         } catch (MalformedURLException e1) {
             logger.error(UPLOAD_DATASOURCE_URL_ERROR + e1.getMessage());
+        } catch (IllegalArgumentException e1) {
+            logger.error("SSRF validation failed: " + e1.getMessage());
         }
 
         if (!(connectionDetails.optString("url").contains("blob") || (connectionDetails.optString("url").contains("aws")) || (connectionDetails.optString("url").contains("google")))) {
@@ -1165,7 +1163,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
             TrustManager[] trustAllCerts = getTrustAllCerts();
             SSLContext sslContext = getSslContext(trustAllCerts);
             ClientConfiguration clientConfiguration = new ClientConfiguration();
-            ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, (hostname, session) -> true);
+            ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
             clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
             System.setProperty(SDKGlobalConfiguration.DISABLE_CERT_CHECKING_SYSTEM_PROPERTY, "true");
             TransferManager transferManager = TransferManagerBuilder.standard()
@@ -1254,10 +1252,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                     while ((line = reader.readLine()) != null) {
                                         textBuilder.append(line);
                                     }
-                                    String[] qa = textBuilder.toString().split("Q\\. ");
+                                    String[] qa = textBuilder.toString().split("Q[.] ");
                                     List<Map<String, String>> keyVal = new ArrayList<>();
                                     for (String i : qa) {
-                                        String[] values = i.split("A\\.");
+                                        String[] values = i.split("A[.]", 2);
                                         if (values.length == 2) {
                                             String ques = values[0];
                                             String ans = values[1];
@@ -1292,10 +1290,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                     while ((line = reader.readLine()) != null) {
                                         textBuilder.append(line);
                                     }
-                                    String[] qa = textBuilder.toString().split("Q\\. ");
+                                    String[] qa = textBuilder.toString().split("Q[.] ");
                                     List<Map<String, String>> keyVal = new ArrayList<>();
                                     for (String i : qa) {
-                                        String[] values = i.split("A\\.");
+                                        String[] values = i.split("A[.]", 2);
                                         if (values.length == 2) {
                                             String ques = values[0];
                                             String ans = values[1];
@@ -1429,7 +1427,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 }
                 logger.debug("Detected file extension: {}", extension);
 
-                byteArray = Files.readAllBytes(Paths.get(downloadedFilePath));
+                byteArray = Files.readAllBytes(PathValidationUtil.validateAndGetPath(downloadedFilePath));
                 logger.info("Read {} bytes from downloaded file", byteArray.length);
 
                 switch (extension) {
@@ -1450,10 +1448,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                 while ((line = reader.readLine()) != null) {
                                     textBuilder.append(line);
                                 }
-                                String[] qa = textBuilder.toString().split("Q\\. ");
+                                String[] qa = textBuilder.toString().split("Q[.] ");
                                 List<Map<String, String>> keyVal = new ArrayList<>();
                                 for (String i : qa) {
-                                    String[] values = i.split("A\\.");
+                                    String[] values = i.split("A[.]", 2);
                                     if (values.length == 2) {
                                         String ques = values[0];
                                         String ans = values[1];
@@ -1488,10 +1486,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                 while ((line = reader.readLine()) != null) {
                                     textBuilder.append(line);
                                 }
-                                String[] qa = textBuilder.toString().split("Q\\. ");
+                                String[] qa = textBuilder.toString().split("Q[.] ");
                                 List<Map<String, String>> keyVal = new ArrayList<>();
                                 for (String i : qa) {
-                                    String[] values = i.split("A\\.");
+                                    String[] values = i.split("A[.]", 2);
                                     if (values.length == 2) {
                                         String ques = values[0];
                                         String ans = values[1];
@@ -1622,7 +1620,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                 }
                 logger.debug("Detected file extension: {}", extension);
 
-                byteArray = Files.readAllBytes(Paths.get(downloadedFilePath));
+                byteArray = Files.readAllBytes(PathValidationUtil.validateAndGetPath(downloadedFilePath));
                 logger.info("Read {} bytes from downloaded file", byteArray.length);
 
                 switch (extension) {
@@ -1643,10 +1641,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                 while ((line = reader.readLine()) != null) {
                                     textBuilder.append(line);
                                 }
-                                String[] qa = textBuilder.toString().split("Q\\. ");
+                                String[] qa = textBuilder.toString().split("Q[.] ");
                                 List<Map<String, String>> keyVal = new ArrayList<>();
                                 for (String i : qa) {
-                                    String[] values = i.split("A\\.");
+                                    String[] values = i.split("A[.]", 2);
                                     if (values.length == 2) {
                                         String ques = values[0];
                                         String ans = values[1];
@@ -1681,10 +1679,10 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
                                 while ((line = reader.readLine()) != null) {
                                     textBuilder.append(line);
                                 }
-                                String[] qa = textBuilder.toString().split("Q\\. ");
+                                String[] qa = textBuilder.toString().split("Q[.] ");
                                 List<Map<String, String>> keyVal = new ArrayList<>();
                                 for (String i : qa) {
-                                    String[] values = i.split("A\\.");
+                                    String[] values = i.split("A[.]", 2);
                                     if (values.length == 2) {
                                         String ques = values[0];
                                         String ans = values[1];
@@ -2146,85 +2144,40 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
 
             return (T) getDataAsJSONArray(dataset, pagination.getSize(), pagination.getPage()).toString();
         } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException | IOException e) {
-            logger.error(e.getMessage());
-            throw new SQLException(e.getMessage());
+            logger.error("Error retrieving dataset data", e);
+            throw new SQLException("Failed to retrieve dataset data");
         } catch (NumberFormatException e) {
-            logger.error(e.getMessage());
-            throw new SQLException(e.getMessage());
+            logger.error("Invalid number format in dataset data", e);
+            throw new SQLException("Failed to retrieve dataset data");
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            throw new SQLException(e.getMessage());
+            logger.error("Unexpected error retrieving dataset data", e);
+            throw new SQLException("Failed to retrieve dataset data");
         }
 
     }
 
-    //	private TrustManager[] getTrustAllCerts() {
-//		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-//			@Override
-//			public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
-//			}
-//
-//			@Override
-//			public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
-//			}
-//
-//			@Override
-//			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-//				return new java.security.cert.X509Certificate[] {};
-//			}
-//		} };
-//		return trustAllCerts;
-//	}
     private TrustManager[] getTrustAllCerts() {
         logger.info("certificateCheck value: {}", certificateCheck);
-        if ("true".equalsIgnoreCase(certificateCheck)) {
-            try {
-                // Load the default trust store
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory
-                        .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                trustManagerFactory.init((KeyStore) null);
-                // Get the trust managers from the factory
-                TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+        try {
+            // Always load the default trust store for proper certificate validation
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory
+                    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init((KeyStore) null);
+            // Get the trust managers from the factory
+            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
 
-                // Ensure we have at least one X509TrustManager
-                for (TrustManager trustManager : trustManagers) {
-                    if (trustManager instanceof X509TrustManager) {
-                        return new TrustManager[]{(X509TrustManager) trustManager};
-                    }
+            // Ensure we have at least one X509TrustManager
+            for (TrustManager trustManager : trustManagers) {
+                if (trustManager instanceof X509TrustManager) {
+                    return new TrustManager[]{(X509TrustManager) trustManager};
                 }
-            } catch (KeyStoreException e) {
-                logger.info(e.getMessage());
-            } catch (NoSuchAlgorithmException e) {
-                logger.info(e.getMessage());
             }
-            throw new IllegalStateException("No X509TrustManager found. Please install the certificate in keystore");
-        } else {
-            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                    // Log the certificate chain and authType
-                    logger.info("checkClientTrusted called with authType: {}", authType);
-                    for (X509Certificate cert : chain) {
-                        logger.info("Client certificate: {}", cert.getSubjectDN());
-                    }
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                    // Log the certificate chain and authType
-                    logger.info("checkServerTrusted called with authType: {}", authType);
-                    for (X509Certificate cert : chain) {
-                        logger.info("Server certificate: {}", cert.getSubjectDN());
-                    }
-                }
-
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[] {};
-                }
-            }};
-            return trustAllCerts;
+        } catch (KeyStoreException e) {
+            logger.error("Failed to load trust store: {}", e.getMessage(), e);
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("Failed to load trust manager algorithm: {}", e.getMessage(), e);
         }
+        throw new IllegalStateException("No X509TrustManager found. Please install the certificate in keystore");
     }
 
     private SSLContext getSslContext(TrustManager[] trustAllCerts) {
@@ -2309,7 +2262,7 @@ public class ICIPDataSetServiceUtilS3 extends ICIPDataSetServiceUtil {
 
         } catch (Exception e) {
             logger.error("Failed to download file as bytes: {}", fileName, e);
-            throw new RuntimeException("Failed to download file: " + fileName, e);
+            throw new RuntimeException("Failed to download file from storage");
         }
     }
 

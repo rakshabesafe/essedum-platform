@@ -440,7 +440,7 @@ public class JobSyncExecutorService {
 							try {
 								chainjob = stopJobServices.stopPipelineJobs(chainjob);
 							} catch (EssedumException e) {
-								e.printStackTrace();
+								logger.error("Error stopping pipeline jobs", e);
 							}
 						}
 					}

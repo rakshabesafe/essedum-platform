@@ -29,6 +29,7 @@ import com.lfn.icip.icipwebeditor.fileserver.constants.LoggerConstants;
 import com.lfn.icip.icipwebeditor.fileserver.service.impl.CommonService;
 import com.lfn.icip.icipwebeditor.fileserver.util.ChecksumUtil;
 import com.lfn.icip.icipwebeditor.fileserver.util.FileServerUtil;
+import com.lfn.icip.icipwebeditor.fileserver.util.UrlSanitizationUtil;
 import com.lfn.icip.icipwebeditor.fileserver.util.FileUtil;
 import com.lfn.icip.icipwebeditor.fileserver.util.StringUtil;
 
@@ -106,7 +107,7 @@ public class MinioServer implements FileServerUtil {
 	@Override
 	public String generateFileID(String bucket, String prefix) throws Exception {
 		bucket = getBucket(bucket);
-		String fileid = StringUtil.addPrefix(prefix, StringUtil.getRandomString());
+		String fileid = StringUtil.addPrefix(UrlSanitizationUtil.sanitizePathSegment(prefix), StringUtil.getRandomString());
 		if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
 			minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
 		}
@@ -140,7 +141,9 @@ public class MinioServer implements FileServerUtil {
 			ChecksumUtil.check(checksum, path, checksumPath);
 
 			if (folder != null) {
-				fileid = String.format(LoggerConstants.STRING_SLASH_STRING, fileid, folder);
+				fileid = String.format(LoggerConstants.STRING_SLASH_STRING, UrlSanitizationUtil.sanitizePathSegment(fileid), UrlSanitizationUtil.sanitizePathSegment(folder));
+			} else {
+				fileid = UrlSanitizationUtil.sanitizePathSegment(fileid);
 			}
 
 			if (Files.exists(path)) {
@@ -206,6 +209,8 @@ public class MinioServer implements FileServerUtil {
 	@Override
 	public byte[] download(String fileid, String index, String bucket) throws Exception {
 		bucket = getBucket(bucket);
+		fileid = UrlSanitizationUtil.sanitizePathSegment(fileid);
+		index = UrlSanitizationUtil.sanitizePathSegment(index);
 		Path dirpath = commonService.createTempPath();
 		Path path = Paths.get(dirpath.toAbsolutePath().toString(), index);
 		Files.createDirectories(path.getParent());
@@ -226,6 +231,7 @@ public class MinioServer implements FileServerUtil {
 	@Override
 	public String delete(String fileid, String bucket) throws Exception {
 		bucket = getBucket(bucket);
+		fileid = UrlSanitizationUtil.sanitizePathSegment(fileid);
 		List<DeleteObject> objects = new LinkedList<>();
 		Iterable<Result<Item>> lists = minioClient
 				.listObjects(ListObjectsArgs.builder().bucket(bucket).recursive(true).prefix(fileid).build());
@@ -270,6 +276,7 @@ public class MinioServer implements FileServerUtil {
 	@Override
 	public boolean lastCall(String fileid, String bucket) throws Exception {
 		bucket = getBucket(bucket);
+		fileid = UrlSanitizationUtil.sanitizePathSegment(fileid);
 		Path dirpath = commonService.createTempPath();
 		Path path = Paths.get(dirpath.toAbsolutePath().toString(), fileid, constants.getTimestampFile());
 		Files.createDirectories(path.getParent());
@@ -291,6 +298,7 @@ public class MinioServer implements FileServerUtil {
 	@Override
 	public String getLastIndex(String fileid, String bucket) throws Exception {
 		bucket = getBucket(bucket);
+		fileid = UrlSanitizationUtil.sanitizePathSegment(fileid);
 		Path dirpath = commonService.createTempPath();
 		Path path = Paths.get(dirpath.toAbsolutePath().toString(), fileid, constants.getCountFile());
 		Files.createDirectories(path.getParent());
@@ -315,6 +323,8 @@ public class MinioServer implements FileServerUtil {
 	@Override
 	public String getChecksum(String fileid, String index, String bucket) throws Exception {
 		bucket = getBucket(bucket);
+		fileid = UrlSanitizationUtil.sanitizePathSegment(fileid);
+		index = UrlSanitizationUtil.sanitizePathSegment(index);
 		Path dirpath = commonService.createTempPath();
 		Path path = Paths.get(dirpath.toAbsolutePath().toString(), fileid, constants.getMetadata(),
 				constants.getChecksum(), index);
@@ -356,6 +366,7 @@ public class MinioServer implements FileServerUtil {
 
 	@Override
 	public String getLastIndex(String fileid, String bucket, String datasource) throws Exception {
+		fileid = UrlSanitizationUtil.sanitizePathSegment(fileid);
 		Path dirpath = commonService.createTempPath();
 		Path path = Paths.get(dirpath.toAbsolutePath().toString(), fileid, constants.getCountFile());
 		Files.createDirectories(path.getParent());

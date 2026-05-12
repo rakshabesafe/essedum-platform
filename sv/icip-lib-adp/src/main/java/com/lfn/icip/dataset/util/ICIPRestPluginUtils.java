@@ -286,7 +286,7 @@ public final class ICIPRestPluginUtils {
 				String fileParamName = reqObj.optString(ICIPPluginConstants.FILE_PARAM_NAME);
 				if (fileParamName == null || fileParamName.isEmpty())
 					fileParamName = ICIPPluginConstants.FILE_LOWER_CASE;
-				File file = new File(reqObj.optString(ICIPPluginConstants.UPLOAD_FILE_PATH));
+				File file = PathValidationUtil.validatePath(reqObj.optString(ICIPPluginConstants.UPLOAD_FILE_PATH));
 				MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
 				multipartEntityBuilder.addBinaryBody(fileParamName, file, ContentType.DEFAULT_BINARY, file.getName());
 				HttpEntity entity = multipartEntityBuilder.build();
@@ -329,7 +329,7 @@ public final class ICIPRestPluginUtils {
 		if (bodyType.equalsIgnoreCase(ICIPPluginConstants.FILE)) {
 			if (uploadDirecoryPath != null && !uploadDirecoryPath.isEmpty()) {
 				try {
-					File directory = new File(uploadDirecoryPath);
+					File directory = PathValidationUtil.validatePath(uploadDirecoryPath);
 					FileUtils.cleanDirectory(directory);
 				} catch (Exception e) {
 					logger.error("Error because of:{} at class:{} and line:{}", e.getMessage(),

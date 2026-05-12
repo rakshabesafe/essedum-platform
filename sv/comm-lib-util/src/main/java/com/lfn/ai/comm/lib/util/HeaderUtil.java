@@ -49,9 +49,31 @@ public final class HeaderUtil {
      */
     public static HttpHeaders createAlert(String message, String param) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-" + APPLICATION_NAME + "-alert", message);
-        headers.add("X-" + APPLICATION_NAME + "-params", param);
+        headers.add("X-" + APPLICATION_NAME + "-alert", sanitizeHeaderValue(message));
+        headers.add("X-" + APPLICATION_NAME + "-params", sanitizeHeaderValue(param));
         return headers;
+    }
+
+    /**
+     * Sanitizes a value for safe inclusion in HTTP response headers.
+     * Removes newlines (to prevent HTTP header injection) and encodes HTML special characters (to prevent XSS).
+     *
+     * @param value the raw value
+     * @return the sanitized value
+     */
+    private static String sanitizeHeaderValue(String value) {
+        if (value == null) {
+            return "";
+        }
+        // Remove CR/LF to prevent HTTP header injection
+        String sanitized = value.replaceAll("[\\r\\n]", "");
+        // Encode HTML special characters to prevent XSS when headers are rendered in browser
+        sanitized = sanitized.replace("&", "&amp;")
+                             .replace("<", "&lt;")
+                             .replace(">", "&gt;")
+                             .replace("\"", "&quot;")
+                             .replace("'", "&#x27;");
+        return sanitized;
     }
 
     /**
@@ -99,8 +121,8 @@ public final class HeaderUtil {
         log.error("Entity processing failed, {}", defaultMessage);
         log.error("Error key, {}",errorKey);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-" + APPLICATION_NAME + "-error", defaultMessage);
-        headers.add("X-" + APPLICATION_NAME + "-params", entityName);
+        headers.add("X-" + APPLICATION_NAME + "-error", sanitizeHeaderValue(defaultMessage));
+        headers.add("X-" + APPLICATION_NAME + "-params", sanitizeHeaderValue(entityName));
         return headers;
     }
     
@@ -114,8 +136,8 @@ public final class HeaderUtil {
     public static HttpHeaders customQueryAlert(String entityName, String string) {
 		log.error("Entity processing failed, {}", string);
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("X-pamApp-error", "error." + string);
-		headers.add("X-pamApp-params", entityName);
+		headers.add("X-pamApp-error", sanitizeHeaderValue("error." + string));
+		headers.add("X-pamApp-params", sanitizeHeaderValue(entityName));
 		return headers;
 	}
 

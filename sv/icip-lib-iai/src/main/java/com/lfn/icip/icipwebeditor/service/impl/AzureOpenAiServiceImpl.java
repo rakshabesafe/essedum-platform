@@ -24,6 +24,7 @@ import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import com.lfn.icip.dataset.util.GroovySandboxUtil;
 
 
 @Service("azureopenaichatmodel")
@@ -111,7 +112,7 @@ public class AzureOpenAiServiceImpl implements ICIPPromptChatModel {
 		Binding binding = new Binding();
 		binding.setProperty("response", response);
 
-		GroovyShell shell = new GroovyShell(binding);
+		GroovyShell shell = GroovySandboxUtil.createSandboxedShell(binding);
 		Object transformedResult = shell.evaluate(new StringReader(transformScript));
 
 		response = transformedResult.toString();

@@ -78,7 +78,7 @@ public class ICIPRemoteStopJobService implements IICIPStopJobService {
 		if (sslContext != null) {
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.build();
 		MediaType mediaType = MediaType.parse("application/json");
 		JSONObject bodyObject = new JSONObject();

@@ -17,6 +17,7 @@ package com.lfn.icip.dataset.service.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -549,7 +550,7 @@ public class ICIPDatasetFilesService implements IICIPDatasetFilesService {
 				List<Path> paths = stream.collect(Collectors.toList());
 				Path mergedPath = path;
 				mergedPath = Files.createDirectory(Paths.get(path.getParent().toString(), "merged"));
-				File merged = new File(
+				File merged = PathValidationUtil.validatePath(
 						Paths.get(mergedPath.toString(), path.getFileName().toString().replaceFirst("^[0-9]*_", ""))
 								.toString());
 				if (!merged.createNewFile()) {

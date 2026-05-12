@@ -441,11 +441,11 @@ public class UserProjectRoleResource {
             log.debug("REST request to save Users : {}", users_dto);            
             ModelMapper modelMapper = new ModelMapper();
             Users users = modelMapper.map(users_dto, Users.class);
-            boolean validatedpassword = users_dto.getPassword().matches("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_\\[\\]-{}|';:,+=|`~<\\\\\\/>?])[A-Za-z\\d!@#$%^&*_\\[\\]-{}|';:,+=|`~<\\\\\\/>?].{7,19}");
+            boolean validatedpassword = users_dto.getPassword().matches("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_\\[\\]\\-{}|';:,+=|`~<\\\\/>?])[A-Za-z\\d!@#$%^&*_\\[\\]\\-{}|';:,+=|`~<\\\\/>?]{8,20}");
             if(!validatedpassword){
                 return new ResponseEntity<String>("Password should contain atleast 1 number, 1 uppercase and lowercase character and 1 special character", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            boolean validatedUserName = users_dto.getUser_f_name().matches("^([A-Za-z]+\\s?)+$");
+            boolean validatedUserName = users_dto.getUser_f_name().matches("^[A-Za-z]+(?:\\s[A-Za-z]+)*$");
             if(!validatedUserName){
                 return new ResponseEntity<String>("Alpha numeric and atmost one special characters -_. allowed", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
             }

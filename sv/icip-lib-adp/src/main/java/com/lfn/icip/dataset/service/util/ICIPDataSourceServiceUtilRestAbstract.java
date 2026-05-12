@@ -87,6 +87,7 @@ import com.lfn.icip.dataset.service.impl.ICIPDatasourceService;
 import com.lfn.icip.dataset.service.util.IICIPDataSetServiceUtil.DATATYPE;
 import com.lfn.icip.dataset.service.util.IICIPDataSetServiceUtil.SQLPagination;
 import com.lfn.icip.dataset.util.ICIPRestPluginUtils;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import com.lfn.icip.icipwebeditor.fileserver.service.impl.FileServerService;
 
 
@@ -425,7 +426,7 @@ public abstract class ICIPDataSourceServiceUtilRestAbstract extends ICIPDataSour
 				}
 				
 				content = fileserverservice.download(fileId, "1", datasource.getOrganization());
-				File tempFile = new File(fileUploadPath+"/bigqueryAuth.json");
+				File tempFile = PathValidationUtil.validatePath(fileUploadPath, "bigqueryAuth.json");
 				FileUtils.writeByteArrayToFile(tempFile, content);
 				FileInputStream fileInpStream = null;
 				try {
@@ -487,7 +488,7 @@ public abstract class ICIPDataSourceServiceUtilRestAbstract extends ICIPDataSour
 		 
 		KeyStore keyStore= null;
 		 if(mtlsAdded) {
-			FileInputStream instream = new FileInputStream(new File(keyStorePath));
+			FileInputStream instream = new FileInputStream(PathValidationUtil.validatePath(keyStorePath));
 			try {
 				keyStore= KeyStore.getInstance("JKS");
 				 keyStore.load(instream, keystorepass.toCharArray());
