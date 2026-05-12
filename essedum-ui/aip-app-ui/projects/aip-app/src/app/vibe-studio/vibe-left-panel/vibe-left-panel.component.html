@@ -1,13 +1,36 @@
 <div class="copilot-panel">
 
+  <!-- ── Model selector bar ── -->
+  <div class="model-bar">
+    <div class="model-bar-left">
+      <i class="bi bi-stars model-icon"></i>
+      <span class="model-label">Model</span>
+    </div>
+    <div class="model-selector-wrap">
+      <select class="model-select" [(ngModel)]="selectedModel" (change)="onModelChange()">
+        <option *ngFor="let m of models" [value]="m.value">{{ m.label }}</option>
+      </select>
+      <i class="bi bi-chevron-down select-chevron"></i>
+    </div>
+  </div>
+
   <!-- ── Messages ── -->
   <div class="messages-area" #chatContainer>
 
     <!-- Empty / welcome state -->
     <div *ngIf="messages.length === 0" class="welcome-state">
-      <span class="welcome-avatar"><i class="bi bi-robot"></i></span>
-      <h3>Vibe Studio</h3>
-      <p>Describe what you'd like to build and I'll generate the code for you.</p>
+      <div class="welcome-glow-ring">
+        <span class="welcome-avatar"><i class="bi bi-robot"></i></span>
+      </div>
+      <div class="welcome-text-group">
+        <h3>Vibe Studio</h3>
+        <p>Describe what you'd like to build and I'll generate the full code for you.</p>
+      </div>
+      <div class="welcome-capabilities">
+        <div class="cap-chip"><i class="bi bi-code-slash"></i> Full-stack apps</div>
+        <div class="cap-chip"><i class="bi bi-cpu"></i> AI agents</div>
+        <div class="cap-chip"><i class="bi bi-diagram-3"></i> MCP servers</div>
+      </div>
     </div>
 
     <!-- Chat turns -->
@@ -20,20 +43,23 @@
 
       <!-- ── User message ── -->
       <ng-container *ngIf="msg.role === 'user'">
-        <div class="turn-meta">
-          <span class="user-dot"></span>
+        <div class="turn-meta user-meta">
           <span class="turn-label">You</span>
+          <span class="user-avatar"><i class="bi bi-person-fill"></i></span>
         </div>
-        <div class="user-text">{{ msg.content }}</div>
+        <div class="user-card">
+          <div class="user-text">{{ msg.content }}</div>
+        </div>
       </ng-container>
 
       <!-- ── Assistant message ── -->
       <ng-container *ngIf="msg.role === 'assistant'">
-        <div class="turn-meta">
-          <span class="assistant-avatar"><i class="bi bi-robot"></i></span>
+        <div class="turn-meta assistant-meta">
+          <span class="assistant-avatar"><i class="bi bi-stars"></i></span>
           <span class="turn-label">Vibe Studio</span>
+          <span class="ai-badge">AI</span>
         </div>
-        <div class="assistant-body">
+        <div class="assistant-card">
           <!-- Typing dots while waiting for first token -->
           <div *ngIf="!msg.content && status === 'generating' && last" class="typing-dots">
             <span></span><span></span><span></span>
@@ -67,7 +93,7 @@
         (keydown)="onKeyDown($event)"
         (focus)="inputFocused = true"
         (blur)="inputFocused = false"
-        placeholder="Ask Vibe Studio…"
+        placeholder="Ask Vibe Studio to build something…"
         rows="1"
         [disabled]="status === 'generating'"
       ></textarea>

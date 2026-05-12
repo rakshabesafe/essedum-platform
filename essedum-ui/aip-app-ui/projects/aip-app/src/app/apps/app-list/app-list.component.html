@@ -23,61 +23,49 @@
         <!-- Cards container -->
         <div *ngIf="appData.length>0" class="row" style='min-width: -webkit-fill-available;padding: 0px;'>
             <div class="col-4" *ngFor="let app of appData,let index=index" style="margin-bottom: 2%;">
-                <div style="height: 150px;display: grid">
-                    <mat-card class="mat-mdc-card mdc-card lfx-c-card lfx-c-card--hover example-card card-shadow"
-                        appearance="outlined" (mouseenter)="app.hover = true" (mouseleave)="app.hover = false">
-                        <div class="row main-card-div" >
-                            <div class="col-md-8"
-                                [ngStyle]="{'height': app.hover ? '100px' : '110px', 'transition': 'height 0.2s'}">
+                <div style="display: block">
+                    <mat-card class="mat-mdc-card mdc-card lfx-c-card example-card card-shadow"
+                        [class.is-hovered]="app.hover || menuOpenIndex === index"
+                        appearance="outlined"
+                        (mouseenter)="app.hover = true"
+                        (mouseleave)="app.hover = false">
+
+                        <!-- Main content: title + description + image -->
+                        <div class="main-card-div">
+                            <div class="card-text-col">
                                 <mat-card-header class="mat-card-header-transition">
                                     <mat-card-title class="lfx-card-header">{{app?.alias}}</mat-card-title>
                                 </mat-card-header>
-                                <mat-card-content class="lfx-app-description" [ngStyle]="{
-                                            'height': (app?.description?.length > 200) ? '50%' : '70%',
-                                            'transition': 'height 0.2s',
-                                            'margin-top': (app?.description?.length < 200) ? '20px' : (app.hover ? '0px' : '30px'),
-                                            'margin-bottom': app.hover ? '0px' : '-20px',
-                                            'overflow': (app?.description?.length > 200) ? 'hidden' : 'hidden'
-                                        }" style="max-height: 60px;">
+                                <mat-card-content class="lfx-app-description">
                                     {{app?.description}}
                                 </mat-card-content>
-
-
                             </div>
-                            <div class="col-md-4"
-                                [ngStyle]="{'height': app.hover ? '40%' : '60%',  'transition': 'height 0.2s'}">
+                            <div class="card-image-col">
                                 <img *ngIf="app.image" class="lfx-card-image" [src]="app?.image"
-                                    style="height: 100%; object-fit: contain;" />
-
+                                    alt="App image" />
                                 <img *ngIf="!app.image" class="lfx-card-image"
                                     src="assets/images/apps_default_logo.jpeg"
-                                    style="height: 100%; object-fit: contain;" alt="Default App Image" />
-
+                                    alt="Default App Image" />
                             </div>
                         </div>
 
-                         <div class="card-actions-container" [ngStyle]="{
-                                   'position': 'relative',
-                                   'opacity': app.hover || menuOpenIndex === index ? '1' : '0',
-                                   'pointer-events': app.hover || menuOpenIndex === index ? 'auto' : 'none',
-                                   'transform': app.hover || menuOpenIndex === index ? 'translateY(0)' : 'translateY(40px)',
-                                   'transition': 'opacity 0.2s, transform 0.2s'
-                                }">
-                            <mat-card-actions
-                                class="lfx-c-card__action-hover d-flex justify-content-between card-actions-hover"
-                               >
-                                <button style="height: 32px !important;" mat-flat-button class="mat-action-button-s view-details-btn overview mat-button-radius"
+                        <!-- Actions overlay — slides up from bottom on hover -->
+                        <div class="card-actions-overlay">
+                            <mat-card-actions class="card-actions-hover d-flex justify-content-between">
+
+                                <button mat-flat-button class="overview-btn"
                                     (click)="openApp(app, 'overview')">
                                     Overview
                                 </button>
-                                <button mat-menu-item  class="button-hover"  (click)="openApp(app, 'runApp')">
-                                    <mat-icon class="embed_option" matTooltip="Open App" [matTooltipPosition]="'below'">
-                                        pan_tool_alt
-                                    </mat-icon>
+
+                                <button mat-icon-button class="button-hover"
+                                    (click)="openApp(app, 'runApp')"
+                                    matTooltip="Open App" [matTooltipPosition]="'above'">
+                                    <mat-icon class="embed_option">pan_tool_alt</mat-icon>
                                 </button>
 
-                                <div class="aip-cursor w-20">
-                                    <div class="lfx-c-avatar  aip-hover-avatar">
+                                <div class="aip-cursor">
+                                    <div class="aip-hover-avatar lfx-c-avatar">
                                         {{(app.target.created_by)|firstCharacter}}
                                     </div>
                                     <div class="aip-hover-detail">
@@ -85,12 +73,13 @@
                                     </div>
                                 </div>
 
-                                <div class="dropdown d-inline-block w-20">
-                                    <mat-icon class="aip-cursor action-icon" [matMenuTriggerFor]="menu"                                       
-                                        (menuOpened)="menuOpenIndex = index" (menuClosed)="menuOpenIndex = null">
+                                <div class="dropdown d-inline-block">
+                                    <mat-icon class="aip-cursor action-icon" [matMenuTriggerFor]="menu"
+                                        (menuOpened)="menuOpenIndex = index"
+                                        (menuClosed)="menuOpenIndex = null">
                                         more_vert
                                     </mat-icon>
-                                    <mat-menu #menu="matMenu">                                
+                                    <mat-menu #menu="matMenu">
                                         <button mat-menu-item *ngIf="app.isvideoPresent"
                                             (click)="openApp(app, 'video')">
                                             Open Video
@@ -101,14 +90,16 @@
                                         </button>
                                         <button mat-menu-item *ngIf="editAuth" (click)="openAddedit(true,app)">
                                             Edit
-                                        </button>            
+                                        </button>
                                         <button mat-menu-item (click)="deleteApp(index)">
                                             Delete
                                         </button>
                                     </mat-menu>
                                 </div>
+
                             </mat-card-actions>
                         </div>
+
                     </mat-card>
                 </div>
             </div>
@@ -125,4 +116,3 @@
 
     </ng-container>
 </div>
-

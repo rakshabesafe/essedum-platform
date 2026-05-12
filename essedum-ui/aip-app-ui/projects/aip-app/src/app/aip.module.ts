@@ -158,6 +158,7 @@ import { VibeStudioComponent } from './vibe-studio/vibe-studio/vibe-studio.compo
 import { VibeLeftPanelComponent } from './vibe-studio/vibe-left-panel/vibe-left-panel.component';
 import { VibeRightPanelComponent } from './vibe-studio/vibe-right-panel/vibe-right-panel.component';
 import { VibeStudioService } from './vibe-studio/services/vibe-studio.service';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 PlotlyModule.plotlyjs = PlotlyJS;
 const dbConfig: DBConfig = {
@@ -268,7 +269,8 @@ const dbConfig: DBConfig = {
     BranchSelectionDialogComponent,
     VibeStudioComponent,
     VibeLeftPanelComponent,
-    VibeRightPanelComponent
+    VibeRightPanelComponent,
+    DashboardComponent
   ],
   imports: [
     CommonModule,

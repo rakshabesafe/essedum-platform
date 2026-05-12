@@ -45,7 +45,7 @@
             </div>
 
             <div mat-dialog-actions class="dialog-actions justify-content-end">
-                <button mat-raised-button color="primary" class="action-button" (click)="next()" [disabled]="false">
+                <button class="save-btn" (click)="next()" [disabled]="false">
                     <mat-icon>arrow_forward</mat-icon>
                     <span>NEXT</span>
                 </button>
@@ -57,10 +57,9 @@
             <div *ngIf="dataset" class="container-fluid">
                 <div *ngIf="formType=='API'">
 
-                    <div class="row">
-
-                        <!-- Request Method -->
-                        <div class="col-md-4 lfx-u-pad-b-8">
+                    <!-- Request Method + URL on same row -->
+                    <div class="method-url-row">
+                        <div class="method-col">
                             <div class="lfx-u-sub-header-alias">
                                 Request Method
                                 <span class="required-indicator">*</span>
@@ -76,17 +75,18 @@
                             </mat-form-field>
                         </div>
 
-                        <div class="col-md-8 lfx-u-pad-b-8">
-                            <div class="lfx-u-sub-header-alias">
-                                URL
-                            </div>
+                        <div class="url-col">
+                            <div class="lfx-u-sub-header-alias">URL</div>
                             <mat-form-field appearance="fill" class="w-100 custom-alias-field"
                                 subscriptSizing="dynamic">
                                 <input matInput placeholder="URL" [(ngModel)]="dataset.attributes['Url']"
                                     [disabled]="false" [required]="false">
                             </mat-form-field>
                         </div>
+                    </div>
 
+                    <!-- Tabs below the row -->
+                    <div class="tabs-wrapper">
                         <mat-tab-group id="schema-modal-tabs" class="tabs-left-aligned"
                             (selectedIndexChange)="basicReqTabChange($event)">
                             <mat-tab label="Query Parameters" data-tab-id="adapter-method-query-params">
@@ -278,7 +278,7 @@
                                         <!-- Label -->
                                         <div>
 
-                                            <mat-form-field appearance="fill" class="custom-alias-field"
+                                            <mat-form-field appearance="fill" class="custom-alias-field body-type-select"
                                                 subscriptSizing="dynamic">
                                                 <mat-select [(value)]="selectedOption"
                                                     (selectionChange)="optionChange($event)">
@@ -368,15 +368,6 @@
                             </mat-tab>
                         </mat-tab-group>
                     </div>
-
-                    <button mat-raised-button color="primary" *ngIf="action !== 'view'" class="action-button"
-                        (click)="testConnection()" [disabled]="false">
-                        <span>TEST</span>
-                    </button>
-                    <button mat-raised-button color="primary" *ngIf="action !== 'view'" class="action-button"
-                        (click)="saveDataset()" [disabled]="false">
-                        <span>SAVE</span>
-                    </button>
 
                 </div>
                 <div *ngIf="formType=='Script'">
@@ -528,25 +519,23 @@
                         </div>
                     </div>
 
-                    <div *ngIf="methodType">
-                        <button mat-raised-button color="primary" *ngIf="action !== 'view'" class="action-button"
-                            (click)="testConnection()" [disabled]="false">
-                            <span>TEST</span>
-                        </button>
-                    </div>
-
-                    <button mat-raised-button color="primary" *ngIf="action !== 'view'" class="action-button"
-                        (click)="saveDataset()" [disabled]="false">
-                        <span>SAVE</span>
-                    </button>
-
                 </div>
             </div>
-            <div mat-dialog-actions class="dialog-actions justify-content-start">
-                <button mat-raised-button color="primary" class="action-button" (click)="previous()" [disabled]="false">
+            <div mat-dialog-actions class="dialog-actions justify-content-between">
+                <button class="cancel-btn" (click)="previous()" [disabled]="false">
                     <mat-icon>arrow_backward</mat-icon>
                     <span>PREV</span>
                 </button>
+                <div class="d-flex gap-2" *ngIf="action !== 'view'">
+                    <button class="save-btn"
+                        *ngIf="formType === 'API' || (formType === 'Script' && methodType)"
+                        (click)="testConnection()" [disabled]="false">
+                        <span>TEST</span>
+                    </button>
+                    <button class="save-btn" (click)="saveDataset()" [disabled]="false">
+                        <span>SAVE</span>
+                    </button>
+                </div>
             </div>
         </div>
 

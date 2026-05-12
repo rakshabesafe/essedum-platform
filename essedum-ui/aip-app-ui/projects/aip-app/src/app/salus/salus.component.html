@@ -1,17 +1,17 @@
-<div class="aip-container lfx-u-pad-lr-30" id="mainCtr">
-  <!-- Embedded Salus Screen - Always Visible -->
-  <mat-card class="salus-embed-card">
-    <div class="iframe-container">
-      <iframe 
-        #salusIframeRef
-        id="salusIframe"
-        [src]="currentIframeUrl" 
-        width="100%" 
-        height="100%"
-        frameborder="0"
-        loading="lazy"
-        allow="fullscreen; microphone; camera">
-      </iframe>
+<div class="embed-fullscreen">
+  <iframe
+    *ngIf="isUrlConfigured"
+    #salusIframeRef
+    id="salusIframe"
+    [src]="currentIframeUrl"
+    frameborder="0"
+    allow="fullscreen; microphone; camera">
+  </iframe>
+  <div *ngIf="!isUrlConfigured" class="not-configured">
+    <div class="not-configured-icon">
+      <i class="bi bi-shield-check"></i>
     </div>
-  </mat-card>
+    <h3>Salus Not Configured</h3>
+    <p>The Salus service URL has not been configured for this environment. Set <code>salusUrl</code> in the environment configuration to enable this integration.</p>
+  </div>
 </div>

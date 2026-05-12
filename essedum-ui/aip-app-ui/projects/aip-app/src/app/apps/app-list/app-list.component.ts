@@ -254,10 +254,11 @@ export class AppListComponent implements OnInit {
 
   openAddedit(edit: boolean = false, app?: any): void {
     const dialogRef = this.dialog.open(CreateAppComponent, {
-      height: '80%',
       width: '60%',
       minWidth: '60vw',
+      maxHeight: '90vh',
       disableClose: true,
+      panelClass: 'app-details-dialog',
       data: {
         edit: edit,
         appName: app?.name,

@@ -1,372 +1,570 @@
 :host {
-  font-family: "Roboto", "Segoe UI", sans-serif;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
-.appLogo {
-  border-radius: 15%;
-  height: 70%;
-  object-fit: contain;
-  width: 100%;
+// ── Select dropdown — underline only on selects, native Material arrow ────────
+:host ::ng-deep .mat-mdc-form-field { --mdc-filled-text-field-container-color: transparent; }
+:host ::ng-deep .mdc-text-field--filled {
+  background: transparent !important; background-color: transparent !important;
+  border-radius: 0 !important; border-bottom: none !important; transition: none !important;
+}
+:host ::ng-deep .mdc-text-field--filled::after { border-bottom: none !important; }
+:host ::ng-deep .mdc-text-field--filled:hover,
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; }
+:host ::ng-deep .mat-mdc-form-field-focus-overlay { opacity: 0 !important; background: transparent !important; }
+:host ::ng-deep .mdc-line-ripple { display: none !important; }
+:host ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple { display: block !important; }
+:host ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.5) !important; }
+:host ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
+:host ::ng-deep .mat-mdc-select-arrow { color: #7eb8ff !important; }
+
+:host-context(body.header-light-theme) {
+  ::ng-deep .mat-mdc-form-field { --mdc-filled-text-field-container-color: transparent; }
+  ::ng-deep .mdc-text-field--filled::after { border-bottom: none !important; }
+  ::ng-deep .mdc-line-ripple { display: none !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple { display: block !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::before { border-bottom-color: rgba(35,79,153,0.45) !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::after { border-bottom-color: #234f99 !important; }
+  ::ng-deep .mat-mdc-select-arrow { color: #234f99 !important; }
 }
 
-.config-background {
-  background-color: white !important;
-  border-radius: 1rem;
+:host #mainCtr {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  box-sizing: border-box;
 }
 
-.appTitle {
-  font-size: 1em;
-  color: var(--base-color);
+.row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0 !important;
+  margin: 0 -8px !important;
 }
 
-.appIcon {
-  color: var(--base-color);
-  height: auto;
-  width: auto;
+.col-4 {
+  flex: 0 0 33.33% !important;
+  max-width: 28% !important;
+  padding: 8px !important;
+  box-sizing: border-box !important;
 }
 
-.app-createBtn {
-  background-color: var(--base-color) !important;
-  color: white !important;
+@media (max-width: 992px) {
+  .col-4 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
 }
 
-.icons {
-  float: right;
-  color: grey;
-  size: 7em;
-  padding: 2px;
+@media (max-width: 600px) {
+  .col-4 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
 }
 
-.icons:hover {
-  color: var(--base-color);
+// ── Card ──────────────────────────────────────────────────────────────────────
+
+.mat-mdc-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+  overflow: visible !important;
+  position: relative !important;
+  min-height: 160px !important;
+  display: flex !important;
+  flex-direction: column !important;
+
+  &:hover,
+  &.is-hovered {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 28px rgba(35, 79, 153, 0.22) !important;
+    border-color: #234f99 !important;
+  }
+
+  &:hover .lfx-card-header,
+  &.is-hovered .lfx-card-header {
+    color: #234f99 !important;
+  }
 }
 
-::ng-deep.aip-app-hover-detail {
-  box-shadow: 0px 2px 25px rgba(0, 0, 0, 25%);
-  display: none;
-  cursor: pointer;
-  position: absolute;
-  top: -3rem;
-  z-index: 10000;
-  right: 2.2rem;
-  background-color: white;
-  text-wrap: balance;
-  border-radius: 1rem;
-  width: 23rem;
-  text-align: center;
-  word-break: break-all;
-}
-::ng-deep.aip-app-hover-avatar:hover ~ .aip-app-hover-detail {
-  display: block;
-  transition: display 1s ease-out 0.5s;
-}
-::ng-deep.aip-app-hover-detail::after {
-  content: "";
-  position: absolute;
-  bottom: -10px;
-  left: 90%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 32px solid transparent;
-  border-right: 0 solid transparent;
-  border-top: 10px solid white;
+// ── Main content row — title/desc LEFT, image RIGHT ───────────────────────────
+
+.main-card-div {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  padding: 0 0 8px !important;
+  margin: 0 !important;
 }
 
-::ng-deep .mat-mdc-menu-item:hover {
-  background-color: #e3f2fd !important; /* Light blue background */
-  color: #0094ff !important; /* Change text color */
+.card-text-col {
+  flex: 1 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  // text stays on the left
+  order: 1 !important;
 }
 
-::ng-deep .mat-mdc-menu-item {
-  font-size: 1.2rem !important; /* or any size you prefer */
+// Image pushed to the right
+.card-image-col {
+  flex: 0 0 90px !important;
+  width: 90px !important;
+  height: 90px !important;
+  overflow: hidden !important;
+  border-radius: 10px !important;
+  background: rgba(99, 102, 241, 0.07) !important;
+  border: 1px solid rgba(99, 102, 241, 0.12) !important;
+ // display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+ // padding: 6px !important;
+  order: 2 !important;
+  margin-left: auto !important;
+  transition: width 0.25s ease, height 0.25s ease, opacity 0.25s ease !important;
+  transform-origin: top right !important;
 }
 
-.lfx-card-header {
-  text-align: left;
-  font: normal normal 600 14px/20px "Roboto", "Segoe UI", sans-serif !important;
-  letter-spacing: 0px;
-  color: #000000;
-  opacity: 1;
+.is-hovered .card-image-col {
+  width: 70px !important;
+  height: 70px !important;
+  opacity: 0.85 !important;
+ // padding: 6px !important;
 }
 
 .lfx-card-image {
-  width: 100px;
-  height: 80px;
-  min-width: 100px;
-  max-width: 100px;
-  background: transparent no-repeat padding-box;
-  border-radius: 20%; // Rectangle shape with more pronounced rounded corners
-  opacity: 1;
-  transition: width 0.3s, height 0.3s, border-radius 0.3s;
+  width: 100% !important;
+  height: 100% !important;
+//   object-fit: contain !important;
+  border-radius: 6px !important;
+  display: block !important;
+  transition: all 0.25s ease !important;
 }
 
-.lfx-card-image:hover {
-  width: 100px;
-  height: 80px;
-  border-radius: 16px;
+.mat-card-header-transition {
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-.lfx-main-card {
-  top: 255px;
-  left: 86px;
-  width: 364px;
-  height: 199px;
-  border: 1px solid var(---efefef);
-  background: #ffffff 0% 0% no-repeat padding-box;
-  box-shadow: 0px 2px 4px #00000029;
-  border: 1px solid #efefef;
-  border-radius: 16px;
-  opacity: 1;
+.mat-mdc-card-content {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.mat-mdc-card-actions {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.lfx-card-header {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  margin: 0 !important;
+  line-height: 1.3 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  transition: color 0.22s ease !important;
 }
 
 .lfx-app-description {
- color: #737373;
-text-align: left;
-font: normal normal normal 12px/20px "Roboto", "Segoe UI", sans-serif !important;
-letter-spacing: 0px;
-color: #737373;
-opacity: 1;
-margin-left: -12px !important;
+  font-size: 12px !important;
+  color: #64748b !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
 }
 
-.mat-action-button-s {
-  color: #ffffff !important;
-  background-color: #ebf1f6 !important;
-  height: 26px !important;
-  min-height: 26px !important;
-  font-size: 14px !important;
-  line-height: 2.2;
-  font-weight: 500;
-  letter-spacing: 0px;
-  font-family: "Roboto", "Segoe UI", sans-serif !important;
-  background: transparent
-    linear-gradient(90deg, var(---0052cc) 0%, #0094ff 100%) 0% 0% no-repeat
-    padding-box;
-  background: transparent linear-gradient(90deg, #0052cc 0%, #0094ff 100%) 0% 0%
-    no-repeat padding-box;
+// ── Actions overlay (fixed bottom bar, slides up) ─────────────────────────────
+
+.card-actions-overlay {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  //background: rgba(241, 245, 254, 0.97) !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.07) !important;
+  padding: 8px 14px !important;
+  transform: translateY(100%) !important;
+  opacity: 0 !important;
+  transition: transform 0.25s ease, opacity 0.2s ease !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+
 }
 
-// Card actions
-mat-card-actions.card-actions-hover {
-  transition: opacity 0.2s;
-  padding: 0 0 22px 0 !important;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  width: 100% !important;margin-bottom: -20px;
-
-  .overview-btn {
-    margin-right: 50px;    
-  }
-
-  .button-placeholder {
-    width: 140px;
-    margin-right: 50px;
-  }
-
-  .avatar-container {
-    position: relative;
-
-
-    .aip-hover-detail {
-      position: absolute;
-      display: none;
-      background-color: white;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      padding: 8px;
-      border-radius: 4px;
-      z-index: 10;
-      min-width: 120px;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    &:hover .aip-hover-detail {
-      display: block;
-    }
-  }
+.is-hovered .card-actions-overlay {
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  
 }
 
-.aip-more-actions-icon {
-  font-size: 24px;
-  padding: 0;
-  color: #a5aaad;
-  font-weight: 300;
-  transition: color 0.2s ease;
+.card-actions-hover {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: 38px !important;
+}
 
-  &.aip-icon-hover {
-    color: #0094ff;
+// ── Overview button — matches aip-card's view-details-btn (outlined) ──────────
+
+.overview-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 30px !important;
+  padding: 0 14px !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(35, 79, 153, 0.4) !important;
+  color: #234f99 !important;
+  background: linear-gradient(135deg, rgba(35, 79, 153, 0.12) 0%, rgba(35, 79, 153, 0.08) 100%) !important;
+  box-shadow: 0 2px 6px rgba(35, 79, 153, 0.15) !important;
+  transition: box-shadow 0.2s, transform 0.15s !important;
+  flex-shrink: 0 !important;
+  cursor: pointer !important;
+  font-family: "Inter", "Roboto", sans-serif !important;
+
+  &:hover {
+    background: rgba(35, 79, 153, 0.18) !important;
+    box-shadow: 0 4px 14px rgba(35, 79, 153, 0.3) !important;
+    transform: translateY(-1px) !important;
   }
 }
 
-
-  .lfx-c-avatar {
-    background: #d1ecff;
-    color: #0094ff;
-    border-radius: 50%;
-    text-align: center;
-    vertical-align: middle;
-    font-weight: 500;
-    font-family: "Roboto", "Segoe UI", sans-serif !important;
-    font-style: normal;
-    float: left;
-    width: 30px !important;
-    height: 30px !important;
-    font-size: 14px;
-    padding-top: 5px;
-  }
-
-
-
-
-  .pagination-container {
-  margin: 0.5rem 0;
-
-  .paginator-buttons {
-    width: 100%;
-  }
-
-  .pages-details {
-    display: flex;
-  }
-
-  .pagination-arrow {
-    cursor: pointer;
-    padding: 4px;
-    color: #737373;
-
-    &.disabled {
-      color: #cccccc;
-      cursor: unset;
-    }
-
-    &.active {
-      color: #0094ff;
-    }
-  }
-
-  .page-numbers {
-    display: flex;
-
-    .pg {
-      margin: 4px;
-      width: 24px !important;
-      height: 24px !important;
-      padding-left: 8px !important;
-      padding-right: 8px !important;
-      padding-top: 2px !important;
-      padding-bottom: 3px !important;
-      font-size: 1.4rem;
-      font-weight: 400;
-      font-family: "Roboto", "Segoe UI", sans-serif !important;
-      font-style: normal;
-      box-shadow: 0px 2px 4px #00000029;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-
-      &.selected-page {
-        background-color: #0052cc;
-        color: white;
-      }
-
-      &.hover:not(.selected-page) {
-        background-color: #f0f0f0;
-      }
-    }
-  }
-}
-
-
-.apps-container {
-  width: 100%;
-  position: relative;
-}
-
-.lfx-u-mar-l-80{
-margin-left: 80px !important;
-}
-
-.card-content-wrapper {
-  position: relative;
-  height: 100%;
-}
-
-.card-actions-container {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(40px);
-  transition: opacity 0.2s, transform 0.2s;
-  z-index: 2;
-}
-
-// Show actions on hover of the card
-mat-card:hover .card-actions-container,
-.card-actions-container:hover {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-  margin-left: 5px !important;
-}
-
-.embed_option {
-  color: #5b99f6;
-  background-color: none !important;
-}
+// ── Open-App icon button ───────────────────────────────────────────────────────
 
 .button-hover {
-   width: 20% !important;
-  cursor: pointer;
-  width: auto;
-  height: auto;
-  background-color: transparent !important; color: inherit !important;
+  color: #64748b !important;
+  height: 34px !important;
+  width: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+
+  .embed_option {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  &:hover {
+    background: rgba(35, 79, 153, 0.1) !important;
+    color: #234f99 !important;
+  }
 }
 
-::ng-deep .mat-mdc-tooltip {
-  margin-bottom: 12px !important;
+// ── Avatar — matches aip-card's avatar color scheme ───────────────────────────
+
+.aip-cursor {
+  display: flex !important;
+  align-items: center !important;
+  position: relative !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+
+  &:hover .aip-hover-detail {
+    display: block !important;
+  }
 }
 
-::ng-deep .button-hover .mat-mdc-tooltip {
-  margin-bottom: -10px !important;
+.lfx-c-avatar {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  flex-shrink: 0 !important;
 }
 
-.action-icon{
-  font-size: 22px !important; padding: 3px !important; color: #a5aaad !important; font-weight: 300 !important;
+// Avatar — matches connections card (aip-card) light theme style
+.aip-hover-avatar {
+  box-shadow: none !important;
+
+  color: #234f99 !important;
+    background: rgba(99, 102, 241, 0.1) !important;
+    border-color: rgba(99, 102, 241, 0.2) !important;
 }
 
-.w-30{
-  width: 30% !important;
+.aip-hover-detail {
+  display: none !important;
+  position: absolute !important;
+  bottom: calc(100% + 8px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #041531  !important;
+  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+  color: #3b82f6  !important;
+  padding: 5px 12px !important;
+  border-radius: 6px !important;
+  white-space: nowrap !important;
+  font-size: 12px !important;
+  z-index: 1000 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
 }
 
-.w-15{
-  width: 15% !important;
+// ── More-vert icon — matches aip-card's aip-more-actions-icon ────────────────
+
+.dropdown {
+  display: flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
 }
 
-.w-20{
-  width: 20% !important;
+.action-icon {
+  color: #64748b !important;
+  transition: color 0.15s, background 0.15s !important;
+  padding: 4px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-size: 20px !important;
+  width: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+
+  &:hover {
+    color: #234f99 !important;
+    background: rgba(35, 79, 153, 0.1) !important;
+  }
 }
 
-.overview{
-  height: 28px !important; width: 34% !important;
+// ── Light Theme ────────────────────────────────────────────────────────────────
+
+:host-context(body.header-light-theme) {
+  .mat-mdc-card {
+    &:hover,
+    &.is-hovered {
+      border-color: #234f99 !important;
+      box-shadow: 0 10px 28px rgba(35, 79, 153, 0.22) !important;
+    }
+
+    &:hover .lfx-card-header,
+    &.is-hovered .lfx-card-header {
+      color: #234f99 !important;
+    }
+  }
+
+  .overview-btn {
+    border-color: rgba(35, 79, 153, 0.4) !important;
+    color: #234f99 !important;
+    background: linear-gradient(135deg, rgba(35, 79, 153, 0.1) 0%, rgba(35, 79, 153, 0.06) 100%) !important;
+    &:hover {
+      background: rgba(35, 79, 153, 0.16) !important;
+      box-shadow: 0 4px 14px rgba(35, 79, 153, 0.28) !important;
+      border-color: #234f99 !important;
+    }
+  }
+
+  .button-hover {
+    &:hover {
+      background: rgba(35, 79, 153, 0.1) !important;
+      color: #234f99 !important;
+    }
+  }
+
+  .action-icon {
+    &:hover {
+      color: #234f99 !important;
+      background: rgba(35, 79, 153, 0.1) !important;
+    }
+  }
+
+  .aip-hover-avatar {
+    background: rgba(35, 79, 153, 0.08) !important;
+    border-color: rgba(35, 79, 153, 0.2) !important;
+    color: #234f99 !important;
+    box-shadow: none !important;
+  }
+
+  .aip-hover-detail {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(35, 79, 153, 0.2) !important;
+    color: #234f99 !important;
+    box-shadow: 0 4px 16px rgba(35, 79, 153, 0.15) !important;
+  }
 }
 
-.mat-card-header-transition{
-  padding: 0 !important; width: 95%; height: 100%;height:30% ;transition: height 0.2s;
+// ── Dark Theme ─────────────────────────────────────────────────────────────────
+
+:host-context(body.header-dark-theme) {
+  // 4-side gradient border on hover
+  .mat-mdc-card {
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      border: 2px solid transparent;
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 35%, #818cf8 65%, #3b82f6 100%) border-box;
+      -webkit-mask:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(#fff 0 0);
+      mask:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    &:hover::after,
+    &.is-hovered::after {
+      opacity: 1;
+    }
+  }
+
+  .mat-mdc-card {
+    background: #041531 !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+    min-height: 160px !important;
+    overflow: hidden !important;
+    position: relative !important;
+
+    // Dark/black hover shadow — no blue glow
+    &:hover,
+    &.is-hovered {
+      transform: translateY(-3px) !important;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6) !important;
+      border-color: rgba(59, 130, 246, 0.35) !important;
+    }
+  }
+
+  .lfx-card-header {
+    color: #e2e8f0 !important;
+  }
+
+  .lfx-app-description {
+    color: #94a3b8 !important;
+  }
+
+  .lfx-card-image {
+    opacity: 0.95 !important;
+  }
+
+  .card-image-col {
+    background: rgba(59, 130, 246, 0.1) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  }
+
+  // Dark actions overlay — matches aip-card dark bottom bar
+  .card-actions-overlay {
+    background: #010711 !important;
+    border-top: 1px solid rgba(59, 130, 246, 0.2) !important;
+  }
+
+  // Overview — matches aip-card's dark view-details-btn (outlined)
+  .overview-btn {
+    background: #041531 !important;
+    color: #3b82f6 !important;
+    border: 1px solid #3b82f6 !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important;
+
+    &:hover {
+      background: rgba(59, 130, 246, 0.12) !important;
+      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4) !important;
+      border-color: #60a5fa !important;
+    }
+  }
+
+  .button-hover {
+    color: #94a3b8 !important;
+
+    .embed_option {
+      color: #94a3b8 !important;
+    }
+
+    &:hover {
+      background: rgba(59, 130, 246, 0.15) !important;
+      color: #3b82f6 !important;
+
+      .embed_option {
+        color: #3b82f6 !important;
+      }
+    }
+  }
+
+  // Avatar — dark theme matches connections card
+  .aip-hover-avatar {
+    background: rgba(99, 102, 241, 0.14) !important;
+    color: #a5b4fc !important;
+    box-shadow: none !important;
+    border-color: rgba(129, 140, 248, 0.25) !important;
+  }
+
+  .aip-hover-detail {
+    background: rgba(15, 23, 42, 0.97) !important;
+    border-color: rgba(99, 102, 241, 0.2) !important;
+    color: #e2e8f0 !important;
+  }
+
+  // more_vert — matches aip-card's aip-more-actions-icon dark color
+  .action-icon {
+    color: #3b82f6 !important;
+
+    &:hover {
+      color: #2563eb !important;
+      background: rgba(59, 130, 246, 0.15) !important;
+    }
+  }
+
+  ::ng-deep .mat-mdc-menu-panel {
+    background: #0f172a !important;
+
+    .mat-mdc-menu-item {
+      color: #e2e8f0 !important;
+
+      mat-icon {
+        color: #94a3b8 !important;
+      }
+
+      &:hover {
+        background: rgba(59, 130, 246, 0.1) !important;
+
+        mat-icon {
+          color: #3b82f6 !important;
+        }
+      }
+    }
+  }
 }
-
-.main-card-div{
-  margin-bottom: 2% !important; height: 100% !important
-}
-
-.mat-button-radius {
-  border-radius: 16px !important;
-}
-
-

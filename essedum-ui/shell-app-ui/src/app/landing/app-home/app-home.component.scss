@@ -1,55 +1,126 @@
-.row {
-    display: flex;
-    padding: 2rem 0px;
-    min-height: 30%;
-    box-sizing: border-box;
-}
+:host { display: block !important; width: 100%; padding: 20px 24px; box-sizing: border-box; }
 
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-mat-mdc-button-toggle{
-    color: black;
-}
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-.mat-mdc-button-toggle-checked{
-    background-color: var(--base-color)!important;
-    color: white !important;
-}
-
-
-::ng-deep  .le-c-card.mat-mdc-card:hover .lfx-u-header-xl {
-    color:var(--base-color);
-}
-
-.lfx-u-header-xl{
-	font-size: 18px !important;
-}
-
-.lfx-u-text-neutral-80{
-    font-size: 14px !important;
-    color:#737373 !important;
-}
-
-.lfx-u-header-xxl{
-    font-size: 24px !important;
-}
-
-::ng-deep .le-c-card.mat-mdc-card .mat-mdc-card-actions .le-c-btn--text:first-child{
-    font-size: 14px !important;
-    color: var(--base-color);
+// ── Page header ──────────────────────────────────────────────────────────
+h1.lfx-u-header-xxl {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #e2e8f0 !important;
+  margin-bottom: 8px !important;
+  letter-spacing: -0.3px;
 }
 
 hr {
-    color: black !important;
-    border-top: 1px solid !important;
+  border: none;
+  border-top: 1px solid rgba(79,142,247,0.12) !important;
+  margin: 0 0 16px 0 !important;
 }
 
+// ── App cards ────────────────────────────────────────────────────────────
+mat-card, .mat-mdc-card {
+  background: rgba(8,14,36,0.85) !important;
+  border: 1px solid rgba(79,142,247,0.16) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset !important;
+  overflow: hidden !important;
+  position: relative !important;
+  padding: 0 !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
 
-  .lfx-u-text-primary-80 {
-    color: #0052cc;
+  &::before {
+    content: '';
+    display: block;
+    height: 3px;
+    background: linear-gradient(90deg, #4f8ef7 0%, #7c3aed 55%, #4f46e5 100%);
+    border-radius: 14px 14px 0 0;
+    flex-shrink: 0;
   }
 
-.lfx-c-card__container-left {
-    float: left;
-    width: 80%;
+  &:hover {
+    border-color: rgba(79,142,247,0.32) !important;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 4px 12px rgba(79,142,247,0.1) !important;
   }
+}
+
+// ── Module type label ─────────────────────────────────────────────────────
+.lfx-u-text-primary-80 {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #4f8ef7 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  padding: 14px 16px 0 !important;
+}
+
+mat-card-header { padding: 8px 16px 0 !important; }
+
+mat-card-title h2.lfx-u-header-xl {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #e2e8f0 !important;
+  margin: 0 !important;
+  letter-spacing: -0.2px;
+}
+
+mat-card-content {
+  padding: 8px 16px !important;
+
+  p.lfx-u-body-md { font-size: 13px !important; color: #7a9cbf !important; line-height: 1.5; margin: 0 !important; }
+  p.lfx-u-text-neutral-80 { color: #7a9cbf !important; }
+}
+
+mat-card-actions {
+  padding: 10px 16px 14px !important;
+  border-top: 1px solid rgba(79,142,247,0.08) !important;
+
+  button[mat-raised-button] {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 6px 18px !important;
+    box-shadow: 0 3px 12px rgba(79,70,229,0.4) !important;
+    border: none !important;
+    transition: box-shadow 0.18s, transform 0.15s !important;
+    &:hover { box-shadow: 0 5px 20px rgba(79,70,229,0.55) !important; transform: translateY(-1px) !important; }
+  }
+}
+
+// ── Light theme ───────────────────────────────────────────────────────────
+:host-context(body.header-light-theme) {
+  h1.lfx-u-header-xxl { color: #0f172a !important; }
+  hr { border-top-color: rgba(99,102,241,0.12) !important; }
+
+  mat-card, .mat-mdc-card {
+    background: #ffffff !important;
+    border-color: rgba(99,102,241,0.16) !important;
+    box-shadow: 0 8px 32px rgba(99,102,241,0.1), 0 2px 8px rgba(0,0,0,0.05) !important;
+
+    &::before { background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 60%, #4f46e5 100%); }
+    &:hover { border-color: rgba(99,102,241,0.3) !important; box-shadow: 0 12px 40px rgba(99,102,241,0.15) !important; }
+  }
+
+  .lfx-u-text-primary-80 { color: #4f46e5 !important; }
+  mat-card-title h2.lfx-u-header-xl { color: #0f172a !important; }
+  mat-card-content p.lfx-u-body-md,
+  mat-card-content p.lfx-u-text-neutral-80 { color: #64748b !important; }
+
+  mat-card-actions {
+    border-top-color: rgba(99,102,241,0.1) !important;
+    button[mat-raised-button] { background: #4f46e5 !important; box-shadow: 0 3px 12px rgba(79,70,229,0.3) !important; }
+  }
+}
+
+// ── Dark theme ────────────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
+  h1.lfx-u-header-xxl { color: #e2e8f0 !important; }
+
+  mat-card, .mat-mdc-card {
+    background: rgba(8,14,36,0.85) !important;
+    border-color: rgba(79,142,247,0.16) !important;
+  }
+
+  mat-card-title h2.lfx-u-header-xl { color: #e2e8f0 !important; }
+  mat-card-content p.lfx-u-body-md,
+  mat-card-content p.lfx-u-text-neutral-80 { color: #7a9cbf !important; }
+}
