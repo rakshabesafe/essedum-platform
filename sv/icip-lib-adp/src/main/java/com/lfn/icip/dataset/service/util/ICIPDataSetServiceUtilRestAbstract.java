@@ -85,7 +85,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.Base64Utils;
+import java.util.Base64;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.google.api.client.http.HttpTransport;
@@ -508,7 +508,7 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 			Mac mac = Mac.getInstance(algorithm);
 			mac.init(secretKeySpec);
 			byte[] encRes = mac.doFinal(data.getBytes());
-			String authCode = new String(Base64Utils.encode(encRes));
+			String authCode = new String(Base64.getEncoder().encode(encRes));
 			String authPrefix = authDetailsObj.optString("authPrefix");
 			if (headers.isEmpty())
 				headers = "[]";
@@ -1524,7 +1524,7 @@ public abstract class ICIPDataSetServiceUtilRestAbstract extends ICIPDataSetServ
 						logger.error(e.getMessage());
 					}
 					byte[] encRes = mac.doFinal(data.getBytes());
-					String authCode = new String(Base64Utils.encode(encRes));
+					String authCode = new String(Base64.getEncoder().encode(encRes));
 					String authPrefix = authDetailsObj.optString("authPrefix");
 					if (headers.isEmpty())
 						headers = "[]";
