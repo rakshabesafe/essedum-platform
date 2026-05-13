@@ -1,105 +1,90 @@
-.flexdivrow {
-    display: flex;
-    flex-flow: wrap;
-    flex-direction: row;
-    white-space: pre-wrap;
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+.modal-header {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  padding: 10px 16px !important;
+  border-bottom: none !important;
+  gap: 8px !important;
+}
+
+.copy-icon, .close-icon {
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  cursor: pointer !important;
+  color: #c9d1d9 !important;
+  transition: color 0.15s !important;
+  &:hover { color: #58a6ff !important; }
+}
+
+.modal-body { padding: 16px !important; }
+
+.hidden-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .space {
-    margin: 25px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: none !important;
+
+  h3 {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #8b949e !important;
+    margin: 0 !important;
+    min-width: 140px;
+  }
+
+  .line-wrap {
+    font-size: 13px !important;
+    color: #e6edf3 !important;
+    word-break: break-all;
+    font-family: monospace;
+  }
 }
 
-.mat-mdc-dialog-container {
-    padding: 0px !important;
+.content-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+
+  > div {
+    padding: 8px 12px;
+    background: rgba(88,166,255,0.04);
+    border-radius: 8px;
+    border: 1px solid rgba(88,166,255,0.1);
+
+    h3 { font-size: 11px !important; font-weight: 600 !important; color: #8b949e !important; margin: 0 0 4px !important; }
+  }
 }
 
-.mat-expansion-panel-header{
-   // background-color: white !important;
-    height: 64px;
+.id { color: #c9d1d9 !important; font-size: 12px !important; }
+.content-width { min-width: 140px; }
+
+.tabpadding { padding: 12px !important; }
+.flexdivcolumn { display: flex; flex-direction: column; gap: 12px; }
+
+::ng-deep mat-expansion-panel {
+  background: rgba(88,166,255,0.03) !important;
+  border: 1px solid rgba(88,166,255,0.12) !important;
+  border-radius: 8px !important;
 }
+::ng-deep .mat-expansion-panel-header { background: rgba(88,166,255,0.1) !important; border-radius: 8px !important; }
+::ng-deep .mat-panel-title { color: #e6edf3 !important; font-weight: 600 !important; }
 
-::ng-deep{
-   .h3,h3{
-    font-size: 1.28rem;
-    font-weight: 500;
-   }
-}
-
-.totheright {
-    display: flex;
-    justify-content: flex-end;
-    margin: 20px 4% 5px 0px;
-}
-
-.marginright {
-    margin-right: 15px !important;
-}
-
-
-.flexdivcolumn{
-    margin: auto;
-    width: 90%;
-}
-
-.hidden-details{
-    margin-top: 5px;
-    width: 95%;
-    margin: auto;
-}
-
-.icon{
-    font-size: xxx-large;
-    line-height: 0.8;
-}
-
-.content-group{
-    margin: 25px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.footer-content{
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-}
-
-.id{
-    color:gray;
-    margin-bottom: 10px;
-}
-
-.content-width{
-    width: 200px;
-}
-
-.line-space{
-    line-height: 20px !important;
-}
-
-.line-wrap{
-    word-break: break-word;
-}
-
-i{
-    cursor: pointer;
-}
-
-.icon-data-wrap{
-    display: flex;
-}
-
-.selector-769-1 {
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-}
-
-.modal-header.selector-769-2 {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: #fff;
-  padding: 6px;
-  
+body.header-light-theme {
+  .space h3 { color: #64748b !important; }
+  .space .line-wrap { color: #0f172a !important; }
+  .content-group > div { background: rgba(71,66,220,0.03); border-color: rgba(71,66,220,0.1); h3 { color: #64748b !important; } }
+  .id { color: #334155 !important; }
+  .copy-icon, .close-icon { color: #64748b !important; &:hover { color: #4742dc !important; } }
+  ::ng-deep .mat-expansion-panel-header { background: rgba(71,66,220,0.08) !important; }
+  ::ng-deep .mat-panel-title { color: #0f172a !important; }
 }

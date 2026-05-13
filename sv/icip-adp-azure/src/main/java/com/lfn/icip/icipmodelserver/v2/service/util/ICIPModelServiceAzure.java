@@ -594,7 +594,8 @@ public class ICIPModelServiceAzure implements IICIPModelServiceUtil {
 				logger.error("Exception:" + e.getMessage());
 			}
 		} catch (IOException e) {
-			throw new IOException(e.getMessage());
+			logger.error("Azure model service I/O error", e);
+			throw new IOException("Failed to process Azure model service request");
 		}
 		return saveModel;
 	}

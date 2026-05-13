@@ -94,7 +94,7 @@ public class AzureServer implements FileServerUtil {
 		if (sslContext != null) {
 			OkHttpClient customHttpClient = new OkHttpClient.Builder()
 					.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0])
-					.hostnameVerifier((hostname, session) -> true).build();
+					.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE).build();
 
 			HttpClient httpClient = new OkHttpAsyncHttpClientBuilder(customHttpClient).build();
 			try {

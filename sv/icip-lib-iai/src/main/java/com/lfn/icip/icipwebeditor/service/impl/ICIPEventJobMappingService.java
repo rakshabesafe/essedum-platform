@@ -17,6 +17,7 @@ package com.lfn.icip.icipwebeditor.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -483,8 +484,8 @@ public class ICIPEventJobMappingService implements IICIPEventJobMappingService {
 			if (name.contains("generateScript") && remoteScript.equals("true")) {
 				JsonObject paramsObj = gson.fromJson(params, JsonObject.class);
 
-				File scriptPath = new File(paramsObj.get("scriptPath").getAsString());
-				
+				File scriptPath = PathValidationUtil.validatePath(paramsObj.get("scriptPath").getAsString());
+
 				Git git = null;
 				Boolean result = false;
 				

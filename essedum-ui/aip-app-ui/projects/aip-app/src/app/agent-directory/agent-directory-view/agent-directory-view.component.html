@@ -1,45 +1,23 @@
-<div class="row">
-  <div class="col-lg-12">
-    <div class="lfx-l-level1-middle-col">
-      <div class="lfx-l-level2-middle-ctr">
-        <div class="lfx-l-level2-middle-col">
-          <div class="align-items-center justify-content-between d-flex">
-            <div class="selector-model-title-head d-flex align-items-center">
-              <span style="cursor: pointer;">
-                &nbsp; &nbsp;&nbsp;
-                <mat-icon class="aip-led-icons" (click)="navigateBack()"
-                  [ngStyle]="{'color': isBackHovered ? '#0094ff' : '#0a142f'}" matTooltip="Back"
-                  matTooltipPosition="above" (mouseenter)="isBackHovered = true"
-                  (mouseleave)="isBackHovered = false">arrow_back</mat-icon> &nbsp;
-              </span>
-              <span class="aip-desc-title lfx-u-header-xxl">
-                <span style="color: #737373">Agent Directory:
-                </span>{{agentData.alias}}
-              </span>
-            </div>
-            <div class="selector-model-title-tail">
-              <ul class="d-flex justify-content-between align-items-center py-2 px-4">
-              </ul>
-            </div>
-          </div>
-          <div class="lfx-u-mar-t-16 mx-4 px-5 my-4 mt-0 aip-panel-shadow" style="background-color: white">
-            <mat-tab-group disableRipple>
+<div class="view-container">
+  <!-- Header -->
+  <div class="view-header">
+    <div class="header-left">
+      <span style="cursor: pointer;">
+        <mat-icon class="aip-led-icons" (click)="navigateBack()"
+          [ngStyle]="{'color': isBackHovered ? '#0094ff' : 'inherit'}" matTooltip="Back"
+          matTooltipPosition="above" (mouseenter)="isBackHovered = true"
+          (mouseleave)="isBackHovered = false">arrow_back</mat-icon>
+      </span>
+      <span class="aip-desc-title">
+        <span class="title-prefix">Agent Directory:</span> {{agentData.alias}}
+      </span>
+    </div>
+  </div>
 
-              <mat-tab label="General " class="lfx-u-header-xl">
-                <div class="tab-content selector-764-41 mb-5">
-                  <!-- Top section with run type selector -->
-                  <div class="col-md-12">
-                    <div class="d-flex">
-                      <app-general class="col-md-12" [agentData]="agentData"> </app-general>
-                    </div>
-                  </div>
-                </div>
-              </mat-tab>
-         
-            </mat-tab-group>
-          </div>
-        </div>
-      </div>
+  <!-- Body: main content + side nav -->
+  <div class="view-body">
+    <div class="view-panel">
+      <app-general class="general-block" [agentData]="agentData"></app-general>
     </div>
   </div>
 </div>

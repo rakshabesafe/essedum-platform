@@ -2482,8 +2482,8 @@ public class ICIPDatasetController {
     		ICIPDatasetIdsml result = idsmlService.saveIdsmlData(datasetId, org, toSave, idsmlData);
         	return ResponseEntity.status(200).body(new JSONObject(result).toString());
     	} catch (Exception e) {
-			logger.error(e.getMessage());
-			return ResponseEntity.status(500).body(e.getMessage());
+			logger.error("Error saving IDSML data", e);
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
     	}
     }
 	
@@ -2495,8 +2495,8 @@ public class ICIPDatasetController {
     		ICIPDatasetIdsml result = idsmlService.updateIdsmlData(datasetId, org, toSave, idsmlData);
         	return ResponseEntity.status(200).body(new JSONObject(result).toString());
     	} catch (Exception e) {
-			logger.error(e.getMessage());
-			return ResponseEntity.status(500).body(e.getMessage());
+			logger.error("Error updating IDSML data", e);
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
     	}
     }
 	
@@ -2507,8 +2507,8 @@ public class ICIPDatasetController {
 			List<ICIPDatasetIdsml> result = idsmlService.getChartListByDataset(datasetId, org);
 			return ResponseEntity.status(200).body(new JSONArray(result).toString());
 		} catch (Exception e) {
-			logger.error(e.getMessage());
-			return ResponseEntity.status(500).body(e.getMessage());
+			logger.error("Error listing stories", e);
+			return ResponseEntity.status(500).body("{\"error\": \"An internal error occurred. Please try again later.\"}");
 		}
 	}
 	@PostMapping(path = "/jobExecutor")

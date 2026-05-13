@@ -30,6 +30,7 @@ export class VibeRightPanelComponent implements OnInit, OnDestroy {
   tokenizedLines: SafeHtml[] = [];
   deploymentStatus: 'idle' | 'deploying' | 'success' | 'error' = 'idle';
   deploymentResult: any = null;
+  deploymentSafeUrl: SafeResourceUrl | null = null;
   private selectedExt = '';
 
   private expandedDirs = new Set<string>();
@@ -102,7 +103,12 @@ export class VibeRightPanelComponent implements OnInit, OnDestroy {
 
     this.vibeService.deploymentResult$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((result) => (this.deploymentResult = result));
+      .subscribe((result) => {
+        this.deploymentResult = result;
+        this.deploymentSafeUrl = (result && this.isDeploymentUrl(result))
+          ? this.sanitizer.bypassSecurityTrustResourceUrl(result as string)
+          : null;
+      });
   }
 
   // ─── Tree building ──────────────────────────────────────────────────────────

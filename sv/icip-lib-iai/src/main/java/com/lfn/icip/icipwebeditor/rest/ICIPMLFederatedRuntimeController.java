@@ -6,6 +6,7 @@ import com.lfn.icip.icipwebeditor.model.PortPayload;
 import com.lfn.icip.icipwebeditor.model.ValidatePorts;
 import com.lfn.icip.icipwebeditor.model.dto.ICIPRuntimeParams;
 import com.lfn.icip.icipwebeditor.service.impl.ICIPMLFederatedRuntimeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/${icip.pathPrefix}/runtime")
 public class ICIPMLFederatedRuntimeController {
@@ -209,8 +211,7 @@ public class ICIPMLFederatedRuntimeController {
 		try {
 			s = federatedRuntimeService.deletePorts(name, org);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Error deleting ports for name: {}, org: {}", name, org, e);
 		}
 		return Map.of("Deleted", s);
 	}

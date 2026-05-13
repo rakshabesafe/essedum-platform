@@ -46,7 +46,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
 	public String[] getParameterValues(String parameter) {
 
 		/* allowParamValue is added to accept xml's for btf workflows */
-		String allowParamValue = "<\\?xml version=\"[1-9]\\.[0-9]\" encoding=\"UTF-8\".*\\?>\n<(bpmn[0-9]*:){0,1}definitions.*>[\\s\\S]*?</(bpmn[0-9]*:){0,1}definitions>";
+		String allowParamValue = "<\\?xml version=\"[1-9]\\.[0-9]\" encoding=\"UTF-8\"[^?]*\\?>\n<(?:bpmn[0-9]*:)?definitions[^>]*>[\\s\\S]*?</(?:bpmn[0-9]*:)?definitions>";
 		String[] values = super.getParameterValues(parameter);
 		if (values == null) {
 			return null;

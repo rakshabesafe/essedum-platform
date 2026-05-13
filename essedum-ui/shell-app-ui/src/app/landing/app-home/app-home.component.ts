@@ -68,16 +68,23 @@ export class AppHomeComponent implements OnInit {
     constant["keys"] = this.userProject.role_id.name + " Land";
     this.apiService.getDashConsts().subscribe(
       (res) => {
+        const navigateToDashboard = (url: string) => {
+          // Replace terminal route segment with 'dashboard' to land on dashboard first
+          const segments = url.replace(/^\.\//, '').split('/');
+          segments[segments.length - 1] = 'dashboard';
+          this.router.navigate([segments.join('/')], { relativeTo: this.route });
+        };
+
         let temp = this.userProject.user_id.user_login + " " + this.userProject.role_id.name + " USLand";
         if (res.filter((item) => item.keys == temp).length != 0) {
           constant["keys"] = temp;
           res = res.filter((item) => item.project_id.id == constant.project_id.id && item.keys == constant.keys);
           if (res && res.length > 0) {
-            this.router.navigate([res[0]["value"]], { relativeTo: this.route });
+            navigateToDashboard(res[0]["value"]);
           }
         } else if (res.filter((item) => item.keys == this.userProject.role_id.name + " Land").length != 0) {
           res = res.filter((item) => item.project_id.id == constant.project_id.id && item.keys == constant.keys);
-          this.router.navigate([res[0]["value"]], { relativeTo: this.route });
+          navigateToDashboard(res[0]["value"]);
         }
       },
       (error) => {

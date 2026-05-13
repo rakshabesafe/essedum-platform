@@ -3,7 +3,7 @@
     [multi]="false">
     <mat-expansion-panel style="margin-bottom: 10px !important">
       <mat-expansion-panel-header [collapsedHeight]="'40px'" [expandedHeight]="'40px'">
-        <mat-panel-title style="font-weight: 600; color: inherit; transition: color 0.3s, transform 0.3s;" [ngStyle]="{color: isAuthHovered ? '#0052cc' : 'black',transform: isAuthHovered ? 'translateX(12px)' : 'translateX(0)'
+        <mat-panel-title style="font-weight: 600; color: inherit; transition: color 0.3s, transform 0.3s;" [ngStyle]="{color: isAuthHovered ? '#0052cc' : 'inherit',transform: isAuthHovered ? 'translateX(12px)' : 'translateX(0)'
                                                             }" (mouseenter)="isAuthHovered = true"
           (mouseleave)="isAuthHovered = false">
           Authorization</mat-panel-title>
@@ -267,7 +267,7 @@
     " designType="3D" [hideToggle]="false" [multi]="false">
     <mat-expansion-panel style="margin-bottom: 10px !important">
       <mat-expansion-panel-header [collapsedHeight]="'40px'" [expandedHeight]="'40px'">
-        <mat-panel-title style="font-weight: 600; color: inherit; transition: color 0.3s, transform 0.3s;" [ngStyle]="{color: isPortHovered ? '#0052cc' : 'black',transform: isPortHovered ? 'translateX(12px)' : 'translateX(0)'
+        <mat-panel-title style="font-weight: 600; color: inherit; transition: color 0.3s, transform 0.3s;" [ngStyle]="{color: isPortHovered ? '#0052cc' : 'inherit',transform: isPortHovered ? 'translateX(12px)' : 'translateX(0)'
                                                             }" (mouseenter)="isPortHovered = true"
           (mouseleave)="isPortHovered = false">Ports</mat-panel-title>
       </mat-expansion-panel-header>
@@ -317,7 +317,7 @@
     <mat-expansion-panel style="margin-bottom: 10px !important">
       <mat-expansion-panel-header [collapsedHeight]="'40px'" [expandedHeight]="'40px'">
         <mat-panel-title style="font-weight: 600; color: inherit; transition: color 0.3s, transform 0.3s;" [ngStyle]="{
-            color: isHovered ? '#0052cc' : 'black',
+            color: isHovered ? '#0052cc' : 'inherit',
             transform: isHovered ? 'translateX(12px)' : 'translateX(0)'
           }" (mouseenter)="isHovered = true" (mouseleave)="isHovered = false">
           Connection Details
@@ -386,9 +386,9 @@
               </mat-form-field>
             </div>
           </div>
-          <mat-card class="row d-flex justify-content-between align-items-center lfx-u-pad-tb-16">
+          <mat-card class="row d-flex  align-items-center lfx-u-pad-tb-16">
             <div [type]="type" [headerBg]="headerBg">
-              <mat-tab-group style="width: 100%" (selectedIndexChange)="basicReqTabChange($event)">
+              <mat-tab-group style="width: 100%" mat-stretch-tabs="false" (selectedIndexChange)="basicReqTabChange($event)">
                 <mat-tab>
                   <ng-template mat-tab-label>
                     <span
@@ -624,7 +624,7 @@
     [multi]="false">
     <mat-expansion-panel style="margin-bottom: 10px !important">
       <mat-expansion-panel-header [collapsedHeight]="'40px'" [expandedHeight]="'40px'">
-        <mat-panel-title style="font-weight: 600; color: inherit; transition: color 0.3s, transform 0.3s;" [ngStyle]="{color: isSettingHovered ? '#0052cc' : 'black',transform: isSettingHovered ? 'translateX(12px)' : 'translateX(0)'
+        <mat-panel-title style="font-weight: 600; color: inherit; transition: color 0.3s, transform 0.3s;" [ngStyle]="{color: isSettingHovered ? '#0052cc' : 'inherit',transform: isSettingHovered ? 'translateX(12px)' : 'translateX(0)'
                                                             }" (mouseenter)="isSettingHovered = true"
           (mouseleave)="isSettingHovered = false">Settings</mat-panel-title>
       </mat-expansion-panel-header>

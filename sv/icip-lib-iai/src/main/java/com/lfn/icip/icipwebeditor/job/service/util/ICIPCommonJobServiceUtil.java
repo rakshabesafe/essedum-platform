@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.lfn.ai.comm.lib.util.CommandSanitizer;
 import com.lfn.ai.comm.lib.util.ICIPUtils;
 import com.lfn.ai.comm.lib.util.exceptions.EssedumException;
 import com.lfn.icip.icipwebeditor.constants.IAIJobConstants;
@@ -501,7 +502,7 @@ public abstract class ICIPCommonJobServiceUtil {
 			List<ICIPNativeJobDetails> nativeJobDetails, int index) {
 		String[] cmd;
 		String[] args = new String[2];
-		args[0] = cmds.get(index);
+		args[0] = CommandSanitizer.sanitizeArgument(cmds.get(index));
 		args[1] = "";
 		RuntimeType runtime = job.getJobs().get(index).getRuntime();
 		Path yamltempFile = nativeJobDetails.get(index).getYamltempFile();
@@ -803,7 +804,7 @@ public abstract class ICIPCommonJobServiceUtil {
 		Files.deleteIfExists(outPath);
 		Files.createFile(outPath);
 
-		ProcessBuilder pb = new ProcessBuilder(cmd[0], cmd[1], cmd[2]);
+		ProcessBuilder pb = new ProcessBuilder(cmd[0], cmd[1], CommandSanitizer.sanitizeArgument(cmd[2]));
 		pb.redirectErrorStream(true);
 		pb.redirectOutput(outPath.toFile());
 

@@ -1,111 +1,85 @@
-<div class="lfx-l-mainwrapper--login">
+<div class="lfx-l-mainwrapper--login" [class.login-dark]="isDark" [class.login-light]="!isDark">
+
+  <!-- Top header bar — same structure as main landing header -->
+  <div class="main-header-bg login-header" [ngClass]="{'header-dark': isDark, 'header-light': !isDark}">
+    <div class="responsive-main-toggle">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <img src="assets/img/essedum_icon_small.png" [alt]="essedumTitle" class="essedum-logo responsive-logo-img" />
+        <span class="responsive-title">{{ essedumTitle }}</span>
+      </div>
+      <div class="header-right-controls">
+        <button class="theme-toggle-switch" [class.is-dark]="isDark"
+          (click)="toggleTheme()"
+          [title]="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+          <span class="tgl-pill"></span>
+          <span class="tgl-opt tgl-light">&#9728; Light</span>
+          <span class="tgl-opt tgl-dark">&#9790; Dark</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="lfx-l-pageoverlay">
     <div class="lfx-l-login-mid">
-      <div id="DSA_logoMid" class="DSA_logoMid">
-        <div class="lfx-u-text-white logo-common">ESSEDUM</div>
-      </div>
-      <div class="lfx-l-login-ctr">
-        <h1 class="lfx-u-body-xxl lfx-l-login-mar">
-          Log In
-          <a
-            href="javascript:void(0)"
-            class="icon icon-inline x-16 close-icon float-end lfx-u-mar-t-16"
-            aria-label="close panel"
-          >
-            <!-- <i class="material-icons">close</i> -->
-          </a>
-        </h1>
 
-        <mat-tab-group #tabGroup>
+      <!-- Logo section -->
+      <div class="login-logo-area">
+        <div class="login-logo-icon-wrap">
+          <img src="assets/img/essedum_icon_small.png" [alt]="essedumTitle" class="login-essedum-icon" />
+        </div>
+        <div class="logo-common">{{ essedumTitle }}</div>
+      </div>
+
+      <!-- Login card -->
+      <div class="lfx-l-login-ctr">
+        <h2 class="login-card-title">Log In</h2>
+
+        <div *ngIf="userUnauthorizedAlert" class="login-error-msg">
+          <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+          {{ userUnauthorizedMsg }}
+        </div>
+
+        <mat-tab-group #tabGroup class="login-tab-group">
+
           <mat-tab label="Login As Guest User">
-            <div
-              style="
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-top: -16px;
-              "
-            >
-              <button
-                mat-raised-button
-                style="background-color: #0a142f; color: white"
-                [disabled]="false"
-                (click)="loginAsGuest()"
-                onmouseover="this.style.backgroundColor='#0094ff'; this.style.color='white';"
-                onmouseout="this.style.backgroundColor='#0a142f'; this.style.color='white';"
-                class="demoButton"
-              >
+            <div class="login-tab-content login-tab-content--guest">
+              <button mat-raised-button class="login-cta-btn" [disabled]="false" (click)="loginAsGuest()">
                 Login as Guest User
               </button>
             </div>
           </mat-tab>
 
           <mat-tab label="Login with Credentials">
-            <mat-form-field
-              appearance="outline"
-              style="width: 100%; margin-top: 6px"
-              floatLabel="always"
-            >
-              <mat-label>Username</mat-label>
-              <input
-                matInput
-                placeholder="Enter Username..."
-                [(ngModel)]="username"
-                required
-                class="lfx-fs-12"
-              />
-              <mat-error *ngIf="!username">This field is required</mat-error>
-            </mat-form-field>
-            <mat-form-field
-              appearance="outline"
-              style="width: 100%; margin-top: 6px"
-              floatLabel="always"
-            >
-              <mat-label>Password</mat-label>
-              <input
-                matInput
-                placeholder="Enter Password..."
-                type="password"
-                [(ngModel)]="psd"
-                required
-                class="lfx-fs-12"
-              />
-              <mat-error *ngIf="!psd">This field is required</mat-error>
-            </mat-form-field>
-            <div class="selector-6-18">
-              <!--Error messages can be added here if needed -->
+            <div class="login-tab-content">
+              <mat-form-field appearance="outline" class="login-field" floatLabel="always">
+                <mat-label>Username</mat-label>
+                <input matInput placeholder="Enter username..." [(ngModel)]="username" required class="lfx-fs-12" />
+                <mat-error *ngIf="!username">Username is required</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="login-field" floatLabel="always">
+                <mat-label>Password</mat-label>
+                <input matInput placeholder="Enter password..." type="password" [(ngModel)]="psd" required class="lfx-fs-12" />
+                <mat-error *ngIf="!psd">Password is required</mat-error>
+              </mat-form-field>
+
+              <div *ngIf="errorAlert" class="login-error-msg">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                {{ alertMsg }}
+              </div>
+
+              <button mat-raised-button class="login-cta-btn" [disabled]="false" (click)="dbAuthenticate()">
+                Log In
+              </button>
             </div>
-            <mat-divider></mat-divider>
-            <button
-              mat-raised-button
-              style="background-color: #0a142f; color: white"
-              class="full-width"
-              [disabled]="false"
-              (click)="dbAuthenticate()"
-              onmouseover="this.style.backgroundColor='#0094ff'; this.style.color='white';"
-              onmouseout="this.style.backgroundColor='#0a142f'; this.style.color='white';"
-            >
-              Log In
-            </button>
-            <!-- <div class="clearfix">
-              <a
-                class="float-start lfx-u-body-md DSA_purpleLink lfx-c-btn--hyperlink"
-                (click)="showResetPopup()"
-                style="cursor: pointer"
-              >
-                Forgot Password?
-              </a>
-              <span class="float-end lfx-u-body-md lfx-u-text-black">
-                                New User?
-                                <a class="DSA_purpleLink lfx-c-btn--hyperlink" (click)="goToRegUser()" style="cursor: pointer;">Register</a>
-                            </span>
-            </div> -->
           </mat-tab>
+
         </mat-tab-group>
       </div>
-      <div>
-        <app-footer></app-footer>
-      </div>
+
     </div>
   </div>
+
+  <!-- Rendered here so Angular includes it in the DOM; CSS makes it position:fixed at bottom -->
+  <app-footer></app-footer>
 </div>

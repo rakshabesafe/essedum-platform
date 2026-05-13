@@ -51,6 +51,7 @@ export class ModalConfigSchemaHeaderComponent {
   @Input() cardTitle: string = '';
   @Input() lastRefreshedTime: Date | null = null;
   @Input() showAddButton: boolean = false;
+  @Input() showSearchRefresh: boolean = true;
   @Input() tabValue: string = '';
   @Input() formListView: boolean = false;
   @Input() isRawData: boolean = false;

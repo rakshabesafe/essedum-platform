@@ -1,73 +1,91 @@
-.pagination-wrapper {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 99%;
-  background-color: white;
-  padding-bottom: 50px;
-  padding-right: 8px;
-  z-index: 100;
+:host {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
-.pagination-container {
-  margin: 0.2rem 0;
+.pagination-wrapper {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 0 6px;
+}
 
-  .paginator-buttons {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
+.pagination-container,
+.paginator-buttons {
+  display: inline-flex;
+  align-items: center;
+}
+
+// ── Bare row — no pill, no shadow ─────────────────────────────────────────────
+.pages-details {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+// ── Arrows ────────────────────────────────────────────────────────────────────
+.pagination-arrow {
+  font-size: 18px !important;
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  text-align: center;
+  color: #94a3b8;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.12s, background 0.12s;
+  flex-shrink: 0;
+
+  &.active  { color: #4f46e5; background: rgba(99, 102, 241, 0.07); }
+  &.disabled { color: #cbd5e1 !important; cursor: default; pointer-events: none; background: none !important; }
+}
+
+// ── Page numbers ──────────────────────────────────────────────────────────────
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.pg {
+  min-width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: "Inter", "Roboto", sans-serif;
+  cursor: pointer;
+  color: #64748b;
+  transition: background 0.12s, color 0.12s;
+  user-select: none;
+
+  &.hover        { background: rgba(99, 102, 241, 0.07); color: #4f46e5; }
+  &.selected-page {
+    background: #4f46e5 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    cursor: default;
+    pointer-events: none;
   }
+}
 
-  .pages-details {
-    display: flex;
-  }
-
+// ── Dark theme ────────────────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
   .pagination-arrow {
-    cursor: pointer;
-    padding: 4px;
-    margin-right: 8px;
-    color: #737373;
-
-    &.disabled {
-      color: #cccccc;
-      cursor: unset;
-    }
-
-    &.active {
-      color: #0094ff;
-    }
+    color: #475569;
+    &.active   { color: #818cf8; background: rgba(99, 102, 241, 0.1); }
+    &.disabled { color: #2d3a55 !important; }
   }
 
-  .page-numbers {
-    display: flex;
-
-    .pg {
-      margin: 4px;
-      width: 24px !important;
-      height: 24px !important;
-      display: flex !important;
-      justify-content: center !important;
-      align-items: center !important;
-      font-size: 1.4rem;
-      font-weight: 400;
-      font-family: "Roboto", "Segoe UI", sans-serif !important;
-      font-style: normal;
-      box-shadow: 0px 2px 4px #00000029;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-
-      &.selected-page {
-        background-color: #0052cc;
-        color: white;
-      }
-
-      &.hover:not(.selected-page) {
-        background-color: #f0f0f0;
-      }
-    }
+  .pg {
+    color: #475569;
+    &.hover        { background: rgba(99, 102, 241, 0.1); color: #a5b4fc; }
+    &.selected-page { background: #4f46e5 !important; color: #fff !important; }
   }
 }

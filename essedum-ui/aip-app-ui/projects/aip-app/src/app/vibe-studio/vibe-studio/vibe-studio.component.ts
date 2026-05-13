@@ -44,6 +44,7 @@ export class VibeStudioComponent implements OnInit, OnDestroy {
         filter(() => this.selectedAppType !== 'streamlit'),
       )
       .subscribe((files) => {
+        this.uploadFired = false;          // allow re-upload on every generation round
         this.pendingUploadFiles = files;
         this.tryFlushUpload();
       });
