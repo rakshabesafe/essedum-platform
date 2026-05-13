@@ -67,7 +67,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Base64Utils;
+import java.util.Base64;
 
 import com.google.gson.JsonObject;
 import com.lfn.ai.comm.lib.util.ICIPUtils;
@@ -464,7 +464,7 @@ public class ICIPDataSourceServiceUtilAzure extends ICIPDataSourceServiceUtilRes
 			Mac mac = Mac.getInstance(algorithm);
 			mac.init(secretKeySpec);
 			byte[] encRes = mac.doFinal(data.getBytes());
-			String authCode = new String(Base64Utils.encode(encRes));
+			String authCode = new String(Base64.getEncoder().encode(encRes));
 			String authPrefix = authDetailsObj.optString("authPrefix");
 			JSONArray headersArr = new JSONArray(headers);
 			JSONObject timestamp = new JSONObject();
