@@ -9,6 +9,7 @@ import { environment } from '../../environments/environment';
 export class SalusComponent implements OnInit, AfterViewInit {
   // Embedded Salus interface URL
   currentIframeUrl: SafeResourceUrl;
+  isUrlConfigured = false;
   private readonly salusUrl: string = environment.salusUrl;
 
   @ViewChild('salusIframeRef') salusIframeRef!: ElementRef<HTMLIFrameElement>;
@@ -18,7 +19,10 @@ export class SalusComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.currentIframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.salusUrl);
+    // Guard against unsubstituted build-time placeholders (e.g. __FE_SALUS_URL__).
+    this.isUrlConfigured = !!(this.salusUrl?.startsWith('http'));
+    const url = this.isUrlConfigured ? this.salusUrl : 'about:blank';
+    this.currentIframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   ngAfterViewInit(): void {

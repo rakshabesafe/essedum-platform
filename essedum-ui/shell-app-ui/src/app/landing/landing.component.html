@@ -8,12 +8,12 @@
     </mat-drawer>
     <div class="parent-div selector-3-5">
       <!--main header starts-->
-      <div class="fChild selector-3-6 main-header-bg">
+      <div class="fChild selector-3-6 main-header-bg" [ngClass]="{'header-dark': isDark, 'header-light': !isDark}">
         <!--header starts -->
         <div class="main-toggle responsive-main-toggle">
           <div style="display: flex; align-items: center;">
             <button class="sidebarBtn sidebarBigScreen selector-3-17 main-toggle-btn"
-              *ngIf="sidebar && selectedrole.name != currentrole && showSidebarMenu" mat-icon-button=""
+              *ngIf="!showTopNav && sidebar && selectedrole.name != currentrole && showSidebarMenu" mat-icon-button=""
               (click)="isexpaned()" id="sidebarexpand" aria-label="Toggle Sidebar">
               <span *ngIf="!isExpanded" class="main-toggle">
                 <img src="assets/img/icon-waffle@2x.png" alt="Expand" class="toggleIcon" />
@@ -28,16 +28,154 @@
             <span class="responsive-title" style="margin-left: 8px;">{{essedumTitle}}</span>
 
           </div>
+
+          <!-- TOP-RIGHT: theme toggle + user avatar -->
+          <div class="header-right-controls">
+            <button class="theme-toggle-switch" [class.is-dark]="isDark"
+              (click)="toggleTheme()"
+              [matTooltip]="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+              <span class="tgl-pill"></span>
+              <span class="tgl-opt tgl-light">&#9728; Light</span>
+              <span class="tgl-opt tgl-dark">&#9790; Dark</span>
+            </button>
+
+            <button mat-icon-button="" [matMenuTriggerFor]="menu" (click)="getSession()" [matTooltip]="user.user_f_name"
+              class="userMobile selector-3-80 user-profile-btn user-btn-height">
+              <span *ngIf="!profileimage"
+                [ngClass]="umargin ? 'uname1' : 'uname2'"
+                class="selector-3-82 user-avatar-initial">{{ uname | uppercase }}</span>
+              <img *ngIf="profileimage" class="imageView img-responsive selector-3-83" [src]="profileimage" alt="userimg" />
+            </button>
+
+            <mat-menu #menu="matMenu" class="projectArrow selector-3-84 profile-menu-panel">
+              <!-- Welcome header -->
+              <div mat-menu-item="" style="cursor: default; pointer-events: none;" class="selector-3-85 profile-menu-welcome">
+                <div class="d-flex align-items-center gap-2 w-100">
+                  <div class="profile-menu-avatar-lg flex-shrink-0">{{ uname | uppercase }}</div>
+                  <div class="d-flex align-items-center gap-1">
+                    <span class="profile-menu-welcome-label">Welcome</span>
+                    <b class="selector-3-88 profile-menu-welcome-name">{{ user && user.user_f_name }}</b>
+                  </div>
+                </div>
+              </div>
+
+              <div class="profile-menu-divider"></div>
+
+              <!-- Portfolio -->
+              <div *ngIf="portfoliodata?.length >= 1" (click)="$event.stopPropagation()" class="profile-menu-field-row">
+                <span class="profile-menu-field-label">Portfolio</span>
+                <mat-form-field class="profile-form-field" appearance="outline" subscriptSizing="dynamic">
+                  <mat-select [compareWith]="compareObjects" [(ngModel)]="selectedportfolio"
+                    (ngModelChange)="onSelection($event)" name="Portfolio" panelClass="profile-select-panel">
+                    <mat-option *ngFor="let item of portfoliodata; trackBy: trackByMethod" [value]="item">
+                      {{ item.portfolioName }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <!-- Project / Customer -->
+              <div *ngIf="projectList.length >= 1" (click)="$event.stopPropagation()" class="profile-menu-field-row">
+                <span class="profile-menu-field-label">{{ role1 ? 'Customer' : 'Project' }}</span>
+                <mat-form-field class="profile-form-field" appearance="outline" subscriptSizing="dynamic">
+                  <mat-select [compareWith]="compareObjects" [(ngModel)]="selectedproject"
+                    (ngModelChange)="valuechangeproject1($event)" name="project" panelClass="profile-select-panel">
+                    <mat-option *ngFor="let item of projectList; trackBy: trackByMethod" [value]="item">
+                      {{ item.projectdisplayname }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <!-- Role -->
+              <div *ngIf="roleList?.length >= 1" (click)="$event.stopPropagation()" class="profile-menu-field-row">
+                <span class="profile-menu-field-label">Role</span>
+                <mat-form-field class="profile-form-field" appearance="outline" subscriptSizing="dynamic">
+                  <mat-select [compareWith]="compareObjects" [(ngModel)]="selectedrole"
+                    (ngModelChange)="valuechangerole($event); clearsession()" name="role"
+                    panelClass="profile-select-panel matOptionPopup">
+                    <mat-option *ngFor="let item of roleList; trackBy: trackByMethod" [value]="item" [id]="'role-' + item.name">
+                      {{ item.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="profile-menu-divider"></div>
+
+              <!-- Actions -->
+              <div class="profile-menu-actions">
+                <button id="home-btn-logout" mat-menu-item="" (click)="logout()" class="selector-3-112 profile-action-btn">
+                  <i class="fa fa-power-off" aria-hidden="true"></i>
+                  <span>&nbsp;Logout</span>
+                </button>
+                <button *ngIf="showProfilePresent()" mat-menu-item (click)="toggleProfileInfo()" class="profile-action-btn profile-action-btn--profile">
+                  <i class="fa fa-user" aria-hidden="true"></i>
+                  <span>&nbsp;Profile</span>
+                </button>
+              </div>
+            </mat-menu>
+          </div>
         </div>
         <!--header ends -->
 
-        <div class="example-container selector-3-19" *ngIf="sidebar && selectedrole.name != currentrole">
+        <!-- ── Top Navigation Bar (replaces left icon sidebar) ── -->
+        <div *ngIf="showTopNav && sidebar && selectedrole.name != currentrole"
+             class="top-nav-bar"
+             [ngClass]="{'top-nav-dark': isDark, 'top-nav-light': !isDark}">
+          <div class="top-nav-scroll">
+            <ng-container *ngFor="let item of sidebarMenu">
+              <!-- items with children → mat-menu dropdown -->
+              <ng-container *ngIf="item.children && item.children.length > 0">
+                <button class="top-nav-item top-nav-has-children"
+                        [class.top-nav-item-active]="item.label == highlightedLabel"
+                        [matMenuTriggerFor]="topNavDrop"
+                        (click)="toggleActive($event, item.label)">
+                  <span class="top-nav-label">{{ item.label }}</span>
+                  <i class="fa fa-angle-down top-nav-caret" aria-hidden="true"></i>
+                </button>
+                <mat-menu #topNavDrop="matMenu" class="top-nav-mat-menu">
+                  <ng-container *ngFor="let child of item.children">
+                    <button mat-menu-item
+                            *ngIf="!child.children || child.children.length === 0"
+                            [routerLink]="child.url"
+                            (click)="Highlight(child)">
+                      {{ child.label }}
+                    </button>
+                    <ng-container *ngIf="child.children && child.children.length > 0">
+                      <button mat-menu-item [matMenuTriggerFor]="topNavSubDrop">{{ child.label }}</button>
+                      <mat-menu #topNavSubDrop="matMenu" class="top-nav-mat-menu">
+                        <button mat-menu-item
+                                *ngFor="let gc of child.children"
+                                [routerLink]="gc.url">
+                          {{ gc.label }}
+                        </button>
+                      </mat-menu>
+                    </ng-container>
+                  </ng-container>
+                </mat-menu>
+              </ng-container>
+              <!-- leaf items -->
+              <button *ngIf="!item.children || item.children.length === 0"
+                      class="top-nav-item"
+                      [class.top-nav-item-active]="item.label == highlightedLabel"
+                      [routerLink]="item.type !== 'external' ? item.url : null"
+                      (click)="toggleActive($event, item.label); item.type === 'external' ? checkAndOpenExtLink(item.url) : viewtabsonload()">
+                <span class="top-nav-label">{{ item.label }}</span>
+              </button>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="example-container selector-3-19"
+             [class.top-nav-mode]="showTopNav"
+             *ngIf="sidebar && selectedrole.name != currentrole">
           <mat-sidenav-container class="example-sidenav-container selector-3-20" autosize="">
-            <mat-sidenav *ngIf="
+            <mat-sidenav *ngIf="!showTopNav && (
                 (showSidebarMenu && !isExpanded) ||
                 (iconsidebarrole == selectedrole.name && showSidebarMenu)
-              " #sidenav="" class="width parentsidenav selector-3-21" mode="side" opened="true"
-              style="overflow-x: hidden; height: 100% ;width: 70px;" [ngClass]="{
+              )" #sidenav="" class="width parentsidenav selector-3-21" mode="side" opened="true"
+              style="overflow: visible; height: 100%; width: 64px;" [ngClass]="{
                 enableSidebarShadow: enableSidebarShadow == true,
                 sidebarbgcolor: sidebarbgcolor == true,
                 sidebarbgcolordefault: sidebarbgcolor != true,
@@ -47,15 +185,13 @@
                 class="dashboard sidebarlineheight" style="
                   display: flex;
                   flex-direction: column;
-                  overflow-x: hidden;
-                  padding-top: 1.3vh;
-                  height: inherit;
-                  align-items: center;
+                  overflow: hidden;
+                  padding-top: 0;
+                  height: 100%;
+                  align-items: stretch;
                 ">
                 <span class="list-menu-toggle" (click)="toggleSidebarMenu()" #sidebarMenuTrigger>
-                  <i class="fa fa-bars fa-2x sidebar-Icons-list" aria-hidden="true" [ngStyle]="{                    
-                      color: !showSidebarMenuList ? '#0052cc' : ''
-                    }" [ngClass]="{
+                  <i class="fa fa-bars fa-2x sidebar-Icons-list" aria-hidden="true" [ngClass]="{
                       sidebariconcolor: sidebariconcolor,
                       sidebartexticonhovercolor: sidebartexticonhovercolor
                     }"></i>
@@ -87,6 +223,7 @@
                 </app-sidebar-menu-text>
 </div>
                 <!-- Sidenav Icons menu bar -->
+                <ng-container *ngFor="let item of sidebarMenu; let i = index">
                 <div class="a-height sidebar-item-container" [class.sidebar-border]="
                     item.label == highlightedLabel &&
                     sidebarhighlightcolor != true
@@ -95,25 +232,18 @@
                     sidebarhighlightcolor == true
                   " [class.second-item]="i === 1" [ngClass]="{ sidebarhovercolor: sidebarhovercolor == true }" [ngStyle]="{
                     'margin-top': i != 0 ? sidebarItemMarginTop : '',
-                
+
                     height:
                       iconsidebarrole == selectedrole.name
                         ? sidebarMenuHeight
                         : ''
                   }" [class.iconsidebarheight]="
                     iconsidebarrole == selectedrole.name
-                  " *ngFor="let item of sidebarMenu; let i = index" (click)="
-                    toggleActive($event, item.label);
-                    item.children && item.children.length
-                      ? showTabs(item)
-                      : viewtabsonload()
-                  " [routerLink]="item.url">
-                  <div class="" [matTooltip]="item.altText ? item.altText : item.label"
-                    matTooltipClass="widgettitletooltip" [class.collapsed]="!isExpanded"
-                    [class.griddirection]="iconsidebarrole == selectedrole.name" [ngStyle]="{
-                      'border-left': item.label == highlightedLabel ? '5px solid #0052cc' : 'none',
-                      width: '57.6px'
-                    }">
+                  " (click)="handleSidebarItemClick($event, item)"
+                  (mouseenter)="onSidebarItemEnter($event, item)"
+                  (mouseleave)="onSidebarItemLeave()"
+                  [routerLink]="item.url">
+                  <div class="sidebar-item-inner">
                     <div class="sidebar-itemIcon" style="text-align: -webkit-center"
                       [class.iconmapping]="iconsidebarrole == selectedrole.name" [ngStyle]="{
                         'margin-left':
@@ -163,36 +293,88 @@
                           item.label !== 'Salus' &&
                           item.label !== 'Vibe Studio'
                         " [src]="item.icon" alt="" 
-                        style="height: 42px !important; width: 42px !important;" />
+                        class="sidebar-product-img" />
                       
-                      <!-- Hardcoded image for Agent Designer -->
-                      <img id="imgid" class="sidebar-itemImg sidebar-Icons-list" *ngIf="
-                          item.label === 'Agent Designer'
-                        " src="assets/img/ai-agent-logo.jpg" alt="Agent Designer Icon"
-                        style="height: 42px !important; width: 42px !important;" />
-                      <div style="margin-top: 0px !important;">
-                      <img class="sidebar-itemImg sidebar-Icons-list "  *ngIf="
-                          item.label === 'Agent MCP Pipelines'
-                        " src="assets/img/pipeline_agent.jpg" alt="Pipeline Agent Icon"
-                        style="height: 42px !important; width: 42px !important;" />
+                      <!-- Agent Designer: filled robot face — eyes/mouth are evenodd holes -->
+                      <div *ngIf="item.label === 'Agent Designer'"
+                           class="sidebar-ai-icon"
+                           [ngStyle]="{height: sideMenuIconSize, width: sideMenuIconSize}"
+                           [ngClass]="{'sidebar-svg-iconcolor': sidebartextcolor == true, 'sidebar-svg-iconcolordefault': sidebartextcolor != true}">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M8 6h8a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3zM8.8 9.5a1.2 1.2 0 1 0 2.4 0a1.2 1.2 0 1 0-2.4 0zm4 0a1.2 1.2 0 1 0 2.4 0a1.2 1.2 0 1 0-2.4 0zM10.5 13h3v.5a1.5 1.5 0 0 1-3 0z"/>
+                          <circle cx="12" cy="3.5" r="1.5"/>
+                          <rect x="11.25" y="4.5" width="1.5" height="2"/>
+                          <rect x="4" y="10.5" width="1.5" height="2" rx=".5"/>
+                          <rect x="18.5" y="10.5" width="1.5" height="2" rx=".5"/>
+                        </svg>
+                      </div>
 
-                                <img class="sidebar-itemImg sidebar-Icons-list "  *ngIf="
-                          item.label === 'Lite LLM'
-                        " src="assets/img/lite-llm.jpg" alt="Lite LLM Icon"
-                        style="height: 42px !important; width: 42px !important;" />
-                                <img class="sidebar-itemImg sidebar-Icons-list "  *ngIf="
-                          item.label === 'Langfuse'
-                        " src="assets/img/langfuse.jpg" alt="langfuse Icon"
-                        style="height: 42px !important; width: 42px !important;" />
-                                <img class="sidebar-itemImg sidebar-Icons-list "  *ngIf="
-                          item.label === 'Salus'
-                        " src="assets/img/salus.png" alt="Salus Icon"
-                        style="height: 42px !important; width: 42px !important;" />
+                      <!-- Agent MCP Pipelines: Custom pipeline flow SVG -->
+                      <div *ngIf="item.label === 'Agent MCP Pipelines'"
+                           class="sidebar-ai-icon"
+                           [ngStyle]="{height: sideMenuIconSize, width: sideMenuIconSize}"
+                           [ngClass]="{'sidebar-svg-iconcolor': sidebartextcolor == true, 'sidebar-svg-iconcolordefault': sidebartextcolor != true}">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                          <!-- Central hub circle -->
+                          <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+                          <!-- Top node -->
+                          <circle cx="12" cy="4" r="1.8" fill="currentColor"/>
+                          <rect x="11.3" y="6" width="1.4" height="3.5" fill="currentColor"/>
+                          <!-- Bottom node -->
+                          <circle cx="12" cy="20" r="1.8" fill="currentColor"/>
+                          <rect x="11.3" y="14.5" width="1.4" height="3.5" fill="currentColor"/>
+                          <!-- Left node -->
+                          <circle cx="4" cy="12" r="1.8" fill="currentColor"/>
+                          <rect x="6" y="11.3" width="3.5" height="1.4" fill="currentColor"/>
+                          <!-- Right node -->
+                          <circle cx="20" cy="12" r="1.8" fill="currentColor"/>
+                          <rect x="14.5" y="11.3" width="3.5" height="1.4" fill="currentColor"/>
+                          <!-- Diagonal nodes -->
+                          <circle cx="6.5" cy="6.5" r="1.5" fill="currentColor"/>
+                          <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
+                          <circle cx="6.5" cy="17.5" r="1.5" fill="currentColor"/>
+                          <circle cx="17.5" cy="17.5" r="1.5" fill="currentColor"/>
+                        </svg>
+                      </div>
 
-                                <img class="sidebar-itemImg sidebar-Icons-list "  *ngIf="
-                          item.label === 'Vibe Studio'
-                        " src="assets/img/vibe.png" alt="Vibe Studio Icon"
-                        style="height: 42px !important; width: 42px !important;" />
+                      <!-- Lite LLM: filled solid lightning bolt -->
+                      <div *ngIf="item.label === 'Lite LLM'"
+                           class="sidebar-ai-icon"
+                           [ngStyle]="{height: sideMenuIconSize, width: sideMenuIconSize}"
+                           [ngClass]="{'sidebar-svg-iconcolor': sidebartextcolor == true, 'sidebar-svg-iconcolordefault': sidebartextcolor != true}">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                          <path d="M13 3L5.5 13H11L9.5 22 18.5 11H13L15 3Z"/>
+                        </svg>
+                      </div>
+
+                      <!-- Langfuse: filled eye with evenodd iris ring + pupil -->
+                      <div *ngIf="item.label === 'Langfuse'"
+                           class="sidebar-ai-icon"
+                           [ngStyle]="{height: sideMenuIconSize, width: sideMenuIconSize}"
+                           [ngClass]="{'sidebar-svg-iconcolor': sidebartextcolor == true, 'sidebar-svg-iconcolordefault': sidebartextcolor != true}">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C4.5 7 8 4 12 4S19.5 7 22 12C19.5 17 16 20 12 20S4.5 17 2 12zM7 12a5 5 0 1 0 10 0a5 5 0 1 0-10 0zM9.5 12a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0-5 0z"/>
+                        </svg>
+                      </div>
+
+                      <!-- Salus: filled shield with evenodd cross cutout -->
+                      <div *ngIf="item.label === 'Salus'"
+                           class="sidebar-ai-icon"
+                           [ngStyle]="{height: sideMenuIconSize, width: sideMenuIconSize}"
+                           [ngClass]="{'sidebar-svg-iconcolor': sidebartextcolor == true, 'sidebar-svg-iconcolordefault': sidebartextcolor != true}">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2L4 6v7c0 5.25 3.5 9.75 8 11 4.5-1.25 8-5.75 8-11V6L12 2zM10 9h4v2h3v4h-3v2h-4v-2H7v-4h3V9z"/>
+                        </svg>
+                      </div>
+
+                      <!-- Vibe Studio: filled code-editor window with evenodd dots, lines + sparkle -->
+                      <div *ngIf="item.label === 'Vibe Studio'"
+                           class="sidebar-ai-icon"
+                           [ngStyle]="{height: sideMenuIconSize, width: sideMenuIconSize}"
+                           [ngClass]="{'sidebar-svg-iconcolor': sidebartextcolor == true, 'sidebar-svg-iconcolordefault': sidebartextcolor != true}">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M5 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5zM3 8h18v.75H3zM6.5 5.5a1 1 0 1 0 2 0a1 1 0 1 0-2 0zM9.5 5.5a1 1 0 1 0 2 0a1 1 0 1 0-2 0zM18 4.75l.45 1.1 1.05.45-1.05.45-.45 1.1-.45-1.1-1.05-.45 1.05-.45.45-1.1zM5.5 10.5h7v1.5h-7zM5.5 13h10v1.5h-10zM5.5 15.5h4.5v1.5h-4.5z"/>
+                        </svg>
                       </div>
                       <i *ngIf="
                           item.icon &&
@@ -206,9 +388,7 @@
                           item.label !== 'Salus' &&
                           item.label !== 'Vibe Studio' &&
                           !item.icon.includes('data:image/')
-                        " class="fa fa-{{ item.icon }} fa-2x" [ngStyle]="{
-                          color: item.label == highlightedLabel ? '#0052cc' : '#68696c'
-                        }" [ngClass]="{
+                        " class="fa fa-{{ item.icon }} fa-2x" [ngClass]="{
                           sidebariconcolor: sidebariconcolor,
                           sidebartexticonhovercolor: sidebartexticonhovercolor
                         }" class="sidebar-Icons-list"></i>
@@ -223,47 +403,36 @@
                         }"></i>
                       <i *ngIf="!item.icon" class="fa fa-folder fa-2x"
                         [ngClass]="{ sidebariconcolor: sidebariconcolor }"></i>
-                      <div [ngStyle]="{
-                          'font-size': sidebarMenuTextSize,
-                          'line-height': sidebarTextLineHeight,
-                          width:
-                            iconsidebarrole != selectedrole.name
-                              ? sidebarWidth
-                              : '',
-                          'padding-right':
-                            iconsidebarrole == selectedrole.name
-                              ? iconSideBarMarginLeft
-                              : '',
-                          'padding-left':
-                            iconsidebarrole == selectedrole.name
-                              ? iconsidebarpadding
-                              : ''
-                        }" style="margin: unset" [class.outlooksidebarfontsize]="
-                          iconsidebarrole == selectedrole.name
-                        " *ngIf="
-                          !(iconsidebarrole == selectedrole.name && !isExpanded)
-                        " [ngClass]="{
-                          'sidebar-item-full-text':
-                            show_sidebar_full_text == true,
-                          'sidebar-item-text': show_sidebar_full_text != true,
-                          sidebartextcolor: sidebartextcolor == true,
-                          sidebartextcolordefault: sidebartextcolor != true,
-                          sidebartexticonhovercolor: sidebartexticonhovercolor
-                        }" [class.collapsed]="!isExpanded">
-                        <!-- {{ item.label }} -->
-                      </div>
                     </div>
+                    <span class="sidebar-nav-label">{{ item.label }}</span>
                   </div>
                 </div>
+                <!-- Sidebar submenu flyout panel — hover-triggered -->
+                <div *ngIf="item.children && item.children.length > 0 && item.label === hoveredLabel"
+                     class="sidebar-submenu-panel"
+                     [ngStyle]="{'top': submenuTop + 'px', 'max-height': 'calc(100vh - ' + submenuTop + 'px - 44px)'}"
+                     (mouseenter)="onSubmenuEnter()"
+                     (mouseleave)="onSubmenuLeave()">
+                  <div class="sidebar-submenu-title">{{ item.label }}</div>
+                  <div *ngFor="let child of item.children"
+                       class="sidebar-submenu-item"
+                       [class.sidebar-submenu-item--active]="child.label === seclevelhighlighted"
+                       [routerLink]="child.url"
+                       (click)="selectSubmenuChild(child)">
+                    <span class="sidebar-submenu-item-dot" *ngIf="child.label === seclevelhighlighted"></span>
+                    <span class="sidebar-submenu-item-label">{{ child.label }}</span>
+                  </div>
+                </div>
+                </ng-container>
               </mat-nav-list>
             </mat-sidenav>
             <!-- righside container starts-->
             <mat-sidenav-content class="selector-3-47" id="containerDivForScroll"
-              [style.margin-left]="getContentMarginLeft()">
+              [style.margin-left]="showTopNav ? '0' : getContentMarginLeft()">
               <ng-container *ngIf="loadingRouteConfig" class="selector-3-48">
-                <div style="font-size: 5vmin; margin-left: 100vh; margin-top: 45vh" class="selector-3-49">
+                <div class="lfx-loading-indicator selector-3-49">
                   Loading
-                  <div class="spinner-border selector-3-50" style="color: #0094ff"></div>
+                  <div class="spinner-border lfx-loading-spinner selector-3-50"></div>
                 </div>
               </ng-container>
               <div *ngIf="!loadingRouteConfig" id="bcc-dashboard-content" class="selector-3-51">
@@ -296,7 +465,7 @@
                   </p-dialog>
                 </div>
                 <div id="tabsContainer overlay" style="background-color: var(--bg-color); display: unset"
-                  class="tabsContainer selector-3-52" *ngIf="tabs.length > 0">
+                  class="tabsContainer selector-3-52" *ngIf="!showTopNav && tabs.length > 0">
                   <div *ngIf="!hidesidebar" style="display: flex" class="selector-3-171" [ngClass]="{
                       sidebarbgcolor: sidebarbgcolor == true,
                       sidebarbgcolordefault: sidebarbgcolor != true,
@@ -497,7 +666,7 @@
           </a>
         </nav>
 
-        <div style="
+        <div class="legacy-header-controls" style="
             display: flex;
             align-items: center;
             justify-content: flex-end;
@@ -608,130 +777,18 @@
 
           </div>
 
-        
-          <button mat-icon-button="" [matMenuTriggerFor]="menu" (click)="getSession()" [matTooltip]="user.user_f_name"
-            class="userMobile selector-3-80 user-profile-btn
-            user-btn-height">
-            <span *ngIf="!profileimage" style="background-color: white; padding: 0.4em"
-              [ngClass]="umargin ? 'uname1' : 'uname2'" [ngStyle]="{
-                color:
-                  bgColorType == 2
-                    ? '#8626C3'
-                    : headercolor
-                    ? headercolor
-                    : 'var(--base-color)',
-              }" class="selector-3-82 dash-icon-color user-btn-span-height">{{ uname | uppercase }}
-            </span>
-            <img *ngIf="profileimage" class="imageView img-responsive selector-3-83" [src]="profileimage"
-              alt="userimg" />
-          </button>
-          <mat-menu #menu="matMenu" class="projectArrow selector-3-84 overflow-hidden">
-            <div mat-menu-item="" style="cursor: default" class="selector-3-85" [style.height]="detailsPopupHeight">
-              <span class="selector-3-86"> Welcome </span>
-              <span class="selector-3-87">
-                <b class="selector-3-88">{{ user && user.user_f_name }}</b>
-              </span>
-            </div>
-            <div mat-menu-item="" *ngIf="portfoliodata?.length >= 1" (click)="$event.stopPropagation()"
-              [style.height]="detailsPopupHeight" class="selector-3-89">
-              <div class="dropdownrole selector-3-90" *ngIf="portfoliodata.length >= 1">
-                <span class="dropdownrole roleheading selector-3-91">
-                  Portfolio:
-                </span>
-                <mat-form-field class="selector-3-92">
-                  <mat-select id="Portfolio1" [compareWith]="compareObjects" (ngModelChange)="onSelection($event)"
-                    [(ngModel)]="selectedportfolio" name="Portfolio" #Portfolio="ngModel" class="option1 selector-3-93">
-                    <mat-option class="option1 selector-3-94" *ngFor="let item of portfoliodata; trackBy: trackByMethod"
-                      [value]="item" [style.height]="matOptionHeight">
-                      {{ item.portfolioName }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </div>
-            <div mat-menu-item="" *ngIf="projectList.length >= 1" (click)="$event.stopPropagation()"
-              [style.height]="detailsPopupHeight" class="selector-3-95">
-              <div class="dropdownrole selector-3-96" *ngIf="projectList.length >= 1">
-                <span *ngIf="role1" class="dropdownrole roleheading selector-3-97">
-                  Customer:
-                </span>
-                <span *ngIf="!role1" class="dropdownrole roleheading selector-3-98">
-                  Project:
-                </span>
-                <mat-form-field class="selector-3-100">
-                  <mat-select id="project" [compareWith]="compareObjects" (ngModelChange)="valuechangeproject1($event)"
-                    [(ngModel)]="selectedproject" name="role" #role="ngModel" class="option1 selector-3-101">
-                    <mat-option class="option1 selector-3-102" *ngFor="let item of projectList; trackBy: trackByMethod"
-                      [value]="item" [style.height]="matOptionHeight">
-                      {{ item.projectdisplayname }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </div>
-            <div mat-menu-item="" *ngIf="roleList?.length >= 1" (click)="$event.stopPropagation()"
-              [style.height]="detailsPopupHeight" class="selector-3-103">
-              <div class="dropdownrole selector-3-104" *ngIf="roleList.length >= 1">
-                <span class="dropdownrole roleheading selector-3-105">
-                  Role:
-                </span>
-                <mat-form-field class="selector-3-106">
-                  <mat-select id="role" [compareWith]="compareObjects"
-                    (ngModelChange)="valuechangerole($event); clearsession()" [(ngModel)]="selectedrole" name="role"
-                    #role="ngModel" class="option1 selector-3-107" panelClass="matOptionPopup">
-                    <mat-option class="option1 selector-3-108" *ngFor="let item of roleList; trackBy: trackByMethod"
-                      [value]="item" [style.height]="matOptionHeight" id="role-{{ item.name }}">
-                      {{ item.name }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </div>
-            <!-- <button *ngIf="profileCheck && demouserFlag && logout_status" mat-menu-item=""
-              [style.height]="detailsPopupHeight" (click)="resetPassword()" class="selector-3-109">
-              <i class="fa fa-key selector-3-110" aria-hidden="true"></i>
-              <span class="selector-3-111">&nbsp;Reset Password</span>
-            </button> -->
-
-            <div class="button-container" style="display: flex">
-              <button id="home-btn-logout" mat-menu-item="" (click)="logout()" class="selector-3-112"
-                [style.height]="detailsPopupHeight">
-                <i class="fa fa-power-off selector-3-113" aria-hidden="true"></i>
-                <span class="selector-3-114">&nbsp;Logout</span>
-              </button>
-
-              <button *ngIf="showProfilePresent()" mat-menu-item (click)="toggleProfileInfo()"
-                [style.height]="detailsPopupHeight" style="color: var(--base-color)">
-                <i class="fa fa-user" aria-hidden="true" style="color: var(--base-color)"></i>
-                <span style="color: var(--base-color)">&nbsp;Profile</span>
-              </button>
-            </div>
-            <hr style="margin: 0px" class="selector-3-115" />
-          </mat-menu>
         </div>
       </div>
       <!--main header ends-->
-      <button mat-icon-button="" draggable="true" (dragstart)="onDragStartChat($event)"
-        (dragend)="onDragEndChat($event)" id="aipButton" *ngIf="aip_chatbot && !showChatBot" style="
-          padding-left: 2.5vh;
-          cursor: pointer;
-          font-size: 16px;
-          position: fixed;
-          border-radius: 40%;
-          z-index: 100;
-          background: #c0c0c080 url(assets/images/Chatbot.png) no-repeat center
-            center;
-        " [style.right]="iconPosition.right" [style.bottom]="iconPosition.bottom" (click)="loadAipChatbot()"
-        [matBadgeHidden]="notificationslength >= '0'" [ngStyle]="{ color: !backgroundcolor ? 'white' : 'white' }"
-        [matBadge]="notificationslength" matBadgeColor="warn" matBadgeSize="small" mat-icon-button="">
-        <i [ngStyle]="{ color: headericoncolor }" aria-hidden="true"></i>
-      </button>
       <app-chat-aip *ngIf="showChatBot" [chat_title]="chat_title" [selectedInstance]="selectedInstance"
         (closeChatbot)="closeChatbot($event)"></app-chat-aip>
       <span *ngIf="cortex_chatbot">
         <virtual-assistant style="z-index: 99" [language]="'en'" [suggestionBackendUrl]="suggestionBackendUrl"
           [backendUrl]="backendUrl" [appNameInput]="appNameInput"></virtual-assistant></span>
       <ng-container *ngIf="load" class="selector-3-150">
-        <div style="font-size: 2.5vmin; margin-left: 100vh; margin-top: 45vh" class="selector-3-151">
+        <div class="lfx-loading-indicator selector-3-151">
           Loading
-          <div class="spinner-border selector-3-152" style="color: #0094ff"></div>
+          <div class="spinner-border lfx-loading-spinner selector-3-152"></div>
         </div>
       </ng-container>
       <div *ngIf="!load && selectedrole.name == currentrole" style="height: 100%" class="selector-3-153">

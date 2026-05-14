@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.Base64Utils;
+import java.util.Base64;
 
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -87,6 +87,7 @@ import com.lfn.icip.dataset.service.impl.ICIPDatasourceService;
 import com.lfn.icip.dataset.service.util.IICIPDataSetServiceUtil.DATATYPE;
 import com.lfn.icip.dataset.service.util.IICIPDataSetServiceUtil.SQLPagination;
 import com.lfn.icip.dataset.util.ICIPRestPluginUtils;
+import com.lfn.icip.dataset.util.PathValidationUtil;
 import com.lfn.icip.icipwebeditor.fileserver.service.impl.FileServerService;
 
 
@@ -394,7 +395,7 @@ public abstract class ICIPDataSourceServiceUtilRestAbstract extends ICIPDataSour
 		    Mac mac = Mac.getInstance(algorithm);
 		    mac.init(secretKeySpec);
 		    byte[] encRes = mac.doFinal(data.getBytes());
-			String authCode = new String(Base64Utils.encode(encRes));
+			String authCode = new String(Base64.getEncoder().encode(encRes));
 			String authPrefix = authDetailsObj.optString("authPrefix");
 			JSONArray headersArr = new JSONArray(headers);
 			JSONObject timestamp = new JSONObject();
@@ -425,7 +426,7 @@ public abstract class ICIPDataSourceServiceUtilRestAbstract extends ICIPDataSour
 				}
 				
 				content = fileserverservice.download(fileId, "1", datasource.getOrganization());
-				File tempFile = new File(fileUploadPath+"/bigqueryAuth.json");
+				File tempFile = PathValidationUtil.validatePath(fileUploadPath, "bigqueryAuth.json");
 				FileUtils.writeByteArrayToFile(tempFile, content);
 				FileInputStream fileInpStream = null;
 				try {
@@ -487,7 +488,7 @@ public abstract class ICIPDataSourceServiceUtilRestAbstract extends ICIPDataSour
 		 
 		KeyStore keyStore= null;
 		 if(mtlsAdded) {
-			FileInputStream instream = new FileInputStream(new File(keyStorePath));
+			FileInputStream instream = new FileInputStream(PathValidationUtil.validatePath(keyStorePath));
 			try {
 				keyStore= KeyStore.getInstance("JKS");
 				 keyStore.load(instream, keystorepass.toCharArray());

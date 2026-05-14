@@ -1102,7 +1102,8 @@ public class ICIPDatasetPluginsService implements IICIPDatasetPluginsService {
 		this.getDataSetService(dataset).deleteFiledata(dataset,fileName);
 		return("Success, File Deleted");
 		}catch(Exception e) {
-	        throw new RuntimeException("Failed, File Not Deleted", e);
+			logger.error("Failed to delete file from storage", e);
+	        throw new RuntimeException("Failed to delete file from storage");
         }
 		
 	}

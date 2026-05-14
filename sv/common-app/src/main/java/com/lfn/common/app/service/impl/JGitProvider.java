@@ -307,7 +307,7 @@ public class JGitProvider implements GitStorageProvider {
         HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 
         // Set the default hostname verifier
-        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+        HttpsURLConnection.setDefaultHostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 
         log.info("SSL verification bypass configured for JGit operations");
     }

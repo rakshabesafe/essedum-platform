@@ -62,12 +62,9 @@ public class GitHubOAuthService {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
 
-            // Create hostname verifier that accepts all hostnames
-            HostnameVerifier allHostsValid = (hostname, session) -> true;
-
             // Set default SSL socket factory and hostname verifier
             HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+            HttpsURLConnection.setDefaultHostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 
             log.warn("SSL verification is disabled for GitHub OAuth - DO NOT USE IN PRODUCTION");
 

@@ -1385,9 +1385,12 @@ export class PipelineAgentProvider implements vscode.WebviewViewProvider {
                     jsonLoadError = error.message || 'Failed to load configuration file';
                 }
 
-                // Create error JSON content
-                const safeErrorMessage = (jsonLoadError || 'Unknown error').replace(/"/g, '\\"').replace(/\n/g, '\\n');
-                formattedContent = `{\n  "error": "Failed to load configuration",\n  "message": "${safeErrorMessage}"\n}`;
+                // Create error JSON content — JSON.stringify handles all necessary encoding
+                const safeErrorMsg = (String(jsonLoadError || 'Unknown error')).substring(0, 500);
+                formattedContent = JSON.stringify({
+                    error: 'Failed to load configuration',
+                    message: safeErrorMsg
+                }, null, 2);
 
                 // Show warning notification
                 // vscode.window.showWarningMessage(`${this.logPrefix} ${jsonLoadError}. Showing detail view with available information.`);
@@ -1615,7 +1618,21 @@ export class PipelineAgentProvider implements vscode.WebviewViewProvider {
                 placeHolder: 'https://github.com/owner/repository',
                 validateInput: (value) => {
                     if (!value) { return 'Repository URL is required'; }
-                    if (!value.includes('github.com')) { return 'Please enter a valid GitHub repository URL'; }
+                    // Use URL parser only — no substring checks to avoid incomplete sanitization
+                    try {
+                        const parsed = new URL(value);
+                        if (parsed.protocol !== 'https:') {
+                            return 'Please enter a valid HTTPS GitHub repository URL';
+                        }
+                        if (parsed.username || parsed.password) {
+                            return 'URL should not contain credentials';
+                        }
+                        if (parsed.hostname !== 'github.com') {
+                            return 'Please enter a valid GitHub repository URL';
+                        }
+                    } catch {
+                        return 'Please enter a valid GitHub repository URL';
+                    }
                     return null;
                 }
             });

@@ -2,6 +2,7 @@ package com.lfn.icip.icipwebeditor.service.impl;
 
 import java.io.IOException;
 import java.net.URL;
+import com.lfn.icip.dataset.util.SsrfProtectionUtil;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -215,7 +216,7 @@ public class ICIPMLFederatedRuntimeService {
 		// Create OkHttp client
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.build();
 
 		// Create RequestBody
@@ -238,7 +239,7 @@ public class ICIPMLFederatedRuntimeService {
 			}
 			return responseBody;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Operation failed", e);
 			return "Error";
 		}
 	}
@@ -353,7 +354,7 @@ public class ICIPMLFederatedRuntimeService {
 		// Create OkHttp client
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.connectTimeout(50, TimeUnit.SECONDS).readTimeout(50, TimeUnit.SECONDS)
 				.writeTimeout(50, TimeUnit.SECONDS).build();
 
@@ -376,7 +377,7 @@ public class ICIPMLFederatedRuntimeService {
 			}
 			return responseBody;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Operation failed", e);
 			return "Error";
 		}
 	}
@@ -389,7 +390,7 @@ public class ICIPMLFederatedRuntimeService {
 		// Create OkHttp client
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.build();
 
 		// Create RequestBody
@@ -411,7 +412,7 @@ public class ICIPMLFederatedRuntimeService {
 			}
 			return responseBody;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Operation failed", e);
 			return "Error";
 		}
 	}
@@ -424,7 +425,7 @@ public class ICIPMLFederatedRuntimeService {
 		// Create OkHttp client
 		OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
 		newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
-		newBuilder.hostnameVerifier((hostname, session) -> true);
+		newBuilder.hostnameVerifier(com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE);
 		OkHttpClient client = newBuilder.build();
 
 		// Create RequestBody
@@ -446,7 +447,7 @@ public class ICIPMLFederatedRuntimeService {
 			}
 			return responseBody;
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Operation failed", e);
 			return "Error";
 		}
 	}
@@ -554,7 +555,7 @@ public class ICIPMLFederatedRuntimeService {
 
 						icipMlFederatedRuntimeRepository.save(icipml);
 						String address = icipml.getConnendpoint();
-						URL url = new URL(address);
+						URL url = SsrfProtectionUtil.validateAndCreateUrl(address);
 						String endpoint = url.getPath(); // Gets the path component from the URL
 
 						// icipApps.setJobName(assignRuntime.getName());

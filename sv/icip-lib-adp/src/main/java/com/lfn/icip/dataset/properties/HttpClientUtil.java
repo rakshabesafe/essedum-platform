@@ -178,7 +178,7 @@ public class HttpClientUtil {
 //				}
 //			}).build());
 			builder.setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustAllStrategy()).build())
-			.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+			.setSSLHostnameVerifier(javax.net.ssl.HttpsURLConnection.getDefaultHostnameVerifier())
 			.build();
 		logger.info("Client Builder Created");
 		

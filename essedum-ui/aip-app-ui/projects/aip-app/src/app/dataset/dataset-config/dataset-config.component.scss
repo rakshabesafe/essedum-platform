@@ -1,380 +1,293 @@
-.lfx-u-mar-b-16 {
-  margin-bottom: 16px !important;
+// ═══════════════════════════════════════════════════════════════════
+//  DATASET CONFIG FORM — 2026 AI Platform  ✦  Complete Redesign
+// ═══════════════════════════════════════════════════════════════════
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+@keyframes fadeUp    { from { opacity:0; transform:translateY(12px); }  to { opacity:1; transform:translateY(0); } }
+@keyframes borderGlow{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+@keyframes rowIn     { from { opacity:0; transform:translateX(-5px); }  to { opacity:1; transform:translateX(0); } }
+
+.le-u-pad-tb-16 { padding: 0 !important; }
+
+form.col-md-12 {
+  background: linear-gradient(150deg, rgba(11,20,44,0.94) 0%, rgba(7,13,30,0.92) 100%) !important;
+  border: 1px solid rgba(68,128,245,0.15) !important; border-radius: 16px !important;
+  box-shadow: 0 16px 52px rgba(0,0,0,0.44), 0 1px 0 rgba(255,255,255,0.04) inset !important;
+  padding: 24px !important; position: relative !important; overflow: hidden !important;
+  animation: fadeUp 0.3s ease both !important;
+
+  &::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px; background: linear-gradient(90deg, #4480f5, #16b8e8, #875ef7, #4742dc, #4480f5); background-size: 400% 100%; animation: borderGlow 7s ease infinite; z-index: 10; border-radius: 16px 16px 0 0; }
+  &::after { content: ''; position: absolute; top: -50px; right: -50px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(68,128,245,0.08) 0%, transparent 70%); pointer-events: none; }
 }
 
-.lfx-u-header-xxl {
-  font-size: 2.4rem;
-  font-weight: 600;
-  font-family: 12px"Roboto", "Segoe UI", sans-serif !important;
-  font-style: normal;
-}
-
-.lfx-u-mar-l-8 {
-  margin-left: 8px !important;
-}
-
-.lfx-u-pad-16 {
-  padding: 16px !important;
-}
-
-.lfx-u-mar-tb-16 {
-  margin-top: 16px !important;
-  margin-bottom: 16px !important;
-}
-
-.lfx-l-level2-middle-col {
-  display: table-cell;
-  vertical-align: top;
-  height: 100%;
-}
-
-.lfx-u-pad-t-32 {
-  padding-top: 32px !important;
-}
-
-.lfx-u-pad-lr-24 {
-  padding-left: 24px !important;
-  padding-right: 24px !important;
-}
-
-.lfx-l-level2-middle-ctr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
-
-.lfx-c-panel {
-  border-radius: 16px;
-  background: #ffffff;
-  min-height: 100px;
-}
-
-.lfx-c-panel {
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16) !important;
-}
-
-.lfx-l-level1-middle-col {
-  padding: 32px 16px 32px 16px;
-}
-
-.base-color {
-  color: #0094ff !important;
-}
-
-.secondary-color {
-  color: #0a142f !important;
-}
-
-.back-icon {
-  font-size: 24px !important;
-  color: #0a142f !important;
-}
-
-/* Layout utilities */
-.lfx-field {
-  width: 100%;
-  margin-bottom: 16px;
-}
-
-.lfx-mt-24 {
-  margin-top: 24px;
-}
-
-.lfx-mb-16 {
-  margin-bottom: 16px;
-}
-
-.lfx-button-right {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
-}
-
-
-.lfx-half-col {
-  width: 100%;
-}
-
-.lfx-half-col {
-  width: 48%;
-}
-
+// ── Form row ──────────────────────────────────────────────────────
 .lfx-flex-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
+  display: flex !important; gap: 14px !important; flex-wrap: wrap !important;
+  padding: 14px 12px !important; border-radius: 10px !important;
+  border: 1px solid rgba(68,128,245,0.07) !important;
+  background: rgba(255,255,255,0.02) !important; margin-bottom: 12px !important;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease !important;
+  &:focus-within { border-color: rgba(68,128,245,0.24) !important; background: rgba(68,128,245,0.035) !important; box-shadow: 0 0 0 3px rgba(68,128,245,0.055) !important; }
+}
+.lfx-mb-16 { margin-bottom: 12px !important; }
+.lfx-field { margin-bottom: 3px !important; &.lfx-half-col { flex: 1 !important; min-width: 200px !important; } .col-lg-6, .col-md-6, .col-md-12 { padding: 0 !important; width: 100% !important; max-width: 100% !important; flex: none !important; } .custom-select-wrapper { width: 100% !important; } }
+
+// ── Dataset name label ────────────────────────────────────────────
+.name-label { font-size: 13px !important; font-weight: 700 !important; color: #6aaaf5 !important; background: rgba(68,128,245,0.06) !important; border: 1px solid rgba(68,128,245,0.14) !important; border-radius: 7px !important; padding: 8px 13px !important; margin: 0 !important; display: flex !important; align-items: center !important; gap: 7px !important; }
+
+// ── Back icon ─────────────────────────────────────────────────────
+.back-icon {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  width: 34px !important; height: 34px !important; border-radius: 50% !important;
+  border: 1.5px solid rgba(68,128,245,0.28) !important; background: rgba(68,128,245,0.07) !important;
+  color: #6aaaf5 !important; font-size: 16px !important; cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important; margin-bottom: 14px !important;
+  &:hover { background: rgba(68,128,245,0.16) !important; border-color: rgba(68,128,245,0.54) !important; box-shadow: 0 0 0 5px rgba(68,128,245,0.09), 0 4px 14px rgba(68,128,245,0.26) !important; transform: translateX(-2px) scale(1.08) !important; }
+  &::before { font-family: 'Material Icons', sans-serif; content: 'arrow_back'; font-size: 16px !important; }
 }
 
-.lfx-card {
-  margin-top: 24px;
-  padding: 16px;
+// ── MDC form field: borderless, deployment-style ──────────────────
+:host ::ng-deep .mat-mdc-form-field,
+:host ::ng-deep .mat-mdc-form-field.mat-mdc-form-field { width: 100% !important; font-size: 13px !important; margin-bottom: 0 !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; padding: 0 !important; background: transparent !important; overflow: visible !important; }
+:host ::ng-deep .mat-mdc-form-field-flex { align-items: flex-end !important; }
+:host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
+:host ::ng-deep .mdc-text-field--filled {
+  background: transparent !important; border: none !important;
+  border-radius: 0 !important; padding: 0 4px !important;
+  height: auto !important; min-height: auto !important;
+}
+:host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border: none !important; box-shadow: none !important; }
+:host ::ng-deep .mat-mdc-form-field-infix { min-height: 44px !important; padding: 18px 0 6px !important; border-top: 0 !important; width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled .mdc-floating-label { top: 7px !important; font-size: 11px !important; }
+:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #8b949e !important; font-size: 12px !important; font-weight: 500 !important; transition: color 0.16s !important; }
+:host ::ng-deep .mdc-floating-label--float-above { color: #58a6ff !important; font-size: 11px !important; font-weight: 600 !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e6edf3 !important; font-size: 14px !important; }
+:host ::ng-deep textarea.mat-mdc-input-element { line-height: 1.5 !important; resize: vertical !important; }
+:host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e6edf3 !important; font-size: 14px !important; }
+:host ::ng-deep .mat-mdc-select-value { font-size: 14px !important; }
+:host ::ng-deep .mat-mdc-select-placeholder { color: #484f58 !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-select-arrow, :host ::ng-deep .mat-mdc-form-field-hint { color: #58a6ff !important; font-size: 11px !important; }
+:host ::ng-deep .mdc-line-ripple,
+:host ::ng-deep .mdc-line-ripple::before,
+:host ::ng-deep .mdc-line-ripple::after,
+:host ::ng-deep .mat-mdc-form-field-focus-overlay,
+:host ::ng-deep .mdc-text-field__ripple { display: none !important; height: 0 !important; opacity: 0 !important; border: none !important; background: transparent !important; }
+:host ::ng-deep .mat-mdc-form-field-subscript-wrapper { min-height: 0 !important; padding: 0 !important; margin: 0 !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { opacity: 0.5 !important; border-bottom: none !important; }
+:host ::ng-deep .mdc-text-field--disabled .mat-mdc-input-element,
+:host ::ng-deep .mdc-text-field--disabled input { color: #484f58 !important; -webkit-text-fill-color: #484f58 !important; }
+:host ::ng-deep .mdc-text-field--disabled .mdc-floating-label { color: rgba(139,148,158,0.5) !important; }
+:host ::ng-deep mat-error { color: #f85149 !important; font-size: 11px !important; }
+:host ::ng-deep mat-checkbox .mdc-label { color: #e6edf3 !important; font-size: 13px !important; font-weight: 500 !important; }
+:host ::ng-deep mat-checkbox .mdc-checkbox__background { border-color: #58a6ff !important; border-radius: 4px !important; }
+:host ::ng-deep mat-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background { background-color: #58a6ff !important; border-color: #58a6ff !important; }
+// Row layout: 2 fields per row
+.row { display: flex !important; flex-wrap: wrap !important; margin: 0 -10px !important; }
+.col-lg-6, .col-md-6, .col-sm-6 { flex: 0 0 50% !important; max-width: 50% !important; padding: 0 12px !important; box-sizing: border-box !important; }
+.col-lg-12, .col-md-12, .col-sm-12 { flex: 0 0 100% !important; max-width: 100% !important; padding: 0 12px !important; box-sizing: border-box !important; }
+
+// ── Next button ───────────────────────────────────────────────────
+#nxt-btn { padding-top: 18px !important; border-top: 1px solid rgba(68,128,245,0.09) !important; margin-top: 6px !important; }
+
+button.next-btn {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  gap: 7px !important; padding: 10px 32px !important; border-radius: 10px !important;
+  border: none !important; background: linear-gradient(135deg, #4480f5 0%, #875ef7 100%) !important;
+  color: #fff !important; font-size: 13px !important; font-weight: 700 !important;
+  cursor: pointer !important; box-shadow: 0 5px 20px rgba(68,128,245,0.48) !important;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
+  position: relative !important; overflow: hidden !important;
+  &::before { content: '' !important; position: absolute !important; top: 0 !important; left: -80% !important; width: 55% !important; height: 100% !important; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important; transform: skewX(-20deg) !important; transition: left 0.48s ease !important; pointer-events: none !important; }
+  &:hover { box-shadow: 0 7px 28px rgba(68,128,245,0.62) !important; transform: translateY(-2px) scale(1.02) !important; &::before { left: 160% !important; } }
+  &:active { transform: translateY(0) scale(0.99) !important; }
+  &[disabled] { opacity: 0.38 !important; cursor: not-allowed !important; box-shadow: none !important; transform: none !important; pointer-events: none !important; }
 }
 
-.next-btn:hover {
-  color: #ffffff !important;
-  background-color: #ebf1f6 !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  font-size: 12px !important;
-  line-height: 2;
-  font-weight: 400;
-  letter-spacing: 0px;
-  font-family: 12px"Roboto", "Segoe UI", sans-serif !important;
-  border-radius: 16px;
-  background: transparent linear-gradient(90deg, var(---0052cc) 0%, #0094ff 100%) 0% 0% no-repeat padding-box;
-  background: transparent linear-gradient(90deg, #0052cc 0%, #0094ff 100%) 0% 0% no-repeat padding-box;
+// ── Accordion panels ──────────────────────────────────────────────
+:host ::ng-deep .dataset-form-accordion { display: flex !important; flex-direction: column !important; gap: 10px !important; }
+
+// COLLAPSED state
+:host ::ng-deep .dataset-form-panel {
+  background: linear-gradient(160deg, rgba(8,14,36,0.88) 0%, rgba(5,9,22,0.86) 100%) !important;
+  border: 1px solid rgba(68,128,245,0.11) !important;
+  border-left: 3.5px solid rgba(68,128,245,0.22) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.22) !important;
+  transition: border-color 0.3s ease, border-left-color 0.3s ease, box-shadow 0.35s ease, background 0.3s ease !important;
+
+  // collapsed top-bar: dim
+  &::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(68,128,245,0.18), transparent); pointer-events: none; z-index: 5; transition: background 0.4s ease; }
+
+  // EXPANDED — dramatic lift
+  &.mat-expanded {
+    background: linear-gradient(160deg, rgba(11,20,52,0.97) 0%, rgba(6,11,30,0.96) 100%) !important;
+    border-color: rgba(68,128,245,0.3) !important;
+    border-left-color: #4480f5 !important;
+    box-shadow: 0 0 0 1px rgba(68,128,245,0.09) inset, 0 12px 48px rgba(0,0,0,0.44), 0 0 32px rgba(68,128,245,0.09) !important;
+    &::before { background: linear-gradient(90deg, #4480f5, #16b8e8, #875ef7, #4742dc, #4480f5); background-size: 400% 100%; animation: borderGlow 4s ease infinite; }
+  }
 }
 
-.next-btn {
-  color: #002966 !important;
-  background-color: #dadada !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  font-size: 12px !important;
-  line-height: 2;
-  font-weight: 400;
-  letter-spacing: 0px;
-  font-family: 12px"Roboto", "Segoe UI", sans-serif !important;
-  border-radius: 16px;
-  background: #dadada 0% 0% no-repeat padding-box;
-  opacity: 1;
-}
-
-.next-btn:disabled {
-  color: grey !important;
-  background-color: #dadada !important;
-  height: 30px !important;
-  min-height: 30px !important;
-  font-size: 12px !important;
-  line-height: 2;
-  font-weight: 400;
-  letter-spacing: 0px;
-  font-family: 12px"Roboto", "Segoe UI", sans-serif !important;
-  border-radius: 16px;
-  background: #dadada 0% 0% no-repeat padding-box;
-  opacity: 1;
-}
-
-::ng-deep .mat-mdc-form-field {
-  width: 100%;
-  background: transparent;
-  padding: 0;
-}
-
-::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper {
-  border: none !important;
-  box-shadow: none !important;
+// COLLAPSED header
+:host ::ng-deep .dataset-form-panel mat-expansion-panel-header {
   background: transparent !important;
-  padding: 0 !important;
-}
-
-::ng-deep .mat-mdc-form-field-appearance-fill .mat-mdc-form-field-flex {
-  padding: 0 !important;
-}
-
-::ng-deep .mat-mdc-input-element {
-  font-family: 12px"Roboto", "Segoe UI", sans-serif !important;
-  font-size: 16px;
-  font-weight: 500;
-  padding: 0 !important;
-  color: #0a142f;
-  background: transparent !important;
-  border: none !important;
-}
-
-::ng-deep .mat-mdc-form-field-underline {
-  display: none !important;
-}
-
-::ng-deep .mdc-line-ripple {
-  display: none !important;
-}
-
-::ng-deep .mat-mdc-select-arrow {
-  color: #0a142f !important;
-}
-::ng-deep .mat-mdc-form-field-subscript-wrapper {
-  margin-top: 4px;
-}
-
-::ng-deep .mat-mdc-form-field-focus-overlay {
-  background-color: transparent !important;
-}
-
-::ng-deep .mdc-line-ripple {
-  display: none !important;
-  height: 0 !important;
-}
-
-::ng-deep .mat-mdc-select-arrow {
-  display: none !important;
-}
-
-:host ::ng-deep {
-  .dropdown-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    width: 100%;
+  border-bottom: none !important;
+  padding: 0 16px !important;
+  height: 52px !important;
+  border-radius: 0 !important;
+  transition: background 0.22s ease;
+  &:hover { background: rgba(68,128,245,0.07) !important; border-bottom: none !important; }
+  // EXPANDED header — gradient wash
+  &[aria-expanded="true"] {
+    background: linear-gradient(90deg, rgba(68,128,245,0.14) 0%, rgba(135,94,247,0.06) 60%, transparent 100%) !important;
+    border-bottom: none !important;
   }
 }
 
-.custom-select-wrapper {
-  position: relative;
-  display: flex;
-  mat-form-field {
-    flex: 1;
-    margin-bottom: 0;
-    width: 100%;
-
-    .mat-form-field-wrapper {
-      padding-bottom: 0 !important;
-    }
-
-    .mat-form-field-underline {
-      display: none !important;
-    }
-
-    .mat-select-placeholder {
-      opacity: 1 !important;
-    }
-  }
-
-  .custom-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    right: 16px;
-    pointer-events: none;
-    color: #737373;
-    font-size: 24px;
-    transition: transform 0.3s ease;
-    z-index: 2;
-    &.rotated {
-      transform: translateY(-50%) rotate(180deg);
-    }
+// Panel title (collapsed)
+:host ::ng-deep .dataset-form-panel mat-panel-title {
+  color: #4d7ab0 !important; font-size: 12.5px !important; font-weight: 700 !important;
+  display: flex !important; align-items: center !important; gap: 9px !important;
+  transition: color 0.22s ease !important;
+  .panel-icon, mat-icon {
+    font-size: 15px !important; color: #3a6fb5 !important; opacity: 0.7 !important;
+    background: rgba(68,128,245,0.08) !important; border-radius: 6px !important;
+    width: 26px !important; height: 26px !important; padding: 4px !important; box-sizing: border-box !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    flex-shrink: 0 !important; border: 1px solid rgba(68,128,245,0.14) !important;
+    transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1) !important;
   }
 }
 
-
-::ng-deep .mat-mdc-input-element {
-  background-color: #f7f7f7ed !important;
-  border-bottom: 0px solid rgba(0, 0, 0, 0.42) !important;
+// Panel title (EXPANDED) — title + icon glow
+:host ::ng-deep .dataset-form-panel mat-expansion-panel-header[aria-expanded="true"] mat-panel-title {
+  color: #7ab8ff !important;
+  .panel-icon, mat-icon {
+    color: #6aaaf5 !important; opacity: 1 !important;
+    background: rgba(68,128,245,0.22) !important; border-color: rgba(68,128,245,0.42) !important;
+    box-shadow: 0 0 16px rgba(68,128,245,0.55), 0 0 6px rgba(68,128,245,0.3) !important;
+    transform: scale(1.13) !important;
+  }
 }
 
-::ng-deep .mdc-text-field {
-  border-bottom: 0px solid rgba(0, 0, 0, 0.42) !important;
+// Panel description
+:host ::ng-deep .dataset-form-panel mat-panel-description {
+  color: #253750 !important; font-size: 11px !important;
+  transition: color 0.22s ease !important;
+}
+:host ::ng-deep .dataset-form-panel mat-expansion-panel-header[aria-expanded="true"] mat-panel-description {
+  color: #3d6080 !important;
 }
 
-::ng-deep .mdc-text-field {
-  all: unset;
- 
+// Expand/collapse indicator pill
+:host ::ng-deep .dataset-form-panel .mat-expansion-indicator {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  width: 28px !important; height: 28px !important; border-radius: 50% !important;
+  background: rgba(68,128,245,0.05) !important; border: 1px solid rgba(68,128,245,0.14) !important;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+:host ::ng-deep .dataset-form-panel .mat-expansion-indicator::after {
+  color: #3a5570 !important; border-color: #3a5570 !important;
+  transition: color 0.22s ease, border-color 0.22s ease !important;
+}
+:host ::ng-deep .dataset-form-panel mat-expansion-panel-header[aria-expanded="true"] .mat-expansion-indicator {
+  background: rgba(68,128,245,0.2) !important; border-color: rgba(68,128,245,0.5) !important;
+  box-shadow: 0 0 14px rgba(68,128,245,0.45), 0 0 4px rgba(135,94,247,0.3) !important;
+}
+:host ::ng-deep .dataset-form-panel mat-expansion-panel-header[aria-expanded="true"] .mat-expansion-indicator::after {
+  color: #6aaaf5 !important; border-color: #6aaaf5 !important;
 }
 
-::ng-deep .mat-mdc-select-arrow {
-  display: none !important; 
+:host ::ng-deep .dataset-form-panel .mat-expansion-panel-body { padding: 0 !important; }
+
+:host ::ng-deep .dataset-form-panel .panel-content {
+  padding: 18px 20px !important;
+  border-top: 1px solid rgba(68,128,245,0.09) !important;
+  animation: fadeUp 0.28s cubic-bezier(0.22,1,0.36,1) both !important;
 }
 
-.name-label {
-  text-align: left;
-  font: normal normal normal 16px/18px Roboto !important;
-  letter-spacing: 0px;
-  color: #555555;
-  opacity: 1;
+// ══════════════════════════════════════════════════════════════════
+//  LIGHT THEME
+// ══════════════════════════════════════════════════════════════════
+
+// Non-::ng-deep class selectors
+body.header-light-theme {
+  .name-label { color: #4742dc !important; background: rgba(71,66,220,0.06) !important; border-color: rgba(71,66,220,0.14) !important; }
+  .back-icon { color: #4742dc !important; background: rgba(71,66,220,0.06) !important; border-color: rgba(71,66,220,0.26) !important; }
+  .lfx-flex-row { background: rgba(71,66,220,0.02) !important; border-color: rgba(71,66,220,0.07) !important; &:focus-within { border-color: rgba(71,66,220,0.2) !important; background: rgba(71,66,220,0.035) !important; } }
+  #nxt-btn { border-top-color: rgba(71,66,220,0.09) !important; }
+  button.next-btn { background: linear-gradient(135deg, #4742dc, #7c3aed) !important; box-shadow: 0 5px 20px rgba(71,66,220,0.42) !important; }
 }
 
-::ng-deep mat-label {
-  text-align: left;
-  font: normal normal normal 16px/18px Roboto !important;
-  letter-spacing: 0px;
-  color: #555555;
-  opacity: 1;
+// ::ng-deep overrides — use :host-context() to guarantee light-theme scoping
+:host-context(body.header-light-theme) {
+  // Form wrapper
+  ::ng-deep form.col-md-12 {
+    background: #ffffff !important;
+    border-color: rgba(71,66,220,0.14) !important;
+    box-shadow: 0 12px 48px rgba(71,66,220,0.1), 0 2px 8px rgba(0,0,0,0.04) !important;
+    &::before { background: linear-gradient(90deg, #4742dc, #06b6d4, #7c3aed, #4f46e5, #4742dc) !important; }
+    &::after { background: radial-gradient(circle, rgba(71,66,220,0.07) 0%, transparent 70%) !important; }
+  }
+
+  // Form fields
+  ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
+  ::ng-deep .mdc-text-field--filled { border: none !important; border-bottom: none !important; border-radius: 0 !important; }
+  ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom: none !important; box-shadow: none !important; }
+  ::ng-deep .mdc-floating-label, ::ng-deep mat-label { color: #64748b !important; }
+  ::ng-deep .mdc-floating-label--float-above { color: #4742dc !important; }
+  ::ng-deep .mat-mdc-input-element { color: #0f172a !important; -webkit-text-fill-color: #0f172a !important; }
+  ::ng-deep textarea.mat-mdc-input-element { color: #0f172a !important; -webkit-text-fill-color: #0f172a !important; }
+  ::ng-deep mat-select .mat-mdc-select-value-text { color: #0f172a !important; }
+  ::ng-deep .mat-mdc-select-placeholder { color: #94a3b8 !important; }
+  ::ng-deep .mat-mdc-select-arrow { color: #64748b !important; }
+
+  // Expansion panels
+  ::ng-deep .dataset-form-panel {
+    background: #f4f6fd !important;
+    border-color: rgba(71,66,220,0.12) !important;
+    border-left-color: rgba(71,66,220,0.3) !important;
+    box-shadow: 0 2px 12px rgba(71,66,220,0.08) !important;
+    &::before { background: linear-gradient(90deg, transparent, rgba(71,66,220,0.2), transparent) !important; }
+    &.mat-expanded {
+      background: #ffffff !important;
+      border-color: rgba(71,66,220,0.28) !important;
+      border-left-color: #4742dc !important;
+      box-shadow: 0 0 0 1px rgba(71,66,220,0.09) inset, 0 10px 40px rgba(71,66,220,0.13), 0 0 28px rgba(71,66,220,0.08) !important;
+      &::before { background: linear-gradient(90deg, #4742dc, #06b6d4, #7c3aed, #4f46e5, #4742dc); background-size: 400% 100%; animation: borderGlow 4s ease infinite; }
+    }
+  }
+  ::ng-deep .dataset-form-panel mat-expansion-panel-header {
+    background: transparent !important;
+    &:hover { background: rgba(71,66,220,0.05) !important; }
+    &[aria-expanded="true"] { background: linear-gradient(90deg, rgba(71,66,220,0.1) 0%, rgba(124,58,237,0.04) 60%, transparent 100%) !important; border-bottom: none !important; }
+  }
+  ::ng-deep .dataset-form-panel mat-panel-title { color: #6d6bb5 !important; }
+  ::ng-deep .dataset-form-panel mat-panel-title .panel-icon,
+  ::ng-deep .dataset-form-panel mat-panel-title mat-icon { color: #4742dc !important; background: rgba(71,66,220,0.08) !important; border-color: rgba(71,66,220,0.16) !important; opacity: 0.85 !important; }
+  ::ng-deep .dataset-form-panel mat-expansion-panel-header[aria-expanded="true"] mat-panel-title { color: #4742dc !important; }
+  ::ng-deep .dataset-form-panel mat-expansion-panel-header[aria-expanded="true"] mat-panel-title .panel-icon,
+  ::ng-deep .dataset-form-panel mat-expansion-panel-header[aria-expanded="true"] mat-panel-title mat-icon { color: #4742dc !important; background: rgba(71,66,220,0.16) !important; border-color: rgba(71,66,220,0.38) !important; box-shadow: 0 0 14px rgba(71,66,220,0.4) !important; opacity: 1 !important; transform: scale(1.13) !important; }
+  ::ng-deep .dataset-form-panel mat-panel-description { color: #94a3b8 !important; }
+  ::ng-deep .dataset-form-panel mat-expansion-panel-header[aria-expanded="true"] mat-panel-description { color: #64748b !important; }
+  ::ng-deep .dataset-form-panel .mat-expansion-indicator { background: rgba(71,66,220,0.05) !important; border-color: rgba(71,66,220,0.16) !important; }
+  ::ng-deep .dataset-form-panel .mat-expansion-indicator::after { color: #94a3b8 !important; border-color: #94a3b8 !important; }
+  ::ng-deep .dataset-form-panel mat-expansion-panel-header[aria-expanded="true"] .mat-expansion-indicator { background: rgba(71,66,220,0.14) !important; border-color: rgba(71,66,220,0.42) !important; box-shadow: 0 0 12px rgba(71,66,220,0.38) !important; }
+  ::ng-deep .dataset-form-panel mat-expansion-panel-header[aria-expanded="true"] .mat-expansion-indicator::after { color: #4742dc !important; border-color: #4742dc !important; }
+  ::ng-deep .dataset-form-panel .panel-content { border-top-color: rgba(71,66,220,0.09) !important; }
+
+  // Disabled fields
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { opacity: 0.5 !important; border-bottom: none !important; }
+  ::ng-deep .mdc-text-field--disabled .mat-mdc-input-element,
+  ::ng-deep .mdc-text-field--disabled input { color: #94a3b8 !important; -webkit-text-fill-color: #94a3b8 !important; }
+  ::ng-deep .mdc-text-field--disabled .mdc-floating-label { color: #94a3b8 !important; }
+
+  // Checkboxes
+  ::ng-deep mat-checkbox .mdc-label { color: #1e293b !important; }
+  ::ng-deep mat-checkbox .mdc-checkbox__background { border-color: rgba(71,66,220,0.4) !important; }
 }
-
-::ng-deep mat-option,
-::ng-deep mat-option .mat-option-text{
-  font-family: 12px"Roboto", "Segoe UI", sans-serif !important;
-
-}
-
-
-::ng-deep .mat-mdc-form-field input.mat-mdc-input-element {
-  text-align: left;
-  font: normal normal normal 16px/24px Roboto !important;
-  letter-spacing: 0px;
-  color: #000000 !important;
-  text-transform: capitalize;
-  opacity: 1;
-  margin-left: 4px !important;
-}
-
-::ng-deep .mat-mdc-form-field input.mat-mdc-input-element::placeholder {
-  color: #737373 !important;
-  text-align: left;
-  font: normal normal normal 16px/24px Roboto !important;
-  letter-spacing: 0px;
-  text-transform: capitalize;
-  opacity: 1;
-}
-
-.ml-15m {
-  margin-left: -11px !important;
-}
-
-::ng-deep .mat-mdc-select {
-  background-color: #f7f7f7ed !important;
-  border-radius: 4px !important;
-  margin-left: 4px !important;
-  font: normal normal normal Roboto !important;
-
-}
-
-.mat-button-radius {
-  border-radius: 16px !important;
-}
-
-::ng-deep .mat-mdc-form-field-required-marker {
-  color: grey !important;
-}
-
-
-.custom-select-wrapper,
-mat-form-field.custom-mat-select {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box;
-}
-
-::ng-deep .mat-mdc-select-trigger {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-::ng-deep .mat-mdc-select-trigger::after {
-  content: "";
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  background-image: url("/assets/images/Accordion_open.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  pointer-events: none;
-  display: block;
-  z-index: 2;
-}
-
-
-::ng-deep .mat-mdc-form-field-flex {
-  overflow: visible !important;
-  position: relative;
-}
-

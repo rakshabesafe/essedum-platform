@@ -168,11 +168,10 @@ async function attemptFallbackConfiguration(context: vscode.ExtensionContext): P
         const axios = require('axios');
         const https = require('https');
 
+        // Fallback configuration fetch uses standard SSL validation
         const agent = new https.Agent({
-            rejectUnauthorized: false,
-            checkServerIdentity: () => undefined,
-            requestCert: false,
-            agent: false
+            rejectUnauthorized: true,
+            keepAlive: false
         });
 
         const response = await axios.get(getConfigApiUrl(), {

@@ -1,73 +1,112 @@
+:host { display: block !important; width: 100% !important; box-sizing: border-box; }
+
 .pagination-wrapper {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  background-color: white;
-  padding-bottom: 50px;
-  padding-right: 30px;
-  z-index: 100;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(79,142,247,0.08);
 }
 
-.pagination-container {
-  margin: 0.2rem 0;
+.pagination-container { width: 100%; }
+
+.paginator-buttons {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+}
 
-  .paginator-buttons {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
+.pages-details {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pagination-arrow {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+  color: #7a9cbf;
+  font-size: 20px !important;
+  border: 1px solid rgba(79,142,247,0.15);
+  background: rgba(255,255,255,0.03);
+  transition: all 0.15s;
+  user-select: none;
+
+  &:hover:not(.disabled) {
+    border-color: rgba(79,142,247,0.4) !important;
+    color: #e2e8f0 !important;
+    background: rgba(79,142,247,0.08) !important;
+    transform: translateY(-1px);
   }
 
-  .pages-details {
-    display: flex;
+  &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
   }
+
+  &.active { color: #4f8ef7 !important; }
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.pg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: #7a9cbf;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  user-select: none;
+
+  &:hover { background: rgba(79,142,247,0.08); color: #e2e8f0; }
+
+  &.selected-page {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #fff !important;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(79,70,229,0.4);
+  }
+}
+
+// ── Light theme ───────────────────────────────────────────────────────────
+:host-context(body.header-light-theme) {
+  .pagination-wrapper { border-top-color: rgba(99,102,241,0.1); }
 
   .pagination-arrow {
-    cursor: pointer;
-    padding: 4px;
-    margin-right: 8px;
-    color: #737373;
-
-    &.disabled {
-      color: #cccccc;
-      cursor: unset;
+    border-color: rgba(99,102,241,0.15);
+    color: #64748b;
+    background: rgba(255,255,255,0.8);
+    &:hover:not(.disabled) {
+      border-color: rgba(99,102,241,0.4) !important;
+      color: #0f172a !important;
+      background: rgba(99,102,241,0.06) !important;
     }
-
-    &.active {
-      color: #0094ff;
-    }
+    &.active { color: #4f46e5 !important; }
   }
 
-  .page-numbers {
-    display: flex;
-
-    .pg {
-      margin: 4px;
-      width: 24px !important;
-      height: 24px !important;
-      display: flex !important;
-      justify-content: center !important;
-      align-items: center !important;
-      font-size: 1.4rem;
-      font-weight: 400;
-      font-family: "Roboto", "Segoe UI", sans-serif !important;
-      font-style: normal;
-      box-shadow: 0px 2px 4px #00000029;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-
-      &.selected-page {
-        background-color: #0052cc;
-        color: white;
-      }
-
-      &.hover:not(.selected-page) {
-        background-color: #f0f0f0;
-      }
-    }
+  .pg {
+    color: #64748b;
+    &:hover { background: rgba(99,102,241,0.06); color: #0f172a; }
+    &.selected-page { background: #4f46e5; box-shadow: 0 2px 8px rgba(79,70,229,0.3); }
   }
+}
+
+// ── Dark theme ────────────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
+  .pagination-wrapper { border-top-color: rgba(79,142,247,0.08); }
+  .pagination-arrow { border-color: rgba(79,142,247,0.15); color: #7a9cbf; }
+  .pg { color: #7a9cbf; }
 }

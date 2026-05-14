@@ -1,8 +1,8 @@
 <div class="aip-top">
     <div class="clearfix js-bodywrapper" id="mainCtr">
-        <div class="col-sm-12 col-md-12 col-lg-12  lfx-u-pad-lr-30 mb-100" id="mainrightCnt">
+        <div class="aip-main-content" id="mainrightCnt">
             <!-- Header Section -->
-            <div class="aip-content">
+            <div class="aip-content" [class.has-empty-state]="records">
                 <!-- Header -->
                 <app-aip-header [cardTitle]="cardTitle" [lastRefreshedTime]="lastRefreshedTime"
                     [showAddButton]="createAuth" (search)="filterz($event)" (refresh)="refreshComplete()"
@@ -14,12 +14,17 @@
                         dataSourceList: dataSourceList
                     }" (tagSelected)="tagSelectedEvent($event)" (filterStatusChange)="onFilterStatusChange($event)">
                 </app-aip-filter>
+
+                <!-- Empty state (inside same card) -->
+                <div class="model-empty-shell" *ngIf="records">
+                    <app-aip-empty-state class="model-empty-state"></app-aip-empty-state>
+                </div>
             </div>
 
 
             <!-- Cards container -->
             <div class="lfx-c-card__action-ul aip-card-container lfx-u-pad-b-40">
-                <div class="col-md-8 col-lg-6 col-xl-5 aip-card-wrapper" *ngFor="let card of cards">
+                <div class="aip-card-wrapper" *ngFor="let card of cards">
                     <div class="card-wrapper h-100">
                         <app-aip-card [servicev1]="servicev1" [card]="card" [editAuth]="editAuth"
                             [deployAuth]="deployAuth" [deleteAuth]="deleteAuth"
@@ -29,9 +34,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Empty state -->
-            <app-aip-empty-state *ngIf="records"></app-aip-empty-state>
 
             <!-- Pagination -->
             <app-aip-pagination *ngIf="records!=true" [pageNumber]="pageNumber" [noOfPages]="noOfPages"

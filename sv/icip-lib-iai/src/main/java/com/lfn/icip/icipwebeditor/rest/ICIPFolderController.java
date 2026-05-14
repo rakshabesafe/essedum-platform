@@ -132,6 +132,12 @@ public class ICIPFolderController {
                 logger.info("Using provided folder path: {}", pathToUse);
             }
 
+            // Buffer zip bytes so we can use them for both DB persist and GitHub push
+            byte[] zipBytes = null;
+            if (zipFile != null && !zipFile.isEmpty()) {
+                zipBytes = zipFile.getBytes();
+            }
+
             List<ICIPAiAgentScript> result = folderService.persistInAiAgentScriptTableFromZipOrFolder(zipFile, pathToUse, cname, org);
 
             if (result == null || result.isEmpty()) {
@@ -139,7 +145,43 @@ public class ICIPFolderController {
                 throw new FileUploadException("No scripts were found or uploaded. Verify the ZIP file or folder contains valid script files.");
             }
 
-            logger.info("Successfully uploaded {} scripts for cname={}, org={}", result.size(), cname, org);
+            // Push zip file contents to GitHub (Vibe Studio: push all files from the zip in a single call)
+            boolean githubPushSuccess = false;
+            String githubPushError = "";
+            String repoUrl = "";
+            String branchName = "studio/" + cname;
+            try {
+                repoUrl = githubservice.resolveRepoUrl(org);
+                if (repoUrl != null && !repoUrl.isEmpty() && zipBytes != null) {
+                    logger.info("[Vibe Studio] Pushing all zip file contents to GitHub in a single commit. Repo URL: {}, Branch: {}, cname: {}, org: {}", repoUrl, branchName, cname, org);
+                    // Collect all files from zip into a map
+                    java.util.Map<String, byte[]> filesToPush = new java.util.LinkedHashMap<>();
+                    try (java.util.zip.ZipInputStream zis = new java.util.zip.ZipInputStream(new java.io.ByteArrayInputStream(zipBytes))) {
+                        java.util.zip.ZipEntry entry;
+                        while ((entry = zis.getNextEntry()) != null) {
+                            if (!entry.isDirectory()) {
+                                filesToPush.put(entry.getName(), zis.readAllBytes());
+                            }
+                            zis.closeEntry();
+                        }
+                    }
+                    // Single call to push all files at once
+                    githubservice.saveFilesToGitHubBranch(filesToPush, cname, org, branchName);
+                    githubPushSuccess = true;
+                    logger.info("[Vibe Studio] Successfully pushed {} files to GitHub in one commit. Repo: {}, Branch: {}", filesToPush.size(), repoUrl, branchName);
+                } else {
+                    githubPushError = "GitHub not configured or no zip file provided";
+                    logger.warn("Skipping GitHub push: {}", githubPushError);
+                }
+            } catch (Exception e) {
+                githubPushError = e.getMessage();
+                logger.error("[Vibe Studio] Failed to push zip contents to GitHub. Repo: {}, Branch: {}, Reason: {}", repoUrl, branchName, githubPushError, e);
+            }
+
+            logger.info("Upload complete for cname={}, org={}. Scripts persisted: {}, GitHub repo URL: {}, Branch: {}, GitHub push: {}{}, Metadata stored in DB table: 'icipaiagentscriptentity'",
+                    cname, org, result.size(), repoUrl, branchName,
+                    githubPushSuccess ? "SUCCESS" : "FAILED",
+                    githubPushSuccess ? "" : " - Reason: " + githubPushError);
             return new ResponseEntity<>(result, HttpStatus.OK);
 
         } catch (InvalidRequestException | FileDeletionException | FileUploadException e) {
@@ -179,7 +221,36 @@ public class ICIPFolderController {
 
             List<ICIPAiAgentScript> result = folderService.bulkUpdateAiAgentScripts(cname, org, updates);
 
-            logger.info("Successfully updated {} scripts for cname={}, org={}", result.size(), cname, org);
+            // Sync updated files to GitHub in a single call
+            boolean githubPushSuccess = false;
+            String githubPushError = "";
+            String repoUrl = "";
+            String branchName = "studio/" + cname;
+            try {
+                repoUrl = githubservice.resolveRepoUrl(org);
+                if (repoUrl != null && !repoUrl.isEmpty()) {
+                    logger.info("[Vibe Studio] Syncing {} updated files to GitHub in one commit. Repo: {}, Branch: {}", updates.size(), repoUrl, branchName);
+                    java.util.Map<String, byte[]> filesToPush = new java.util.LinkedHashMap<>();
+                    for (ICIPAiAgentScriptDTO dto : updates) {
+                        if (dto.getFilescript() != null && dto.getFilePath() != null) {
+                            filesToPush.put(dto.getFilePath(), dto.getFilescript().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        }
+                    }
+                    if (!filesToPush.isEmpty()) {
+                        githubservice.saveFilesToGitHubBranch(filesToPush, cname, org, branchName);
+                        githubPushSuccess = true;
+                        logger.info("[Vibe Studio] Successfully synced {} files to GitHub. Repo: {}, Branch: {}", filesToPush.size(), repoUrl, branchName);
+                    }
+                }
+            } catch (Exception e) {
+                githubPushError = e.getMessage();
+                logger.error("[Vibe Studio] Failed to sync updates to GitHub. Repo: {}, Branch: {}, Reason: {}", repoUrl, branchName, githubPushError, e);
+            }
+
+            logger.info("Successfully updated {} scripts for cname={}, org={}. GitHub push: {}{}",
+                    result.size(), cname, org,
+                    githubPushSuccess ? "SUCCESS" : "FAILED",
+                    githubPushSuccess ? "" : " - Reason: " + githubPushError);
             return new ResponseEntity<>(result, HttpStatus.OK);
 
         } catch (InvalidRequestException e) {

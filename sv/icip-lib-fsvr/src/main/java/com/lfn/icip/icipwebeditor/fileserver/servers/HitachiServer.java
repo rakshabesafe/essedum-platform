@@ -170,7 +170,7 @@ public class HitachiServer implements FileServerUtil {
 		BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 		TrustManager[] trustAllCerts = getTrustAllCerts();
 		SSLContext sslContext = getSslContext(trustAllCerts);
-		HostnameVerifier myVerifier = (hostname, session) -> true;
+		HostnameVerifier myVerifier = com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE;
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
 		ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, myVerifier);
 		clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
@@ -329,7 +329,7 @@ public class HitachiServer implements FileServerUtil {
 	throws Exception {
 		TrustManager[] trustAllCerts = getTrustAllCerts();
 		SSLContext sslContext = getSslContext(trustAllCerts);
-		HostnameVerifier myVerifier = (hostname, session) -> true;
+		HostnameVerifier myVerifier = com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE;
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
 		ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, myVerifier);
 		clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);
@@ -356,7 +356,7 @@ public class HitachiServer implements FileServerUtil {
 		FileInputStream fis = new FileInputStream(path.toFile()) ;
 		TrustManager[] trustAllCerts = getTrustAllCerts();
 		SSLContext sslContext = getSslContext(trustAllCerts);
-		HostnameVerifier myVerifier = (hostname, session) -> true;
+		HostnameVerifier myVerifier = com.lfn.ai.comm.lib.util.SafeHostnameVerifier.INSTANCE;
 		ClientConfiguration clientConfiguration = new ClientConfiguration();
 		ConnectionSocketFactory factory = new SdkTLSSocketFactory(sslContext, myVerifier);
 		clientConfiguration.getApacheHttpClientConfig().setSslSocketFactory(factory);

@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,49 +64,59 @@ public class ICIPAdaptersV1Controller {
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(ICIPAdaptersV1Controller.class);
 
+	private static final String GENERIC_ERROR_MSG = "{\"error\": \"An internal error occurred. Please try again later.\"}";
+
 	@Autowired
 	private ICIPAdaptersV1Service iCIPAdaptersV1Service;
 
 	@GetMapping(path = "/{org}/{specname}/{methodname}")
 	public ResponseEntity<String> getData(@PathVariable(name = "specname") String specname,
 			@PathVariable(name = "methodname") String methodname, @PathVariable(name = "org") String org,
-			@RequestHeader Map<String, String> headers, @RequestParam Map<String, String> params)
-			throws InvalidKeyException, KeyManagementException, NoSuchAlgorithmException, NoSuchPaddingException,
-			InvalidKeySpecException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException,
-			KeyStoreException, ClassNotFoundException, SQLException, DecoderException, IOException, URISyntaxException {
-		return iCIPAdaptersV1Service.getData(org, specname, methodname, headers, params);
+			@RequestHeader Map<String, String> headers, @RequestParam Map<String, String> params) {
+		try {
+			return iCIPAdaptersV1Service.getData(org, specname, methodname, headers, params);
+		} catch (Exception e) {
+			logger.error("Error processing GET adapter request for spec: {}, method: {}", specname, methodname, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(GENERIC_ERROR_MSG);
+		}
 	}
 
 	@PostMapping(path = "/{org}/{specname}/{methodname}")
 	public ResponseEntity<String> getPostData(@PathVariable(name = "specname") String specname,
 			@PathVariable(name = "methodname") String methodname, @PathVariable(name = "org") String org,
 			@RequestHeader Map<String, String> headers, @RequestParam Map<String, String> params,
-			@RequestBody String body)
-			throws InvalidKeyException, KeyManagementException, NoSuchAlgorithmException, NoSuchPaddingException,
-			InvalidKeySpecException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException,
-			KeyStoreException, ClassNotFoundException, SQLException, DecoderException, IOException, URISyntaxException {
-		return iCIPAdaptersV1Service.getPostData(org, specname, methodname, headers, params, body);
+			@RequestBody String body) {
+		try {
+			return iCIPAdaptersV1Service.getPostData(org, specname, methodname, headers, params, body);
+		} catch (Exception e) {
+			logger.error("Error processing POST adapter request for spec: {}, method: {}", specname, methodname, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(GENERIC_ERROR_MSG);
+		}
 	}
 
 	@DeleteMapping(path = "/{org}/{specname}/{methodname}")
 	public ResponseEntity<String> deleteData(@PathVariable(name = "specname") String specname,
 			@PathVariable(name = "methodname") String methodname, @PathVariable(name = "org") String org,
-			@RequestHeader Map<String, String> headers, @RequestParam Map<String, String> params)
-			throws InvalidKeyException, KeyManagementException, NoSuchAlgorithmException, NoSuchPaddingException,
-			InvalidKeySpecException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException,
-			KeyStoreException, ClassNotFoundException, SQLException, DecoderException, IOException, URISyntaxException {
-		return iCIPAdaptersV1Service.deleteData(org, specname, methodname, headers, params);
+			@RequestHeader Map<String, String> headers, @RequestParam Map<String, String> params) {
+		try {
+			return iCIPAdaptersV1Service.deleteData(org, specname, methodname, headers, params);
+		} catch (Exception e) {
+			logger.error("Error processing DELETE adapter request for spec: {}, method: {}", specname, methodname, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(GENERIC_ERROR_MSG);
+		}
 	}
 
 	@PostMapping(path = "/{org}/{specname}/{methodname}/file")
 	public ResponseEntity<String> getPostDataForFile(@PathVariable(name = "specname") String specname,
 			@PathVariable(name = "methodname") String methodname, @PathVariable(name = "org") String org,
 			@RequestHeader Map<String, String> headers, @RequestParam Map<String, String> params,
-			@RequestParam("file") MultipartFile file)
-			throws InvalidKeyException, KeyManagementException, NoSuchAlgorithmException, NoSuchPaddingException,
-			InvalidKeySpecException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException,
-			KeyStoreException, ClassNotFoundException, SQLException, DecoderException, IOException, URISyntaxException {
-		return iCIPAdaptersV1Service.getPostDataForFile(org, specname, methodname, headers, params, file);
+			@RequestParam("file") MultipartFile file) {
+		try {
+			return iCIPAdaptersV1Service.getPostDataForFile(org, specname, methodname, headers, params, file);
+		} catch (Exception e) {
+			logger.error("Error processing POST file adapter request for spec: {}, method: {}", specname, methodname, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(GENERIC_ERROR_MSG);
+		}
 	}
 
 

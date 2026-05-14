@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, abort, request, render_template, make_response, g
 import uuid
+import html as html_module
 from utils import *
 from Queue import Queue
 from db import DatabaseOperations, JobNF
@@ -41,6 +42,14 @@ process_lock = Lock()
 db_operations = DatabaseOperations()
 submitted_futures = {}
 pause_event = Event()
+
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses to mitigate XSS and MIME-sniffing attacks."""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
 
 @app.before_request
 def create_database():
@@ -157,6 +166,12 @@ def show_tasks():
 @app.route('/execute/<task_id>/getStatus', methods=['GET'])
 def get_task_status(task_id):
     try:
+        # Validate task_id is a well-formed UUID before use
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid task ID'}), 400
+
         task = db_operations.get_job_by_id(task_id)
         if task is None:
             abort(404)
@@ -178,6 +193,12 @@ def get_task_status(task_id):
 @app.route('/execute/<task_id>/stop', methods=['GET'])
 def terminate_task(task_id):
     try:
+        # Validate task_id is a well-formed UUID before use
+        try:
+            uuid.UUID(task_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid task ID'}), 400
+
         task = db_operations.get_job_by_id(task_id)
         print('task', task)
         if task is None:
@@ -373,18 +394,17 @@ def projects_datasets_create():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_datasets_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -408,16 +428,15 @@ def projects_datasets_list_list():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_datasets_list_list(adapter_instance, project, isCached, isInstance, connections)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 @app.route('/api/service/v1/datasets/<dataset_id>', methods=['get'])
@@ -440,16 +459,15 @@ def projects_datasets_get(dataset_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_datasets_get(adapter_instance, project, isCached, isInstance, connections, dataset_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 400
 
 
@@ -480,16 +498,15 @@ def projects_datasets_delete(dataset_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_datasets_delete(adapter_instance, project, isCached, isInstance, connections, dataset_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -520,18 +537,17 @@ def projects_datasets_export_create(dataset_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_datasets_export_create(adapter_instance, project, isCached, isInstance, connections, dataset_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -562,18 +578,17 @@ def projects_endpoints_create():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_endpoints_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -597,16 +612,15 @@ def projects_endpoints_list_list():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_endpoints_list_list(adapter_instance, project, isCached, isInstance, connections)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -631,16 +645,15 @@ def projects_endpoints_get(endpoint_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers,isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_endpoints_get(adapter_instance, project, isCached, isInstance, connections, endpoint_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -663,16 +676,15 @@ def projects_endpoints_delete(endpoint_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_endpoints_delete(adapter_instance, project, isCached, isInstance, connections, endpoint_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -703,18 +715,17 @@ def projects_endpoints_deploy_model_create(endpoint_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_endpoints_deploy_model_create(adapter_instance, project, isCached, isInstance, connections, endpoint_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -746,18 +757,17 @@ def projects_endpoints_explain_create(endpoint_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_endpoints_explain_create(adapter_instance, project, isCached, isInstance, connections, endpoint_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -789,18 +799,17 @@ def projects_endpoints_infer_create(endpoint_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_endpoints_infer_create(adapter_instance, project, isCached, isInstance, connections, endpoint_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -832,18 +841,17 @@ def projects_endpoints_undeploy_models_create(endpoint_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_endpoints_undeploy_models_create(adapter_instance, project, isCached, isInstance, connections, endpoint_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -869,16 +877,15 @@ def projects_models_list():
         
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_models_list(adapter_instance, project, isCached, isInstance, connections)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 @app.route('/api/service/v1/models/<model_id>', methods=['get'])
@@ -901,16 +908,15 @@ def projects_models_get(model_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_models_get(adapter_instance, project, isCached, isInstance, connections, model_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -942,19 +948,18 @@ def projects_models_register_create():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
         
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_models_register_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -978,16 +983,15 @@ def projects_models_delete(model_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_models_delete(adapter_instance, project, isCached, isInstance, connections, model_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1018,18 +1022,17 @@ def projects_models_export_create(model_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_models_export_create(adapter_instance, project, isCached, isInstance, connections, model_id, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1061,18 +1064,17 @@ def training_automl_simplified_create():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.training_automl_simplified_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1104,15 +1106,14 @@ def training_custom_script_create():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
         return create_task_util(request_body)
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1136,16 +1137,15 @@ def training_istlist():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.training_istlist(adapter_instance, project, isCached, isInstance, connections)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1176,18 +1176,17 @@ def training_train_create():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.training_train_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1211,16 +1210,15 @@ def training_cancel_list(training_job_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.training_cancel_list(adapter_instance, project, isCached, isInstance, connections, training_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1244,16 +1242,15 @@ def training_delete(training_job_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.training_delete(adapter_instance, project, isCached, isInstance, connections, training_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1279,16 +1276,15 @@ def training_get_list(training_job_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.training_get_list(adapter_instance, project, isCached, isInstance, connections, training_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1320,18 +1316,17 @@ def projects_inferencePipelines_create():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_inferencePipelines_create(adapter_instance, project, isCached, isInstance, connections, request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1356,16 +1351,15 @@ def projects_inferencePipelines_list_list():
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_inferencePipelines_list_list(adapter_instance, project, isCached, isInstance, connections)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1389,16 +1383,15 @@ def projects_inferencePipelines_delete(inference_job_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_inferencePipelines_delete(adapter_instance, project, isCached, isInstance, connections, inference_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1423,18 +1416,17 @@ def projects_inferencePipelines_cancel(inference_job_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result, status_code = vertex.projects_inferencePipelines_cancel(adapter_instance, project, isCached, isInstance, connections, inference_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1458,16 +1450,15 @@ def projects_inferencePipelines_get(inference_job_id):
 
         connections = get_connection_details_with_token(referer, adapter_instance, project, headers, isInstance)
         if not connections:
-            logger.info(f"Connections details is empty. {str(connections)}")
+            logger.info("Connection details not found")
             result = "Please check if connection details are present in DB."
             return jsonify(result), 400
         result, status_code = vertex.projects_inferencePipelines_get(adapter_instance, project, isCached, isInstance, connections, inference_job_id)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1477,14 +1468,13 @@ def adapter_function_execute():
     result=""
     try:
         request_body = request.get_json()
-        logger.info(f"Request body is: {str(request_body)}")
+        logger.info("Processing request")
         result = function_execute(request_body)
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), 200
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
     return jsonify(result), 500
 
 
@@ -1496,12 +1486,11 @@ def cloudconnect():
         result, status_code = vertex.cloudconnect(payload)
         if result:
             return jsonify(result), 200
-        logger.info(f"Response from mlops/<>.py is: {str(result)} !!!")
+        logger.info("Response received from mlops handler")
         return jsonify(result), status_code
     except Exception as err:
         result = str(err)
-        exc_trace = traceback.format_exc()
-        logger.info(f"Error is: {str(exc_trace)}")
+        logger.error("An unexpected error occurred", exc_info=True)
         return jsonify(result), 400
 
 

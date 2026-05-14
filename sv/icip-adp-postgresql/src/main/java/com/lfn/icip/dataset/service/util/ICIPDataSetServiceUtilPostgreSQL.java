@@ -69,6 +69,7 @@ import com.lfn.icip.dataset.factory.IICIPDataSetServiceUtilFactory;
 import com.lfn.icip.dataset.model.ICIPDataset;
 import com.lfn.icip.dataset.model.ICIPDatasource;
 import com.lfn.icip.dataset.service.util.IICIPDataSetServiceUtil.SQLPagination;
+import com.lfn.icip.dataset.util.SqlSanitizationUtil;
 
 //
 /**
@@ -1281,7 +1282,7 @@ public class ICIPDataSetServiceUtilPostgreSQL extends ICIPDataSetServiceUtilSqlA
 	@Override
 	public boolean isTablePresent(ICIPDataset ds, String tableName) throws SQLException, NoSuchAlgorithmException {
 		JSONObject condetails = new JSONObject(ds.getDatasource().getConnectionDetails());
-		String query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + tableName + "' ";
+		String query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + SqlSanitizationUtil.escapeSqlLiteral(tableName) + "' ";
 		try (Connection conn = getDbConnection(condetails)) {
 			try (PreparedStatement stmt = conn.prepareStatement(query)) {
 				try (ResultSet res = stmt.executeQuery()) {
@@ -1379,7 +1380,7 @@ public class ICIPDataSetServiceUtilPostgreSQL extends ICIPDataSetServiceUtilSqlA
 							schema.put(new JSONObject("{\"isunique\":false,\"isrequired\":false,\"recordcolumndisplayname\":\"Archival Date\",\"recordcolumnname\":\"archivalDate\",\"columntype\":\"varchar\"}\r\n"
 									+ ""));
 					}}
-					sqlCreate = "CREATE TABLE IF NOT EXISTS " + attributes.getString(TNAME) + "("
+					sqlCreate = "CREATE TABLE IF NOT EXISTS " + SqlSanitizationUtil.validateIdentifier(attributes.getString(TNAME)) + "("
 							+ getcolumnMappings(schema,
 									dataset.getIsApprovalRequired() != null ? dataset.getIsApprovalRequired() : false,
 									dataset.getIsInboxRequired() != null ? dataset.getIsInboxRequired() : false)
@@ -1396,9 +1397,9 @@ public class ICIPDataSetServiceUtilPostgreSQL extends ICIPDataSetServiceUtilSqlA
 				}
 				if (dataset.getIsAuditRequired()) {
 
-					String sqlCreateAudit = "CREATE TABLE IF NOT EXISTS " + attributes.getString(TNAME) + "_audit"
+					String sqlCreateAudit = "CREATE TABLE IF NOT EXISTS " + SqlSanitizationUtil.validateIdentifier(attributes.getString(TNAME)) + "_audit"
 							+ "( id INT auto_increment,entry_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,action VARCHAR(255),"
-							+ "user VARCHAR(255)," + attributes.getString("uniqueIdentifier")
+							+ "user VARCHAR(255)," + SqlSanitizationUtil.validateIdentifier(attributes.getString("uniqueIdentifier"))
 							+ " VARCHAR(255),row_data TEXT,primary key (id,entry_timestamp));";
 					try (Connection conn = getDbConnection(connectionDetails)) {
 						try (PreparedStatement stmt = conn.prepareStatement(sqlCreateAudit)) {
@@ -1448,7 +1449,7 @@ public class ICIPDataSetServiceUtilPostgreSQL extends ICIPDataSetServiceUtilSqlA
 		JSONArray schema = new JSONArray(map);
 		JSONObject attributes = new JSONObject(dataset.getAttributes());
 		if (!(attributes.getString(TNAME)).equals(null)&& !(attributes.getString(TNAME)).equals("")) {
-			String sqlCreate = "CREATE TABLE IF NOT EXISTS " + attributes.getString(TNAME) + "("
+			String sqlCreate = "CREATE TABLE IF NOT EXISTS " + SqlSanitizationUtil.validateIdentifier(attributes.getString(TNAME)) + "("
 					+ getcolumnMappingsForCsv(schema) + ");";
 			try (Connection conn = getDbConnection(connectionDetails)) {
 				try (PreparedStatement stmt = conn.prepareStatement(sqlCreate)) {

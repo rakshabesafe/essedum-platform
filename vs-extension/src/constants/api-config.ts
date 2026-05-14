@@ -169,13 +169,10 @@ export function getHTTPSAgent(context?: vscode.ExtensionContext): https.Agent {
 }
 
 // Legacy export for backward compatibility - uses default agent without context
-// WARNING: This may not work correctly without context. Use getHTTPSAgent(context) instead.
+// WARNING: Use getHTTPSAgent(context) for network-aware SSL configuration.
+// SECURITY: SSL validation is ENABLED by default. For Infosys network, use getHTTPSAgent(context).
 export const HTTPS_AGENT = new https.Agent({
-    rejectUnauthorized: false,
-    checkServerIdentity: () => undefined,
-    secureOptions: require('constants').SSL_OP_LEGACY_SERVER_CONNECT,
-    secureProtocol: 'TLSv1_2_method',
-    requestCert: false,
+    rejectUnauthorized: true, // SSL validation enabled (default safe state)
     keepAlive: true,
     keepAliveMsecs: 60000,
     maxSockets: 10,

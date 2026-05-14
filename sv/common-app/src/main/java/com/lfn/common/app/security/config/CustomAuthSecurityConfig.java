@@ -40,7 +40,7 @@ import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -161,12 +161,20 @@ class CustomAuthSecurityConfig {
 			throw new EssedumException("The active profile must contain either dbjwt or oauth2");
 		
 		http.headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()));
-//		http.csrf(configurer -> {
-//			configurer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-//			configurer.ignoringRequestMatchers(antMatchers(ignoreCsrfUrls));
-//		});
 
-        http.cors(withDefaults()).csrf((csrf) -> csrf.disable());
+		// Enable CSRF protection with cookie-based token repository
+		CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+		requestHandler.setCsrfRequestAttributeName(null); // opt into BREACH protection
+		http.cors(withDefaults()).csrf(csrf -> {
+			csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+			csrf.csrfTokenRequestHandler(requestHandler);
+			csrf.ignoringRequestMatchers(antMatchers(ignoreCsrfUrls));
+			// Ignore CSRF for actuator and WebSocket endpoints
+			csrf.ignoringRequestMatchers(
+					AntPathRequestMatcher.antMatcher("/actuator/**"),
+					AntPathRequestMatcher.antMatcher("/ws/**")
+			);
+		});
 		FilterChainProxy filterChainProxy = new FilterChainProxy(new SecurityFilterChain() {
 
 			@Override

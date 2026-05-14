@@ -34,6 +34,7 @@ import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.model.output.Response;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import com.lfn.icip.dataset.util.GroovySandboxUtil;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -180,7 +181,7 @@ public class BedRockChatModelImpl implements ICIPPromptChatModel {
 			Binding binding = new Binding();
 			binding.setProperty("response", resp);
 	
-			GroovyShell shell = new GroovyShell(binding);
+			GroovyShell shell = GroovySandboxUtil.createSandboxedShell(binding);
 			Object transformedResult = shell.evaluate(new StringReader(transformScript));
 	
 			resp = transformedResult.toString();
