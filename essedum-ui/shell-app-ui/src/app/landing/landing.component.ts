@@ -136,6 +136,11 @@ export class LandingComponent implements OnInit, AfterViewInit {
   submenuTop: number = 55;
   private submenuHideTimer: any = null;
 
+  // ── Advanced / optional menu items ──────────────────────────────────────
+  readonly ADVANCED_MENU_LABELS: string[] = ['Agent Designer', 'Lite LLM', 'Langfuse', 'Salus', 'Apps', 'App List'];
+  customMenuState: { [label: string]: boolean } = {};
+  showMenuCustomizer: boolean = false;
+
   @HostListener("window:resize", ["$event"])
   onResize(event) {
     setTimeout(() => {
@@ -158,11 +163,21 @@ export class LandingComponent implements OnInit, AfterViewInit {
         }
       }
     }
+    // Close the menu customizer when clicking outside it
+    if (this.showMenuCustomizer) {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.menu-customizer-wrapper')) {
+        this.showMenuCustomizer = false;
+      }
+    }
   }
 
   @HostListener("document:keydown", ["$event"])
   handleEscapeEvent(event: KeyboardEvent) {
-    if (event.key === "Escape") this.apisService.cancelPendingRequests();
+    if (event.key === "Escape") {
+      this.apisService.cancelPendingRequests();
+      this.showMenuCustomizer = false;
+    }
   }
 
   @HostListener("document:mousemove", ["$event"])
@@ -470,6 +485,7 @@ export class LandingComponent implements OnInit, AfterViewInit {
     );
     this.sidebarMenuPopupWidth = this.showSidebarMenuList ? "130px" : "0px";
     this.sidebarmaxwidth = this.showSidebarMenuList ? "260px" : "7vw";
+    this.loadMenuCustomization();
     
     // Call getNotificationsPermision only once per session to prevent duplicate API calls
     if (!sessionStorage.getItem('notificationsLoaded')) {
@@ -3748,5 +3764,97 @@ if ((roleChanged || portfolioChanged || projectChanged) && !navigationInProgress
     } else {
       return "64px";
     }
+  }
+
+  // ── Menu Customization ───────────────────────────────────────────────────
+
+  /** Returns the sidebarMenu with advanced items hidden unless the user has opted in. */
+  get visibleSidebarMenu(): any[] {
+    return this.sidebarMenu.filter(
+      (item) =>
+        !this.ADVANCED_MENU_LABELS.includes(item.label) ||
+        this.customMenuState[item.label] === true
+    );
+  }
+
+  /** Items from sidebarMenu that belong to the advanced/optional group. */
+  getAdvancedMenuItems(): any[] {
+    return this.sidebarMenu.filter((item) =>
+      this.ADVANCED_MENU_LABELS.includes(item.label)
+    );
+  }
+
+  /** Count how many advanced items are currently enabled. */
+  getEnabledAdvancedCount(): number {
+    return this.ADVANCED_MENU_LABELS.filter(
+      (l) => this.customMenuState[l] === true
+    ).length;
+  }
+
+  /** Human-readable description for each advanced menu module. */
+  getItemDescription(label: string): string {
+    const map: { [k: string]: string } = {
+      'Agent Designer':  'Design AI agent workflows',
+      'Lite LLM':        'Manage LLM proxy & routing',
+      'Langfuse':        'Monitor & trace LLM calls',
+      'Salus':           'Security & compliance hub',
+      'Apps':            'Browse & launch applications',
+      'App List':        'Browse & launch applications',
+    };
+    return map[label] || label;
+  }
+
+  /** Get the icon label used in the sidebar SVG block for each advanced item. */
+  getItemIconLabel(label: string): string {
+    return label;
+  }
+
+  loadMenuCustomization(): void {
+    const saved = localStorage.getItem('essedum-advanced-menu');
+    if (saved) {
+      try {
+        this.customMenuState = JSON.parse(saved);
+      } catch {
+        this.customMenuState = {};
+      }
+    } else {
+      this.customMenuState = {};
+    }
+  }
+
+  saveMenuCustomization(): void {
+    localStorage.setItem('essedum-advanced-menu', JSON.stringify(this.customMenuState));
+  }
+
+  toggleAdvancedMenuItem(label: string, event?: MouseEvent): void {
+    if (event) event.stopPropagation();
+    const turningOff = !!this.customMenuState[label];
+    this.customMenuState = {
+      ...this.customMenuState,
+      [label]: !this.customMenuState[label],
+    };
+    this.saveMenuCustomization();
+
+    // If the user just turned OFF a module they are currently viewing, redirect to dashboard
+    if (turningOff) {
+      const item = this.sidebarMenu.find((m) => m.label === label);
+      if (item && item.url) {
+        // Normalise both sides: strip leading './' and trailing slashes for comparison
+        const itemPath = item.url.replace(/^\.\//, '').replace(/\/$/, '').toLowerCase();
+        const currentPath = this.router.url.replace(/^\/landing\/?/, '').replace(/\/$/, '').toLowerCase();
+        if (currentPath && currentPath.startsWith(itemPath)) {
+          this.router.navigate(['/landing']);
+        }
+      }
+    }
+  }
+
+  toggleMenuCustomizer(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showMenuCustomizer = !this.showMenuCustomizer;
+  }
+
+  closeMenuCustomizer(): void {
+    this.showMenuCustomizer = false;
   }
 }
