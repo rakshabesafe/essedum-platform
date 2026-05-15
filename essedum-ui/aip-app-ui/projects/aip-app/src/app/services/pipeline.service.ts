@@ -223,6 +223,36 @@ export class PipelineService {
       }));
   }
 
+  getPipelinesByInterfaceType(interfacetype: string, type?: string, page: number = 1, size: number = 3): Observable<any> {
+    const org = sessionStorage.getItem('organization');
+    let param = new HttpParams()
+      .set('project', org)
+      .set('isCached', 'true')
+      .set('adapter_instance', 'internal')
+      .set('interfacetype', interfacetype)
+      .set('cloud_provider', 'internal')
+      .set('page', page)
+      .set('size', size);
+    if (type) param = param.set('type', type);
+    return this.https.get(this.dataUrl + '/service/v1/pipelines/training/list', { observe: 'response', params: param })
+      .pipe(map(response => response.body))
+      .pipe(catchError(err => this.handleError(err)));
+  }
+
+  getPipelinesCount(interfacetype: string, type?: string): Observable<any> {
+    const org = sessionStorage.getItem('organization');
+    let param = new HttpParams()
+      .set('project', org)
+      .set('isCached', 'true')
+      .set('adapter_instance', 'internal')
+      .set('interfacetype', interfacetype)
+      .set('cloud_provider', 'internal');
+    if (type) param = param.set('type', type);
+    return this.https.get(this.dataUrl + '/service/v1/pipelines/count', { observe: 'response', params: param })
+      .pipe(map(response => response.body))
+      .pipe(catchError(err => this.handleError(err)));
+  }
+
   
   
 

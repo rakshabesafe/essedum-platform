@@ -1,25 +1,11 @@
-import { Component } from '@angular/core';
-
-// API requirements (replace mock data with real calls):
-// GET /api/models/summary          → { count, activeCount, recentlyAdded }
-// GET /api/connections/summary     → { count, activeCount, errorCount }
-// GET /api/datasets/summary        → { count, totalSizeMb }
-// GET /api/agents/summary          → { count, activeCount }
-// GET /api/agent-pipelines/summary → { count, runningCount }
-// GET /api/pipelines/summary       → { count, runs24h, failureRate }
-// GET /api/apps/summary            → { count, deployedCount }
-// GET /api/mcp-servers/summary     → { count, onlineCount }
-// GET /api/activity/recent         → ActivityItem[] (last 10 events)
-// GET /api/models/top-traffic      → ModelTraffic[] (top 5 by request count)
-
-interface StatCard {
-  label: string;
-  value: string;
-  trend: string;
-  trendUp: boolean | null;
-  trendColor: string;
-  icon: string;
-}
+import { Component, OnInit } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { DatasourceService } from '../datasource/datasource.service';
+import { DatasetServices } from '../dataset/dataset-service';
+import { Services } from '../services/service';
+import { PipelineService } from '../services/pipeline.service';
 
 interface ModuleStat {
   label: string;
@@ -31,9 +17,9 @@ interface ModuleStat {
 }
 
 interface PipelineCard {
+  alias: string;
   name: string;
-  status: 'running' | 'completed' | 'failed' | 'pending';
-  runs: string;
+  status: 'running' | 'completed' | 'failed';
   icon: string;
   accent: string;
 }
@@ -43,37 +29,98 @@ interface PipelineCard {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
 
   moduleStats: ModuleStat[] = [
-    { label: 'Connections',    count: 12, sub: '10 active · 2 error',       icon: 'fa-plug',         accent: '#3b82f6', route: 'connections' },
-    { label: 'Datasets',       count: 28, sub: '45 GB total · 5 new',        icon: 'fa-database',     accent: '#10b981', route: 'datasets' },
-    { label: 'Models',         count: 34, sub: '12 deployed · 22 available', icon: 'fa-cubes',        accent: '#8b5cf6', route: 'models' },
-    { label: 'Agent Pipelines',count: 9,  sub: '5 running · 4 idle',         icon: 'fa-code-fork',    accent: '#fb923c', route: 'agent-pipeline' },
-    { label: 'MCP Pipelines',  count: 6,  sub: '4 active · 2 paused',        icon: 'fa-server',       accent: '#06b6d4', route: 'agent-pipeline' },
-    { label: 'App Pipelines',  count: 11, sub: '8 deployed · 3 staging',     icon: 'fa-window-restore',accent: '#fbbf24', route: 'app-list' },
+    { label: 'Connections',     count: 0, sub: 'Loading...', icon: 'fa-plug',          accent: '#3b82f6', route: 'connections' },
+    { label: 'Datasets',        count: 0, sub: 'Loading...', icon: 'fa-database',      accent: '#10b981', route: 'datasets' },
+    { label: 'Models',          count: 0, sub: 'Loading...', icon: 'fa-cubes',         accent: '#8b5cf6', route: 'models' },
+    { label: 'Agent Pipelines', count: 0, sub: 'Loading...', icon: 'fa-code-fork',     accent: '#fb923c', route: 'agent-pipeline' },
+    { label: 'MCP Pipelines',   count: 0, sub: 'Loading...', icon: 'fa-server',        accent: '#06b6d4', route: 'agent-pipeline' },
+    { label: 'App Pipelines',   count: 0, sub: 'Loading...', icon: 'fa-window-restore',accent: '#fbbf24', route: 'agent-pipeline' },
   ];
 
- 
+  topAgentPipelines: PipelineCard[] = [];
+  topMcpPipelines: PipelineCard[]   = [];
+  topAppPipelines: PipelineCard[]   = [];
 
-  // Top Agent Pipelines
-  topAgentPipelines: PipelineCard[] = [
-    { name: 'data-extraction-v3', status: 'running', runs: '2.4K', icon: 'fa-code-fork', accent: '#22c55e' },
-    { name: 'inference-batch-daily', status: 'completed', runs: '1.8K', icon: 'fa-check-circle', accent: '#22c55e' },
-    { name: 'sentiment-analysis', status: 'failed', runs: '890', icon: 'fa-exclamation-circle', accent: '#f59e0b' },
-  ];
+  constructor(
+    private datasourceService: DatasourceService,
+    private datasetService: DatasetServices,
+    private services: Services,
+    private pipelineService: PipelineService
+  ) {}
 
-  // Top MCP Pipelines
-  topMcpPipelines: PipelineCard[] = [
-    { name: 'tools-integration', status: 'running', runs: '3.2K', icon: 'fa-code-fork', accent: '#22c55e' },
-    { name: 'resource-sync', status: 'completed', runs: '1.2K', icon: 'fa-check-circle', accent: '#22c55e' },
-    { name: 'cache-cleanup', status: 'pending', runs: '456', icon: 'fa-hourglass', accent: '#818cf8' },
-  ];
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
 
-  // Top App Pipelines
-  topAppPipelines: PipelineCard[] = [
-    { name: 'analytics-portal', status: 'running', runs: '5.1K', icon: 'fa-code-fork', accent: '#22c55e' },
-    { name: 'dashboard-sync', status: 'completed', runs: '2.9K', icon: 'fa-check-circle', accent: '#22c55e' },
-    { name: 'report-generator', status: 'running', runs: '678', icon: 'fa-code-fork', accent: '#22c55e' },
-  ];
+  private loadDashboardData(): void {
+    const modelParams = new HttpParams();
+    const datasetParams = new HttpParams()
+      .set('project', sessionStorage.getItem('organization') || '')
+      .set('search', '');
+
+    forkJoin({
+      connections:      this.datasourceService.getDatasources().pipe(catchError(() => of([]))),
+      datasets:         this.datasetService.getDatasetsLenBySearch('').pipe(catchError(() => of(0))),
+      models:           this.services.getCountModels(modelParams).pipe(catchError(() => of(0))),
+      agentCount:       this.pipelineService.getPipelinesCount('pipeline-agent').pipe(catchError(() => of(0))),
+      mcpCount:         this.pipelineService.getPipelinesCount('mcp-pipeline', 'mcpServer').pipe(catchError(() => of(0))),
+      appCount:         this.pipelineService.getPipelinesCount('app-pipeline', 'appPipeline').pipe(catchError(() => of(0))),
+      agentPipelines:   this.pipelineService.getPipelinesByInterfaceType('pipeline-agent', null, 1, 3).pipe(catchError(() => of([]))),
+      mcpPipelines:     this.pipelineService.getPipelinesByInterfaceType('mcp-pipeline', 'mcpServer', 1, 3).pipe(catchError(() => of([]))),
+      appPipelines:     this.pipelineService.getPipelinesByInterfaceType('app-pipeline', 'appPipeline', 1, 3).pipe(catchError(() => of([]))),
+    }).subscribe(results => {
+      const connCount = Array.isArray(results.connections) ? results.connections.length : 0;
+      this.moduleStats[0].count = connCount;
+      this.moduleStats[0].sub   = `${connCount} total`;
+
+      const dsetCount = Number(results.datasets) || 0;
+      this.moduleStats[1].count = dsetCount;
+      this.moduleStats[1].sub   = `${dsetCount} total`;
+
+      const mdlCount = Number(results.models) || 0;
+      this.moduleStats[2].count = mdlCount;
+      this.moduleStats[2].sub   = `${mdlCount} total`;
+
+      const agentCount = Number(results.agentCount) || 0;
+      this.moduleStats[3].count = agentCount;
+      this.moduleStats[3].sub   = `${agentCount} total`;
+
+      const mcpCount = Number(results.mcpCount) || 0;
+      this.moduleStats[4].count = mcpCount;
+      this.moduleStats[4].sub   = `${mcpCount} total`;
+
+      const appCount = Number(results.appCount) || 0;
+      this.moduleStats[5].count = appCount;
+      this.moduleStats[5].sub   = `${appCount} total`;
+
+      this.topAgentPipelines = this.mapToPipelineCards(results.agentPipelines, 'fa-code-fork');
+      this.topMcpPipelines   = this.mapToPipelineCards(results.mcpPipelines,   'fa-server');
+      this.topAppPipelines   = this.mapToPipelineCards(results.appPipelines,   'fa-window-restore');
+    });
+  }
+
+  private mapToPipelineCards(pipelines: any[], defaultIcon: string): PipelineCard[] {
+    if (!Array.isArray(pipelines)) return [];
+    return pipelines.slice(0, 3).map(p => {
+      const status = this.mapStatus(p.status || p.jobStatus || p.state);
+      return {
+        alias:  p.alias || p.cname || 'Unknown',
+        name:   p.name  || p.jobName || '',
+        status: status,
+        icon:   status === 'running' ? defaultIcon : status === 'failed' ? 'fa-exclamation-circle' : 'fa-check-circle',
+        accent: status === 'running' ? '#22c55e'  : status === 'failed'  ? '#ef4444'              : '#94a3b8'
+      };
+    });
+  }
+
+  private mapStatus(raw: string): 'running' | 'completed' | 'failed' {
+    if (!raw) return 'completed';
+    const s = raw.toLowerCase();
+    if (s === 'running' || s === 'active' || s === 'inprogress') return 'running';
+    if (s === 'failed'  || s === 'error'  || s === 'failure')    return 'failed';
+    return 'completed';
+  }
 }

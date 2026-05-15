@@ -7,6 +7,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatasetServices } from './dataset/dataset-service';
+import { DatasourceService } from './datasource/datasource.service';
 import { EventsService } from './services/event.service';
 import { MatChipsModule } from '@angular/material/chips';
 import { ModelComponent } from './model/model.component';
@@ -344,6 +345,7 @@ const dbConfig: DBConfig = {
     AdapterServices,
     PipelineService,
     DatasetServices,
+    DatasourceService,
     EventsService,
     JobsService,
     SchemaRegistryService,
