@@ -137,7 +137,8 @@ export class LandingComponent implements OnInit, AfterViewInit {
   private submenuHideTimer: any = null;
 
   // ── Advanced / optional menu items ──────────────────────────────────────
-  readonly ADVANCED_MENU_LABELS: string[] = ['Agent Designer', 'Lite LLM', 'Langfuse', 'Salus', 'Apps', 'App List'];
+  advancedMenuItems: { label: string; description: string }[] = [];
+  get ADVANCED_MENU_LABELS(): string[] { return this.advancedMenuItems.map(i => i.label); }
   customMenuState: { [label: string]: boolean } = {};
   showMenuCustomizer: boolean = false;
 
@@ -485,7 +486,7 @@ export class LandingComponent implements OnInit, AfterViewInit {
     );
     this.sidebarMenuPopupWidth = this.showSidebarMenuList ? "130px" : "0px";
     this.sidebarmaxwidth = this.showSidebarMenuList ? "260px" : "7vw";
-    this.loadMenuCustomization();
+    this.loadAdvancedMenuConfig().then(() => this.loadMenuCustomization());
     
     // Call getNotificationsPermision only once per session to prevent duplicate API calls
     if (!sessionStorage.getItem('notificationsLoaded')) {
@@ -3791,22 +3792,37 @@ if ((roleChanged || portfolioChanged || projectChanged) && !navigationInProgress
     ).length;
   }
 
-  /** Human-readable description for each advanced menu module. */
+  /** Human-readable description for each advanced menu module (sourced from config). */
   getItemDescription(label: string): string {
-    const map: { [k: string]: string } = {
-      'Agent Designer':  'Design AI agent workflows',
-      'Lite LLM':        'Manage LLM proxy & routing',
-      'Langfuse':        'Monitor & trace LLM calls',
-      'Salus':           'Security & compliance hub',
-      'Apps':            'Browse & launch applications',
-      'App List':        'Browse & launch applications',
-    };
-    return map[label] || label;
+    const item = this.advancedMenuItems.find(i => i.label === label);
+    return item?.description || label;
   }
 
   /** Get the icon label used in the sidebar SVG block for each advanced item. */
   getItemIconLabel(label: string): string {
     return label;
+  }
+
+  /** Load the list of advanced menu items from the config file. */
+  loadAdvancedMenuConfig(): Promise<void> {
+    return this.http.get<{ advancedMenuItems: { label: string; description: string }[] }>('configs/menu-advanced-config.json')
+      .toPromise()
+      .then((cfg) => {
+        if (cfg && Array.isArray(cfg.advancedMenuItems)) {
+          this.advancedMenuItems = cfg.advancedMenuItems;
+        }
+      })
+      .catch(() => {
+        // Fallback to defaults if config cannot be loaded
+        this.advancedMenuItems = [
+          { label: 'Agent Designer', description: 'Design AI agent workflows' },
+          { label: 'Lite LLM',       description: 'Manage LLM proxy & routing' },
+          { label: 'Langfuse',       description: 'Monitor & trace LLM calls' },
+          { label: 'Salus',          description: 'Security & compliance hub' },
+          { label: 'Apps',           description: 'Browse & launch applications' },
+          { label: 'App List',       description: 'Browse & launch applications' },
+        ];
+      });
   }
 
   loadMenuCustomization(): void {
