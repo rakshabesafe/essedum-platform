@@ -39,6 +39,106 @@
               <span class="tgl-opt tgl-dark">&#9790; Dark</span>
             </button>
 
+            <!-- ── Menu Customizer Button ── -->
+            <div class="menu-customizer-wrapper" *ngIf="sidebar && selectedrole.name != currentrole">
+              <button class="menu-customizer-btn"
+                      [class.menu-customizer-btn--active]="showMenuCustomizer"
+                      [class.menu-customizer-btn--has-items]="getEnabledAdvancedCount() > 0"
+                      (click)="toggleMenuCustomizer($event)"
+                      matTooltip="Customize Menu Modules">
+                <!-- apps-grid SVG icon -->
+                <svg class="mca-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+                  <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                  <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+                  <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                </svg>
+                <span class="mca-badge" *ngIf="getEnabledAdvancedCount() > 0">{{ getEnabledAdvancedCount() }}</span>
+              </button>
+
+              <!-- ── Customizer Dropdown Panel ── -->
+              <div class="menu-customizer-panel"
+                   [class.mcp--open]="showMenuCustomizer"
+                   (click)="$event.stopPropagation()">
+                <div class="mcp-header">
+                  <div class="mcp-title-row">
+                    <svg class="mcp-title-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm-1 14.5v-5l-3 1.5 3-7v5l3-1.5-3 7z"/>
+                    </svg>
+                    <span class="mcp-title">App Modules</span>
+                    <button class="mcp-close-btn" (click)="closeMenuCustomizer()">
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                    </button>
+                  </div>
+                  <p class="mcp-subtitle">Toggle modules to show or hide them in the sidebar</p>
+                </div>
+
+                <div class="mcp-items">
+                  <ng-container *ngFor="let item of getAdvancedMenuItems()">
+                    <div class="mcp-item"
+                         [class.mcp-item--on]="customMenuState[item.label]"
+                         (click)="toggleAdvancedMenuItem(item.label, $event)">
+                      <!-- reuse the same icon SVG blocks from the sidebar -->
+                      <div class="mcp-item-icon">
+                        <ng-container [ngSwitch]="item.label">
+                          <svg *ngSwitchCase="'Agent Designer'" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M8 6h8a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3zM8.8 9.5a1.2 1.2 0 1 0 2.4 0a1.2 1.2 0 1 0-2.4 0zm4 0a1.2 1.2 0 1 0 2.4 0a1.2 1.2 0 1 0-2.4 0zM10.5 13h3v.5a1.5 1.5 0 0 1-3 0z"/>
+                            <circle cx="12" cy="3.5" r="1.5"/>
+                            <rect x="11.25" y="4.5" width="1.5" height="2"/>
+                          </svg>
+                          <svg *ngSwitchCase="'Lite LLM'" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M13 3L5.5 13H11L9.5 22 18.5 11H13L15 3Z"/>
+                          </svg>
+                          <svg *ngSwitchCase="'Langfuse'" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C4.5 7 8 4 12 4S19.5 7 22 12C19.5 17 16 20 12 20S4.5 17 2 12zM7 12a5 5 0 1 0 10 0a5 5 0 1 0-10 0zM9.5 12a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0-5 0z"/>
+                          </svg>
+                          <svg *ngSwitchCase="'Salus'" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2L4 6v7c0 5.25 3.5 9.75 8 11 4.5-1.25 8-5.75 8-11V6L12 2zM10 9h4v2h3v4h-3v2h-4v-2H7v-4h3V9z"/>
+                          </svg>
+                          <svg *ngSwitchCase="'Apps'" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="2" y="2" width="9" height="9" rx="1.5"/>
+                            <rect x="13" y="2" width="9" height="9" rx="1.5"/>
+                            <rect x="2" y="13" width="9" height="9" rx="1.5"/>
+                            <rect x="13" y="13" width="9" height="9" rx="1.5"/>
+                          </svg>
+                          <svg *ngSwitchCase="'App List'" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="2" y="2" width="9" height="9" rx="1.5"/>
+                            <rect x="13" y="2" width="9" height="9" rx="1.5"/>
+                            <rect x="2" y="13" width="9" height="9" rx="1.5"/>
+                            <rect x="13" y="13" width="9" height="9" rx="1.5"/>
+                          </svg>
+                          <svg *ngSwitchDefault viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="12" cy="12" r="5"/>
+                          </svg>
+                        </ng-container>
+                      </div>
+                      <div class="mcp-item-info">
+                        <span class="mcp-item-label">{{ item.label }}</span>
+                        <span class="mcp-item-desc">{{ getItemDescription(item.label) }}</span>
+                      </div>
+                      <div class="mcp-toggle" [class.mcp-toggle--on]="customMenuState[item.label]">
+                        <div class="mcp-toggle-track">
+                          <div class="mcp-toggle-thumb"></div>
+                        </div>
+                        <span class="mcp-toggle-label">{{ customMenuState[item.label] ? 'ON' : 'OFF' }}</span>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <!-- Empty state when no advanced items in the menu yet -->
+                  <div class="mcp-empty" *ngIf="getAdvancedMenuItems().length === 0">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                    <p>No optional modules available for your current role.</p>
+                  </div>
+                </div>
+
+                <div class="mcp-footer">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 17h2v-6h-2v6zm1-8a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+                  <span>Changes apply to the sidebar immediately</span>
+                </div>
+              </div>
+            </div>
+            <!-- ── / Menu Customizer ── -->
+
             <button mat-icon-button="" [matMenuTriggerFor]="menu" (click)="getSession()" [matTooltip]="user.user_f_name"
               class="userMobile selector-3-80 user-profile-btn user-btn-height">
               <span *ngIf="!profileimage"
@@ -124,7 +224,7 @@
              class="top-nav-bar"
              [ngClass]="{'top-nav-dark': isDark, 'top-nav-light': !isDark}">
           <div class="top-nav-scroll">
-            <ng-container *ngFor="let item of sidebarMenu">
+            <ng-container *ngFor="let item of visibleSidebarMenu">
               <!-- items with children → mat-menu dropdown -->
               <ng-container *ngIf="item.children && item.children.length > 0">
                 <button class="top-nav-item top-nav-has-children"
@@ -216,14 +316,14 @@
                 <app-sidebar-menu-text                
                   [showSidebarMenuList]="showSidebarMenuList"
                   [sidebarMenuPopupPosition]="dynamicSidebarMenuPopupPosition"
-                  [sidebarMenu]="sidebarMenu"
+                  [sidebarMenu]="visibleSidebarMenu"
                   [highlightedLabel]="highlightedLabel"
                   (close)="closeSidebarMenuPopup()"
                   (menuItemClick)="onSidebarMenuItemClick($event.event, $event.item)">
                 </app-sidebar-menu-text>
 </div>
                 <!-- Sidenav Icons menu bar -->
-                <ng-container *ngFor="let item of sidebarMenu; let i = index">
+                <ng-container *ngFor="let item of visibleSidebarMenu; let i = index">
                 <div class="a-height sidebar-item-container" [class.sidebar-border]="
                     item.label == highlightedLabel &&
                     sidebarhighlightcolor != true
