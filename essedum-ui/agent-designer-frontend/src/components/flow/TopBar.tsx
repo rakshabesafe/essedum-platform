@@ -1,0 +1,217 @@
+import { useState } from 'react';
+import { useFlowStore } from '../../store/flowStore';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { Separator } from '../ui/separator';
+import { Badge } from '../ui/badge';
+import {
+  Play, Square, Save, Download, Upload,
+  Plus, PanelLeft, PanelRight, Terminal, Edit2, Check, X,
+  Layers, Zap
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { cn } from '../../lib/utils';
+
+export function TopBar() {
+  const {
+    currentFlowName, renameFlow, saveFlow, newFlow, exportFlow, importFlow,
+    runFlow, stopExecution, execution,
+    showNodeLibrary, showInspector, showLogs,
+    toggleNodeLibrary, toggleInspector, toggleLogs,
+    setShowFlowManager, nodes, edges,
+  } = useFlowStore();
+
+  const [editingName, setEditingName] = useState(false);
+  const [nameVal, setNameVal] = useState(currentFlowName);
+
+  const isRunning = execution.status === 'running';
+
+  const handleRename = () => {
+    if (nameVal.trim()) { renameFlow(nameVal.trim()); toast.success('Flow renamed'); }
+    setEditingName(false);
+  };
+
+  const handleSave = () => { saveFlow(); toast.success('Flow saved'); };
+
+  const handleRun = async () => {
+    if (nodes.length === 0) { toast.error('Add nodes to the canvas first'); return; }
+    await runFlow();
+  };
+
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        importFlow(e.target?.result as string);
+        toast.success('Flow imported');
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
+  return (
+    <header className="h-12 flex items-center gap-2 px-3 border-b border-border bg-card/80 backdrop-blur-sm z-50 flex-shrink-0">
+      {/* Brand */}
+      <div className="flex items-center gap-2 mr-2">
+        <div className="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center">
+          <Zap className="w-4 h-4 text-primary" />
+        </div>
+        <span className="text-sm font-bold text-foreground font-display tracking-wide hidden sm:block">
+          AgentFlow
+        </span>
+      </div>
+
+      <Separator orientation="vertical" className="h-6" />
+
+      {/* Flow Name */}
+      <div className="flex items-center gap-1 min-w-0">
+        {editingName ? (
+          <div className="flex items-center gap-1">
+            <Input
+              value={nameVal}
+              onChange={(e) => setNameVal(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') setEditingName(false); }}
+              className="h-7 text-sm w-40 bg-background"
+              autoFocus
+            />
+            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleRename}><Check className="w-3 h-3" /></Button>
+            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditingName(false)}><X className="w-3 h-3" /></Button>
+          </div>
+        ) : (
+          <button
+            onClick={() => { setNameVal(currentFlowName); setEditingName(true); }}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-muted transition-colors group"
+          >
+            <span className="text-sm font-medium text-foreground truncate max-w-[160px]">{currentFlowName}</span>
+            <Edit2 className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+        )}
+      </div>
+
+      {/* Stats */}
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-1 hidden md:flex">
+        <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-mono">{nodes.length}N</Badge>
+        <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-mono">{edges.length}E</Badge>
+      </div>
+
+      <div className="flex-1" />
+
+      {/* Panel toggles */}
+      <div className="flex items-center gap-0.5">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon" variant="ghost"
+              className={cn('h-8 w-8', showNodeLibrary && 'bg-primary/10 text-primary')}
+              onClick={toggleNodeLibrary}
+            >
+              <PanelLeft className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Node Library</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon" variant="ghost"
+              className={cn('h-8 w-8', showLogs && 'bg-primary/10 text-primary')}
+              onClick={toggleLogs}
+            >
+              <Terminal className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Execution Logs</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon" variant="ghost"
+              className={cn('h-8 w-8', showInspector && 'bg-primary/10 text-primary')}
+              onClick={toggleInspector}
+            >
+              <PanelRight className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Node Inspector</TooltipContent>
+        </Tooltip>
+      </div>
+
+      <Separator orientation="vertical" className="h-6" />
+
+      {/* Actions */}
+      <div className="flex items-center gap-1">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setShowFlowManager(true)}>
+              <Layers className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Flow Manager</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { newFlow(); toast.info('New flow created'); }}>
+              <Plus className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>New Flow</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleSave}>
+              <Save className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Save Flow (Ctrl+S)</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={exportFlow}>
+              <Download className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Export JSON</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleImport}>
+              <Upload className="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Import JSON</TooltipContent>
+        </Tooltip>
+      </div>
+
+      <Separator orientation="vertical" className="h-6" />
+
+      {/* Run / Stop */}
+      {isRunning ? (
+        <Button
+          size="sm"
+          variant="destructive"
+          className="h-8 gap-1.5 text-xs font-semibold"
+          onClick={stopExecution}
+        >
+          <Square className="w-3 h-3 fill-current" />
+          Stop
+        </Button>
+      ) : (
+        <Button
+          size="sm"
+          className="h-8 gap-1.5 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={handleRun}
+        >
+          <Play className="w-3 h-3 fill-current" />
+          Run Flow
+        </Button>
+      )}
+    </header>
+  );
+}
