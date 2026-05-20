@@ -40,7 +40,7 @@
             </button>
 
             <!-- ── Menu Customizer Button ── -->
-            <div class="menu-customizer-wrapper" *ngIf="sidebar && selectedrole.name != currentrole">
+            <div class="menu-customizer-wrapper" *ngIf="sidebar">
               <button class="menu-customizer-btn"
                       [class.menu-customizer-btn--active]="showMenuCustomizer"
                       [class.menu-customizer-btn--has-items]="getEnabledAdvancedCount() > 0"
