@@ -77,7 +77,7 @@ export function FlowManager() {
                         ? 'bg-primary/10 border-primary/30'
                         : 'border-transparent hover:bg-muted/70 hover:border-border/50'
                     )}
-                    onClick={() => { loadFlow(flow.id); toast.success(`Loaded "${flow.name}"`); }}
+                    onClick={() => { loadFlow(flow.id).then(() => toast.success(`Loaded "${flow.name}"`)).catch(() => toast.error('Failed to load flow')); }}
                   >
                     <div className={cn(
                       'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
@@ -115,7 +115,7 @@ export function FlowManager() {
                       <Button
                         size="icon" variant="ghost"
                         className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => { deleteFlow(flow.id); toast.info(`Deleted "${flow.name}"`); }}
+                        onClick={() => { deleteFlow(flow.id).then(() => toast.info(`Deleted "${flow.name}"`)).catch(() => toast.error('Failed to delete flow')); }}
                         title="Delete"
                       >
                         <Trash2 className="w-3 h-3" />
@@ -132,7 +132,7 @@ export function FlowManager() {
           <span className="text-xs text-muted-foreground">{savedFlows.length} saved flows</span>
           <Button
             size="sm" variant="outline" className="h-8 text-xs gap-1.5"
-            onClick={() => { saveFlow(); toast.success('Flow saved'); }}
+            onClick={() => { saveFlow().then(() => toast.success('Flow saved')).catch(() => toast.error('Failed to save flow')); }}
           >
             <Plus className="w-3 h-3" /> Save Current Flow
           </Button>

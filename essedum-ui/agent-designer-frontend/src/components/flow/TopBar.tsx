@@ -32,7 +32,7 @@ export function TopBar() {
     setEditingName(false);
   };
 
-  const handleSave = () => { saveFlow(); toast.success('Flow saved'); };
+  const handleSave = () => { saveFlow().then(() => toast.success('Flow saved')).catch(() => toast.error('Failed to save flow')); };
 
   const handleRun = async () => {
     if (nodes.length === 0) { toast.error('Add nodes to the canvas first'); return; }

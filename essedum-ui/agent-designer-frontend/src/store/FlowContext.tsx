@@ -1,8 +1,11 @@
-import { createContext, useCallback, useReducer, useRef } from 'react';
+import { createContext, useCallback, useReducer, useRef, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { applyNodeChanges, applyEdgeChanges, addEdge } from '@xyflow/react';
 import type { Edge, NodeChange, EdgeChange, Connection } from '@xyflow/react';
 import type { AgentFlowNode, FlowNodeData, SavedFlow, ExecutionState, LogEntry } from '../types/flow';
+import { flowService } from '../services/flowService';
+import { executionService } from '../services/executionService';
+import type { FlowResponse } from '../models/api';
 
 let _idCounter = 1;
 const uid = (p = 'x') => `${p}_${Date.now()}_${_idCounter++}`;
@@ -16,6 +19,7 @@ interface State {
   currentFlowName: string;
   savedFlows: SavedFlow[];
   execution: ExecutionState;
+  executionId: string | null;
   showNodeLibrary: boolean;
   showInspector: boolean;
   showLogs: boolean;
@@ -51,7 +55,9 @@ type Action =
   | { type: 'TOGGLE_INSPECTOR' }
   | { type: 'TOGGLE_LOGS' }
   | { type: 'SET_SHOW_LOGS'; show: boolean }
-  | { type: 'SET_FLOW_MANAGER'; show: boolean };
+  | { type: 'SET_FLOW_MANAGER'; show: boolean }
+  | { type: 'SET_SAVED_FLOWS'; flows: SavedFlow[] }
+  | { type: 'SET_EXECUTION_ID'; executionId: string };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function loadFlows(): SavedFlow[] {
@@ -59,6 +65,20 @@ function loadFlows(): SavedFlow[] {
 }
 function persistFlows(flows: SavedFlow[]) {
   localStorage.setItem('agentflow_saved_flows', JSON.stringify(flows));
+}
+
+/** Convert backend FlowResponse → frontend SavedFlow */
+function apiFlowToSaved(f: FlowResponse): SavedFlow {
+  return {
+    id: f.id,
+    name: f.name,
+    description: f.description ?? undefined,
+    nodes: f.nodes,
+    edges: f.edges,
+    createdAt: f.created_at,
+    updatedAt: f.updated_at,
+    tags: f.tags,
+  };
 }
 
 // ─── Reducer ─────────────────────────────────────────────────────────────────
@@ -166,6 +186,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, showLogs: action.show };
     case 'SET_FLOW_MANAGER':
       return { ...state, showFlowManager: action.show };
+    case 'SET_SAVED_FLOWS':
+      return { ...state, savedFlows: action.flows };
+    case 'SET_EXECUTION_ID':
+      return { ...state, executionId: action.executionId };
     default:
       return state;
   }
@@ -183,12 +207,13 @@ interface ContextValue extends State {
   duplicateNode: (nodeId: string) => void;
   selectNode: (nodeId: string | null) => void;
   newFlow: () => void;
-  saveFlow: () => void;
-  loadFlow: (flowId: string) => void;
-  deleteFlow: (flowId: string) => void;
+  saveFlow: () => Promise<void>;
+  loadFlow: (flowId: string) => Promise<void>;
+  deleteFlow: (flowId: string) => Promise<void>;
   renameFlow: (name: string) => void;
   exportFlow: () => void;
   importFlow: (json: string) => void;
+  fetchFlows: () => Promise<void>;
   runFlow: () => Promise<void>;
   stopExecution: () => void;
   clearLogs: () => void;
@@ -208,6 +233,7 @@ const initialState: State = {
   currentFlowName: 'Untitled Flow',
   savedFlows: loadFlows(),
   execution: { status: 'idle', logs: [] },
+  executionId: null,
   showNodeLibrary: true,
   showInspector: true,
   showLogs: false,
@@ -233,24 +259,77 @@ export function FlowProvider({ children }: { children: ReactNode }) {
   const newFlow = useCallback(() => dispatch({ type: 'NEW_FLOW' }), []);
   const renameFlow = useCallback((name: string) => dispatch({ type: 'RENAME_FLOW', name }), []);
 
-  const saveFlow = useCallback(() => {
+  // ─── Fetch all flows from backend API ──────────────────────────────
+  const fetchFlows = useCallback(async () => {
+    try {
+      const apiFlows = await flowService.list();
+      const saved = apiFlows.map(apiFlowToSaved);
+      dispatch({ type: 'SET_SAVED_FLOWS', flows: saved });
+      persistFlows(saved);
+    } catch (err) {
+      console.warn('API unavailable, using local flows', err);
+    }
+  }, []);
+
+  // Load flows from API on mount
+  useEffect(() => { fetchFlows(); }, [fetchFlows]);
+
+  // ─── Save flow → API (create or update) ────────────────────────────
+  const saveFlow = useCallback(async () => {
     const s = stateRef.current;
-    const id = s.currentFlowId || uid('flow');
-    const now = new Date().toISOString();
-    const flow: SavedFlow = {
-      id, name: s.currentFlowName, nodes: s.nodes, edges: s.edges,
-      createdAt: s.savedFlows.find((f) => f.id === id)?.createdAt || now,
-      updatedAt: now,
+    const payload = {
+      name: s.currentFlowName,
+      nodes: s.nodes as unknown as Record<string, unknown>[],
+      edges: s.edges as unknown as Record<string, unknown>[],
     };
-    dispatch({ type: 'SAVE_FLOW', flow });
+
+    try {
+      let apiFlow: FlowResponse;
+      if (s.currentFlowId) {
+        // Update existing flow
+        apiFlow = await flowService.update(s.currentFlowId, payload);
+      } else {
+        // Create new flow
+        apiFlow = await flowService.create(payload);
+      }
+      const saved = apiFlowToSaved(apiFlow);
+      dispatch({ type: 'SAVE_FLOW', flow: saved });
+    } catch (err) {
+      console.error('Failed to save flow to API, saving locally', err);
+      // Fallback: local save
+      const id = s.currentFlowId || uid('flow');
+      const now = new Date().toISOString();
+      const flow: SavedFlow = {
+        id, name: s.currentFlowName, nodes: s.nodes, edges: s.edges,
+        createdAt: s.savedFlows.find((f) => f.id === id)?.createdAt || now,
+        updatedAt: now,
+      };
+      dispatch({ type: 'SAVE_FLOW', flow });
+    }
   }, []);
 
-  const loadFlow = useCallback((flowId: string) => {
-    const flow = stateRef.current.savedFlows.find((f) => f.id === flowId);
-    if (flow) dispatch({ type: 'LOAD_FLOW', flow });
+  // ─── Load flow by ID → API then dispatch ───────────────────────────
+  const loadFlow = useCallback(async (flowId: string) => {
+    try {
+      const apiFlow = await flowService.get(flowId);
+      const saved = apiFlowToSaved(apiFlow);
+      dispatch({ type: 'LOAD_FLOW', flow: saved });
+    } catch (err) {
+      console.warn('API load failed, trying local', err);
+      const flow = stateRef.current.savedFlows.find((f) => f.id === flowId);
+      if (flow) dispatch({ type: 'LOAD_FLOW', flow });
+    }
   }, []);
 
-  const deleteFlow = useCallback((flowId: string) => dispatch({ type: 'DELETE_FLOW', flowId }), []);
+  // ─── Delete flow → API then dispatch ───────────────────────────────
+  const deleteFlow = useCallback(async (flowId: string) => {
+    try {
+      await flowService.delete(flowId);
+    } catch (err) {
+      console.warn('API delete failed, removing locally', err);
+    }
+    dispatch({ type: 'DELETE_FLOW', flowId });
+  }, []);
 
   const exportFlow = useCallback(() => {
     const s = stateRef.current;
@@ -273,6 +352,7 @@ export function FlowProvider({ children }: { children: ReactNode }) {
     } catch (e) { console.error('Import failed', e); }
   }, []);
 
+  // ─── Run flow → API execution ──────────────────────────────────────
   const runFlow = useCallback(async () => {
     const s = stateRef.current;
     if (s.nodes.length === 0) return;
@@ -284,7 +364,31 @@ export function FlowProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'EXEC_START' });
     addLog({ level: 'info', message: '▶  Flow execution started' });
 
-    // Topological sort
+    // If we have a saved flow ID, try running via the API
+    if (s.currentFlowId) {
+      try {
+        // Find the chat_input node's text as the message
+        const inputNode = s.nodes.find((n) => n.data.definition.type === 'chat_input' || n.data.definition.category === 'input');
+        const message = inputNode ? String(inputNode.data.config?.input_text || 'Hello') : 'Hello';
+
+        addLog({ level: 'info', message: '  Sending execution request to backend API…' });
+        const runResult = await executionService.run(s.currentFlowId, { message });
+        const execId = runResult.execution_id;
+        dispatch({ type: 'SET_EXECUTION_ID', executionId: execId });
+        addLog({ level: 'info', message: `  Execution queued: ${execId}` });
+        addLog({ level: 'success', message: `✓ Execution submitted to backend (id: ${execId})` });
+        s.nodes.forEach((n) => {
+          dispatch({ type: 'UPDATE_NODE_STATUS', nodeId: n.id, status: 'success' });
+        });
+        dispatch({ type: 'EXEC_COMPLETE' });
+        return;
+      } catch (apiErr) {
+        addLog({ level: 'warning', message: `  API execution failed, falling back to local simulation: ${apiErr}` });
+        // Fall through to local mock execution
+      }
+    }
+
+    // ─── Local mock execution (fallback when no API / unsaved flow) ──
     const { nodes, edges } = stateRef.current;
     const inDeg: Record<string, number> = {};
     const adj: Record<string, string[]> = {};
@@ -335,7 +439,9 @@ export function FlowProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const stopExecution = useCallback(() => dispatch({ type: 'EXEC_STOP' }), []);
+  const stopExecution = useCallback(() => {
+    dispatch({ type: 'EXEC_STOP' });
+  }, []);
   const clearLogs = useCallback(() => dispatch({ type: 'EXEC_CLEAR_LOGS' }), []);
   const toggleNodeLibrary = useCallback(() => dispatch({ type: 'TOGGLE_LIBRARY' }), []);
   const toggleInspector = useCallback(() => dispatch({ type: 'TOGGLE_INSPECTOR' }), []);
@@ -349,7 +455,7 @@ export function FlowProvider({ children }: { children: ReactNode }) {
       addNode, updateNodeConfig, updateNodeLabel,
       deleteNode, duplicateNode, selectNode,
       newFlow, saveFlow, loadFlow, deleteFlow, renameFlow, exportFlow, importFlow,
-      runFlow, stopExecution, clearLogs,
+      fetchFlows, runFlow, stopExecution, clearLogs,
       toggleNodeLibrary, toggleInspector, toggleLogs, setShowFlowManager,
     }}>
       {children}
