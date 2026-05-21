@@ -3,3 +3,4 @@ agent_flow-local.db
 agent_flow.db
 .env
 *.log
+pip.ini
