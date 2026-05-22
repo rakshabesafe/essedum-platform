@@ -12,10 +12,11 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
+import { PlaygroundModal } from './PlaygroundModal';
 
 export function TopBar() {
   const {
-    currentFlowName, renameFlow, saveFlow, newFlow, exportFlow, importFlow,
+    currentFlowName, currentFlowId, renameFlow, saveFlow, newFlow, exportFlow, importFlow,
     runFlow, stopExecution, execution,
     showNodeLibrary, showInspector, showLogs,
     toggleNodeLibrary, toggleInspector, toggleLogs,
@@ -24,6 +25,7 @@ export function TopBar() {
 
   const [editingName, setEditingName] = useState(false);
   const [nameVal, setNameVal] = useState(currentFlowName);
+  const [playgroundOpen, setPlaygroundOpen] = useState(false);
 
   const isRunning = execution.status === 'running';
 
@@ -212,6 +214,26 @@ export function TopBar() {
           Run Flow
         </Button>
       )}
+
+      {/* Playground — only when flow is saved */}
+      {currentFlowId && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 gap-1.5 text-xs font-semibold border-primary/40 text-primary hover:bg-primary/10 hover:text-primary"
+              onClick={() => setPlaygroundOpen(true)}
+            >
+              <Play className="w-3 h-3" />
+              Playground
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Open Playground</TooltipContent>
+        </Tooltip>
+      )}
+
+      <PlaygroundModal open={playgroundOpen} onClose={() => setPlaygroundOpen(false)} />
     </header>
   );
 }
