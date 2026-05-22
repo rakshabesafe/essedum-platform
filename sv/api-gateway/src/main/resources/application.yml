@@ -1,0 +1,174 @@
+# =====================================================
+# API Gateway - Spring Cloud Gateway
+# =====================================================
+# Routes all requests to the appropriate microservice.
+# Supports both Eureka-based (lb://) and direct URL routing.
+# =====================================================
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      # ---- Global CORS ----
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+
+      # ---- Default Filters ----
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
+      # ---- Route Definitions ----
+      routes:
+        # ============================================================
+        # USM Service - User & Security Management (Port 8081)
+        # ============================================================
+        - id: usm-authenticate
+          uri: ${USM_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/authenticate,/api/userInfo,/api/userInfoCAP,/api/validateUser,/api/validateUserCAP
+          filters:
+            - RewritePath=/(?<remaining>.*), /${remaining}
+
+        - id: usm-users
+          uri: ${USM_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/users/**,/api/userss/**,/api/registerUser
+
+        - id: usm-roles
+          uri: ${USM_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/roles/**,/api/role-processs/**
+
+        - id: usm-organisations
+          uri: ${USM_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/organisations/**,/api/org-units/**,/api/projects/**
+
+        - id: usm-permissions
+          uri: ${USM_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/permissions/**,/api/role-permissionss/**,/api/usm-permission-apis/**,/api/user-api-permissionss/**
+
+        - id: usm-misc
+          uri: ${USM_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/delegates/**,/api/email/**,/api/country-time-zones/**,/api/usm-modules/**,/api/usm-module-organisations/**,/api/usm-notificationss/**,/api/usm-portfolios/**,/api/usm-stages/**,/api/user-project-roles/**,/api/user-units/**,/api/user-process-mappings/**,/api/usm-role-to-roles/**,/api/usm-user-to-users/**,/api/file-extension-keys/**,/api/icms-processs/**,/api/dash-constants/**
+
+        - id: usm-config
+          uri: ${USM_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/getConfigDetails,/api/essedum/logout,/api/essedum/authorize
+
+        # ============================================================
+        # ICIP Service - AI/ML Pipeline & Jobs (Port 8082)
+        # ============================================================
+        - id: icip-aip
+          uri: ${ICIP_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/aip/**
+
+        - id: icip-events
+          uri: ${ICIP_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/event/**,/api/webhook/**
+
+        - id: icip-models
+          uri: ${ICIP_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/modelservice/**,/api/pipelinemodels/**,/api/mltopics/**,/api/mldatasettopics/**
+
+        - id: icip-services
+          uri: ${ICIP_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/service/**
+
+        - id: icip-mlops
+          uri: ${ICIP_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/exp/**
+
+        - id: icip-websocket
+          uri: ${ICIP_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/ws/**
+
+        - id: icip-automation
+          uri: ${ICIP_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/automation/**,/api/interactiveWorkflow/**,/api/workflow/**,/api/inbox/**,/api/RPAExternalTask/**
+
+        - id: icip-misc
+          uri: ${ICIP_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/saveBpmn/**,/api/deployBpmn/**,/api/copyblueprint/**,/api/batch/client/**,/api/sre-availability-cal/**,/api/adapter_workflow/**,/api/dashboard-configurations/**,/api/license/**
+
+        # ============================================================
+        # Data Service - Files & Data Adapters (Port 8083)
+        # ============================================================
+        - id: data-files
+          uri: ${DATA_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/file/**
+
+        - id: data-datasets
+          uri: ${DATA_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/datasets/**
+
+        - id: data-adapters
+          uri: ${DATA_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/adapters/**
+
+        # ============================================================
+        # Vibe Service - AI-Assisted Coding (Port 8084)
+        # ============================================================
+        - id: vibe-sessions
+          uri: ${VIBE_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/vibe/**
+
+        - id: vibe-goose
+          uri: ${VIBE_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/goose/**
+
+        - id: vibe-github
+          uri: ${VIBE_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/github/**
+
+# Eureka client config
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+    enabled: ${EUREKA_ENABLED:false}
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty: INFO
+

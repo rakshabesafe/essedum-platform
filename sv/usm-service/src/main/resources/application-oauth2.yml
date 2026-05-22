@@ -1,0 +1,14 @@
+# =====================================================
+# USM Service - OAuth2 Profile
+# =====================================================
+# Activate with: --spring.profiles.active=mysql,oauth2
+# =====================================================
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${OAUTH2_JWK_URI:}
+          issuer-uri: ${OAUTH2_ISSUER_URI:}
+

@@ -1,0 +1,9 @@
+# Vibe Service - OAuth2 Profile
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${OAUTH2_JWK_URI:}
+          issuer-uri: ${OAUTH2_ISSUER_URI:}
+
