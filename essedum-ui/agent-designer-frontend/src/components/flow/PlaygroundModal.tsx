@@ -27,6 +27,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { LABELS } from '../../lib/labels';
 import { useFlowStore } from '../../store/flowStore';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -199,7 +200,7 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
               <div className="w-7 h-7 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center">
                 <Play className="w-3.5 h-3.5 text-primary fill-current" />
               </div>
-              <DialogTitle className="text-base font-semibold">Playground</DialogTitle>
+              <DialogTitle className="text-base font-semibold">{LABELS.PLAYGROUND_TITLE}</DialogTitle>
               <Badge variant="outline" className="text-[10px] h-5 px-1.5">
                 {currentFlowName}
               </Badge>
@@ -236,7 +237,7 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
               {/* Session switcher — preserves all past sessions */}
               <Select value={activeSessionId} onValueChange={(id) => { setActiveSessionId(id); setInputValue(''); }}>
                 <SelectTrigger className="h-7 text-xs w-40 bg-background">
-                  <SelectValue placeholder="Select session" />
+                  <SelectValue placeholder={LABELS.PLAYGROUND_SELECT_SESSION_PLACEHOLDER} />
                 </SelectTrigger>
                 <SelectContent>
                   {sessions.map((s) => (
@@ -263,7 +264,7 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
           >
             <span className="flex items-center gap-1.5">
               <Hash className="w-3 h-3" />
-              Session Details — {activeSession.info.sessionName}
+              {LABELS.PLAYGROUND_SESSION_DETAILS} — {activeSession.info.sessionName}
             </span>
             {showSessionDetails ? (
               <ChevronUp className="w-3.5 h-3.5" />
@@ -276,14 +277,14 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
             <div className="px-5 pb-3 flex items-start gap-6">
               {/* Session Name */}
               <div className="flex flex-col gap-0.5 min-w-0">
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Session Name</span>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{LABELS.PLAYGROUND_SESSION_NAME_LABEL}</span>
                 <span className="text-xs font-medium text-foreground">{activeSession.info.sessionName}</span>
               </div>
               {/* Created At */}
               <div className="flex flex-col gap-0.5 min-w-0">
                 <span className="text-[10px] text-muted-foreground uppercase tracking-wide flex items-center gap-1">
                   <Clock className="w-2.5 h-2.5" />
-                  Created At
+                  {LABELS.PLAYGROUND_CREATED_AT_LABEL}
                 </span>
                 <span className="text-xs text-foreground whitespace-nowrap">{activeSession.info.createdAt}</span>
               </div>
@@ -291,7 +292,7 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
               <div className="w-px self-stretch bg-border mx-1" />
               {/* All Sessions */}
               <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">All Sessions</span>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{LABELS.PLAYGROUND_ALL_SESSIONS_LABEL}</span>
                 <div className="flex flex-wrap gap-1.5">
                   {sessions.map((s) => (
                     <button
@@ -321,7 +322,7 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
                 <Bot className="w-6 h-6 text-primary" />
               </div>
               <p className="text-sm text-muted-foreground">
-                Send a message to start the playground session.
+                {LABELS.PLAYGROUND_EMPTY_STATE}
               </p>
             </div>
           )}

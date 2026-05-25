@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
 import { PlaygroundModal } from './PlaygroundModal';
+import { LABELS } from '../../lib/labels';
 
 export function TopBar() {
   const {
@@ -30,14 +31,14 @@ export function TopBar() {
   const isRunning = execution.status === 'running';
 
   const handleRename = () => {
-    if (nameVal.trim()) { renameFlow(nameVal.trim()); toast.success('Flow renamed'); }
+    if (nameVal.trim()) { renameFlow(nameVal.trim()); toast.success(LABELS.TOPBAR_TOAST_FLOW_RENAMED); }
     setEditingName(false);
   };
 
-  const handleSave = () => { saveFlow().then(() => toast.success('Flow saved')).catch(() => toast.error('Failed to save flow')); };
+  const handleSave = () => { saveFlow().then(() => toast.success(LABELS.TOPBAR_TOAST_FLOW_SAVED)).catch(() => toast.error(LABELS.TOPBAR_TOAST_FLOW_SAVE_FAILED)); };
 
   const handleRun = async () => {
-    if (nodes.length === 0) { toast.error('Add nodes to the canvas first'); return; }
+    if (nodes.length === 0) { toast.error(LABELS.TOPBAR_TOAST_NO_NODES); return; }
     await runFlow();
   };
 
@@ -66,7 +67,7 @@ export function TopBar() {
           <Zap className="w-4 h-4 text-primary" />
         </div>
         <span className="text-sm font-bold text-foreground font-display tracking-wide hidden sm:block">
-          AgentFlow
+          {LABELS.APP_NAME}
         </span>
       </div>
 
@@ -117,7 +118,7 @@ export function TopBar() {
               <PanelLeft className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Node Library</TooltipContent>
+          <TooltipContent>{LABELS.TOPBAR_NODE_LIBRARY}</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -129,7 +130,7 @@ export function TopBar() {
               <Terminal className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Execution Logs</TooltipContent>
+          <TooltipContent>{LABELS.TOPBAR_EXECUTION_LOGS}</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -141,7 +142,7 @@ export function TopBar() {
               <PanelRight className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Node Inspector</TooltipContent>
+          <TooltipContent>{LABELS.TOPBAR_NODE_INSPECTOR}</TooltipContent>
         </Tooltip>
       </div>
 
@@ -155,15 +156,15 @@ export function TopBar() {
               <Layers className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Flow Manager</TooltipContent>
+          <TooltipContent>{LABELS.TOPBAR_FLOW_MANAGER}</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { newFlow(); toast.info('New flow created'); }}>
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { newFlow(); toast.info(LABELS.TOPBAR_TOAST_NEW_FLOW); }}>
               <Plus className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>New Flow</TooltipContent>
+          <TooltipContent>{LABELS.TOPBAR_NEW_FLOW}</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -171,7 +172,7 @@ export function TopBar() {
               <Save className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Save Flow (Ctrl+S)</TooltipContent>
+          <TooltipContent>{LABELS.TOPBAR_SAVE_FLOW}</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -179,7 +180,7 @@ export function TopBar() {
               <Download className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Export JSON</TooltipContent>
+          <TooltipContent>{LABELS.TOPBAR_EXPORT_JSON}</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -187,7 +188,7 @@ export function TopBar() {
               <Upload className="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Import JSON</TooltipContent>
+          <TooltipContent>{LABELS.TOPBAR_IMPORT_JSON}</TooltipContent>
         </Tooltip>
       </div>
 
@@ -202,7 +203,7 @@ export function TopBar() {
           onClick={stopExecution}
         >
           <Square className="w-3 h-3 fill-current" />
-          Stop
+          {LABELS.TOPBAR_STOP}
         </Button>
       ) : (
         <Button
@@ -211,7 +212,7 @@ export function TopBar() {
           onClick={handleRun}
         >
           <Play className="w-3 h-3 fill-current" />
-          Run Flow
+          {LABELS.TOPBAR_RUN_FLOW}
         </Button>
       )}
 
@@ -226,10 +227,10 @@ export function TopBar() {
               onClick={() => setPlaygroundOpen(true)}
             >
               <Play className="w-3 h-3" />
-              Playground
+              {LABELS.TOPBAR_PLAYGROUND}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Open Playground</TooltipContent>
+          <TooltipContent>{LABELS.TOPBAR_OPEN_PLAYGROUND}</TooltipContent>
         </Tooltip>
       )}
 

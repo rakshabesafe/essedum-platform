@@ -5,6 +5,7 @@ import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
 import { Trash2, Download, ChevronDown, ChevronRight, X } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { LABELS } from '../../lib/labels';
 
 export function LogsPanel() {
   const { execution, clearLogs, toggleLogs } = useFlowStore();
@@ -33,14 +34,14 @@ export function LogsPanel() {
   };
 
   const statusColor = { idle: 'bg-muted-foreground', running: 'bg-primary animate-pulse', completed: 'bg-green-400', error: 'bg-destructive' }[status];
-  const statusText = { idle: 'Idle', running: 'Running', completed: 'Completed', error: 'Error' }[status];
+  const statusText = { idle: LABELS.LOGS_STATUS_IDLE, running: LABELS.LOGS_STATUS_RUNNING, completed: LABELS.LOGS_STATUS_COMPLETED, error: LABELS.LOGS_STATUS_ERROR }[status];
 
   return (
     <div className="h-52 flex flex-col bg-card border-t border-border flex-shrink-0 animate-slide-in-top">
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border flex-shrink-0">
         <div className={cn('w-2 h-2 rounded-full flex-shrink-0', statusColor)} />
-        <span className="text-xs font-bold text-foreground">Execution Logs</span>
+        <span className="text-xs font-bold text-foreground">{LABELS.LOGS_PANEL_TITLE}</span>
         <Badge variant="outline" className="text-[10px] h-4 px-1.5 font-mono">{logs.length}</Badge>
         <span className="text-[11px] text-muted-foreground">{statusText}</span>
         {execution.startedAt && execution.completedAt && (
@@ -52,13 +53,13 @@ export function LogsPanel() {
         <div className="flex items-center gap-1">
           <label className="flex items-center gap-1 text-[10px] text-muted-foreground cursor-pointer">
             <input type="checkbox" checked={autoScroll} onChange={(e) => setAutoScroll(e.target.checked)} className="w-3 h-3" />
-            Auto-scroll
+            {LABELS.LOGS_AUTO_SCROLL}
           </label>
           <Separator orientation="vertical" className="h-4 mx-1" />
-          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleDownloadLogs} title="Download logs">
+          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={handleDownloadLogs} title={LABELS.LOGS_DOWNLOAD_TITLE}>
             <Download className="w-3 h-3" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={clearLogs} title="Clear logs">
+          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={clearLogs} title={LABELS.LOGS_CLEAR_TITLE}>
             <Trash2 className="w-3 h-3" />
           </Button>
           <Button size="icon" variant="ghost" className="h-6 w-6" onClick={toggleLogs}>
@@ -75,7 +76,7 @@ export function LogsPanel() {
       >
         {logs.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <p className="text-muted-foreground text-[11px]">No logs yet — run the flow to see execution output</p>
+            <p className="text-muted-foreground text-[11px]">{LABELS.LOGS_PANEL_EMPTY}</p>
           </div>
         ) : (
           logs.map((log) => {

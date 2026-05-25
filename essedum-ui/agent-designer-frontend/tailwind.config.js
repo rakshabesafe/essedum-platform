@@ -60,9 +60,9 @@ module.exports = {
   			}
   		},
   		fontFamily: {
-  			display: ['Syne', 'sans-serif'],
+  			display: ['Roboto', 'sans-serif'],
   			mono: ['JetBrains Mono', 'monospace'],
-  			sans: ['Syne', 'sans-serif'],
+  			sans: ['Roboto', 'sans-serif'],
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
