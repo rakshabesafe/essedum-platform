@@ -20,10 +20,9 @@ import {
   Send,
   Bot,
   User,
-  RefreshCw,
+  Plus,
   ChevronDown,
   ChevronUp,
-  MessageSquare,
   Hash,
   Clock,
 } from 'lucide-react';
@@ -47,6 +46,11 @@ interface SessionInfo {
   status: 'active' | 'idle' | 'error';
 }
 
+interface StoredSession {
+  info: SessionInfo;
+  messages: ChatMessage[];
+}
+
 interface PlaygroundModalProps {
   open: boolean;
   onClose: () => void;
@@ -66,34 +70,48 @@ function nowFull() {
   return new Date().toLocaleString();
 }
 
+function makeSession(flowName: string, index: number): StoredSession {
+  return {
+    info: {
+      sessionId: uid('sess-'),
+      sessionName: `Session ${index}`,
+      createdAt: nowFull(),
+      flowName,
+      status: 'idle',
+    },
+    messages: [],
+  };
+}
+
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
   const { currentFlowName, currentFlowId } = useFlowStore();
 
-  // Session
-  const [session, setSession] = useState<SessionInfo>(() => ({
-    sessionId: uid('sess-'),
-    sessionName: 'Default Session',
-    createdAt: nowFull(),
-    flowName: currentFlowName,
-    status: 'idle',
-  }));
+  const initialSession = makeSession(currentFlowName, 1);
+
+  // All sessions — persisted across "New Session" clicks
+  const [sessions, setSessions] = useState<StoredSession[]>([initialSession]);
+  const [activeSessionId, setActiveSessionId] = useState<string>(initialSession.info.sessionId);
 
   const [showSessionDetails, setShowSessionDetails] = useState(true);
 
   // Input settings
   const [inputType, setInputType] = useState<'chat' | 'text' | 'json'>('chat');
 
-  // Chat
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Sync flow name into session when flow changes
+  // Derive active session data
+  const activeSession = sessions.find((s) => s.info.sessionId === activeSessionId) ?? sessions[0];
+  const messages = activeSession.messages;
+
+  // Sync flow name into all sessions when flow changes
   useEffect(() => {
-    setSession((prev) => ({ ...prev, flowName: currentFlowName }));
+    setSessions((prev) =>
+      prev.map((s) => ({ ...s, info: { ...s.info, flowName: currentFlowName } }))
+    );
   }, [currentFlowName]);
 
   // Auto-scroll
@@ -101,20 +119,20 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const resetSession = () => {
-    setMessages([]);
-    setSession({
-      sessionId: uid('sess-'),
-      sessionName: 'Default Session',
-      createdAt: nowFull(),
-      flowName: currentFlowName,
-      status: 'idle',
-    });
+  // Create a new session without destroying existing ones
+  const newSession = () => {
+    const next = makeSession(currentFlowName, sessions.length + 1);
+    setSessions((prev) => [...prev, next]);
+    setActiveSessionId(next.info.sessionId);
+    setInputValue('');
   };
 
   const handleSend = async () => {
     const text = inputValue.trim();
     if (!text || isLoading) return;
+
+    // Capture session ID at send time to avoid stale closure
+    const sessionId = activeSession.info.sessionId;
 
     const userMsg: ChatMessage = {
       id: uid('msg-'),
@@ -123,10 +141,15 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
       timestamp: nowTime(),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.info.sessionId === sessionId
+          ? { ...s, messages: [...s.messages, userMsg], info: { ...s.info, status: 'active' } }
+          : s
+      )
+    );
     setInputValue('');
     setIsLoading(true);
-    setSession((prev) => ({ ...prev, status: 'active' }));
 
     // Placeholder response — replace with real API call once endpoint is shared
     try {
@@ -137,10 +160,21 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
         content: `[Playground] Received: "${text}"\n\nThis is a placeholder response. Connect the playground to your flow execution endpoint to get real results.`,
         timestamp: nowTime(),
       };
-      setMessages((prev) => [...prev, assistantMsg]);
-      setSession((prev) => ({ ...prev, status: 'idle' }));
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.info.sessionId === sessionId
+            ? { ...s, messages: [...s.messages, assistantMsg], info: { ...s.info, status: 'idle' } }
+            : s
+        )
+      );
     } catch {
-      setSession((prev) => ({ ...prev, status: 'error' }));
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.info.sessionId === sessionId
+            ? { ...s, info: { ...s.info, status: 'error' } }
+            : s
+        )
+      );
     } finally {
       setIsLoading(false);
     }
@@ -151,12 +185,6 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
       e.preventDefault();
       handleSend();
     }
-  };
-
-  const statusColor: Record<SessionInfo['status'], string> = {
-    active: 'bg-green-500',
-    idle: 'bg-yellow-400',
-    error: 'bg-red-500',
   };
 
   return (
@@ -176,15 +204,54 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
                 {currentFlowName}
               </Badge>
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-7 gap-1.5 text-xs text-muted-foreground"
-              onClick={resetSession}
-            >
-              <RefreshCw className="w-3 h-3" />
-              New Session
-            </Button>
+
+            <div className="flex items-center gap-2 mr-7">
+              {/* Input Type */}
+              <Select value={inputType} onValueChange={(v) => setInputType(v as typeof inputType)}>
+                <SelectTrigger className="h-7 text-xs w-24 bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="chat">Chat</SelectItem>
+                  <SelectItem value="text">Text</SelectItem>
+                  <SelectItem value="json">JSON</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Divider */}
+              <div className="w-px h-4 bg-border" />
+
+              {/* New Session — placed before session list for clear grouping */}
+              <Button
+                size="icon"
+                variant="ghost"
+                title="New Session"
+                aria-label="New Session"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                onClick={newSession}
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </Button>
+
+              {/* Session switcher — preserves all past sessions */}
+              <Select value={activeSessionId} onValueChange={(id) => { setActiveSessionId(id); setInputValue(''); }}>
+                <SelectTrigger className="h-7 text-xs w-40 bg-background">
+                  <SelectValue placeholder="Select session" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sessions.map((s) => (
+                    <SelectItem key={s.info.sessionId} value={s.info.sessionId}>
+                      <span className="flex items-center gap-1.5">
+                        <span>{s.info.sessionName}</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          ({s.messages.length} msg{s.messages.length !== 1 ? 's' : ''})
+                        </span>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </DialogHeader>
 
@@ -196,7 +263,7 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
           >
             <span className="flex items-center gap-1.5">
               <Hash className="w-3 h-3" />
-              Session Details
+              Session Details — {activeSession.info.sessionName}
             </span>
             {showSessionDetails ? (
               <ChevronUp className="w-3.5 h-3.5" />
@@ -206,69 +273,44 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
           </button>
 
           {showSessionDetails && (
-            <div className="px-5 pb-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {/* Session ID */}
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Session ID</span>
-                <span className="text-xs font-mono text-foreground truncate">{session.sessionId}</span>
-              </div>
+            <div className="px-5 pb-3 flex items-start gap-6">
               {/* Session Name */}
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-0.5 min-w-0">
                 <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Session Name</span>
-                <span className="text-xs font-medium text-foreground">{session.sessionName}</span>
-              </div>
-              {/* Flow */}
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Flow</span>
-                <span className="text-xs font-medium text-foreground truncate">{session.flowName}</span>
-              </div>
-              {/* Created / Status */}
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Status</span>
-                <div className="flex items-center gap-1.5">
-                  <span className={cn('w-2 h-2 rounded-full', statusColor[session.status])} />
-                  <span className="text-xs font-medium capitalize">{session.status}</span>
-                </div>
+                <span className="text-xs font-medium text-foreground">{activeSession.info.sessionName}</span>
               </div>
               {/* Created At */}
-              <div className="flex flex-col gap-0.5 col-span-2">
+              <div className="flex flex-col gap-0.5 min-w-0">
                 <span className="text-[10px] text-muted-foreground uppercase tracking-wide flex items-center gap-1">
                   <Clock className="w-2.5 h-2.5" />
                   Created At
                 </span>
-                <span className="text-xs text-foreground">{session.createdAt}</span>
+                <span className="text-xs text-foreground whitespace-nowrap">{activeSession.info.createdAt}</span>
               </div>
-              {/* Flow ID */}
-              {currentFlowId && (
-                <div className="flex flex-col gap-0.5 col-span-2">
-                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Flow ID</span>
-                  <span className="text-xs font-mono text-foreground truncate">{currentFlowId}</span>
+              {/* Divider */}
+              <div className="w-px self-stretch bg-border mx-1" />
+              {/* All Sessions */}
+              <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">All Sessions</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {sessions.map((s) => (
+                    <button
+                      key={s.info.sessionId}
+                      onClick={() => { setActiveSessionId(s.info.sessionId); setInputValue(''); }}
+                      className={cn(
+                        'text-[10px] px-2 py-0.5 rounded-full border transition-colors',
+                        s.info.sessionId === activeSessionId
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-muted text-muted-foreground border-border hover:bg-muted/80',
+                      )}
+                    >
+                      {s.info.sessionName} · {s.messages.length} msg{s.messages.length !== 1 ? 's' : ''}
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
             </div>
           )}
-        </div>
-
-        {/* ── Config Row ── */}
-        <div className="flex-shrink-0 flex items-center gap-3 px-5 py-2 border-b border-border bg-muted/20">
-          <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">Input Type</span>
-          <Select value={inputType} onValueChange={(v) => setInputType(v as typeof inputType)}>
-            <SelectTrigger className="h-7 text-xs w-28 bg-background">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="chat">Chat</SelectItem>
-              <SelectItem value="text">Text</SelectItem>
-              <SelectItem value="json">JSON</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div className="flex-1" />
-
-          <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-mono">
-            {messages.length} msg{messages.length !== 1 ? 's' : ''}
-          </Badge>
         </div>
 
         {/* ── Chat Area ── */}
@@ -370,9 +412,7 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
               <Send className="w-3.5 h-3.5" />
             </Button>
           </div>
-          <p className="text-[10px] text-muted-foreground mt-1.5 text-center">
-            Press <kbd className="px-1 rounded border border-border text-[9px]">Enter</kbd> to send · Input: <strong>{inputType}</strong>
-          </p>
+
         </div>
       </DialogContent>
     </Dialog>
