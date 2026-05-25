@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -17,7 +16,6 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -35,18 +33,10 @@ import javax.sql.DataSource;
  * - common-app security infrastructure (JWT auth, OAuth2, CORS, exception handlers)
  * - comm-lib-secrets / comm-secrets-app (secrets management)
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class, org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.class})
 @RefreshScope
 @ServletComponentScan
-@ComponentScan(basePackages = {
-    "com.lfn"
-})
-@EntityScan(basePackages = {
-    "com.lfn"
-})
-@EnableJpaRepositories(basePackages = {
-    "com.lfn"
-})
+@ComponentScan(basePackages = {"com.lfn"})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableAsync
 @EnableScheduling

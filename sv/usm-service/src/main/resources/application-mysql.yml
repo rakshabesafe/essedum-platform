@@ -9,7 +9,8 @@ telemetry:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    jdbcurl: jdbc:mysql://${MYSQL_DATASOURCE_URL:localhost:3306}/telemetrydb
+    jdbcUrl: jdbc:mysql://${MYSQL_DATASOURCE_URL:localhost:3306}/telemetrydb
+    url: jdbc:mysql://${MYSQL_DATASOURCE_URL:localhost:3306}/telemetrydb
     username: ${MYSQL_USER:root}
     password: ${MYSQL_PASSWORD:admin@121$}
 
