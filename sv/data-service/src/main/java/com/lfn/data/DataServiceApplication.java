@@ -34,7 +34,7 @@ import javax.sql.DataSource;
  * - icip-lib-search (search functionality: Lucene-based searchable entities)
  * - icip-adp-* (all data adapter plugins: REST, S3, MySQL, PostgreSQL, Azure, AI Cloud, etc.)
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class, org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.class})
 @RefreshScope
 @ServletComponentScan
 @ComponentScan(basePackages = {"com.lfn"})
