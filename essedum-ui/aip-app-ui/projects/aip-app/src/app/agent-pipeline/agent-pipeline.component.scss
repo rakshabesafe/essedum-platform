@@ -4,6 +4,9 @@
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
 @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 @keyframes floatIn { from { opacity:0; transform:translateY(20px) scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.spin-icon { animation: spin 1s linear infinite !important; }
 
 :host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
@@ -702,8 +705,9 @@
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  background: rgba(0, 0, 0, 0.6) !important;
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.65) !important;
+  // backdrop-filter: blur(4px) removed — it forces full-viewport GPU compositing
+  // on a complex page (code editor + file tree) which causes a multi-second freeze.
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
