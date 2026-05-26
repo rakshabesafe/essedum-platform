@@ -1,8 +1,7 @@
-.dashboard-container {
+﻿.dashboard-container {
   padding: 28px 32px;
   min-height: 100%;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: var(--background-colour, #1e293b);
 }
 
 .dashboard-header {
@@ -12,21 +11,21 @@
 .dashboard-title {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--text-color, #e2e8f0);
   margin: 0 0 4px 0;
   letter-spacing: -0.01em;
 }
 
 .dashboard-subtitle {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--text-color-secondary, #94a3b8);
   margin: 0;
 }
 
-/* ── Stat Card (Large Container) ── */
+/* ΓöÇΓöÇ Stat Card (Large Container) ΓöÇΓöÇ */
 .stat-card.large-card {
-  background: #0d1530;
-  border: 1px solid rgba(79,142,247,0.18);
+  background: var(--bg-color, #0d1530);
+  border: 1px solid var(--border-color, rgba(79,142,247,0.12));
   border-radius: 12px;
   padding: 20px;
   display: flex;
@@ -48,11 +47,11 @@
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #e2e8f0;
+  color: var(--text-color, #e2e8f0);
   margin: 0;
 }
 
-/* ── Small Cards Grid (3 × 2 = 6 cards) ── */
+/* ΓöÇΓöÇ Small Cards Grid (3 ├ù 2 = 6 cards) ΓöÇΓöÇ */
 .small-cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -106,7 +105,7 @@
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: #94a3b8;
+  color: var(--text-color-secondary, #94a3b8);
   text-transform: uppercase;
 }
 
@@ -118,27 +117,27 @@
 
 .small-card-sub {
   font-size: 1rem;
-  color: #64748b;
+  color: var(--text-color-secondary, #64748b);
   line-height: 1.3;
 }
 
 
-/* ── Section Titles ── */
+/* ΓöÇΓöÇ Section Titles ΓöÇΓöÇ */
 .section-title {
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--text-color-secondary, #94a3b8);
   margin: 8px 0 14px;
 }
 
-/* ── Module Grid ── */
+/* ΓöÇΓöÇ Module Grid ΓöÇΓöÇ */
 .module-grid {
   display: none;
 }
 
-/* ── Pipeline Lists Container ── */
+/* ΓöÇΓöÇ Pipeline Lists Container ΓöÇΓöÇ */
 .pipeline-lists-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -149,8 +148,8 @@
 }
 
 .pipeline-section {
-  background: #0d1530;
-  border: 1px solid rgba(79,142,247,0.18);
+  background: var(--bg-color, #0d1530);
+  border: 1px solid var(--border-color, rgba(79,142,247,0.12));
   border-radius: 12px;
   padding: 12px 14px;
   display: flex;
@@ -163,7 +162,7 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--text-color-secondary, #94a3b8);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -174,7 +173,7 @@
   i { font-size: 1rem; }
 }
 
-/* ── Pipeline List — activity feed style ── */
+/* ΓöÇΓöÇ Pipeline List ΓÇö activity feed style ΓöÇΓöÇ */
 .pipeline-list {
   list-style: none;
   padding: 0;
@@ -211,6 +210,7 @@
   &.dot-running   { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.55); }
   &.dot-completed { background: #94a3b8; }
   &.dot-failed    { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.5); }
+  &.dot-pending   { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.5); }
 }
 
 .pipeline-item-info {
@@ -222,24 +222,21 @@
 }
 
 .pipeline-item-name {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: #e2e8f0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-color, #e2e8f0);
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-transform: capitalize;
 }
 
+.pipeline-item-runs,
 .pipeline-item-sub {
-  font-size: 0.78rem;
-  font-weight: 400;
-  color: #7dd3fc;
+  font-size: 1rem;
+  color: var(--text-color-secondary, #64748b);
   display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  opacity: 0.85;
 }
 
 .pipeline-item-status {
@@ -269,4 +266,9 @@
     border: 1px solid rgba(239,68,68,0.25);
   }
 
+  &.status-pending {
+    background: rgba(245,158,11,0.12);
+    color: #f59e0b;
+    border: 1px solid rgba(245,158,11,0.25);
+  }
 }
