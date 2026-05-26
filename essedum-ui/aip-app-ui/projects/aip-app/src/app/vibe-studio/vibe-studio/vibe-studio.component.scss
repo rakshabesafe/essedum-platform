@@ -36,7 +36,7 @@
   height: 100%;
   padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: hidden;   // panels-wrapper handles its own scroll; picker scrolls internally
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
@@ -106,14 +106,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex: 1;
-  padding: 32px 24px 40px;
+  padding: 32px 24px 48px;
   text-align: center;
-  gap: 32px;
+  gap: 28px;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 
+  // Push content down slightly when there's plenty of vertical room
+  // so it still feels centered on large screens
   &::before {
     content: '';
     position: absolute;
@@ -125,6 +128,7 @@
     background: radial-gradient(ellipse, rgba(79, 142, 247, 0.1) 0%, transparent 70%);
     pointer-events: none;
     filter: blur(2px);
+    z-index: 0;
   }
 
   &::after {
@@ -136,7 +140,12 @@
     height: 200px;
     background: radial-gradient(ellipse, rgba(124, 58, 237, 0.07) 0%, transparent 70%);
     pointer-events: none;
+    z-index: 0;
   }
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(79,142,247,0.2); border-radius: 3px; }
 }
 
 .picker-hero {
@@ -213,9 +222,155 @@
 
   i { font-size: 10px; }
 
-  &.badge-react { background: rgba(97,218,251,0.08); border-color: rgba(97,218,251,0.28); color: #61dafb; }
-  &.badge-ai    { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.28); color: #a78bfa; }
-  &.badge-mcp   { background: rgba(79,142,247,0.08);  border-color: rgba(79,142,247,0.28);  color: #4f8ef7; }
+  &.badge-react     { background: rgba(97,218,251,0.08); border-color: rgba(97,218,251,0.28); color: #61dafb; }
+  &.badge-ai        { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.28); color: #a78bfa; }
+  &.badge-mcp       { background: rgba(79,142,247,0.08);  border-color: rgba(79,142,247,0.28);  color: #4f8ef7; }
+  &.badge-streamlit { background: rgba(255,75,75,0.08);   border-color: rgba(255,75,75,0.28);   color: #ff4b4b; }
+}
+
+// ── Model picker (Step 1) ────────────────────────────────────────────────────
+.model-picker-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+}
+
+.model-picker-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #4f8ef7, #7c3aed);
+  color: #fff;
+  flex-shrink: 0;
+
+  &.step-badge--inactive {
+    background: transparent;
+    border: 1.5px solid currentColor;
+    opacity: 0.35;
+  }
+}
+
+.model-picker-dropdown {
+  width: 100%;
+  max-width: 340px;
+}
+
+.providers-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  opacity: 0.55;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.providers-loading-spin { animation: spin 1s linear infinite; }
+
+.provider-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+// ── Locked / inactive step section ───────────────────────────────────────────
+.model-picker-label--inactive {
+  opacity: 0.4;
+}
+
+.picker-section--locked {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.provider-select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  padding: 10px 36px 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus { box-shadow: 0 0 0 3px rgba(79,142,247,0.25); }
+  &:disabled { cursor: not-allowed; }
+}
+
+.provider-select-chevron {
+  position: absolute;
+  right: 12px;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+// Remove old button-style model option classes (kept minimal for theming)
+.model-option-selected { /* unused — kept to avoid stale class errors */ }
+
+// ── Step 2 label ─────────────────────────────────────────────────────────────
+.picker-step-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  margin-left: calc((100% - 760px) / 2);
+  max-width: 760px;
+  width: 100%;
+
+  .step-label--inactive { opacity: 0.35; }
+}
+
+.step-hint {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.55;
+  letter-spacing: 0.3px;
+}
+
+// ── Card lock overlay ────────────────────────────────────────────────────────
+.picker-card-lock {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  font-size: 18px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
 }
 
 .picker-cards {
@@ -242,6 +397,16 @@
   overflow: hidden;
   transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   animation: card-pop 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+
+  &.picker-card--locked {
+    cursor: not-allowed;
+    opacity: 0.45;
+    filter: grayscale(0.5);
+
+    &:hover { transform: none; }
+    &:hover .picker-card-lock { opacity: 1; }
+    &::after { animation: none !important; }
+  }
 
   &:nth-child(1) { animation-delay: 0.06s; }
   &:nth-child(2) { animation-delay: 0.12s; }
@@ -303,6 +468,62 @@
   transition: all 0.2s;
 
   .picker-card:hover & { opacity: 0.7; transform: translateY(0); }
+}
+
+// ── Panels wrapper (houses banner + split panels) ─────────────────────────────
+.vibe-panels-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+// ── Pipeline registration banner ─────────────────────────────────────────────
+@keyframes banner-slide-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pipeline-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 16px;
+  margin: 0 16px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  animation: banner-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.pipeline-banner-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pipeline-banner-text {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.pipeline-banner-dismiss {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+
+  i { font-size: 11px; }
+
+  &:hover { opacity: 1; }
 }
 
 // ── Split Panels ──────────────────────────────────────────────────────────────
@@ -383,6 +604,21 @@
     p  { color: #94a3b8; }
   }
 
+  .model-picker-label { color: #94a3b8; }
+  .picker-step-label  { color: #94a3b8; }
+
+  .provider-select {
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(79,142,247,0.25);
+    color: #e2e8f0;
+    option { background: #1e2a3a; color: #e2e8f0; }
+    &:focus { border-color: #4f8ef7; }
+  }
+  .provider-select-chevron { color: #94a3b8; }
+  .providers-loading { color: #94a3b8; }
+
+  .picker-card-lock { background: rgba(0,0,0,0.45); color: #64748b; }
+
   .new-session-btn {
     color: #60a5fa;
     background: rgba(96,165,250,0.08);
@@ -423,6 +659,28 @@
 
   .panel.left { border-right-color: rgba(79,142,247,0.08); }
 
+  // card created — indigo/blue
+  .pipeline-banner.banner-created {
+    background: rgba(79,142,247,0.1);
+    border: 1px solid rgba(79,142,247,0.3);
+    color: #93c5fd;
+
+    .pipeline-banner-icon { color: #60a5fa; }
+    .pipeline-banner-text strong { color: #eff6ff; }
+    .pipeline-banner-dismiss { color: #93c5fd; }
+  }
+
+  // files stored — green
+  .pipeline-banner.banner-files-pushed {
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.22);
+    color: #86efac;
+
+    .pipeline-banner-icon { color: #4ade80; }
+    .pipeline-banner-text strong { color: #f0fdf4; }
+    .pipeline-banner-dismiss { color: #86efac; }
+  }
+
   .panel-divider {
     background: rgba(79,142,247,0.06);
     &::after { background: rgba(79,142,247,0.4); }
@@ -454,6 +712,21 @@
     h2 { color: #0f172a; }
     p  { color: #64748b; }
   }
+
+  .model-picker-label { color: #64748b; }
+  .picker-step-label  { color: #64748b; }
+
+  .provider-select {
+    background: #ffffff;
+    border: 1.5px solid rgba(99,102,241,0.25);
+    color: #1e293b;
+    option { background: #ffffff; color: #1e293b; }
+    &:focus { border-color: #6366f1; }
+  }
+  .provider-select-chevron { color: #64748b; }
+  .providers-loading { color: #64748b; }
+
+  .picker-card-lock { background: rgba(255,255,255,0.6); color: #94a3b8; }
 
   .new-session-btn {
     color: #4f46e5;
@@ -494,6 +767,28 @@
   }
 
   .panel.left { border-right-color: rgba(99,102,241,0.1); }
+
+  // card created — indigo/blue
+  .pipeline-banner.banner-created {
+    background: rgba(99,102,241,0.07);
+    border: 1px solid rgba(99,102,241,0.22);
+    color: #3730a3;
+
+    .pipeline-banner-icon { color: #4f46e5; }
+    .pipeline-banner-text strong { color: #1e1b4b; }
+    .pipeline-banner-dismiss { color: #3730a3; }
+  }
+
+  // files stored — green
+  .pipeline-banner.banner-files-pushed {
+    background: rgba(34,197,94,0.07);
+    border: 1px solid rgba(34,197,94,0.2);
+    color: #166534;
+
+    .pipeline-banner-icon { color: #16a34a; }
+    .pipeline-banner-text strong { color: #14532d; }
+    .pipeline-banner-dismiss { color: #166534; }
+  }
 
   .panel-divider {
     background: rgba(99,102,241,0.05);

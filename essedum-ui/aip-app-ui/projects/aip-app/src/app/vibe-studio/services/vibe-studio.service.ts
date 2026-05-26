@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subject, BehaviorSubject } from 'rxjs';
+import { Subject, BehaviorSubject, Observable } from 'rxjs';
 import {
   VibeSession,
   VibeChatMessage,
@@ -17,6 +17,217 @@ import {
 function generateRequestId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
 }
+
+const PROJECT_STRUCTURE_INSTRUCTIONS = `
+You build web applications, backends, data apps, and MCP servers.
+Read the user's request carefully and pick the correct project type below.
+Do NOT default to React — match the type to what the user asks for.
+
+## CRITICAL: What files to create
+
+ALWAYS create MULTIPLE files — a source file, a requirements.txt or package.json, AND a Dockerfile.
+NEVER create a single HTML file as the output for a backend, MCP server, or Streamlit app.
+A single .html file CANNOT be deployed. It will always fail.
+
+The only time you output HTML is for React frontend source files (e.g. frontend/src/App.js which contain JSX, NOT a standalone .html page).
+
+## How to choose the project type
+- User asks for a **website, dashboard, UI, web app** → use React (see below)
+- User asks for a **data science, ML, analytics** app → use Streamlit
+- User asks for an **MCP server, tool server, AI tool provider, agent integration** → use MCP server structure
+- User asks for an **API, backend, microservice** with no frontend → use Python FastAPI or Node.js Express
+
+When in doubt between React and another type, ask yourself: does this need a browser UI? If not, do NOT use React and do NOT create HTML files.
+
+---
+
+## React web application (only for UI/dashboard/website requests)
+
+Use this structure **only** when the user explicitly asks for a website, web app, dashboard, or UI.
+The preview system handles bundling, JSX transpilation, and React mounting — you just write the source files.
+
+\`\`\`
+project-name/
+├── frontend/
+│   ├── src/
+│   │   ├── App.js              ← root React component (REQUIRED)
+│   │   ├── App.css             ← styles for App (optional)
+│   │   └── components/
+│   │       ├── MyComponent.js  ← one component per file
+│   │       └── MyComponent.css ← styles for that component (optional)
+│   └── Dockerfile
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   └── Dockerfile
+└── docker-compose.yml
+\`\`\`
+
+## Frontend rules (CRITICAL)
+
+### App.js
+- Export a **default function named \`App\`**.
+- Always use \`React.useState\`, \`React.useEffect\`, \`React.useCallback\`, etc.
+  (prefix every hook with \`React.\` — do NOT destructure from an import).
+- Return JSX — standard HTML tags in lowercase, React components in PascalCase.
+
+### Component files (\`frontend/src/components/MyComponent.js\`)
+- Each file defines **exactly one component** as a named function.
+- Do **NOT** use \`export\`, \`import\`, or \`require\` in any frontend file.
+  The preview system concatenates all files automatically.
+
+### CSS files
+- Put styles in a \`.css\` file next to the component.
+- Reference class names with \`className\` in JSX.
+- Do NOT use inline style objects or CSS-in-JS libraries.
+
+### API calls
+- Use \`fetch('/api/...')\` — never hardcode \`localhost\`, a port, or a full URL.
+
+### What NOT to do (will break the preview)
+- Do NOT write any \`import\` or \`require\` statement in frontend files.
+- Do NOT call \`ReactDOM.createRoot\` or \`ReactDOM.render\`.
+- Do NOT generate \`node_modules/\`, \`package-lock.json\`, \`build/\`, or \`dist/\`.
+- Do NOT generate \`public/index.html\` or \`src/index.js\`.
+- Do NOT use TypeScript (\`.ts\`, \`.tsx\`).
+- Do NOT reference any CDN URL or external script.
+- Do NOT use CSS-in-JS (styled-components, emotion, etc.).
+
+## Backend rules
+
+The backend can be written in **Node.js (Express)** or **Python (FastAPI / Flask)**.
+Choose based on what the user asks for. If not specified, default to Node.js.
+
+### Node.js backend (\`backend/server.js\`)
+- Express server listening on \`process.env.PORT || 5000\`.
+- Include CORS middleware (\`cors\` npm package).
+- All API routes prefixed with \`/api/\`.
+- Respond with JSON.
+
+### Python backend (\`backend/app.py\` or \`backend/main.py\`)
+- Use **FastAPI** (preferred) or **Flask**.
+- Always bind to \`0.0.0.0\` and read port from \`os.environ.get("PORT", 5000)\`.
+
+## Streamlit frontend (for data science / ML / analytics projects)
+
+When the user asks for a **data science, ML, analytics, or Python-first** application,
+use **Streamlit** as the frontend instead of React.
+
+### Project structure for Streamlit projects
+\`\`\`
+project-name/
+├── app.py                  ← Streamlit frontend (REQUIRED)
+├── requirements.txt        ← ALL Python dependencies
+├── Dockerfile
+├── docker-compose.yml
+├── README.md
+└── src/                    ← helper modules (optional)
+\`\`\`
+
+### \`app.py\` rules
+- Always include \`st.set_page_config(page_title="...", layout="wide")\` as the first Streamlit call.
+- Use \`st.sidebar\` for controls/filters, \`st.columns()\` for multi-column layouts.
+- Handle errors with \`st.error()\` / \`st.warning()\`.
+
+### Dockerfile for Streamlit
+\`\`\`dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8501
+CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]
+\`\`\`
+
+## MCP server (for AI tool / agent integration projects)
+
+When the user asks for an **MCP server**, **AI tool server**, or any project that exposes tools for AI agents,
+use **FastMCP** (Python) or **@modelcontextprotocol/sdk** (Node.js).
+
+**CRITICAL: ALWAYS use HTTP transport (SSE). NEVER use stdio transport.**
+stdio servers cannot be deployed as containers.
+
+### Project structure for Python MCP servers
+\`\`\`
+project-name/
+├── server.py               ← MCP server entry point (REQUIRED)
+├── requirements.txt        ← ALL Python dependencies (REQUIRED)
+├── Dockerfile              ← (REQUIRED)
+└── docker-compose.yml
+\`\`\`
+
+### \`server.py\` — Python FastMCP example
+\`\`\`python
+from fastmcp import FastMCP
+import os
+
+mcp = FastMCP("my-server")
+
+@mcp.tool()
+def add(a: int, b: int) -> int:
+    '''Add two numbers together.'''
+    return a + b
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    mcp.run(transport="sse", host="0.0.0.0", port=port)
+\`\`\`
+
+### Dockerfile for Python MCP servers
+\`\`\`dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8080
+CMD ["python", "server.py"]
+\`\`\`
+
+### MCP server rules (CRITICAL)
+- **ALWAYS** use HTTP transport: \`mcp.run(transport="sse", ...)\` in Python.
+- **NEVER** use \`mcp.run()\` with no args (defaults to stdio).
+- **ALWAYS** bind to \`0.0.0.0\` — required for container networking.
+- Port: default **8080** for Python (FastMCP), **3000** for Node.js.
+- **NEVER create a single HTML file** for an MCP server.
+
+## Docker deployment (REQUIRED for every project)
+
+Every project MUST include complete Docker configuration.
+
+### \`docker-compose.yml\` (REQUIRED)
+\`\`\`yaml
+version: "3.8"
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+    restart: unless-stopped
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+\`\`\`
+
+### Rules for Docker files
+- Always pin base image versions (e.g. \`node:18-alpine\`, \`python:3.11-slim\`).
+- Always include \`requirements.txt\` for Python backends with ALL dependencies.
+- Never bake secrets or API keys into Dockerfiles — use environment variables.
+`;
+
+const VIBE_STUDIO_RECIPE = {
+  version: '1.0.0',
+  title: 'App Dev Session',
+  description: 'Builds web apps, backends, Streamlit apps, and MCP servers. Detects the correct project type from the user request.',
+  instructions: PROJECT_STRUCTURE_INSTRUCTIONS,
+};
 
 @Injectable()
 export class VibeStudioService implements OnDestroy {
@@ -37,6 +248,8 @@ export class VibeStudioService implements OnDestroy {
   readonly sessionId$         = new BehaviorSubject<string | null>(null);
   /** Emits the complete final file list exactly once when a generation round fully completes. */
   readonly generationComplete$ = new Subject<VibeFile[]>();
+  /** Emits once when the ZIP of generated files is successfully stored in the pipeline card. */
+  readonly fileUploadSuccess$  = new Subject<void>();
   /** Deployment status after the ZIP upload triggers /sessions/{id}/preview. */
   readonly deploymentStatus$  = new BehaviorSubject<'idle' | 'deploying' | 'success' | 'error'>('idle');
   /** Raw response from /sessions/{id}/preview on success. */
@@ -55,17 +268,31 @@ export class VibeStudioService implements OnDestroy {
     return this.session;
   }
 
+  /** Fetches the available LLM providers from the backend configuration endpoint. */
+  getProviders(): Observable<any> {
+    const url = `${this.baseUrl}/service/v1/vibe-coding/config/providers`;
+    return this.http.get<any>(url, { headers: this.getHttpHeaders() });
+  }
+
   setAppType(appType: AppType): void {
     this.session.appType = appType;
     this.status$.next('selecting');
   }
 
-  /** Change LLM model.  If a Goose session is already running, propagates immediately. */
-  setModel(model: VibeModel): void {
+  /** Change LLM model (and optionally the agent provider name). If a Goose session is already running, propagates immediately. */
+  setModel(model: VibeModel, agentProvider?: string): void {
     this.session.model = model;
-    if (this.session.id) {
-      this.updateProvider(model);
+    if (agentProvider !== undefined) {
+      this.session.agentProvider = agentProvider;
     }
+    if (this.session.id) {
+      this.updateProvider();
+    }
+  }
+
+  /** Update the agent provider name stored in the session (sent as `provider` in update-provider calls). */
+  setAgentProvider(name: string): void {
+    this.session.agentProvider = name;
   }
 
   /**
@@ -86,6 +313,13 @@ export class VibeStudioService implements OnDestroy {
     this.ensureAgentStarted().then((sessionId) => {
       this.openReplyStream(sessionId, prompt + ' - send all code files generated here');
     }).catch(() => {
+      const errMsg: VibeChatMessage = {
+        role: 'assistant',
+        content: '⚠️ Failed to start the AI agent session. Please refresh the page and try again.',
+        timestamp: new Date(),
+      };
+      this.session.messages.push(errMsg);
+      this.messages$.next([...this.session.messages]);
       this.status$.next('error');
     });
   }
@@ -144,7 +378,10 @@ export class VibeStudioService implements OnDestroy {
 
     return new Promise((resolve, reject) => {
       const url = `${this.baseUrl}/service/v1/vibe-coding/agent/start`;
-      const body: GooseAgentStartRequest = { working_dir: '.' };
+      const body: GooseAgentStartRequest = {
+        working_dir: '.',
+        recipe: VIBE_STUDIO_RECIPE,
+      };
 
       this.http.post<any>(url, body, { headers: this.getHttpHeaders() }).subscribe({
         next: (resp) => {
@@ -168,23 +405,24 @@ export class VibeStudioService implements OnDestroy {
 
   /** Calls /agent/update_provider so the session uses the selected VibeModel. */
   private applyModelToSession(sessionId: string, model: VibeModel): Promise<void> {
-    const { provider, gooseModel } = GOOSE_PROVIDER_MAP[model];
+    const provider = this.session.agentProvider || model;
     const url = `${this.baseUrl}/service/v1/vibe-coding/agent/update-provider`;
     return new Promise((resolve, reject) => {
       this.http.post(url,
-        { session_id: sessionId, provider, model: gooseModel },
+        { session_id: sessionId, provider, model },
         { headers: this.getHttpHeaders() },
       ).subscribe({ next: () => resolve(), error: reject });
     });
   }
 
   /** Hot-swap the provider on an already-running session. */
-  private updateProvider(model: VibeModel): void {
+  private updateProvider(): void {
     if (!this.session.id) return;
-    const { provider, gooseModel } = GOOSE_PROVIDER_MAP[model];
+    const provider = this.session.agentProvider || this.session.model;
+    const model = this.session.model;
     const url = `${this.baseUrl}/service/v1/vibe-coding/agent/update-provider`;
     this.http.post(url,
-      { session_id: this.session.id, provider, model: gooseModel },
+      { session_id: this.session.id, provider, model },
       { headers: this.getHttpHeaders() },
     ).subscribe({ error: () => {} });
   }
@@ -222,7 +460,13 @@ export class VibeStudioService implements OnDestroy {
     fetch(url, { method: 'POST', headers, body: JSON.stringify(body), credentials: 'include', signal })
       .then((response) => {
         if (!response.ok || !response.body) {
+          const msg = response.status === 403
+            ? `Access denied (403 Forbidden). Your session may have expired — please refresh the page and try again.`
+            : `The request failed with status ${response.status}. Please try again.`;
+          assistantText = `⚠️ ${msg}`;
+          this.updateStreamingAssistantMessage(assistantText);
           this.finaliseAssistantMessage(assistantText);
+          this.status$.next('error');
           return;
         }
 
@@ -263,7 +507,11 @@ export class VibeStudioService implements OnDestroy {
       })
       .catch((err: any) => {
         if (err?.name !== 'AbortError') {
+          const msg = '⚠️ A network error occurred while connecting to the AI agent. Please check your connection and try again.';
+          assistantText = msg;
+          this.updateStreamingAssistantMessage(assistantText);
           this.finaliseAssistantMessage(assistantText);
+          this.status$.next('error');
         }
       });
   }
@@ -773,6 +1021,7 @@ export class VibeStudioService implements OnDestroy {
       id: null,
       appType: null,
       model: 'claude',
+      agentProvider: '',
       messages: [],
       files: [],
       previewUrl: null,
@@ -783,13 +1032,25 @@ export class VibeStudioService implements OnDestroy {
   private getHttpHeaders(): Record<string, string> {
     const project = JSON.parse(sessionStorage.getItem('project') || '{}');
     const role    = JSON.parse(sessionStorage.getItem('role')    || '{}');
-    return {
-      Authorization:  'Bearer ' + (localStorage.getItem('jwtToken') ?? ''),
-      Project:        project.id?.toString() ?? '',
-      Roleid:         role.id?.toString()    ?? '',
-      Rolename:       role.name?.toString()  ?? '',
-      'Access-Token': localStorage.getItem('accessToken') ?? '',
+    const headers: Record<string, string> = {
+      Authorization:      'Bearer ' + (localStorage.getItem('jwtToken') ?? ''),
+      Project:            project.id?.toString() ?? '',
+      Roleid:             role.id?.toString()    ?? '',
+      Rolename:           role.name?.toString()  ?? '',
+      'Access-Token':     localStorage.getItem('accessToken') ?? '',
+      'X-Requested-With': 'Leap',
     };
+    const csrf = this.readCsrfCookie();
+    if (csrf) {
+      headers['X-XSRF-TOKEN'] = csrf;
+    }
+    return headers;
+  }
+
+  /** Reads the XSRF-TOKEN cookie set by the backend for CSRF protection. */
+  private readCsrfCookie(): string {
+    const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : '';
   }
 
   /**
@@ -823,7 +1084,10 @@ export class VibeStudioService implements OnDestroy {
       const sessionId = this.session.id;
       this.http.post(url, formData, { headers: this.getHttpHeaders() })
         .subscribe({
-          next: () => { if (sessionId) this.triggerPreview(sessionId); },
+          next: () => {
+            this.fileUploadSuccess$.next();
+            if (sessionId) this.triggerPreview(sessionId);
+          },
           error: () => { if (sessionId) this.triggerPreview(sessionId); },
         });
     } catch {

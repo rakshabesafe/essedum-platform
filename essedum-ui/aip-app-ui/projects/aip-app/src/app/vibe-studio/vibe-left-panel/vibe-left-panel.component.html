@@ -1,17 +1,9 @@
 <div class="copilot-panel">
 
-  <!-- ── Model selector bar ── -->
-  <div class="model-bar">
-    <div class="model-bar-left">
-      <i class="bi bi-stars model-icon"></i>
-      <span class="model-label">Model</span>
-    </div>
-    <div class="model-selector-wrap">
-      <select class="model-select" [(ngModel)]="selectedModel" (change)="onModelChange()">
-        <option *ngFor="let m of models" [value]="m.value">{{ m.label }}</option>
-      </select>
-      <i class="bi bi-chevron-down select-chevron"></i>
-    </div>
+  <!-- ── Agent indicator bar ── -->
+  <div *ngIf="modelLabel" class="model-indicator-bar">
+    <i class="bi bi-robot model-indicator-icon"></i>
+    <span class="model-indicator-label">{{ modelLabel }}</span>
   </div>
 
   <!-- ── Messages ── -->
