@@ -28,6 +28,46 @@ export class SidebarComponent implements OnInit {
       ],
     },
     { label: "Knowledge Graph", icon: "bar-chart", url: "./iamp-graph/main" },
+    {
+      label: "Data Ops",
+      icon: "database",
+      children: [
+        { label: "Datasets", icon: "table", url: "./data/datasets", children: [] },
+        { label: "Models", icon: "superpowers", url: "./data/models", children: [] },
+        { label: "Connections", icon: "plug", url: "./data/connections", children: [] },
+        { label: "Schemas", icon: "puzzle-piece", url: "./data/schemas", children: [] },
+      ],
+    },
+    {
+      label: "Agents",
+      icon: "gg",
+      children: [
+        { label: "AI Agent Studio", icon: "rocket", url: "./agent/studio", children: [] },
+        { label: "Agent Pipeline", icon: "wpexplorer", url: "./agent/pipeline", children: [] },
+        { label: "Agent Directory", icon: "address-book", url: "./agent/directory", children: [] },
+      ],
+    },
+    {
+      label: "Integrations",
+      icon: "plug",
+      children: [
+        { label: "Adapters", icon: "exchange", url: "./integration/implementations", children: [] },
+        { label: "Pipelines", icon: "sitemap", url: "./integration/pipelines", children: [] },
+        { label: "Apps", icon: "th-large", url: "./integration/apps", children: [] },
+        { label: "Instances", icon: "server", url: "./integration/instances", children: [] },
+        { label: "Jobs", icon: "tasks", url: "./integration/jobs", children: [] },
+      ],
+    },
+    {
+      label: "Vibe Studio",
+      icon: "code",
+      children: [
+        { label: "Vibe Editor", icon: "magic", url: "./vibe/editor", children: [] },
+        { label: "Code Editor", icon: "file-code-o", url: "./vibe/code-editor", children: [] },
+        { label: "Scripts", icon: "terminal", url: "./vibe/scripts", children: [] },
+        { label: "Spec Templates", icon: "file-text", url: "./vibe/spec-templates", children: [] },
+      ],
+    },
   ];
 
   user: any = new Object();
@@ -187,6 +227,11 @@ export class SidebarComponent implements OnInit {
           this.ready = true;
           this.populateDefaultSidebarMenu();
         }
+        // Remap legacy DashConsts URLs to new MFE routes so clicking AI-Brain/AIP
+        // sidebar entries loads our federated MFEs (apps/data-ops, apps/agent,
+        // apps/integration, apps/vibe-studio) instead of the buggy icip_app/aip_app
+        // cross-remote chain that fails with "Cannot access 'AipModule' before init".
+        this.remapLegacyUrls(this.sidebarMenu);
       });
     }
   }
@@ -1060,6 +1105,98 @@ export class SidebarComponent implements OnInit {
     else if (this.sidebarType == "#8626C3")
       this.bgColorType = 2;
   });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  Legacy → new-MFE URL remap
+  // ─────────────────────────────────────────────────────────────────────────
+  // Production DashConsts records still point at the legacy MFE paths
+  // (./aibrain/..., ./aip/...) which load the icip_app + aip_app remotes.
+  // Those two remotes cross-reference each other ("Cannot access 'AipModule'
+  // before initialization"), so navigating to them currently crashes.
+  //
+  // Until DashConsts records are migrated in the DB, we intercept legacy URLs
+  // at sidebar-render time and redirect them to the new federated MFE routes
+  // (./data/..., ./agent/..., ./integration/..., ./vibe/...).
+  //
+  // Remove this remap once DashConsts is updated to point directly at the new
+  // paths AND the legacy MFEs are decommissioned.
+  private readonly URL_REMAP: { [legacy: string]: string } = {
+    // Data Ops (was MLStudio / icip_app)
+    './aibrain/datasets':       './data/datasets',
+    './aibrain/datasources':    './data/connections',
+    './aibrain/coreDatasources':'./data/connections',
+    './aibrain/connections':    './data/connections',
+    './aibrain/models':         './data/models',
+    './aibrain/schemas':        './data/schemas',
+    // Data Ops — aip namespace variants (some DashConsts rows use ./aip/* instead of ./aibrain/*)
+    './aip/datasets':           './data/datasets',
+    './aip/datasources':        './data/connections',
+    './aip/connections':        './data/connections',
+    './aip/models':             './data/models',
+    './aip/schemas':            './data/schemas',
+
+    // Agents (was aip_app / agent module)
+    './aibrain/agent':          './agent/studio',
+    './aibrain/agents':         './agent/pipeline',
+    './aibrain/agent-directory':'./agent/directory',
+    './aip/agent':              './agent/studio',
+    './aip/agent-pipeline':     './agent/pipeline',
+    './aip/agent-directory':    './agent/directory',
+
+    // Integrations (was aip_app pipelines/apps/instances/jobs)
+    './aibrain/pipelines':      './integration/pipelines',
+    './aip/pipelines':          './integration/pipelines',
+    './aip/implementations':    './integration/implementations',
+    './aip/app-list':           './integration/apps',
+    './aip/instances':          './integration/instances',
+    './aip/jobs':                './integration/jobs',
+    './aibrain/jobs/chain':     './integration/jobs',
+    './aibrain/jobs/scheduled': './integration/jobs',
+    './aibrain/jobs/logs':      './integration/jobs',
+
+    // Vibe Studio (was aip_app vibe-studio)
+    './aip/vibe-studio':        './vibe/editor',
+    './aip/specs':              './vibe/spec-templates',
+
+    // Dashboard (migrated into integration MFE from legacy aip-app-ui)
+    // Dashboard owned by host (was temporarily in integration MFE)
+    './aibrain/dashboard':      './dashboard',
+    './aip/dashboard':          './dashboard',
+    './integration/dashboard':  './dashboard',
+
+    // Salus iframe (migrated into integration MFE from legacy aip-app-ui)
+    './aip/salus':              './integration/salus',
+    './aibrain/salus':          './integration/salus',
+
+    // LiteLLM (migrated into agent MFE from legacy aip-app-ui)
+    './aip/lite-llm':           './agent/litellm',
+    './aip/litellm':            './agent/litellm',
+    './aibrain/litellm':        './agent/litellm',
+
+    // Langfuse observability (migrated into agent MFE from legacy aip-app-ui)
+    './aip/langfuse':           './agent/langfuse',
+    './aibrain/langfuse':       './agent/langfuse',
+  };
+
+  /** Recursively rewrites menu items' `url` fields using URL_REMAP. */
+  // DashConsts records store URLs both as `./aip/foo` and `aip/foo` (no `./`).
+  // Normalize the lookup so either form matches, and re-attach the `./` prefix
+  // on the result to keep navigation consistent with the rest of the menu.
+  private remapLegacyUrls(items: any[]): void {
+    if (!Array.isArray(items)) return;
+    for (const item of items) {
+      if (item && typeof item.url === 'string') {
+        const raw = item.url;
+        const withDot = raw.startsWith('./') ? raw : './' + raw.replace(/^\/+/, '');
+        if (this.URL_REMAP[withDot]) {
+          item.url = this.URL_REMAP[withDot];
+        }
+      }
+      if (item && Array.isArray(item.children)) {
+        this.remapLegacyUrls(item.children);
+      }
+    }
   }
 
 }

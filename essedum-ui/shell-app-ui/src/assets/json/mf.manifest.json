@@ -1,4 +1,32 @@
 {
+	"agent": {
+		"remoteEntry": "/mfe/agent/remoteEntry.js",
+		"exposedModule": "./Module",
+		"routePath": "agent",
+		"ngModuleName": "EntryModule",
+		"title": "Essedum"
+	},
+	"data-ops": {
+		"remoteEntry": "/mfe/data-ops/remoteEntry.js",
+		"exposedModule": "./Module",
+		"routePath": "data",
+		"ngModuleName": "EntryModule",
+		"title": "Essedum"
+	},
+	"integration": {
+		"remoteEntry": "/mfe/integration/remoteEntry.js",
+		"exposedModule": "./Module",
+		"routePath": "integration",
+		"ngModuleName": "EntryModule",
+		"title": "Essedum"
+	},
+	"vibe-studio": {
+		"remoteEntry": "/mfe/vibe-studio/remoteEntry.js",
+		"exposedModule": "./Module",
+		"routePath": "vibe",
+		"ngModuleName": "EntryModule",
+		"title": "Essedum"
+	},
 	"mfe14": {
 		"remoteEntry": "http://localhost:5002/remoteEntry.js",
 		"exposedModule": "./FeatureModule",
@@ -71,12 +99,6 @@
 		"exposedModule": "./Component",
 		"routePath": "aibrain",
 		"ngModuleName": "MlstudioModule"
-	},
-	"aip_app": {
-		"remoteEntry": "/aipui/remoteEntry.js",
-		"exposedModule": "./Component",
-		"routePath": "aip",
-		"ngModuleName": "AipModule"
 	},
 	"cipwflw_app": {
 		"remoteEntry": "/cipui/remoteEntry-cipwflw.js",

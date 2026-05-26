@@ -10,6 +10,12 @@
 /node_modules
 npm-debug.log
 yarn-error.log
+build.log
+
+# Secrets / corporate config — never commit
+.npmrc
+*.bak
+*.corp
 
 # IDEs and editors
 .idea/
@@ -36,6 +42,8 @@ yarn-error.log
 /libpeerconnection.log
 testem.log
 /typings
+*.tsbuildinfo
+out-tsc/
 
 # System files
 .DS_Store

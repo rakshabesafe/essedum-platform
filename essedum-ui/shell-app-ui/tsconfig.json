@@ -2,6 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
+    "ignoreDeprecations": "5.0",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -33,6 +34,9 @@
       "common-app-util": [
         "dist/common-app-util/common-app-util",
         "dist/common-app-util"
+      ],
+      "@essedum/shared-lib": [
+        "projects/shared-lib/src/public-api.ts"
       ]
     }
   },

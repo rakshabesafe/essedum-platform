@@ -18,7 +18,7 @@ $size-text-14: 14px;
 $size-text-12: 12px;
 $font-400: 400;
 $font-700: 700;
-@import "../node_modules/jsoneditor/dist/jsoneditor.min.css";
+// jsoneditor CSS was needed by ang-jsoneditor in the monolith. Now lives in MFEs only.
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "./assets/css/usm-styles.scss";
 @import "./assets/css/common-app-styles.css";

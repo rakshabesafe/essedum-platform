@@ -44,25 +44,28 @@
             "styles": [
               "src/styles.scss",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/drawflow.min.css",
-              "src/beautiful.css",
               "node_modules/primeng/resources/themes/nova/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/font-awesome/scss/font-awesome.scss",
               "node_modules/ng-busy/src/style/busy.css",
               "node_modules/font-awesome/css/font-awesome.min.css",
-              "node_modules/cookieconsent/build/cookieconsent.min.css"
+              "node_modules/cookieconsent/build/cookieconsent.min.css",
+              "src/aip-app-legacy.scss"
             ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.min.js",
               "src/assets/js/popper.min.js",
-              "src/drawflow.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.min.js",
               "src/assets/js/usm-script.js",
               "node_modules/cookieconsent/build/cookieconsent.min.js"
             ],
             "extraWebpackConfig": "webpack.config.js",
-            "commonChunk": false
+            "commonChunk": false,
+            "allowedCommonJsDependencies": [
+              "quill-delta",
+              "moment-timezone",
+              "file-saver",
+              "ng4-loading-spinner",
+              "@linuxfoundation/lfx-ui-core"
+            ]
           },
           "configurations": {
             "production": {
@@ -85,7 +88,12 @@
                 }
               ],
               "outputHashing": "all",
-              "extraWebpackConfig": "webpack.prod.config.js"
+              "extraWebpackConfig": "webpack.prod.config.js",
+              "optimization": {
+                "scripts": true,
+                "styles": { "minify": true, "inlineCritical": true },
+                "fonts": false
+              }
             },
             "development": {
               "buildOptimizer": false,
@@ -165,6 +173,35 @@
             "main": "projects/iamp-usm/src/test.ts",
             "tsConfig": "projects/iamp-usm/tsconfig.spec.json",
             "karmaConfig": "projects/iamp-usm/karma.conf.js"
+          }
+        }
+      }
+    },
+    "shared-lib": {
+      "projectType": "library",
+      "root": "projects/shared-lib",
+      "sourceRoot": "projects/shared-lib/src",
+      "prefix": "essedum",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/shared-lib/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/shared-lib/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/shared-lib/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/shared-lib/tsconfig.spec.json"
           }
         }
       }

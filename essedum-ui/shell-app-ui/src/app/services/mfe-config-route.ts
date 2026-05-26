@@ -3,6 +3,19 @@ import { Routes } from '@angular/router';
 import { routes } from '../landing/landing-routing.module';
 import { CustomManifest } from './Config.model';
 import { WebComponentWrapper,WebComponentWrapperOptions } from '@angular-architects/module-federation-tools';
+import { MfeErrorBoundaryModule } from '../landing/mfe-error-boundary/mfe-error-boundary.module';
+
+// Plan §13 Pitfall #14 — when an MFE's remoteEntry.js fails to load (network,
+// stale manifest, broken deploy), swap in MfeErrorBoundaryModule so the user
+// sees a recoverable fallback inside the host layout instead of a blank page.
+function loadWithFallback(remoteEntry: string, exposedModule: string, ngModuleName: string, mfeName: string) {
+  return loadRemoteModule({ type: 'module', remoteEntry, exposedModule })
+    .then(m => m[ngModuleName])
+    .catch(err => {
+      console.error(`[MFE-load] Failed to load remote "${mfeName}" from ${remoteEntry}:`, err);
+      return MfeErrorBoundaryModule;
+    });
+}
 
 export function buildRoutes(options: CustomManifest): Routes {
 
@@ -19,13 +32,7 @@ export function buildRoutes(options: CustomManifest): Routes {
             if(entry['title'] && entry['title']!=""){
                 r1 = {
                     path: entry.routePath,
-                    loadChildren: () => 
-                        loadRemoteModule({
-                            type: 'module',
-                            remoteEntry: remoteEntry,
-                            exposedModule: entry.exposedModule
-                        })
-                        .then(m => m[entry.ngModuleName]),
+                    loadChildren: () => loadWithFallback(remoteEntry, entry.exposedModule, entry.ngModuleName, entry.routePath),
                     data : {
                         title: entry['title']
                     }
@@ -35,13 +42,7 @@ export function buildRoutes(options: CustomManifest): Routes {
                 console.log(remoteEntry)
                 r1 = {
                     path: entry.routePath,
-                    loadChildren: () => 
-                        loadRemoteModule({
-                            type: 'module',
-                            remoteEntry: remoteEntry,
-                            exposedModule: entry.exposedModule
-                        })
-                        .then(m => m[entry.ngModuleName])
+                    loadChildren: () => loadWithFallback(remoteEntry, entry.exposedModule, entry.ngModuleName, entry.routePath)
                 }
             }
         }

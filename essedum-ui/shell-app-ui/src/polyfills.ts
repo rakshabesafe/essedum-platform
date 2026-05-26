@@ -43,6 +43,24 @@
  */
 
 /***************************************************************************************************
+ * Angular runtime flags — MUST be set before any @angular/core code runs.
+ *
+ * When @angular/core is shared as a Module Federation singleton across the host
+ * and multiple remote MFEs, those remote bundles reference `ngDevMode` /
+ * `ngI18nClosureMode` / `ngJitMode` from their own compiled output, but the
+ * deduplicated singleton's init code doesn't always run before the remote's
+ * platform-browser bundle is evaluated. Result: ReferenceError: ngDevMode is
+ * not defined → cascades into "Cannot access 'AipModule' before initialization"
+ * for everything downstream.
+ *
+ * Setting these flags ourselves before Zone.js / Angular loads guarantees the
+ * globals exist regardless of bundle load order.
+ */
+(globalThis as any).ngDevMode = false;
+(globalThis as any).ngI18nClosureMode = false;
+(globalThis as any).ngJitMode = false;
+
+/***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
 import 'zone.js';  // Included with Angular CLI.

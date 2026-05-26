@@ -34,6 +34,11 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MyProfileComponent } from "./my-profile/my-profile.component";
 import { DialogModule } from "primeng/dialog"
+
+// Cross-MFE platform dashboard — owned by the host per MFE plan §1.
+// Was temporarily housed in integration MFE during 2026-05-25 migration.
+import { DashboardComponent } from './dashboard/dashboard.component';
+
 @NgModule({
   declarations: [
     LandingComponent,
@@ -43,6 +48,7 @@ import { DialogModule } from "primeng/dialog"
     SidebarComponent,
     MyProfileComponent,
     SidebarMenuTextComponent,
+    DashboardComponent,
   ],
   imports: [
     MatCardModule,

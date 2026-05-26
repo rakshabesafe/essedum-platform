@@ -2,12 +2,12 @@ const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPl
 const mf = require("@angular-architects/module-federation/webpack");
 const path = require("path");
 const share = mf.share;
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const sharedMappings = new mf.SharedMappings();
 sharedMappings.register(
   path.join(__dirname, 'tsconfig.json'),
-  [/* mapped paths to share */]);
+  ['@essedum/shared-lib']
+);
 
 module.exports = {
   output: {
@@ -34,30 +34,25 @@ module.exports = {
     outputModule: true
   },
   plugins: [
-    // new BundleAnalyzerPlugin(),
     new ModuleFederationPlugin({
       library: { type: "module" },
 
-      // For remotes (please adjust)
-      // name: "common-app",
-      // filename: "remoteEntry.js",
-      // exposes: {
-      //     './Component': './/src/app/app.component.ts',
-      // },        
-
-      // For hosts (please adjust)
-      remotes: {
-        // "mfe14": "http://localhost:5002/remoteEntry.js",
-        // "surveyApp": "http://localhost:8082/remoteEntry.js"
-      },
+      // Host: remotes are loaded dynamically via manifest (mf.manifest.json).
+      // No static remotes block is required when using `type: 'manifest'` in loadRemoteModule.
+      remotes: {},
 
       shared: share({
-        "@angular/core": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        "@angular/common": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
+        "@angular/core":        { singleton: true, strictVersion: true, requiredVersion: 'auto' },
+        "@angular/common":      { singleton: true, strictVersion: true, requiredVersion: 'auto' },
         "@angular/common/http": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        "@angular/router": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-        'rxjs': { singleton: true, strictVersion: true, requiredVersion: '^7.8.1'},
-		    'rxjs/operators': { singleton: true, strictVersion: true, requiredVersion: '^7.8.1'},
+        "@angular/router":      { singleton: true, strictVersion: true, requiredVersion: 'auto' },
+        "@angular/forms":       { singleton: true, strictVersion: true, requiredVersion: 'auto' },
+        "@angular/material":    { singleton: true, strictVersion: false, requiredVersion: 'auto' },
+        "@angular/cdk":         { singleton: true, strictVersion: false, requiredVersion: 'auto' },
+        "primeng":              { singleton: true, strictVersion: false, requiredVersion: 'auto' },
+        "@essedum/shared-lib":  { singleton: true, strictVersion: true, requiredVersion: 'auto' },
+        'rxjs':                 { singleton: true, strictVersion: true, requiredVersion: '^7.8.1' },
+        'rxjs/operators':       { singleton: true, strictVersion: true, requiredVersion: '^7.8.1' },
         ...sharedMappings.getDescriptors()
       })
 
