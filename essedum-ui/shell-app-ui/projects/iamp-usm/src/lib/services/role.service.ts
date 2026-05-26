@@ -407,11 +407,9 @@ export class RoleService {
     // Add User-Agent header
     headers = headers.append('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0');
 
-    // Add Referer header - matching the exact format in the curl example
-    if (typeof window !== 'undefined') {
-      // Use the actual origin like in the curl example
-      headers = headers.append('Referer', window.location.origin + '/');
-    }
+    // Referer is a forbidden header name — browsers set it automatically and
+    // reject any manual append. The original `headers.append('Referer', ...)`
+    // was dead code generating a console warning. Removed.
 
     // Add authorization header if available
     if (sessionStorage.getItem("authToken")) {
@@ -450,10 +448,8 @@ export class RoleService {
       }
     }
 
-    // Try to add Cookie header if available from document.cookie
-    if (typeof document !== 'undefined' && document.cookie) {
-      headers = headers.append('Cookie', document.cookie);
-    }
+    // Cookie is a forbidden header name — browsers attach cookies automatically.
+    // The manual append was dead code generating a console warning. Removed.
 
     return headers;
   }

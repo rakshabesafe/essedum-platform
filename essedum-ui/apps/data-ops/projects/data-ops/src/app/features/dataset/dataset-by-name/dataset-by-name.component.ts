@@ -433,10 +433,15 @@ export class DatasetByNameComponent {
 
   getIconStatus() {
     this.filteredCards.forEach(card => {
-      this.semanticService.getIngestedTopicsByDatasetnameAndOrg(card.name).subscribe(res => {
-        if (res && res.length > 0) {
-          this.embeddedStatus[card.name] = res[0].status;
-        }
+      this.semanticService.getIngestedTopicsByDatasetnameAndOrg(card.name).subscribe({
+        next: (res) => {
+          if (res && res.length > 0) {
+            this.embeddedStatus[card.name] = res[0].status;
+          }
+        },
+        // /api/aip/mldatasettopics returns 500 in some environments. Treat as
+        // "no embedded status" — non-fatal, silence the console noise.
+        error: () => {},
       });
       // dataset enrichment
       if (card.event_details != null) {

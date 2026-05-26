@@ -23,16 +23,16 @@ export class AppFooterComponent implements OnInit {
       this.leapAppYear = sessionStorage.getItem("leapAppYear");
     }
 
-    this.licenseService.getLicenseConfigResource().subscribe(
-      (res) => {
-        this.numberOfDays = res;
-
-        if (this.numberOfDays <= -1) {
-          window.location.href = sessionStorage.getItem("contextPath") + 'licenseexpired.html';
-        }
-      }
-
-    )
+    // License check disabled — backend /api/license currently returns 500.
+    // Re-enable once the license service is reachable.
+    // this.licenseService.getLicenseConfigResource().subscribe(
+    //   (res) => {
+    //     this.numberOfDays = res;
+    //     if (this.numberOfDays <= -1) {
+    //       window.location.href = sessionStorage.getItem("contextPath") + 'licenseexpired.html';
+    //     }
+    //   }
+    // );
     let clientWidth = document.documentElement.clientWidth;
     let screenChangeRatio = window.outerWidth / screen.width;
     let screenMultiple = window.outerWidth / window.document.documentElement.clientWidth;

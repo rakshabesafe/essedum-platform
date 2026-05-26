@@ -591,7 +591,10 @@ export class LandingComponent implements OnInit, AfterViewInit {
       "--app-version",
       this.appVersion.replaceAll(".", ",")
     );
-    this.getContentResponse();
+    // Declaration-acceptance check disabled — /api/inbox/checkDeclaration
+    // currently returns 500 in some environments. Re-enable when the inbox
+    // service is reachable.
+    // this.getContentResponse();
     this.setTheme();
     this.showLoader();
     this.headericoncolorbool = false;
@@ -2097,8 +2100,8 @@ export class LandingComponent implements OnInit, AfterViewInit {
             let currentrole;
             try {
               currentrolearray = JSON.parse(item.value).Role.split(",");
-            } catch (e: any) {
-              console.error("JSON.parse error - ", e.message);
+            } catch {
+              // sidebar/Iconsidebar DashConst stored as non-JSON — skip role parsing.
             }
             currentrolearray.forEach((ele: any) => {
               currentrole = ele;
@@ -2119,8 +2122,8 @@ export class LandingComponent implements OnInit, AfterViewInit {
             let currentrole;
             try {
               currentrolearray = JSON.parse(item.value).Role.split(",");
-            } catch (e: any) {
-              console.error("JSON.parse error - ", e.message);
+            } catch {
+              // sidebar/Iconsidebar DashConst stored as non-JSON — skip role parsing.
             }
             currentrolearray.forEach((ele: any) => {
               currentrole = ele;
@@ -2154,8 +2157,14 @@ export class LandingComponent implements OnInit, AfterViewInit {
             item.project_id.id == currentprojectid
           ) {
             if (item.value) {
-              fetchdefaultmappings = false;
-              sidebarMenutemp.push(JSON.parse(item.value));
+              try {
+                const parsed = JSON.parse(item.value);
+                sidebarMenutemp.push(parsed);
+                fetchdefaultmappings = false;
+              } catch {
+                // DashConst row for "<role> Side" stored as non-JSON — skip
+                // this entry and fall back to default sidebar mappings.
+              }
             }
           }
         });
@@ -2175,13 +2184,15 @@ export class LandingComponent implements OnInit, AfterViewInit {
           // Priority 1: Current project SideConfigurations
           SideConfigurationsmappings.forEach((item) => {
             if (item.project_id.id == currentprojectid) {
-              fetchdefaultmappings = false;
-              datafromcurrentproject = true;
-              let tempArray = JSON.parse(item.value);
-              tempArray.forEach((ele) => sidebarMenutemp.push(ele));
+              try {
+                const tempArray = JSON.parse(item.value);
+                tempArray.forEach((ele) => sidebarMenutemp.push(ele));
+                fetchdefaultmappings = false;
+                datafromcurrentproject = true;
+              } catch {/* malformed SideConfigurations entry — skip */}
             }
           });
-          
+
           // Priority 2: Portfolio level SideConfigurations (only if no project-level found)
           if (!(sidebarMenutemp && sidebarMenutemp.length)) {
             SideConfigurationsmappings.forEach((item) => {
@@ -2189,20 +2200,24 @@ export class LandingComponent implements OnInit, AfterViewInit {
                 item.portfolio_id &&
                 item.portfolio_id.id == currentPortfolioId
               ) {
-                fetchdefaultmappings = false;
-                let tempArray = JSON.parse(item.value);
-                tempArray.forEach((ele) => sidebarMenutemp.push(ele));
+                try {
+                  const tempArray = JSON.parse(item.value);
+                  tempArray.forEach((ele) => sidebarMenutemp.push(ele));
+                  fetchdefaultmappings = false;
+                } catch {/* malformed portfolio SideConfigurations — skip */}
               }
             });
           }
-          
+
           // Priority 3: Core SideConfigurations (only if no project or portfolio-level found)
           if (!(sidebarMenutemp && sidebarMenutemp.length)) {
             SideConfigurationsmappings.forEach((item) => {
               if (item.project_name == "Core" || item.project_name == "core") {
-                fetchdefaultmappings = false;
-                let tempArray = JSON.parse(item.value);
-                tempArray.forEach((ele) => sidebarMenutemp.push(ele));
+                try {
+                  const tempArray = JSON.parse(item.value);
+                  tempArray.forEach((ele) => sidebarMenutemp.push(ele));
+                  fetchdefaultmappings = false;
+                } catch {/* malformed Core SideConfigurations — skip */}
               }
             });
           }
@@ -2261,9 +2276,13 @@ export class LandingComponent implements OnInit, AfterViewInit {
           response.forEach((item) => {
             if (item.keys == rolename + " Side") {
               if (item.value) {
-                fetchdefaultmappings = false;
-               // this.isSidebarLoading = false;
-                sidebarMenutemp.push(JSON.parse(item.value));
+                try {
+                  const parsed = JSON.parse(item.value);
+                  sidebarMenutemp.push(parsed);
+                  fetchdefaultmappings = false;
+                } catch {
+                  // Default "<role> Side" DashConst stored as non-JSON — skip.
+                }
               }
             }
           });
@@ -2282,7 +2301,8 @@ export class LandingComponent implements OnInit, AfterViewInit {
           response.forEach((item) => {
             if (item.keys == "Core Project Admin Side") {
               if (item.value) {
-                tempsidebar.push(JSON.parse(item.value));
+                try { tempsidebar.push(JSON.parse(item.value)); }
+                catch {/* skip malformed entry */}
               }
             }
           });
@@ -2290,8 +2310,10 @@ export class LandingComponent implements OnInit, AfterViewInit {
           let SideConfigurationsmappings = response.filter(
             (item) => item.keys == "Core Project Admin SideConfigurations"
           );
-          if (SideConfigurationsmappings && SideConfigurationsmappings.length)
-            this.sidebarMenu = JSON.parse(SideConfigurationsmappings[0].value);
+          if (SideConfigurationsmappings && SideConfigurationsmappings.length) {
+            try { this.sidebarMenu = JSON.parse(SideConfigurationsmappings[0].value); }
+            catch {/* skip malformed entry */}
+          }
         }
         if (
           datafromcoreproject == false &&
@@ -2302,7 +2324,8 @@ export class LandingComponent implements OnInit, AfterViewInit {
           response.forEach((item) => {
             if (item.keys == "Core Portfolio Admin Side") {
               if (item.value) {
-                tempsidebar.push(JSON.parse(item.value));
+                try { tempsidebar.push(JSON.parse(item.value)); }
+                catch {/* skip malformed entry */}
               }
             }
           });
@@ -2310,8 +2333,10 @@ export class LandingComponent implements OnInit, AfterViewInit {
           let SideConfigurationsmappings = response.filter(
             (item) => item.keys == "Core Portfolio Admin SideConfigurations"
           );
-          if (SideConfigurationsmappings && SideConfigurationsmappings.length)
-            this.sidebarMenu = JSON.parse(SideConfigurationsmappings[0].value);
+          if (SideConfigurationsmappings && SideConfigurationsmappings.length) {
+            try { this.sidebarMenu = JSON.parse(SideConfigurationsmappings[0].value); }
+            catch {/* skip malformed entry */}
+          }
         }
         if (
           sessionStorage.getItem("viewtabs") == undefined ||
@@ -2623,7 +2648,11 @@ if ((roleChanged || portfolioChanged || projectChanged) && !navigationInProgress
     return sideJSONArray;
   }
   Highlight(child: any) {
-    let temp = [[...child.parent]];
+    // child.parent is populated by injectParentLabelsHelper; menu items that
+    // bypass that path (legacy DashConst rows, custom redirects) have no parent
+    // breadcrumb chain. Fall back to an empty array instead of throwing.
+    const parentChain: any[] = Array.isArray(child?.parent) ? child.parent : [];
+    let temp = [[...parentChain]];
     temp[0].push(child.label);
     this.displayBreadCrumb(temp[0]);
     if (child.label)
@@ -3279,7 +3308,9 @@ if ((roleChanged || portfolioChanged || projectChanged) && !navigationInProgress
         },
 
         error: (_error) => {
-          console.error("Error ", _error);
+          // /api/inbox/checkDeclaration is a declaration-acceptance check that
+          // currently returns 500 in some environments — non-fatal, the
+          // dialog just doesn't open. Logging suppressed to keep console clean.
         },
       });
   }

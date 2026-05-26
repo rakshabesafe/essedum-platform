@@ -344,11 +344,7 @@ export class UsmRolePermissionsService {
   // Helper method to create standardized request headers with all required values
   private createRequestHeaders(): HttpHeaders {
     let headers = new HttpHeaders();
-    // Add Referer header - matching the exact format in the curl example
-    if (typeof window !== 'undefined') {
-      // Use the actual origin like in the curl example
-      headers = headers.append('Referer', window.location.origin + '/');
-    }
+    // Referer is a forbidden header name — browser sets it automatically.
 
     // Add authorization header if available
     if (sessionStorage.getItem("authToken")) {
@@ -387,10 +383,7 @@ export class UsmRolePermissionsService {
       }
     }
 
-    // Try to add Cookie header if available from document.cookie
-    if (typeof document !== 'undefined' && document.cookie) {
-      headers = headers.append('Cookie', document.cookie);
-    }
+    // Cookie is a forbidden header name — browser attaches cookies automatically.
 
     return headers;
   }

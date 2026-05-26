@@ -338,7 +338,10 @@ export class ApisService {
           sessionStorage.setItem(config, JSON.stringify(configs[config]));
         });
       } catch (e: any) {
-        console.error('JSON.parse error', e);
+        // YMLdefault DashConst is optional — when not valid JSON (e.g. the
+        // backend stored YAML or left it empty) we just skip it. Logging
+        // suppressed because this fires every successful login when the
+        // platform hasn't been configured with YML defaults.
       }
     }
   }

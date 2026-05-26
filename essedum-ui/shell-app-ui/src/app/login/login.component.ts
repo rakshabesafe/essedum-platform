@@ -82,13 +82,19 @@ export class LoginComponent implements OnInit {
     } catch (e: any) {
       console.error("JSON.parse error - ", e.message);
     }
-    if (sessionStorage.getItem("user") && sessionStorage.getItem("portfoliodata") && sessionStorage.getItem("project") && sessionStorage.getItem("role")) {
+    // Require an actual auth token in addition to profile keys — otherwise stale
+    // sessionStorage from a prior session makes us call APIs that 403.
+    const accessToken = localStorage.getItem("access_token");
+    if (accessToken && sessionStorage.getItem("user") && sessionStorage.getItem("portfoliodata") && sessionStorage.getItem("project") && sessionStorage.getItem("role")) {
       this.checkUserProjectRolePortfolio = true
       this.showLogin = false;
-      this.fetchingDashConst = true; 
+      this.fetchingDashConst = true;
       this.apisService.getDashConsts().subscribe(res => {
         this.fetchingDashConst = false;
       })
+    } else if (!accessToken) {
+      // No token → clear any stale profile data so the login UI shows.
+      ["user", "portfoliodata", "project", "role"].forEach(k => sessionStorage.removeItem(k));
     }
     if (JSON.parse(sessionStorage.getItem("activeProfiles")!).indexOf("dbjwt") != -1) {
       if (!this.fetchingDashConst)

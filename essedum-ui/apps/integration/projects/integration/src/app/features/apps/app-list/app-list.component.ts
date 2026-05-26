@@ -203,22 +203,28 @@ export class AppListComponent implements OnInit {
       params = params.set('type', this.selectedTagType.toString());
     if (this.selectedTag.length >= 1)
       params = params.set('tags', this.selectedTag.toString());
-    this.service.getPipelinesCards(params).subscribe((res) => {
-      this.appData = res.filter((res) => res.type == 'App');
-      this.loading = false;
-      this.appData.forEach((app, index) => {
-        this.service.getAppByName(app.name).subscribe((resp) => {
-          this.appData[index]['scope'] = resp.scope;
-          if (resp.videoFile) {
-            this.appData[index]['isvideoPresent'] = true;
-          } else {
-            this.appData[index]['isvideoPresent'] = false;
-          }
+    this.service.getPipelinesCards(params).subscribe({
+      next: (res) => {
+        this.appData = (res || []).filter((r) => r && r.type == 'App');
+        this.loading = false;
+        this.appData.forEach((app, index) => {
+          this.service.getAppByName(app.name).subscribe({
+            next: (resp) => {
+              if (!resp) return;
+              this.appData[index]['scope'] = resp.scope;
+              this.appData[index]['isvideoPresent'] = !!resp.videoFile;
+            },
+            error: () => {}
+          });
+          this.service.getImage(app['name']).subscribe({
+            next: (image) => {
+              this.appData[index]['image'] = image && image['url'] ? image['url'] : null;
+            },
+            error: () => {}
+          });
         });
-        this.service.getImage(app['name']).subscribe((image) => {
-          this.appData[index]['image'] = image['url'];
-        });
-      });
+      },
+      error: () => { this.loading = false; }
     });
     this.getCountPipelines();
     this.updateQueryParam(

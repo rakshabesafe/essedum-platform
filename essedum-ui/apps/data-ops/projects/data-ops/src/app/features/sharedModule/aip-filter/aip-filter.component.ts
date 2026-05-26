@@ -577,8 +577,9 @@ export class AipFilterComponent implements OnInit, OnChanges {
     this.datasetServices
       .getIndexNamesByOrg(sessionStorage.getItem('organization'))
       .pipe(
-        catchError((error) => {
-          console.error('Error fetching topics:', error);
+        catchError(() => {
+          // /api/aip/mltopics/list/activeMltopicsByOrg returns 500 in some
+          // environments — fall back to empty topic list instead of logging.
           return of([]);
         })
       )
