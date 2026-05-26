@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import com.lfn.icip.vibecoding.service.VibeCodingService;
 
 /**
@@ -36,6 +38,18 @@ public class VibeCodingController {
     private static final Logger logger = LoggerFactory.getLogger(VibeCodingController.class);
 
     private final VibeCodingService vibeCodingService;
+
+    @Value("${vibe.azure.openai.endpoint}")
+    private String azureOpenAiEndpoint;
+
+    @Value("${vibe.azure.openai.deployment-name}")
+    private String azureOpenAiDeploymentName;
+
+    @Value("${vibe.azure.openai.api-version}")
+    private String azureOpenAiApiVersion;
+
+    @Value("${vibe.azure.openai.api-key}")
+    private String azureOpenAiApiKey;
 
     public VibeCodingController(VibeCodingService vibeCodingService) {
         this.vibeCodingService = vibeCodingService;
@@ -117,13 +131,25 @@ public class VibeCodingController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> agentUpdateProvider(
             @RequestBody Map<String, Object> request) {
-        // Override provider/model to use local Ollama instead of external providers
         String originalProvider = String.valueOf(request.get("provider"));
         String originalModel = String.valueOf(request.get("model"));
-        request.put("provider", "ollama");
-        request.put("model", "gpt-oss:latest");
-        logger.info("Agent update provider request — remapped [{}/{}] -> [ollama/gpt-oss:latest]",
-                originalProvider, originalModel);
+
+        // Push Azure OpenAI configuration into the Goose config store so that
+        // the provider's from_env() call picks them up on the next update.
+        vibeCodingService.post("/config/upsert",
+                Map.of("key", "AZURE_OPENAI_ENDPOINT", "value", azureOpenAiEndpoint, "is_secret", false));
+        vibeCodingService.post("/config/upsert",
+                Map.of("key", "AZURE_OPENAI_DEPLOYMENT_NAME", "value", azureOpenAiDeploymentName, "is_secret", false));
+        vibeCodingService.post("/config/upsert",
+                Map.of("key", "AZURE_OPENAI_API_VERSION", "value", azureOpenAiApiVersion, "is_secret", false));
+        vibeCodingService.post("/config/upsert",
+                Map.of("key", "AZURE_OPENAI_API_KEY", "value", azureOpenAiApiKey, "is_secret", true));
+
+        // Override provider/model to use Azure OpenAI
+        request.put("provider", originalProvider);
+        request.put("model", originalModel);
+        logger.info("Agent update provider request — original provider/model: {}/{} — updated to azure_openai/{}",
+                originalProvider, originalModel, azureOpenAiDeploymentName);
         return vibeCodingService.post("/agent/update_provider", request);
     }
 
@@ -258,4 +284,3 @@ public class VibeCodingController {
         return vibeCodingService.sseGet("/sessions/" + sessionId + "/events");
     }
 }
-

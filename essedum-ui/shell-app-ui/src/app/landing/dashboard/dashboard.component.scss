@@ -1,4 +1,4 @@
-.dashboard-container {
+﻿.dashboard-container {
   padding: 28px 32px;
   min-height: 100%;
   background: var(--background-colour, #1e293b);
@@ -22,7 +22,7 @@
   margin: 0;
 }
 
-/* ── Stat Card (Large Container) ── */
+/* ΓöÇΓöÇ Stat Card (Large Container) ΓöÇΓöÇ */
 .stat-card.large-card {
   background: var(--bg-color, #0d1530);
   border: 1px solid var(--border-color, rgba(79,142,247,0.12));
@@ -51,7 +51,7 @@
   margin: 0;
 }
 
-/* ── Small Cards Grid (3 × 2 = 6 cards) ── */
+/* ΓöÇΓöÇ Small Cards Grid (3 ├ù 2 = 6 cards) ΓöÇΓöÇ */
 .small-cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -122,7 +122,7 @@
 }
 
 
-/* ── Section Titles ── */
+/* ΓöÇΓöÇ Section Titles ΓöÇΓöÇ */
 .section-title {
   font-size: 0.85rem;
   font-weight: 600;
@@ -132,12 +132,12 @@
   margin: 8px 0 14px;
 }
 
-/* ── Module Grid ── */
+/* ΓöÇΓöÇ Module Grid ΓöÇΓöÇ */
 .module-grid {
   display: none;
 }
 
-/* ── Pipeline Lists Container ── */
+/* ΓöÇΓöÇ Pipeline Lists Container ΓöÇΓöÇ */
 .pipeline-lists-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -173,7 +173,7 @@
   i { font-size: 1rem; }
 }
 
-/* ── Pipeline List — activity feed style ── */
+/* ΓöÇΓöÇ Pipeline List ΓÇö activity feed style ΓöÇΓöÇ */
 .pipeline-list {
   list-style: none;
   padding: 0;
@@ -232,7 +232,8 @@
   text-transform: capitalize;
 }
 
-.pipeline-item-runs {
+.pipeline-item-runs,
+.pipeline-item-sub {
   font-size: 1rem;
   color: var(--text-color-secondary, #64748b);
   display: block;

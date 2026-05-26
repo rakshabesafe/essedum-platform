@@ -14,7 +14,29 @@ import { StreamingServices } from '@essedum/shared-lib';
 export class VibeStudioComponent implements OnInit, OnDestroy {
   readonly appTypeOptions = APP_TYPE_OPTIONS;
 
+  /** Agent options loaded from the /config/providers API (Step 1). */
+  providerOptions: { label: string; value: string }[] = [];
+  providersLoading = true;
+  /** Selected agent value from the Step 1 dropdown. */
+  selectedAgent: VibeModel | null = null;
+
+  /** Fixed model options for Step 2. */
+  readonly modelOptions: { label: string; value: string }[] = [
+    { label: 'qwen3.6:27b',    value: 'qwen3.6:27b'    },
+    { label: 'gemma4:latest',  value: 'gemma4:latest'   },
+    { label: 'gpt-oss:latest', value: 'gpt-oss:latest'  },
+    { label: 'gpt-4o-mini',    value: 'gpt-4o-mini'     },
+  ];
+
   selectedAppType: AppType | null = null;
+  /** Selected model value from the Step 2 dropdown. */
+  selectedModel: VibeModel | null = null;
+  /** True when both agent (Step 1) and model (Step 2) are selected. */
+  get stepsDone(): boolean { return !!this.selectedAgent && !!this.selectedModel; }
+  /** Display label for the selected agent, shown in the left panel. */
+  get selectedAgentLabel(): string {
+    return this.providerOptions.find(p => p.value === this.selectedAgent)?.label ?? this.selectedAgent ?? '';
+  }
   leftPanelWidth = 35;
   private isDragging = false;
   private destroy$ = new Subject<void>();
@@ -28,6 +50,9 @@ export class VibeStudioComponent implements OnInit, OnDestroy {
   private pendingUploadFiles: VibeFile[] | null = null;
   /** guard: upload fires at most once per generation round */
   private uploadFired = false;
+  /** Pipeline registration banner shown after a card is created in ESSEDUM Pipelines */
+  registrationBanner: { name: string; pipelineScreen: string; type: 'created' | 'files-pushed' } | null = null;
+  registrationBannerDismissed = false;
 
   constructor(
     private vibeService: VibeStudioService,
@@ -35,18 +60,38 @@ export class VibeStudioComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Load agent options from the /config/providers endpoint (Step 1 dropdown).
+    this.vibeService.getProviders()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: any) => {
+          this.providerOptions = this.normalizeProviders(data);
+          this.providersLoading = false;
+        },
+        error: () => { this.providersLoading = false; },
+      });
+
     // When generation fully completes, buffer the files and attempt upload.
     // tryFlushUpload() will also be called when registeredCname arrives, so
     // whichever of the two (files, cname) is last wins — no race condition.
     this.vibeService.generationComplete$
       .pipe(
         takeUntil(this.destroy$),
-        filter(() => this.selectedAppType !== 'streamlit'),
       )
       .subscribe((files) => {
         this.uploadFired = false;          // allow re-upload on every generation round
         this.pendingUploadFiles = files;
         this.tryFlushUpload();
+      });
+
+    // When files are successfully stored in the pipeline card, upgrade the banner colour.
+    this.vibeService.fileUploadSuccess$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.registrationBanner) {
+          this.registrationBanner = { ...this.registrationBanner, type: 'files-pushed' };
+          this.registrationBannerDismissed = false;
+        }
       });
   }
 
@@ -55,15 +100,21 @@ export class VibeStudioComponent implements OnInit, OnDestroy {
 
     let type: string;
     let interfacetype: string;
+    let pipelineScreen: string;
 
-    if (this.selectedAppType === 'react_app' || this.selectedAppType === 'react_node') {
+    if (this.selectedAppType === 'react_app' || this.selectedAppType === 'streamlit') {
       type = 'appPipeline';
       interfacetype = 'app-pipeline';
-    } else if (this.selectedAppType === 'agents_mcp') {
+      pipelineScreen = 'App Pipelines';
+    } else if (this.selectedAppType === 'agent') {
       type = 'AIAgent';
       interfacetype = 'pipeline-agent';
+      pipelineScreen = 'Agent Pipelines';
+    } else if (this.selectedAppType === 'mcp_server') {
+      type = 'MCPServer';
+      interfacetype = 'mcp-pipeline';
+      pipelineScreen = 'MCP Pipelines';
     } else {
-      // streamlit — skip registration
       return;
     }
 
@@ -79,17 +130,55 @@ export class VibeStudioComponent implements OnInit, OnDestroy {
     this.services.create(newCanvas).subscribe({
       next: (result) => {
         this.registeredCname = result.name ?? null;
+        this.registrationBanner = { name: displayName, pipelineScreen, type: 'created' };
+        this.registrationBannerDismissed = false;
         this.tryFlushUpload();
       },
       error: () => {
         // create failed (e.g. duplicate alias) — fall back to sessionId so upload still fires
         this.registeredCname = sessionId;
+        this.registrationBanner = { name: displayName, pipelineScreen, type: 'created' };
+        this.registrationBannerDismissed = false;
         this.tryFlushUpload();
       },
     });
   }
 
+  onAgentNameChange(name: string): void {
+    // Keep the service session in sync so update-provider always has the latest agent name.
+    this.vibeService.setAgentProvider(name);
+  }
+
+  /** Normalises the /config/providers API response into a flat label+value list. */
+  private normalizeProviders(data: any): { label: string; value: string }[] {
+    const arr: any[] = Array.isArray(data) ? data : (data?.providers ?? data?.data ?? []);
+    return arr.map((item: any) => ({
+      label: this.toTitleCase(item.name ?? item.displayName ?? item.label ?? item.id ?? item.value ?? String(item)),
+      value: item.id ?? item.value ?? item.provider ?? item.name ?? String(item),
+    }));
+  }
+
+  /** Converts snake_case, kebab-case, camelCase or plain strings to Title Case. */
+  private toTitleCase(s: string): string {
+    return s
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/[_\-]+/g, ' ')
+      .replace(/\b\w/g, ch => ch.toUpperCase());
+  }
+
+  /** Called when user picks an agent from the Step 1 dropdown. */
+  onAgentSelect(agent: VibeModel): void {
+    this.selectedAgent = agent;
+    this.vibeService.setAgentProvider(agent);
+  }
+
+  onModelSelect(model: VibeModel): void {
+    this.selectedModel = model;
+    this.vibeService.setModel(model);
+  }
+
   selectAppType(appType: AppType): void {
+    if (!this.stepsDone) return;
     this.selectedAppType = appType;
     // Cancel any leftover subscription from a previous session and start a fresh one.
     this.sessionReset$.next();
@@ -173,13 +262,21 @@ export class VibeStudioComponent implements OnInit, OnDestroy {
     return `${titled}-${suffix}`;
   }
 
+  dismissRegistrationBanner(): void {
+    this.registrationBannerDismissed = true;
+  }
+
   onNewSession(): void {
     this.sessionReset$.next();
     this.selectedAppType = null;
+    this.selectedAgent = null;
+    this.selectedModel = null;
     this.registeredCname = null;
     this.appName = null;
     this.pendingUploadFiles = null;
     this.uploadFired = false;
+    this.registrationBanner = null;
+    this.registrationBannerDismissed = false;
     this.vibeService.resetSession();
   }
 

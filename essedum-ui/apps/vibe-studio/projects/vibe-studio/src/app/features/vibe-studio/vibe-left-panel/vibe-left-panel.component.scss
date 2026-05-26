@@ -35,57 +35,25 @@
   height: 100%;  min-height: 0;  overflow: hidden;
 }
 
-// ── Model Bar ─────────────────────────────────────────────────────────────────
-.model-bar {
+// ── Model indicator bar ───────────────────────────────────────────────────────
+.model-indicator-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px;
+  gap: 6px;
+  padding: 6px 14px;
   flex-shrink: 0;
   border-bottom: 1px solid;
-
-  .model-bar-left {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    .model-icon  { font-size: 13px; }
-    .model-label { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; }
-  }
 }
 
-.model-selector-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
+.model-indicator-icon {
+  font-size: 12px;
+}
 
-  .model-select {
-    appearance: none;
-    -webkit-appearance: none;
-    border: 1px solid;
-    border-radius: 8px;
-    padding: 4px 26px 4px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    background: transparent;
-    outline: none;
-    font-family: inherit;
-    transition: border-color 0.15s;
-
-    option {
-      font-size: 12px;
-      background: #1e2a3a;
-      color: #e2e8f0;
-    }
-  }
-
-  .select-chevron {
-    position: absolute;
-    right: 8px;
-    font-size: 10px;
-    pointer-events: none;
-  }
+.model-indicator-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 // ── Messages Area ─────────────────────────────────────────────────────────────
@@ -401,28 +369,11 @@
 :host-context(body.header-dark-theme) {
   .copilot-panel { background: transparent; }
 
-  .model-bar {
-    background: rgba(0,0,0,0.15);
-    border-bottom-color: rgba(79,142,247,0.08);
-
-    .model-icon  { color: #a78bfa; }
-    .model-label { color: #8faec8; }
-  }
-
-  .model-selector-wrap {
-    .model-select {
-      background: rgba(255,255,255,0.04);
-      border-color: rgba(79,142,247,0.2);
-      color: #e2e8f0;
-
-      option {
-        background: #1a2236;
-        color: #e2e8f0;
-      }
-
-      &:hover { border-color: rgba(79,142,247,0.45); }
-    }
-    .select-chevron { color: #8faec8; }
+  .model-indicator-bar {
+    border-bottom-color: rgba(79,142,247,0.1);
+    background: rgba(79,142,247,0.05);
+    .model-indicator-icon  { color: #a78bfa; }
+    .model-indicator-label { color: #8faec8; }
   }
 
   .messages-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); }
@@ -490,23 +441,11 @@
 :host-context(body.header-light-theme) {
   .copilot-panel { background: #fafdff; }
 
-  .model-bar {
-    background: rgba(248,250,252,0.9);
-    border-bottom-color: rgba(99,102,241,0.08);
-
-    .model-icon  { color: #7c3aed; }
-    .model-label { color: #64748b; }
-  }
-
-  .model-selector-wrap {
-    .model-select {
-      background: rgba(255,255,255,0.9);
-      border-color: rgba(99,102,241,0.2);
-      color: #1e293b;
-
-      &:hover { border-color: rgba(99,102,241,0.45); }
-    }
-    .select-chevron { color: #94a3b8; }
+  .model-indicator-bar {
+    border-bottom-color: rgba(99,102,241,0.1);
+    background: rgba(99,102,241,0.04);
+    .model-indicator-icon  { color: #7c3aed; }
+    .model-indicator-label { color: #4f46e5; }
   }
 
   .messages-area::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); }

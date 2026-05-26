@@ -35,11 +35,10 @@
           <div class="pipeline-item-left">
             <span class="pipeline-item-dot" [ngClass]="'dot-' + pipeline.status"></span>
             <div class="pipeline-item-info">
-              <span class="pipeline-item-name">{{ pipeline.name | titlecase }}</span>
-              <span class="pipeline-item-runs">{{ pipeline.runs }} runs</span>
+              <span class="pipeline-item-name">{{ pipeline.alias }}</span>
+              <span class="pipeline-item-sub" *ngIf="pipeline.name">{{ pipeline.name }}</span>
             </div>
           </div>
-          <span class="pipeline-item-status" [ngClass]="'status-' + pipeline.status">{{ pipeline.status | uppercase }}</span>
         </div>
       </div>
     </div>
@@ -52,11 +51,10 @@
           <div class="pipeline-item-left">
             <span class="pipeline-item-dot" [ngClass]="'dot-' + pipeline.status"></span>
             <div class="pipeline-item-info">
-              <span class="pipeline-item-name">{{ pipeline.name | titlecase }}</span>
-              <span class="pipeline-item-runs">{{ pipeline.runs }} runs</span>
+              <span class="pipeline-item-name">{{ pipeline.alias }}</span>
+              <span class="pipeline-item-sub" *ngIf="pipeline.name">{{ pipeline.name }}</span>
             </div>
           </div>
-          <span class="pipeline-item-status" [ngClass]="'status-' + pipeline.status">{{ pipeline.status | uppercase }}</span>
         </div>
       </div>
     </div>
@@ -69,11 +67,10 @@
           <div class="pipeline-item-left">
             <span class="pipeline-item-dot" [ngClass]="'dot-' + pipeline.status"></span>
             <div class="pipeline-item-info">
-              <span class="pipeline-item-name">{{ pipeline.name | titlecase }}</span>
-              <span class="pipeline-item-runs">{{ pipeline.runs }} runs</span>
+              <span class="pipeline-item-name">{{ pipeline.alias }}</span>
+              <span class="pipeline-item-sub" *ngIf="pipeline.name">{{ pipeline.name }}</span>
             </div>
           </div>
-          <span class="pipeline-item-status" [ngClass]="'status-' + pipeline.status">{{ pipeline.status | uppercase }}</span>
         </div>
       </div>
     </div>

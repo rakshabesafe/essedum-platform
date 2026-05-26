@@ -293,6 +293,7 @@ export class AgentPipelineComponent implements OnInit, OnDestroy {
 
   // Upload agent files functionality
   isUploadingFiles = false;
+  isOpeningUploadDialog = false; // Tracks button loading state before dialog renders
   showUploadDialog = false;
   selectedZipFile: File | null = null;
 
@@ -2752,11 +2753,20 @@ export class AgentPipelineComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Open file upload dialog for agent files
+   * Open file upload dialog for agent files.
+   * Sets a loading flag immediately so the button shows a spinner,
+   * then defers the actual dialog open by one animation frame so Angular
+   * can paint the button state before the heavier dialog is rendered.
    */
   openUploadDialog(): void {
-    this.showUploadDialog = true;
+    this.isOpeningUploadDialog = true;
     this.selectedZipFile = null;
+    // Let Angular render the button spinner, then open the dialog
+    setTimeout(() => {
+      this.showUploadDialog = true;
+      this.isOpeningUploadDialog = false;
+      this.cdr.detectChanges();
+    }, 0);
   }
 
   /**
@@ -2764,6 +2774,7 @@ export class AgentPipelineComponent implements OnInit, OnDestroy {
    */
   closeUploadDialog(): void {
     this.showUploadDialog = false;
+    this.isOpeningUploadDialog = false;
     this.selectedZipFile = null;
   }
 
