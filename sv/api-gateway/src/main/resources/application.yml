@@ -172,3 +172,33 @@ logging:
     org.springframework.cloud.gateway: INFO
     reactor.netty: INFO
 
+# ---- JWT Authentication (same secret as downstream services) ----
+jwt:
+  base64-secret: ${JWT_SECRET:ZjY0MDRhOTNlZDdlNDM0ODdlOTQ3MWNjODQwYmRhNWIyYTg5YTBjMzJlYmQ2Y2M4OTc5MGFlZjQ5ZjRkNTk0YTMyN2MyOGIzMWRjM2Y5OTgxNGMyZjk1OThiMTM0NGZhMDkzYjk3ODY2NGViZjVkZWI4YWYxN2YzOWY5YzMzMjk=}
+# ---- Gateway Auth Filter Configuration ----
+gateway:
+  auth:
+    enabled: ${GATEWAY_AUTH_ENABLED:true}
+    open-paths:
+      - /api/authenticate
+      - /api/registerUser
+      - /api/getConfigDetails
+      - /api/validateUser
+      - /api/validateUserCAP
+      - /api/userInfo
+      - /api/userInfoCAP
+      - /api/get-startup-constants
+      - /api/get-startup-constants/**
+      - /api/github/oauth/**
+      - /api/aip/langflow/langflow_agent_export
+      - /api/aip/langflow/get_langflow_agent_export
+      - /api/aip/langflow/langflow_export_file_details
+      - /api/aip/langflow/get_langflow_agent_file
+      - /api/aip/file/create/**
+      - /api/aip/service/v1/streamingServices/update
+      - /actuator/**
+      - /ws/**
+# ---- Service-to-Service Access Token ----
+config:
+  service-auth:
+    access-token: ${SERVICE_ACCESS_TOKEN:aec127c2-c984-33f6-9a3a-355xd1dof097}
