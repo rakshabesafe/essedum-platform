@@ -23,15 +23,80 @@
       <h2>What do you want to build?</h2>
       <p>Pick a project type and start describing your idea — Vibe Studio will generate the full code for you.</p>
       <div class="hero-badges">
-        <span class="hero-badge badge-react"><i class="bi bi-lightning-fill"></i> React</span>
         <span class="hero-badge badge-ai"><i class="bi bi-cpu-fill"></i> AI Agents</span>
         <span class="hero-badge badge-mcp"><i class="bi bi-diagram-3-fill"></i> MCP Servers</span>
+        <span class="hero-badge badge-react"><i class="bi bi-lightning-fill"></i> React</span>
+        <span class="hero-badge badge-streamlit"><i class="bi bi-bar-chart-fill"></i> Streamlit</span>
       </div>
     </div>
-    <div class="picker-cards">
+
+    <!-- Steps 1 & 2: Agent + Model in a compact inline row -->
+    <div class="steps-row">
+
+      <!-- Step 1: Agent -->
+      <div class="step-col">
+        <div class="model-picker-label">
+          <span class="step-badge">1</span>
+          <span>Agent</span>
+        </div>
+        <div class="model-picker-dropdown">
+          <div *ngIf="providersLoading" class="providers-loading">
+            <i class="bi bi-arrow-repeat providers-loading-spin"></i>
+            Loading…
+          </div>
+          <div *ngIf="!providersLoading" class="provider-select-wrap">
+            <select
+              class="provider-select"
+              [(ngModel)]="selectedAgent"
+              (ngModelChange)="onAgentSelect($event)"
+            >
+              <option [ngValue]="null" disabled>Select agent…</option>
+              <option *ngFor="let p of providerOptions" [value]="p.value">{{ p.label }}</option>
+            </select>
+            <i class="bi bi-chevron-down provider-select-chevron"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="steps-row-sep"><i class="bi bi-chevron-right"></i></div>
+
+      <!-- Step 2: Model (locked until agent chosen) -->
+      <div class="step-col" [class.step-col--locked]="!selectedAgent">
+        <div class="model-picker-label" [class.model-picker-label--inactive]="!selectedAgent">
+          <span class="step-badge" [class.step-badge--inactive]="!selectedAgent">2</span>
+          <span>Model</span>
+          <span *ngIf="!selectedAgent" class="step-hint">← pick agent first</span>
+        </div>
+        <div class="model-picker-dropdown">
+          <div class="provider-select-wrap">
+            <select
+              class="provider-select"
+              [(ngModel)]="selectedModel"
+              (ngModelChange)="onModelSelect($event)"
+              [disabled]="!selectedAgent"
+            >
+              <option [ngValue]="null" disabled>Select model…</option>
+              <option *ngFor="let m of modelOptions" [value]="m.value">{{ m.label }}</option>
+            </select>
+            <i class="bi bi-chevron-down provider-select-chevron"></i>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Step 3: App type cards (locked until both step 1 + 2 done) -->
+    <div class="picker-step-label">
+      <span class="step-badge" [class.step-badge--inactive]="!stepsDone">3</span>
+      <span [class.step-label--inactive]="!stepsDone">Select project type</span>
+      <span *ngIf="!selectedAgent" class="step-hint">← Select an agent first</span>
+      <span *ngIf="selectedAgent && !selectedModel" class="step-hint">← Select a model first</span>
+    </div>
+    <div class="picker-cards" [class.cards-locked]="!stepsDone">
       <div
         *ngFor="let option of appTypeOptions"
         class="picker-card"
+        [class.picker-card--locked]="!stepsDone"
         (click)="selectAppType(option.value)"
       >
         <div class="picker-card-icon">
@@ -39,18 +104,48 @@
         </div>
         <div class="picker-card-label">{{ option.label }}</div>
         <div class="picker-card-desc">{{ option.description }}</div>
+        <div *ngIf="!stepsDone" class="picker-card-lock"><i class="bi bi-lock-fill"></i></div>
       </div>
     </div>
   </div>
 
   <!-- Split panels (after app type selected) -->
-  <div *ngIf="selectedAppType" class="vibe-panels">
-    <div class="panel left" [style.flex-basis.%]="leftPanelWidth">
-      <app-vibe-left-panel></app-vibe-left-panel>
+  <div *ngIf="selectedAppType" class="vibe-panels-wrapper">
+
+    <!-- Pipeline registration notification banner -->
+    <div *ngIf="registrationBanner && !registrationBannerDismissed"
+         class="pipeline-banner"
+         [class.banner-created]="registrationBanner.type === 'created'"
+         [class.banner-files-pushed]="registrationBanner.type === 'files-pushed'">
+      <i class="bi pipeline-banner-icon"
+         [class.bi-check-circle-fill]="registrationBanner.type === 'files-pushed'"
+         [class.bi-box-arrow-in-right]="registrationBanner.type === 'created'"></i>
+      <span class="pipeline-banner-text">
+        <ng-container *ngIf="registrationBanner.type === 'created'">
+          <strong>{{ registrationBanner.name }}</strong> has been created in the
+          <strong>{{ registrationBanner.pipelineScreen }}</strong> screen in ESSEDUM Pipelines.
+          Generated files will be stored in that card once code generation is complete.
+        </ng-container>
+        <ng-container *ngIf="registrationBanner.type === 'files-pushed'">
+          <strong>{{ registrationBanner.name }}</strong> is now stored in the
+          <strong>{{ registrationBanner.pipelineScreen }}</strong> screen in ESSEDUM Pipelines
+          with all generated files — ready for Git integration and deployment.
+        </ng-container>
+      </span>
+      <button class="pipeline-banner-dismiss" title="Dismiss" (click)="dismissRegistrationBanner()">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
-    <div class="panel-divider" (mousedown)="onDividerMouseDown($event)"></div>
-    <div class="panel right">
-      <app-vibe-right-panel></app-vibe-right-panel>
+
+    <div class="vibe-panels">
+      <div class="panel left" [style.flex-basis.%]="leftPanelWidth">
+        <app-vibe-left-panel [modelLabel]="selectedAgentLabel"></app-vibe-left-panel>
+      </div>
+      <div class="panel-divider" (mousedown)="onDividerMouseDown($event)"></div>
+      <div class="panel right">
+        <app-vibe-right-panel></app-vibe-right-panel>
+      </div>
     </div>
+
   </div>
 </div>

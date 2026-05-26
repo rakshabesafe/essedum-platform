@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -6,7 +6,6 @@ import { marked } from 'marked';
 import { VibeStudioService } from '../services/vibe-studio.service';
 import {
   VibeChatMessage,
-  VibeModel,
   VibeSessionStatus,
 } from '../models/vibe-studio.models';
 
@@ -19,13 +18,9 @@ export class VibeLeftPanelComponent implements OnInit, OnDestroy {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
   @ViewChild('promptInput') promptInput!: ElementRef;
 
-  readonly models: { label: string; value: VibeModel }[] = [
-    { label: 'Claude', value: 'claude' },
-    { label: 'Gemini', value: 'gemini' },
-    { label: 'Azure OpenAI', value: 'azure-oai' },
-  ];
+  /** Label of the model chosen on the picker screen, passed in by the parent. */
+  @Input() modelLabel = '';
 
-  selectedModel: VibeModel = 'claude';
   prompt = '';
   messages: VibeChatMessage[] = [];
   status: VibeSessionStatus = 'idle';
@@ -57,10 +52,6 @@ export class VibeLeftPanelComponent implements OnInit, OnDestroy {
     const result = marked.parse(text);
     const html = typeof result === 'string' ? result : '';
     return this.sanitizer.bypassSecurityTrustHtml(html);
-  }
-
-  onModelChange(): void {
-    this.vibeService.setModel(this.selectedModel);
   }
 
   sendPrompt(): void {

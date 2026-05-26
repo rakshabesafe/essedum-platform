@@ -5,15 +5,17 @@ export interface VibeSession {
   id: string | null;
   appType: AppType | null;
   model: VibeModel;
+  /** Agent name entered by the user — sent as `provider` in the update-provider payload. */
+  agentProvider: string;
   messages: VibeChatMessage[];
   files: VibeFile[];
   previewUrl: string | null;
   status: VibeSessionStatus;
 }
 
-export type AppType = 'agents_mcp' | 'react_app' | 'react_node' | 'streamlit';
+export type AppType = 'agent' | 'mcp_server' | 'react_app' | 'streamlit';
 
-export type VibeModel = 'claude' | 'gemini' | 'azure-oai';
+export type VibeModel = string;
 
 export type VibeSessionStatus =
   | 'idle'       // no session, nothing started
@@ -87,7 +89,7 @@ export interface GooseAgentStartRequest {
 }
 
 /** Maps a VibeModel UI value to a Goose provider identifier and default model. */
-export const GOOSE_PROVIDER_MAP: Record<VibeModel, { provider: string; gooseModel: string }> = {
+export const GOOSE_PROVIDER_MAP: Record<string, { provider: string; gooseModel: string }> = {
   'claude':    { provider: 'anthropic',    gooseModel: 'claude-3-5-sonnet-20241022' },
   'gemini':    { provider: 'google',       gooseModel: 'gemini-2.0-flash' },
   'azure-oai': { provider: 'azure-openai', gooseModel: 'gpt-4o' },
@@ -97,22 +99,22 @@ export const GOOSE_PROVIDER_MAP: Record<VibeModel, { provider: string; gooseMode
 
 export const APP_TYPE_OPTIONS: { label: string; value: AppType; icon: string; description: string }[] = [
   {
-    label: 'Agents, MCP Servers',
-    value: 'agents_mcp',
+    label: 'AI Agent',
+    value: 'agent',
     icon: 'assets/img/ai-agent-mini.jpg',
-    description: 'Build AI agents and MCP server integrations'
+    description: 'Build an autonomous AI agent with tool use and reasoning'
   },
   {
-    label: 'Simple React App',
+    label: 'MCP Server',
+    value: 'mcp_server',
+    icon: 'assets/img/resources_icon.jpg',
+    description: 'Build a Model Context Protocol server integration'
+  },
+  {
+    label: 'React App',
     value: 'react_app',
     icon: 'assets/img/tools_icon.jpg',
     description: 'A standalone React frontend application'
-  },
-  {
-    label: 'React Frontend + NodeJs Backend',
-    value: 'react_node',
-    icon: 'assets/img/resources_icon.jpg',
-    description: 'Full-stack app with React UI and Node.js API'
   },
   {
     label: 'Streamlit App',

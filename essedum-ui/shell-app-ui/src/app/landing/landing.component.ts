@@ -137,7 +137,16 @@ export class LandingComponent implements OnInit, AfterViewInit {
   private submenuHideTimer: any = null;
 
   // ── Advanced / optional menu items ──────────────────────────────────────
-  advancedMenuItems: { label: string; description: string }[] = [];
+  // Pre-populated with defaults so visibleSidebarMenu filters correctly before the async config load completes,
+  // preventing hidden items from flashing briefly on every render/navigation.
+  advancedMenuItems: { label: string; description: string }[] = [
+    { label: 'Agent Designer', description: 'Design AI agent workflows' },
+    { label: 'Lite LLM',       description: 'Manage LLM proxy & routing' },
+    { label: 'Langfuse',       description: 'Monitor & trace LLM calls' },
+    { label: 'Salus',          description: 'Security & compliance hub' },
+    { label: 'Apps',           description: 'Browse & launch applications' },
+    { label: 'App List',       description: 'Browse & launch applications' },
+  ];
   get ADVANCED_MENU_LABELS(): string[] { return this.advancedMenuItems.map(i => i.label); }
   customMenuState: { [label: string]: boolean } = {};
   showMenuCustomizer: boolean = false;
@@ -486,6 +495,9 @@ export class LandingComponent implements OnInit, AfterViewInit {
     );
     this.sidebarMenuPopupWidth = this.showSidebarMenuList ? "130px" : "0px";
     this.sidebarmaxwidth = this.showSidebarMenuList ? "260px" : "7vw";
+    // Load customization state immediately (synchronous) so visibleSidebarMenu
+    // filters correctly from the first render, before the async config resolves.
+    this.loadMenuCustomization();
     this.loadAdvancedMenuConfig().then(() => this.loadMenuCustomization());
     
     // Call getNotificationsPermision only once per session to prevent duplicate API calls
