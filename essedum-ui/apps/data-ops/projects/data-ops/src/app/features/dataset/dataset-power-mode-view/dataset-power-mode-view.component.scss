@@ -1,0 +1,220 @@
+// -------------------------------------------------------------------
+//  DATASET POWER MODE VIEW - 2026 AI Platform  ?  Complete Redesign
+// -------------------------------------------------------------------
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+@keyframes fadeUp    { from { opacity:0; transform:translateY(12px); }  to { opacity:1; transform:translateY(0); } }
+@keyframes borderGlow{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+@keyframes rowIn     { from { opacity:0; transform:translateX(-5px); }  to { opacity:1; transform:translateX(0); } }
+@keyframes cardSlide { from { opacity:0; transform:translateY(7px); }   to { opacity:1; transform:translateY(0); } }
+
+// -- Page container ------------------------------------------------
+.power-mode-container {
+  width: 100%; padding: 14px; box-sizing: border-box; animation: fadeUp 0.25s ease both;
+}
+
+// -- Outer mat-card ------------------------------------------------
+:host ::ng-deep mat-card {
+  background: linear-gradient(150deg, rgba(11,20,44,0.96) 0%, rgba(7,13,30,0.94) 100%) !important;
+  border: 1px solid rgba(68,128,245,0.16) !important;
+  border-radius: 16px !important;
+  padding: 0 !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.04) inset !important;
+  overflow: hidden !important;
+  position: relative !important;
+
+  &::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
+    background: linear-gradient(90deg, #4480f5, #16b8e8, #875ef7, #4742dc, #4480f5);
+    background-size: 400% 100%;
+    animation: borderGlow 7s ease infinite;
+    z-index: 10; pointer-events: none;
+    border-radius: 16px 16px 0 0;
+  }
+}
+
+// -- Toolbar -------------------------------------------------------
+.power-mode-toolbar {
+  display: flex !important; align-items: center !important; gap: 8px !important;
+  padding: 10px 14px !important; margin-bottom: 12px !important; flex-wrap: wrap !important;
+  background: rgba(6,12,28,0.6) !important;
+  border: 1px solid rgba(68,128,245,0.1) !important;
+  border-radius: 10px !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.pm-toolbar-title {
+  font-size: 12.5px !important; font-weight: 700 !important; color: #6aaaf5 !important;
+  margin-right: auto !important; letter-spacing: -0.1px !important;
+}
+
+.pm-toolbar-btn {
+  display: inline-flex !important; align-items: center !important; gap: 5px !important;
+  padding: 5px 13px !important; border-radius: 8px !important;
+  border: 1px solid rgba(68,128,245,0.16) !important;
+  background: rgba(68,128,245,0.05) !important;
+  color: #5b7ea0 !important; font-size: 12px !important; font-weight: 600 !important;
+  cursor: pointer !important; transition: all 0.15s ease !important;
+  mat-icon { font-size: 14px !important; width: 14px !important; height: 14px !important; }
+  &:hover { background: rgba(68,128,245,0.13) !important; border-color: rgba(68,128,245,0.36) !important; color: #6aaaf5 !important; transform: translateY(-1px) !important; box-shadow: 0 3px 10px rgba(68,128,245,0.18) !important; }
+  &.active { background: rgba(68,128,245,0.14) !important; border-color: rgba(68,128,245,0.4) !important; color: #6aaaf5 !important; }
+  &.primary { background: linear-gradient(135deg, #4480f5, #875ef7) !important; border-color: transparent !important; color: #fff !important; box-shadow: 0 3px 14px rgba(68,128,245,0.38) !important; &:hover { box-shadow: 0 5px 20px rgba(68,128,245,0.54) !important; } }
+}
+
+// -- Power content -------------------------------------------------
+.power-mode-content {
+  width: 100% !important; overflow: auto !important;
+  border: 1px solid rgba(68,128,245,0.1) !important;
+  border-radius: 12px !important;
+  background: rgba(6,12,28,0.75) !important;
+  backdrop-filter: blur(8px) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03) !important;
+
+  &::-webkit-scrollbar { width: 5px; height: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(68,128,245,0.2); border-radius: 4px; &:hover { background: rgba(68,128,245,0.4); } }
+}
+
+// -- MDC form field: compact, clean, no bottom line ----------------
+:host ::ng-deep .mat-mdc-form-field,
+:host ::ng-deep .mat-mdc-form-field.mat-mdc-form-field { width: 100% !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
+:host ::ng-deep .mdc-text-field--filled {
+  border-radius: 0 !important; border: none !important;
+  min-height: 40px !important; padding: 0 10px !important;
+  background: transparent !important;
+}
+:host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border: none !important; box-shadow: none !important; }
+:host ::ng-deep .mat-mdc-form-field-infix { min-height: 44px !important; padding: 18px 0 6px !important; border-top: 0 !important; width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled .mdc-floating-label { top: 7px !important; font-size: 11px !important; }
+:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #8b949e !important; font-size: 12px !important; font-weight: 500 !important; }
+:host ::ng-deep .mdc-floating-label--float-above { color: #58a6ff !important; font-size: 11px !important; font-weight: 600 !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e6edf3 !important; font-size: 14px !important; }
+:host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e6edf3 !important; font-size: 14px !important; }
+:host ::ng-deep .mat-mdc-select-value { font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-select-placeholder { color: #484f58 !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-select-arrow { color: #58a6ff !important; }
+// .mdc-line-ripple is now styled globally in styles.scss � do not hide it
+:host ::ng-deep .mat-mdc-form-field-focus-overlay { display: none !important; opacity: 0 !important; }
+:host ::ng-deep .mat-mdc-form-field-subscript-wrapper { min-height: 0 !important; padding: 0 !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { background: rgba(255,255,255,0.02) !important; border-color: rgba(68,128,245,0.1) !important; }
+:host ::ng-deep .mdc-text-field--disabled .mat-mdc-input-element,
+:host ::ng-deep .mdc-text-field--disabled input { color: rgba(100,140,180,0.5) !important; -webkit-text-fill-color: rgba(100,140,180,0.5) !important; }
+:host ::ng-deep .mdc-text-field--disabled .mdc-floating-label { color: rgba(71,99,126,0.5) !important; }
+:host ::ng-deep mat-error { color: #f85149 !important; font-size: 11px !important; }
+
+// -- Table ---------------------------------------------------------
+.table {
+  width: 100% !important; border-collapse: collapse !important;
+
+  thead tr th {
+    font-size: 10.5px !important; font-weight: 700 !important; color: #47637e !important;
+    text-transform: uppercase !important; letter-spacing: 0.8px !important;
+    background: rgba(68,128,245,0.06) !important;
+    border-bottom: none !important;
+    padding: 10px 15px !important; position: sticky; top: 0; z-index: 1; backdrop-filter: blur(8px);
+    &:first-child { padding-left: 18px !important; }
+    &:last-child  { padding-right: 18px !important; }
+  }
+
+  tbody tr {
+    border-bottom: none !important;
+    transition: background 0.13s !important;
+    animation: rowIn 0.18s ease both !important;
+    &:nth-child(even) { background: rgba(68,128,245,0.015) !important; }
+    &:hover { background: rgba(68,128,245,0.065) !important; td { color: #c4d8ec !important; } }
+    &:last-child { border-bottom: none !important; }
+    td { padding: 9px 15px !important; font-size: 12.5px !important; color: #6e9abb !important; vertical-align: middle !important; transition: color 0.13s !important;
+      &:first-child { padding-left: 18px !important; }
+      &:last-child  { padding-right: 18px !important; }
+    }
+  }
+}
+
+// -- Card list view ------------------------------------------------
+.power-card-list { display: flex !important; flex-direction: column !important; gap: 6px !important; padding: 10px !important; }
+
+.power-card-item, .hower-mat-card {
+  display: flex !important; align-items: flex-start !important;
+  padding: 11px 13px !important; border-radius: 9px !important;
+  border: 1px solid rgba(68,128,245,0.1) !important;
+  background: rgba(68,128,245,0.03) !important;
+  gap: 10px !important; cursor: pointer !important;
+  transition: all 0.16s ease !important;
+  animation: cardSlide 0.2s ease both !important;
+  position: relative !important; overflow: hidden !important;
+
+  &:hover { border-color: rgba(68,128,245,0.26) !important; background: rgba(68,128,245,0.08) !important; transform: translateX(2px) !important; box-shadow: 0 2px 12px rgba(68,128,245,0.1) !important; }
+  &.selected, &.mat-card-selected { border-color: rgba(68,128,245,0.4) !important; background: rgba(68,128,245,0.12) !important; box-shadow: 0 0 14px rgba(68,128,245,0.16) !important; }
+}
+
+:host ::ng-deep .power-card-item mat-card-header,
+:host ::ng-deep .hower-mat-card mat-card-header { padding: 0 !important; background: transparent !important; }
+:host ::ng-deep .power-card-item .mat-mdc-card-header-text,
+:host ::ng-deep .hower-mat-card .mat-mdc-card-header-text { padding: 0 !important; }
+:host ::ng-deep .power-card-item mat-card-title,
+:host ::ng-deep .hower-mat-card mat-card-title { font-size: 13px !important; font-weight: 600 !important; color: #7aa3c5 !important; margin: 0 !important; }
+:host ::ng-deep .power-card-item mat-card-subtitle,
+:host ::ng-deep .hower-mat-card mat-card-subtitle { font-size: 11.5px !important; color: #47637e !important; margin-top: 2px !important; }
+
+.power-card-index {
+  width: 22px !important; height: 22px !important; border-radius: 6px !important; flex-shrink: 0 !important;
+  background: rgba(68,128,245,0.13) !important; border: 1px solid rgba(68,128,245,0.24) !important;
+  color: #6aaaf5 !important; font-size: 10px !important; font-weight: 700 !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+}
+.power-card-label { font-size: 13px !important; font-weight: 500 !important; color: #7aa3c5 !important; flex: 1 !important; min-width: 0 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+
+// -- Power form view -----------------------------------------------
+.power-form-view { padding: 16px !important; display: flex !important; flex-direction: column !important; gap: 12px !important; }
+.pf-section-title {
+  font-size: 10px !important; font-weight: 700 !important; color: #3a5570 !important;
+  text-transform: uppercase !important; letter-spacing: 1.2px !important; margin-bottom: 4px !important;
+  padding-left: 10px !important; position: relative !important;
+  &::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 12px; background: linear-gradient(180deg, #4480f5, #875ef7); border-radius: 2px; }
+}
+
+.fa-circle-notch { color: #6aaaf5 !important; font-size: 18px !important; }
+
+// -- Row layout: 2 fields per row ----------------------------------
+.row { display: flex !important; flex-wrap: wrap !important; margin: 0 -10px !important; }
+.col-lg-6, .col-md-6, .col-sm-6 { flex: 0 0 50% !important; max-width: 50% !important; padding: 0 12px !important; box-sizing: border-box !important; }
+.col-lg-12, .col-md-12, .col-sm-12 { flex: 0 0 100% !important; max-width: 100% !important; padding: 0 12px !important; box-sizing: border-box !important; }
+:host ::ng-deep .mat-mdc-form-field-flex { align-items: flex-end !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { padding: 0 !important; background: transparent !important; overflow: visible !important; }
+:host ::ng-deep .mat-mdc-form-field-focus-overlay, :host ::ng-deep .mdc-text-field__ripple { display: none !important; background: transparent !important; opacity: 0 !important; }
+// ------------------------------------------------------------------
+//  LIGHT THEME
+// ------------------------------------------------------------------
+body.header-light-theme {
+  :host ::ng-deep mat-card { background: #ffffff !important; border-color: rgba(71,66,220,0.12) !important; box-shadow: 0 8px 32px rgba(71,66,220,0.1) !important; &::before { background: linear-gradient(90deg, #4742dc, #06b6d4, #7c3aed, #4f46e5, #4742dc); } }
+  .power-mode-toolbar { background: rgba(248,250,252,0.95) !important; border-color: rgba(71,66,220,0.09) !important; }
+  .pm-toolbar-title { color: #4742dc !important; }
+  .pm-toolbar-btn { background: rgba(71,66,220,0.04) !important; border-color: rgba(71,66,220,0.14) !important; color: #64748b !important;
+    &:hover { background: rgba(71,66,220,0.09) !important; border-color: rgba(71,66,220,0.3) !important; color: #4742dc !important; }
+    &.active { background: rgba(71,66,220,0.1) !important; border-color: rgba(71,66,220,0.35) !important; color: #4742dc !important; }
+    &.primary { background: linear-gradient(135deg, #4742dc, #7c3aed) !important; color: #fff !important; } }
+  .power-mode-content { background: #ffffff !important; border-color: rgba(71,66,220,0.1) !important; }
+  .table thead tr th { background: rgba(71,66,220,0.04) !important; color: #64748b !important; border-color: rgba(71,66,220,0.1) !important; }
+  .table tbody tr { border-color: rgba(71,66,220,0.04) !important; td { color: #334155 !important; } &:nth-child(even) { background: rgba(71,66,220,0.015) !important; } &:hover { background: rgba(71,66,220,0.055) !important; td { color: #0f172a !important; } } }
+  .power-card-item, .hower-mat-card { border-color: rgba(71,66,220,0.1) !important; background: rgba(71,66,220,0.03) !important; &:hover { border-color: rgba(71,66,220,0.24) !important; background: rgba(71,66,220,0.07) !important; } &.selected { border-color: rgba(71,66,220,0.36) !important; background: rgba(71,66,220,0.09) !important; } }
+  .power-card-index { background: rgba(71,66,220,0.1) !important; border-color: rgba(71,66,220,0.22) !important; color: #4742dc !important; }
+  .power-card-label { color: #334155 !important; }
+  :host ::ng-deep .power-card-item mat-card-title, :host ::ng-deep .hower-mat-card mat-card-title { color: #334155 !important; }
+  :host ::ng-deep .power-card-item mat-card-subtitle, :host ::ng-deep .hower-mat-card mat-card-subtitle { color: #64748b !important; }
+  :host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
+  :host ::ng-deep .mdc-text-field--filled { border: none !important; border-bottom: none !important; border-radius: 0 !important; }
+  :host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
+  :host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom: none !important; box-shadow: none !important; }
+  :host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #64748b !important; }
+  :host ::ng-deep .mdc-floating-label--float-above { color: #4742dc !important; }
+  :host ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
+  :host ::ng-deep mat-select .mat-mdc-select-value-text { color: #0f172a !important; }
+  :host ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { opacity: 0.5 !important; border-bottom: none !important; }
+  :host ::ng-deep .mdc-text-field--disabled .mat-mdc-input-element,
+  :host ::ng-deep .mdc-text-field--disabled input { color: #94a3b8 !important; -webkit-text-fill-color: #94a3b8 !important; }
+  :host ::ng-deep .mdc-text-field--disabled .mdc-floating-label { color: #94a3b8 !important; }
+}

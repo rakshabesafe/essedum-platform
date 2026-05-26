@@ -1,0 +1,216 @@
+<div class="aip-container lfx-u-pad-lr-30" id="mainCtr">
+    <app-modal-config-schema-header [cardTitle]="CARD_TITLE" [tabValue]="tabValue" [formListView]="formListView"
+        [isRawData]="isRawData" [showSearchRefresh]="false" (search)="onSearch($event)" (refresh)="onRefresh()" (navigateBack)="navigateBack()"
+        (toggleView)="toggleView($event)">
+    </app-modal-config-schema-header>
+
+    <mat-card class="lfx-schema-card">
+        <mat-tab-group id="schema-modal-tabs" class="tabs-left-aligned"
+            (selectedIndexChange)="basicReqTabChange($event)">
+
+            <!-- Configure Tab -->
+            <mat-tab label="Configure" data-tab-id="schema-configure">
+                <div class="lfx-u-pad-16">
+                    <!-- Name Section -->
+                    <div *ngIf="isInEdit" class="flex align-items-center lfx-u-pad-b-16">
+                        <div class="lfx-u-header-lg">Name</div>
+                        <div class="lfx-u-body-xl lfx-u-mar-lr-16">{{ schemaName }}</div>
+                    </div>
+
+                    <!-- Alias Section -->
+                    <div class="lfx-u-mar-t-16 lfx-u-pad-b-16">
+                        <div class="lfx-u-sub-header-alias">Alias*</div>
+                        <mat-form-field appearance="fill" class="w-100 custom-alias-field" subscriptSizing="dynamic">
+                            <input matInput id="schm-modal-alias" [disabled]="isInView" [(ngModel)]="schemaAlias"
+                                required minlength="4" placeholder="Alias length should be greater than 4"
+                                #aliasRef="ngModel" class="custom-alias-input">
+                            <mat-error *ngIf="aliasRef.invalid && aliasRef.touched">
+                                Alias is required and should be longer than 4 characters.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Description Section -->
+                    <div class="lfx-u-mar-t-16 lfx-u-pad-b-16">
+                        <div class="lfx-u-sub-header-alias">Description</div>
+                        <mat-form-field appearance="fill" class="w-100 custom-alias-field" subscriptSizing="dynamic">
+                            <input matInput id="schm-modal-description" [disabled]="isInView"
+                                [(ngModel)]="schemaDescription" placeholder="Enter Description..."
+                                class="custom-alias-input">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </mat-tab>
+
+            <!-- Schema Columns Tab -->
+            <mat-tab *ngIf="isValidSchemaAlias" label="Schema Columns" data-tab-id="schema-columns">
+                <div class="lfx-u-pad-16">
+                    <!-- Raw Data View -->
+                    <div *ngIf="isRawData" class="json-editor-container">
+                        <div class="json-editor-wrapper">
+                            <json-editor id="json-editor-schema" [options]="editorOptions" [data]="schemaValue"
+                                #columnJsonEditor class="cipJSONEditor" role="textbox" aria-label="Schema JSON editor"
+                                tabindex="0">
+                            </json-editor>
+                        </div>
+                    </div>
+
+                    <!-- Table View -->
+                    <div *ngIf="!isRawData">
+                        <!-- Add Row Button -->
+                        <div *ngIf="canAddRows" class="add-row-button lfx-u-pad-8">
+                            <mat-icon id="schm-modal-addrow" (click)="openDialog('Add', {})" matTooltip="Add Row"
+                                matTooltipPosition="left" aria-label="Add new schema row">
+                                add
+                            </mat-icon>
+                        </div>
+
+                        <!-- Data Table -->
+                        <div *ngIf="hasDataSource; else noDatasource">
+                            <mat-table>
+                                <table class="table">
+                                    <thead>
+                                        <tr class="lfx-t-head-row">
+                                            <th>Column order</th>
+                                            <th>Column type</th>
+                                            <th>Record Column Name</th>
+                                            <th>Record Column Display-Name</th>
+                                            <th>Unique Key</th>
+                                            <th>Required</th>
+                                            <th>Primary Key</th>
+                                            <th>Encrypted</th>
+                                            <th>Visible</th>
+                                            <th *ngIf="!isInView">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="lfx-t-body-row"
+                                            *ngFor="let element of dataSource; trackBy: trackByColumnOrder">
+                                            <td>{{ element.columnorder }}</td>
+                                            <td>{{ element.columntype }}</td>
+                                            <td>{{ element.recordcolumnname }}</td>
+                                            <td>{{ element.recordcolumndisplayname }}</td>
+                                            <td>{{ element.isunique || false }}</td>
+                                            <td>{{ element.isrequired || false }}</td>
+                                            <td>{{ element.isprimarykey || false }}</td>
+                                            <td>{{ element.isencrypted || false }}</td>
+                                            <td>{{ element.isvisible || false }}</td>
+                                            <td *ngIf="!isInView">
+                                                <div class="lfx-table-action">
+                                                    <mat-icon (click)="openDialog('Update', element)"
+                                                        matTooltip="Update" [matTooltipPosition]="TOOLTIP_POSITION"
+                                                        aria-label="Edit item">
+                                                        edit
+                                                    </mat-icon>
+                                                    <mat-icon (click)="openDialog('Delete', element)"
+                                                        matTooltip="Delete" [matTooltipPosition]="TOOLTIP_POSITION"
+                                                        aria-label="Delete item">
+                                                        delete
+                                                    </mat-icon>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </mat-table>
+                        </div>
+
+                        <ng-template #noDatasource>
+                            <div class="lfx-u-header-xl flex justify-content-center">
+                                Schema Columns not available
+                            </div>
+                        </ng-template>
+                    </div>
+
+                    <!-- Dialog Actions -->
+                    <div *ngIf="!isInView" mat-dialog-actions class="dialog-actions">
+                        <button mat-raised-button class="cancel-button" (click)="onCancel()">
+                            Cancel
+                        </button>
+                        <button *ngIf="!isAuth" mat-raised-button color="primary" class="action-button"
+                            (click)="onSave()">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </mat-tab>
+
+            <!-- Schema Form Tab -->
+            <mat-tab *ngIf="isValidSchemaForForm" label="Schema Form" data-tab-id="schema-form">
+                <div class="lfx-u-pad-16">
+                    <!-- Form List View -->
+                    <div *ngIf="formListView" class="grid-view">
+                        <span *ngIf="canCreateForm" class="create-form-button" (click)="createForm()">
+                            <i class="fa fa-plus-square-o create-icon-color"></i>
+                            Create Form
+                        </span>
+
+                        <div class="form-grid">
+                            <div *ngFor="let group of formTemplateList; trackBy: trackByFormAlias">
+                                <mat-card class="lfx-c-card">
+                                    <mat-card-header class="form-card-header">
+                                        <mat-card-title>
+                                            <div class="schema-form-card" [class.disabled]="isInView">
+                                                <h2 class="lfx-u-header-xl lfx-u-ellipsis aip-cursor"
+                                                    (click)="getFormTemplate(group)">
+                                                    {{ group.alias }}
+                                                </h2>
+                                                <mat-icon *ngIf="!isAuth" class="delete-form-button"
+                                                    matTooltip="Delete Form" matTooltipPosition="left"
+                                                    (click)="delete(group)" aria-label="Delete form template">
+                                                    close
+                                                </mat-icon>
+                                            </div>
+                                        </mat-card-title>
+                                        <mat-card-subtitle
+                                            class="lfx-u-body-sm lfx-u-text-neutral-80 lfx-u-no-mar-b lfx-u-ellipsis">
+                                            {{ group.name }}
+                                        </mat-card-subtitle>
+                                    </mat-card-header>
+                                </mat-card>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Editor View -->
+                    <ng-container *ngIf="!formListView">
+                        <!-- Raw Data Form Editor -->
+                        <div *ngIf="isRawData && !viewForm" class="form-editor-container">
+                            <div id="schm-modal-view" class="form-editor-wrapper">
+                                <json-editor [options]="editorOptions" [data]="schemaFormCpy" #formJsonEditor
+                                    class="cipJSONEditor form-json-editor">
+                                </json-editor>
+                            </div>
+                        </div>
+
+                        <!-- Form Builder View -->
+                        <div *ngIf="!isRawData && !viewForm" class="form-builder-container">
+                            <div class="lfx-u-pad-16">
+                                <div class="lfx-u-header-md">Form Name</div>
+                                <mat-form-field appearance="fill" class="w-100" subscriptSizing="dynamic">
+                                    <input matInput type="text" id="schm-modal-name" name="formname" [disabled]="isAuth"
+                                        [(ngModel)]="selectedFormTemplate.alias" required>
+                                </mat-form-field>
+                            </div>
+                            <div class="lfx-u-pad-8">
+                                <form-builder [form]="form" (change)="onChange($event)">
+                                </form-builder>
+                            </div>
+                        </div>
+
+                        <!-- Form Dialog Actions -->
+                        <div *ngIf="!isInView" class="dialog-actions flex justify-content-end" mat-dialog-actions>
+                            <button mat-raised-button class="cancel-button" (click)="onCancel('form')">
+                                Cancel
+                            </button>
+                            <button *ngIf="!isAuth" mat-raised-button color="primary" class="action-button"
+                                (click)="saveFormTemplateChanges()">
+                                Save
+                            </button>
+                        </div>
+                    </ng-container>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-card>
+</div>

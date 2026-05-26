@@ -1,0 +1,167 @@
+// ═══════════════════════════════════════════════════════════════════
+//  SCHEMA MODAL HEADER — 2026 AI Platform  ✦  Complete Redesign
+// ═══════════════════════════════════════════════════════════════════
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+@keyframes fadeUp    { from { opacity:0; transform:translateY(12px); }  to { opacity:1; transform:translateY(0); } }
+@keyframes borderGlow{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+// ── Header bar ────────────────────────────────────────────────────
+.lfx-header {
+  display: flex !important; align-items: center !important; justify-content: space-between !important;
+  padding: 12px 16px !important; margin-bottom: 14px !important;
+  border-bottom: none !important;
+  animation: fadeUp 0.22s ease both !important;
+  gap: 12px !important; flex-wrap: wrap !important;
+}
+
+// ── Left section ──────────────────────────────────────────────────
+.header-left {
+  display: flex !important; align-items: center !important; gap: 10px !important;
+
+  mat-icon {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    width: 34px !important; height: 34px !important; min-width: 34px !important;
+    border-radius: 50% !important; border: 1.5px solid rgba(68,128,245,0.28) !important;
+    background: rgba(68,128,245,0.07) !important; color: #6aaaf5 !important;
+    font-size: 18px !important; cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important; flex-shrink: 0 !important;
+    &:hover, &.active { background: rgba(68,128,245,0.16) !important; border-color: rgba(68,128,245,0.54) !important; transform: translateX(-2px) scale(1.08) !important; box-shadow: 0 0 0 5px rgba(68,128,245,0.09), 0 4px 14px rgba(68,128,245,0.26) !important; }
+  }
+
+  h3 {
+    font-size: 16px !important; font-weight: 800 !important;
+    background: linear-gradient(120deg, #dde8f5 0%, #6aaaf5 55%, #a87cf8 100%) !important;
+    -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important;
+    background-clip: text !important; letter-spacing: -0.3px !important; margin: 0 !important;
+  }
+}
+
+// ── Right section ─────────────────────────────────────────────────
+.header-right { display: flex !important; align-items: center !important; }
+
+// ── Action icons container ─────────────────────────────────────────
+.header-actions {
+  display: flex !important; align-items: center !important; gap: 6px !important;
+}
+
+// ── Individual action icon button ─────────────────────────────────
+.action-button {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+
+  mat-icon {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    width: 32px !important; height: 32px !important; min-width: 32px !important;
+    border-radius: 8px !important; border: 1px solid rgba(68,128,245,0.18) !important;
+    background: rgba(68,128,245,0.05) !important; color: #6aaaf5 !important;
+    font-size: 17px !important; cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    &:hover, &.active { background: rgba(68,128,245,0.14) !important; border-color: rgba(68,128,245,0.38) !important; box-shadow: 0 2px 10px rgba(68,128,245,0.2) !important; transform: translateY(-1px) !important; }
+  }
+}
+
+// ── View toggle (segmented pill control) ──────────────────────────
+.flex.align-items-center {
+  background: rgba(13,17,36,0.85) !important;
+  border: 1.5px solid rgba(88,166,255,0.22) !important;
+  border-radius: 24px !important;
+  padding: 4px 5px !important;
+  gap: 2px !important;
+  position: relative !important;
+  box-shadow: 0 0 0 4px rgba(88,166,255,0.04) !important;
+}
+
+// Inactive label
+.flex.align-items-center > .lfx-u-mar-8 {
+  font-size: 10px !important; font-weight: 700 !important;
+  letter-spacing: 0.7px !important; text-transform: uppercase !important;
+  padding: 5px 14px !important; border-radius: 18px !important;
+  color: #8b949e !important; // override inline grey — readable in dark
+  margin: 0 !important; white-space: nowrap !important;
+  transition: all 0.2s ease !important; cursor: pointer !important;
+  user-select: none !important;
+}
+
+// Active label
+.flex.align-items-center > .lfx-u-mar-8.lfx-u-header-lg {
+  background: linear-gradient(135deg, rgba(88,166,255,0.22) 0%, rgba(135,94,247,0.14) 100%) !important;
+  border: 1px solid rgba(88,166,255,0.42) !important;
+  color: #58a6ff !important; // override inline #0094ff
+  box-shadow: 0 0 14px rgba(88,166,255,0.24), 0 2px 6px rgba(88,166,255,0.18) !important;
+  text-shadow: 0 0 12px rgba(88,166,255,0.5) !important;
+}
+
+// ── Slider hidden but functional ──────────────────────────────────
+:host ::ng-deep .flex.align-items-center mat-slider.selector-691-21 {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0 !important;
+  z-index: 10 !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  // keep the slider visible enough to be clickable
+  .mdc-slider { width: 100% !important; height: 100% !important; }
+}
+
+// ── Search container ──────────────────────────────────────────────
+.header-search, .lfx-panel {
+  display: flex !important; align-items: center !important; gap: 6px !important;
+  background: rgba(10,20,44,0.5) !important; border: 1px solid rgba(68,128,245,0.18) !important;
+  border-radius: 8px !important; padding: 0 8px !important; height: 32px !important;
+  transition: border-color 0.18s, background 0.18s !important;
+  &:focus-within { background: rgba(68,128,245,0.07) !important; border-color: rgba(68,128,245,0.42) !important; box-shadow: 0 0 0 3px rgba(68,128,245,0.09) !important; }
+
+  mat-icon {
+    color: #3a5570 !important; font-size: 16px !important; cursor: pointer !important;
+    background: transparent !important; border: none !important; box-shadow: none !important;
+    width: 16px !important; height: 16px !important; min-width: 16px !important;
+    &:hover, &.active { color: #6aaaf5 !important; background: transparent !important; border: none !important; box-shadow: none !important; transform: none !important; }
+  }
+}
+
+.lfx-panel-input {
+  border: none !important; outline: none !important; background: transparent !important;
+  color: #dde8f5 !important; font-size: 12.5px !important; width: 160px !important;
+  &::placeholder { color: #2a4262 !important; }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  LIGHT THEME
+// ══════════════════════════════════════════════════════════════════
+body.header-light-theme {
+  .lfx-header { border-bottom: none !important; }
+
+  .header-left {
+    mat-icon { color: #4742dc !important; background: rgba(71,66,220,0.06) !important; border-color: rgba(71,66,220,0.26) !important; &:hover, &.active { background: rgba(71,66,220,0.13) !important; border-color: rgba(71,66,220,0.5) !important; box-shadow: 0 0 0 5px rgba(71,66,220,0.09), 0 4px 14px rgba(71,66,220,0.26) !important; } }
+    h3 { background: linear-gradient(120deg, #0f172a 0%, #4742dc 55%, #875ef7 100%) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; }
+  }
+
+  .action-button mat-icon { color: #4742dc !important; background: rgba(71,66,220,0.04) !important; border-color: rgba(71,66,220,0.16) !important; &:hover, &.active { background: rgba(71,66,220,0.1) !important; border-color: rgba(71,66,220,0.35) !important; box-shadow: 0 2px 10px rgba(71,66,220,0.16) !important; } }
+
+  .flex.align-items-center {
+    background: #f1f5f9 !important;
+    border-color: rgba(71,66,220,0.18) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+  }
+  .flex.align-items-center > .lfx-u-mar-8 {
+    color: #64748b !important; // override inline grey — readable in light
+  }
+  .flex.align-items-center > .lfx-u-mar-8.lfx-u-header-lg {
+    background: linear-gradient(135deg, rgba(71,66,220,0.14) 0%, rgba(124,58,237,0.09) 100%) !important;
+    border-color: rgba(71,66,220,0.36) !important;
+    color: #4742dc !important; // override inline #0094ff
+    box-shadow: 0 0 12px rgba(71,66,220,0.18), 0 2px 6px rgba(71,66,220,0.12) !important;
+    text-shadow: none !important;
+  }
+
+  .header-search, .lfx-panel {
+    background: rgba(248,250,252,0.95) !important; border-color: rgba(71,66,220,0.16) !important;
+    &:focus-within { background: rgba(71,66,220,0.06) !important; border-color: rgba(71,66,220,0.42) !important; }
+    mat-icon { color: #94a3b8 !important; &:hover { color: #4742dc !important; } }
+  }
+  .lfx-panel-input { color: #0f172a !important; &::placeholder { color: #94a3b8 !important; } }
+
+}

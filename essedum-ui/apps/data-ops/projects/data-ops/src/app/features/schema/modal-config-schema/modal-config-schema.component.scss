@@ -1,0 +1,482 @@
+// ═══════════════════════════════════════════════════════════════════
+//  SCHEMA MODAL CONFIG — 2026 AI Platform  ✦  Complete Redesign
+// ═══════════════════════════════════════════════════════════════════
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+@keyframes fadeUp    { from { opacity:0; transform:translateY(12px); }  to { opacity:1; transform:translateY(0); } }
+@keyframes borderGlow{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+@keyframes rowIn     { from { opacity:0; transform:translateX(-5px); }  to { opacity:1; transform:translateX(0); } }
+
+// ── Outer container ───────────────────────────────────────────────
+.aip-container { padding: 14px 16px !important; animation: fadeUp 0.25s ease both !important; }
+
+// ── Main card ─────────────────────────────────────────────────────
+:host ::ng-deep mat-card.lfx-schema-card {
+  background: linear-gradient(150deg, rgba(11,20,44,0.95) 0%, rgba(7,13,30,0.93) 100%) !important;
+  border: 1px solid rgba(68,128,245,0.16) !important; border-radius: 16px !important;
+  box-shadow: 0 16px 52px rgba(0,0,0,0.44), 0 1px 0 rgba(255,255,255,0.04) inset !important;
+  overflow: hidden !important; padding: 0 !important; position: relative !important;
+  animation: fadeUp 0.28s ease both !important;
+  &::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px; background: linear-gradient(90deg, #4480f5, #16b8e8, #875ef7, #4742dc, #4480f5); background-size: 400% 100%; animation: borderGlow 7s ease infinite; z-index: 10; pointer-events: none; border-radius: 16px 16px 0 0; }
+  &::after { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(68,128,245,0.07) 0%, transparent 70%); pointer-events: none; }
+}
+:host ::ng-deep mat-card.lfx-schema-card mat-card-content { padding: 0 !important; }
+
+// ── Tab group ─────────────────────────────────────────────────────
+:host ::ng-deep mat-tab-group#schema-modal-tabs {
+  .mat-mdc-tab-label-container { flex-grow: 0 !important; }
+  .mat-mdc-tab-header { background: rgba(68,128,245,0.04) !important; border-bottom: none !important; }
+  .mat-mdc-tab-labels { justify-content: flex-start !important; gap: 8px !important; }
+  .mat-mdc-tab { color: #8b949e !important; font-size: 13px !important; font-weight: 600 !important; min-width: 100px !important; opacity: 1 !important; flex: none !important; border-radius: 8px 8px 0 0 !important; transition: all 0.25s cubic-bezier(0.4,0,0.2,1) !important; }
+  .mat-mdc-tab:hover { background: rgba(88,166,255,0.1) !important; transform: translateY(-1px) !important; box-shadow: 0 4px 12px rgba(88,166,255,0.12) !important; color: #c9d1d9 !important; }
+  .mat-mdc-tab:hover { color: #c9d1d9 !important; }
+  .mat-mdc-tab.mdc-tab--active { color: #58a6ff !important; font-weight: 700 !important; }
+  .mdc-tab-indicator__content--underline { border-color: #58a6ff !important; border-width: 2.5px !important; box-shadow: 0 0 8px rgba(88,166,255,0.5) !important; }
+  .mat-mdc-tab-body-content { padding: 16px !important; background: transparent !important; }
+}
+:host ::ng-deep .mat-mdc-tab-body { background: transparent !important; }
+:host ::ng-deep .mat-mdc-tab-body-wrapper { background: transparent !important; }
+:host ::ng-deep mat-card.lfx-schema-card mat-tab-group { background: transparent !important; }
+
+// ── Padding wrapper ────────────────────────────────────────────────
+.lfx-u-pad-16 { padding: 16px !important; }
+
+// ── Name / alias display ──────────────────────────────────────────
+.lfx-u-header-lg { font-size: 13px !important; font-weight: 700 !important; color: #6aaaf5 !important; margin-right: 8px !important; }
+.lfx-u-body-xl { font-size: 14px !important; color: #e6edf3 !important; font-weight: 500 !important; }
+.lfx-u-header-xl { font-size: 14px !important; font-weight: 700 !important; color: #8b949e !important; }
+
+// ── Section sub-labels ────────────────────────────────────────────
+.lfx-u-sub-header-alias {
+  display: flex !important; align-items: center !important; gap: 6px !important;
+  font-size: 11px !important; font-weight: 700 !important; color: #c9d1d9 !important;
+  text-transform: uppercase !important; letter-spacing: 1.1px !important;
+  margin-bottom: 6px !important; padding-left: 10px !important; position: relative !important;
+  &::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 12px; background: linear-gradient(180deg, #58a6ff, #875ef7); border-radius: 2px; }
+}
+.required-indicator { color: #f85149 !important; margin-left: 2px !important; }
+
+// ── MDC form fields ───────────────────────────────────────────────
+:host ::ng-deep .mat-mdc-form-field { width: 100% !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
+:host ::ng-deep .mdc-text-field--filled { background: transparent !important; border: none !important; border-radius: 0 !important; padding: 0 4px !important; height: auto !important; min-height: auto !important; }
+:host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border: none !important; box-shadow: none !important; }
+:host ::ng-deep .mat-mdc-form-field-infix { min-height: 44px !important; padding: 18px 0 6px !important; border-top: 0 !important; width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled .mdc-floating-label { top: 7px !important; font-size: 11px !important; }
+:host ::ng-deep .mdc-floating-label, :host ::ng-deep mat-label { color: #8b949e !important; font-size: 12px !important; font-weight: 500 !important; }
+:host ::ng-deep .mdc-floating-label--float-above { color: #58a6ff !important; font-size: 11px !important; font-weight: 600 !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e6edf3 !important; font-size: 14px !important; }
+:host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e6edf3 !important; font-size: 14px !important; }
+:host ::ng-deep .mat-mdc-select-value { font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-select-placeholder { color: #484f58 !important; font-size: 13px !important; }
+:host ::ng-deep .mat-mdc-select-arrow { color: #58a6ff !important; }
+:host ::ng-deep .mat-mdc-form-field-hint { color: #8b949e !important; font-size: 11px !important; }
+:host ::ng-deep mat-error { color: #f85149 !important; font-size: 11px !important; }
+:host ::ng-deep mat-checkbox .mdc-label { color: #e6edf3 !important; font-size: 13px !important; }
+:host ::ng-deep mat-checkbox .mdc-checkbox__background { border-color: #58a6ff !important; border-radius: 4px !important; }
+:host ::ng-deep mat-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background { background-color: #58a6ff !important; border-color: #58a6ff !important; }
+// .mdc-line-ripple is now styled globally in styles.scss � do not hide it
+:host ::ng-deep .mat-mdc-form-field-focus-overlay { display: none !important; opacity: 0 !important; }
+:host ::ng-deep .mat-mdc-form-field-subscript-wrapper { min-height: 0 !important; padding: 0 !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { opacity: 0.5 !important; border-bottom: none !important; }
+:host ::ng-deep .mdc-text-field--disabled .mat-mdc-input-element,
+:host ::ng-deep .mdc-text-field--disabled input { color: rgba(100,140,180,0.5) !important; -webkit-text-fill-color: rgba(100,140,180,0.5) !important; }
+:host ::ng-deep .mdc-text-field--disabled .mdc-floating-label { color: rgba(71,99,126,0.5) !important; }
+
+// ── Data table ────────────────────────────────────────────────────
+// pierce mat-table component background
+:host ::ng-deep mat-table { background: transparent !important; }
+
+:host ::ng-deep table.table,
+table.table {
+  width: 100% !important; border-collapse: collapse !important;
+  background: transparent !important;
+  tbody, thead, tr, td, th { background: transparent !important; }
+
+  .lfx-t-head-row th {
+    font-size: 10px !important; font-weight: 700 !important; color: #47637e !important;
+    text-transform: uppercase !important; letter-spacing: 0.9px !important;
+    background: rgba(68,128,245,0.05) !important; border-bottom: none !important;
+    padding: 9px 13px !important; white-space: nowrap !important;
+    &:first-child { padding-left: 16px !important; } &:last-child { padding-right: 16px !important; }
+  }
+  .lfx-t-body-row {
+    background: transparent !important;
+    border-bottom: none !important; transition: background 0.13s !important;
+    animation: rowIn 0.18s ease both !important;
+    &:nth-child(even) { background: rgba(68,128,245,0.028) !important; }
+    &:hover { background: rgba(68,128,245,0.07) !important; td { color: #a0c8f5 !important; } }
+    &:last-child { border-bottom: none !important; }
+    td {
+      background: transparent !important;
+      padding: 8px 13px !important; font-size: 12.5px !important; color: #6e9abb !important; vertical-align: middle !important;
+      &:first-child { padding-left: 16px !important; font-weight: 700 !important; color: #6aaaf5 !important; }
+      &:last-child { padding-right: 16px !important; }
+    }
+  }
+}
+
+// ── No records empty state ────────────────────────────────────────
+.lfx-u-header-xl.flex {
+  flex-direction: column !important; align-items: center !important; justify-content: center !important;
+  padding: 48px 20px !important; gap: 10px !important;
+  color: #2a4262 !important; font-size: 13px !important; font-weight: 600 !important;
+  border: 1px dashed rgba(68,128,245,0.14) !important; border-radius: 12px !important;
+  background: rgba(68,128,245,0.02) !important; margin: 12px 0 !important;
+  letter-spacing: 0.3px !important;
+  &::before { content: 'table_chart'; font-family: 'Material Icons'; font-size: 32px !important; color: rgba(68,128,245,0.22) !important; font-weight: normal !important; }
+}
+
+// ── Table action icons ────────────────────────────────────────────
+.lfx-table-action {
+  display: flex !important; gap: 6px !important; align-items: center !important;
+  mat-icon {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    width: 28px !important; height: 28px !important; border-radius: 7px !important;
+    background: rgba(68,128,245,0.07) !important; border: 1px solid rgba(68,128,245,0.15) !important;
+    color: #6aaaf5 !important; font-size: 15px !important; cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    &:hover { background: rgba(68,128,245,0.16) !important; border-color: rgba(68,128,245,0.36) !important; box-shadow: 0 2px 10px rgba(68,128,245,0.22) !important; }
+  }
+}
+
+// ── Add row button ────────────────────────────────────────────────
+.add-row-button {
+  display: flex !important; justify-content: flex-end !important; padding: 8px 16px !important;
+  mat-icon {
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    width: 32px !important; height: 32px !important; border-radius: 8px !important;
+    background: linear-gradient(135deg, rgba(68,128,245,0.15), rgba(135,94,247,0.1)) !important;
+    border: 1px solid rgba(68,128,245,0.28) !important; color: #6aaaf5 !important;
+    font-size: 18px !important; cursor: pointer !important; transition: all 0.18s ease !important;
+    &:hover { background: linear-gradient(135deg, rgba(68,128,245,0.26), rgba(135,94,247,0.18)) !important; border-color: rgba(68,128,245,0.5) !important; box-shadow: 0 3px 14px rgba(68,128,245,0.32) !important; transform: scale(1.08) !important; }
+  }
+}
+
+// ── JSON editor ───────────────────────────────────────────────────
+.json-editor-container { padding: 0 !important; }
+.json-editor-wrapper {
+  border: 1px solid rgba(68,128,245,0.18) !important; border-radius: 10px !important;
+  overflow: hidden !important; background: rgba(6,10,24,0.96) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.48) !important;
+  .cipJSONEditor { min-height: 360px !important; }
+}
+
+:host ::ng-deep .json-editor-wrapper {
+  // ── jsoneditor library dark theme ──
+  .jsoneditor {
+    background: rgba(6,10,24,0.96) !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+  .jsoneditor-menu {
+    background: linear-gradient(135deg, rgba(11,20,52,0.98) 0%, rgba(17,28,68,0.97) 100%) !important;
+    border-bottom: none !important;
+    padding: 6px 8px !important;
+    button {
+      background-color: transparent !important;
+      border: 1px solid rgba(255,255,255,0.18) !important;
+      border-radius: 5px !important;
+      margin: 1px !important;
+      transition: all 0.15s ease !important;
+      filter: none !important;
+      opacity: 0.75 !important;
+      &:hover:not(:disabled) { background-color: rgba(255,255,255,0.14) !important; border-color: rgba(255,255,255,0.36) !important; opacity: 1 !important; }
+      &:disabled { opacity: 0.2 !important; }
+      &.jsoneditor-selected, &.jsoneditor-selected:focus, &.jsoneditor-selected:hover { background-color: rgba(68,128,245,0.35) !important; opacity: 1 !important; }
+    }
+    .jsoneditor-separator { background-color: rgba(255,255,255,0.15) !important; }
+    .jsoneditor-search { display: none !important; }
+    select {
+      background-color: rgba(10,20,44,0.8) !important;
+      color: #6aaaf5 !important;
+      border: 1px solid rgba(68,128,245,0.22) !important;
+      border-radius: 5px !important;
+    }
+  }
+  .jsoneditor-navigation-bar {
+    background: rgba(8,14,36,0.9) !important;
+    border-bottom: none !important;
+    color: #3a5570 !important;
+    font-size: 12px !important;
+  }
+  .jsoneditor-search {
+    background: rgba(8,14,36,0.9) !important;
+    border-bottom: none !important;
+    input { background: rgba(10,20,44,0.6) !important; border: 1px solid rgba(68,128,245,0.18) !important; color: #dde8f5 !important; border-radius: 5px !important; }
+    button { background: transparent !important; border: none !important; color: #3a5570 !important; &:hover { color: #6aaaf5 !important; } }
+  }
+  .jsoneditor-outer, .jsoneditor-treecontent { background: rgba(6,10,24,0.96) !important; }
+  .jsoneditor-tree {
+    background: rgba(6,10,24,0.96) !important;
+    table { background: transparent !important; }
+    tr { background: transparent !important; }
+    tr:hover > td { background: rgba(68,128,245,0.06) !important; }
+    td { background: transparent !important; color: #6e9abb !important; border-color: transparent !important; }
+  }
+  .jsoneditor-field { color: #6aaaf5 !important; font-weight: 600 !important; }
+  .jsoneditor-field[contenteditable="true"]:hover,
+  .jsoneditor-field[contenteditable="true"]:focus { background: rgba(68,128,245,0.1) !important; border: 1px solid rgba(68,128,245,0.28) !important; border-radius: 3px !important; outline: none !important; color: #a0c8f5 !important; }
+  .jsoneditor-value { color: #dde8f5 !important; }
+  .jsoneditor-value.jsoneditor-string { color: #22d69e !important; }
+  .jsoneditor-value.jsoneditor-number { color: #f8b43b !important; }
+  .jsoneditor-value.jsoneditor-boolean { color: #a87cf8 !important; }
+  .jsoneditor-value.jsoneditor-null { color: #f86a6a !important; }
+  .jsoneditor-value.jsoneditor-object,
+  .jsoneditor-value.jsoneditor-array { color: #47637e !important; }
+  .jsoneditor-value[contenteditable="true"]:hover,
+  .jsoneditor-value[contenteditable="true"]:focus { background: rgba(68,128,245,0.08) !important; border: 1px solid rgba(68,128,245,0.24) !important; border-radius: 3px !important; outline: none !important; }
+  .jsoneditor-expand, .jsoneditor-collapsed { color: #3a5570 !important; }
+  .jsoneditor-selected, .jsoneditor-focus { background: rgba(68,128,245,0.14) !important; color: #dde8f5 !important; }
+  .jsoneditor-highlight { background: rgba(68,128,245,0.18) !important; border-radius: 3px !important; }
+  .jsoneditor > .jsoneditor-outer.has-main-menu-bar { margin-top: 0 !important; padding-top: 0 !important; }
+  .jsoneditor-contextmenu .jsoneditor-menu {
+    background: linear-gradient(150deg, rgba(11,20,44,0.98) 0%, rgba(7,13,30,0.97) 100%) !important;
+    border: 1px solid rgba(68,128,245,0.22) !important;
+    border-radius: 9px !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.44) !important;
+    li button { background: transparent !important; border: none !important; color: #8aacc5 !important; border-radius: 6px !important; &:hover { background: rgba(68,128,245,0.1) !important; color: #6aaaf5 !important; } }
+  }
+  .jsoneditor-statusbar { background: rgba(6,10,24,0.9) !important; border-top: 1px solid rgba(68,128,245,0.1) !important; color: #3a5570 !important; font-size: 11px !important; }
+  // ── ACE editor (text/code mode) dark theme ──
+  .jsoneditor-code { background: rgba(6,10,24,0.96) !important; }
+  .ace_editor { background-color: rgba(6,10,24,0.96) !important; color: #c8d6e8 !important; }
+  .ace_gutter { background: rgba(5,9,20,0.99) !important; color: #3a5570 !important; border-right: 1px solid rgba(68,128,245,0.1) !important; }
+  .ace_gutter-cell { color: #3a5570 !important; padding: 0 8px !important; }
+  .ace_gutter-active-line { background: rgba(68,128,245,0.1) !important; color: #6aaaf5 !important; }
+  .ace_scroller, .ace_content { background: rgba(6,10,24,0.96) !important; }
+  .ace_cursor { color: #6aaaf5 !important; border-left-color: #6aaaf5 !important; }
+  .ace_marker-layer .ace_selection { background: rgba(68,128,245,0.22) !important; }
+  .ace_marker-layer .ace_active-line { background: rgba(68,128,245,0.05) !important; }
+  .ace_variable { color: #6aaaf5 !important; }
+  .ace_string { color: #22d69e !important; }
+  .ace_constant.ace_numeric { color: #f8b43b !important; }
+  .ace_constant.ace_language { color: #a87cf8 !important; }
+  .ace_printMargin { background: rgba(68,128,245,0.06) !important; }
+}
+
+// ── Form editor (Schema Form tab JSON view) ───────────────────────
+.form-editor-container { padding: 0 !important; }
+.form-editor-wrapper {
+  border: 1px solid rgba(68,128,245,0.18) !important; border-radius: 10px !important;
+  overflow: hidden !important; background: rgba(6,10,24,0.96) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.48) !important;
+  .cipJSONEditor { min-height: 380px !important; }
+}
+:host ::ng-deep .form-editor-wrapper {
+  .jsoneditor { background: rgba(6,10,24,0.96) !important; border: none !important; }
+  .jsoneditor-menu { background: linear-gradient(135deg, rgba(11,20,52,0.98) 0%, rgba(17,28,68,0.97) 100%) !important; border-bottom: none !important; button { background-color: transparent !important; border: 1px solid rgba(255,255,255,0.18) !important; border-radius: 5px !important; margin: 1px !important; filter: none !important; opacity: 0.75 !important; &:hover:not(:disabled) { background-color: rgba(255,255,255,0.14) !important; opacity: 1 !important; } } .jsoneditor-search { display: none !important; } }
+  .jsoneditor-outer, .jsoneditor-treecontent, .jsoneditor-tree { background: rgba(6,10,24,0.96) !important; }
+  .jsoneditor-tree tr:hover > td { background: rgba(68,128,245,0.06) !important; }
+  .jsoneditor-tree td { background: transparent !important; color: #6e9abb !important; }
+  .jsoneditor-field { color: #6aaaf5 !important; font-weight: 600 !important; }
+  .jsoneditor-value { color: #dde8f5 !important; }
+  .jsoneditor-value.jsoneditor-string { color: #22d69e !important; }
+  .jsoneditor-value.jsoneditor-number { color: #f8b43b !important; }
+  .jsoneditor-value.jsoneditor-boolean { color: #a87cf8 !important; }
+  .jsoneditor-value.jsoneditor-null { color: #f86a6a !important; }
+  .jsoneditor-statusbar { background: rgba(6,10,24,0.9) !important; border-top: 1px solid rgba(68,128,245,0.1) !important; color: #3a5570 !important; }
+  .jsoneditor-code { background: rgba(6,10,24,0.96) !important; }
+  .ace_editor { background-color: rgba(6,10,24,0.96) !important; color: #c8d6e8 !important; }
+  .ace_gutter { background: rgba(5,9,20,0.99) !important; color: #3a5570 !important; border-right: 1px solid rgba(68,128,245,0.1) !important; }
+  .ace_gutter-cell { color: #3a5570 !important; }
+  .ace_gutter-active-line { background: rgba(68,128,245,0.1) !important; color: #6aaaf5 !important; }
+  .ace_scroller, .ace_content { background: rgba(6,10,24,0.96) !important; }
+  .ace_cursor { color: #6aaaf5 !important; border-left-color: #6aaaf5 !important; }
+  .ace_marker-layer .ace_selection { background: rgba(68,128,245,0.22) !important; }
+  .ace_marker-layer .ace_active-line { background: rgba(68,128,245,0.05) !important; }
+  .ace_variable { color: #6aaaf5 !important; }
+  .ace_string { color: #22d69e !important; }
+  .ace_constant.ace_numeric { color: #f8b43b !important; }
+  .ace_constant.ace_language { color: #a87cf8 !important; }
+}
+
+// ── Form template grid ────────────────────────────────────────────
+.grid-view { animation: fadeUp 0.22s ease both !important; }
+.create-form-button {
+  display: inline-flex !important; align-items: center !important; gap: 7px !important;
+  padding: 8px 18px !important; border-radius: 9px !important;
+  background: linear-gradient(135deg, #4480f5 0%, #875ef7 100%) !important;
+  color: #fff !important; font-size: 12.5px !important; font-weight: 700 !important;
+  cursor: pointer !important; box-shadow: 0 4px 16px rgba(68,128,245,0.4) !important;
+  margin-bottom: 14px !important; transition: all 0.18s ease !important;
+  &:hover { box-shadow: 0 6px 22px rgba(68,128,245,0.56) !important; transform: translateY(-1px) !important; }
+  .create-icon-color { color: #fff !important; }
+}
+.form-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; gap: 12px !important; }
+
+// ── Form template cards ───────────────────────────────────────────
+:host ::ng-deep mat-card.lfx-c-card {
+  background: linear-gradient(150deg, rgba(11,20,44,0.92) 0%, rgba(7,13,30,0.9) 100%) !important;
+  border: 1px solid rgba(68,128,245,0.14) !important; border-radius: 12px !important;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.28) !important; overflow: hidden !important;
+  padding: 0 !important; position: relative !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease !important;
+  &::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #4480f5, #875ef7, #4742dc); border-radius: 12px 12px 0 0; }
+  &:hover { transform: translateY(-2px) !important; box-shadow: 0 12px 36px rgba(0,0,0,0.38), 0 0 0 1px rgba(68,128,245,0.2) !important; border-color: rgba(68,128,245,0.28) !important; }
+}
+.schema-form-card { display: flex !important; align-items: center !important; justify-content: space-between !important; }
+.form-card-header { padding: 14px 16px !important; }
+h2.aip-cursor { color: #6aaaf5 !important; font-size: 13px !important; font-weight: 700 !important; cursor: pointer !important; margin: 0 !important; &:hover { color: #a87cf8 !important; } }
+.delete-form-button { color: #f86a6a !important; font-size: 18px !important; cursor: pointer !important; transition: color 0.15s !important; &:hover { color: #ff8a8a !important; } }
+
+// ── Dialog actions ────────────────────────────────────────────────
+.dialog-actions {
+  display: flex !important; justify-content: flex-end !important; align-items: center !important;
+  gap: 9px !important; padding-top: 16px !important; margin-top: 6px !important;
+  border-top: 1px solid rgba(68,128,245,0.09) !important;
+}
+
+button.cancel-button {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  padding: 8px 22px !important; border-radius: 9px !important;
+  background: transparent !important; color: #47637e !important;
+  border: 1px solid rgba(68,128,245,0.22) !important; font-size: 13px !important; font-weight: 600 !important;
+  cursor: pointer !important; transition: all 0.15s ease !important; min-height: 36px !important;
+  &:hover { background: rgba(68,128,245,0.07) !important; border-color: rgba(68,128,245,0.4) !important; color: #6aaaf5 !important; }
+}
+
+button.action-button[color="primary"],
+:host ::ng-deep button[mat-raised-button][color="primary"] {
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  gap: 6px !important; padding: 9px 28px !important; border-radius: 10px !important; border: none !important;
+  background: linear-gradient(135deg, #4480f5 0%, #875ef7 100%) !important;
+  color: #fff !important; font-size: 13px !important; font-weight: 700 !important;
+  cursor: pointer !important; box-shadow: 0 5px 20px rgba(68,128,245,0.46) !important;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important; position: relative !important; overflow: hidden !important; min-height: 38px !important;
+  &::before { content: '' !important; position: absolute !important; top: 0 !important; left: -80% !important; width: 55% !important; height: 100% !important; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important; transform: skewX(-20deg) !important; transition: left 0.48s ease !important; pointer-events: none !important; }
+  &:hover:not([disabled]) { box-shadow: 0 7px 26px rgba(68,128,245,0.6) !important; transform: translateY(-2px) scale(1.02) !important; &::before { left: 160% !important; } }
+  &[disabled] { opacity: 0.38 !important; cursor: not-allowed !important; box-shadow: none !important; transform: none !important; pointer-events: none !important; }
+}
+
+// ── Spacing helpers ───────────────────────────────────────────────
+.lfx-u-mar-t-16 { margin-top: 14px !important; }
+.lfx-u-pad-b-16 { padding-bottom: 14px !important; }
+.w-100 { width: 100% !important; }
+
+// -- Row layout: 2 fields per row ----------------------------------
+.row { display: flex !important; flex-wrap: wrap !important; margin: 0 -10px !important; }
+.col-lg-6, .col-md-6, .col-sm-6 { flex: 0 0 50% !important; max-width: 50% !important; padding: 0 12px !important; box-sizing: border-box !important; }
+.col-lg-12, .col-md-12, .col-sm-12 { flex: 0 0 100% !important; max-width: 100% !important; padding: 0 12px !important; box-sizing: border-box !important; }
+:host ::ng-deep .mat-mdc-form-field-flex { align-items: flex-end !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { padding: 0 !important; background: transparent !important; overflow: visible !important; }
+:host ::ng-deep .mat-mdc-form-field-focus-overlay, :host ::ng-deep .mdc-text-field__ripple { display: none !important; background: transparent !important; opacity: 0 !important; }
+// ══════════════════════════════════════════════════════════════════
+//  LIGHT THEME
+// ══════════════════════════════════════════════════════════════════
+body.header-light-theme {
+  :host ::ng-deep .mat-mdc-tab-body { background: #ffffff !important; }
+  :host ::ng-deep .mat-mdc-tab-body-wrapper { background: #ffffff !important; }
+  :host ::ng-deep mat-card.lfx-schema-card, mat-card.lfx-schema-card {
+    background: #ffffff !important; border-color: rgba(71,66,220,0.12) !important;
+    box-shadow: 0 10px 44px rgba(71,66,220,0.09) !important;
+    &::before { background: linear-gradient(90deg, #4742dc, #06b6d4, #7c3aed, #4f46e5); }
+  }
+  .lfx-u-sub-header-alias { color: #64748b !important; }
+  .lfx-u-header-lg { color: #4742dc !important; }
+  .lfx-u-body-xl { color: #0f172a !important; }
+  .lfx-u-header-xl { color: #334155 !important; }
+  :host ::ng-deep mat-tab-group#schema-modal-tabs {
+    .mat-mdc-tab-header { background: rgba(71,66,220,0.03) !important; border-bottom: none !important; }
+    .mat-mdc-tab { color: #94a3b8 !important; }
+    .mat-mdc-tab.mdc-tab--active { color: #4742dc !important; }
+    .mdc-tab-indicator__content--underline { border-color: #4742dc !important; }
+  }
+  :host ::ng-deep mat-table { background: transparent !important; }
+  :host ::ng-deep table.table,
+  table.table { background: transparent !important; tbody, thead, tr, td, th { background: transparent !important; } }
+  table.table .lfx-t-head-row th { background: rgba(71,66,220,0.05) !important; color: #64748b !important; border-color: rgba(71,66,220,0.1) !important; }
+  table.table .lfx-t-body-row { background: transparent !important; border-color: rgba(71,66,220,0.06) !important; td { background: transparent !important; color: #334155 !important; &:first-child { color: #4742dc !important; } } &:nth-child(even) { background: rgba(71,66,220,0.03) !important; } &:hover { background: rgba(71,66,220,0.07) !important; td { color: #1e293b !important; } } }
+  .lfx-table-action mat-icon { color: #4742dc !important; background: rgba(71,66,220,0.06) !important; border-color: rgba(71,66,220,0.14) !important; &:hover { background: rgba(71,66,220,0.14) !important; border-color: rgba(71,66,220,0.34) !important; } }
+  .lfx-u-header-xl.flex { color: #94a3b8 !important; border-color: rgba(71,66,220,0.12) !important; background: rgba(71,66,220,0.02) !important; &::before { color: rgba(71,66,220,0.2) !important; } }
+  .dialog-actions { border-top-color: rgba(71,66,220,0.09) !important; }
+  button.cancel-button { color: #64748b !important; border-color: rgba(71,66,220,0.2) !important; &:hover { color: #4742dc !important; background: rgba(71,66,220,0.06) !important; border-color: rgba(71,66,220,0.38) !important; } }
+  button.action-button[color="primary"],
+  :host ::ng-deep button[mat-raised-button][color="primary"] { background: linear-gradient(135deg, #4742dc, #7c3aed) !important; box-shadow: 0 5px 20px rgba(71,66,220,0.42) !important; }
+  :host ::ng-deep mat-card.lfx-c-card { background: #f4f6fd !important; border-color: rgba(71,66,220,0.12) !important; &::before { background: linear-gradient(90deg, #4742dc, #7c3aed, #4f46e5); } &:hover { border-color: rgba(71,66,220,0.26) !important; } }
+  h2.aip-cursor { color: #4742dc !important; &:hover { color: #7c3aed !important; } }
+}
+
+:host-context(body.header-light-theme) {
+  ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) { background: transparent !important; }
+  ::ng-deep .mdc-text-field--filled { border: none !important; border-bottom: none !important; border-radius: 0 !important; }
+  ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; border-bottom: none !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; border-bottom: none !important; box-shadow: none !important; }
+  ::ng-deep .mdc-floating-label, ::ng-deep mat-label { color: #64748b !important; }
+  ::ng-deep .mdc-floating-label--float-above { color: #4742dc !important; }
+  ::ng-deep .mat-mdc-input-element { color: #0f172a !important; -webkit-text-fill-color: #0f172a !important; }
+  ::ng-deep mat-select .mat-mdc-select-value-text { color: #0f172a !important; }
+  ::ng-deep .mat-mdc-select-placeholder { color: #94a3b8 !important; }
+  ::ng-deep .mat-mdc-select-arrow { color: #64748b !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--disabled { opacity: 0.5 !important; border-bottom: none !important; }
+  ::ng-deep .mdc-text-field--disabled .mat-mdc-input-element,
+  ::ng-deep .mdc-text-field--disabled input { color: #94a3b8 !important; -webkit-text-fill-color: #94a3b8 !important; }
+  ::ng-deep mat-checkbox .mdc-label { color: #1e293b !important; }
+  ::ng-deep mat-checkbox .mdc-checkbox__background { border-color: rgba(71,66,220,0.4) !important; }
+
+  // JSON editor light theme
+  ::ng-deep .json-editor-wrapper {
+    background: #f8fafc !important;
+    border-color: rgba(71,66,220,0.14) !important;
+    .jsoneditor { background: #ffffff !important; }
+    .jsoneditor-menu {
+      background: linear-gradient(135deg, #eef2ff 0%, #e8ecff 100%) !important;
+      border-bottom: none !important;
+      button { background-color: rgba(255,255,255,0.7) !important; border: 1px solid rgba(71,66,220,0.2) !important; border-radius: 5px !important; filter: invert(1) brightness(0.35) !important; opacity: 0.85 !important; &:hover:not(:disabled) { background-color: rgba(255,255,255,0.9) !important; opacity: 1 !important; } }
+      .jsoneditor-search { display: none !important; }
+      select { background: #fff !important; color: #334155 !important; border-color: rgba(71,66,220,0.2) !important; }
+    }
+    .jsoneditor-tree, .jsoneditor-treecontent, .jsoneditor-outer { background: #ffffff !important; }
+    .jsoneditor-tree tr:hover > td { background: rgba(71,66,220,0.05) !important; }
+    .jsoneditor-tree td { color: #334155 !important; }
+    .jsoneditor-field { color: #4742dc !important; }
+    .jsoneditor-value { color: #1e293b !important; }
+    .jsoneditor-value.jsoneditor-string { color: #059669 !important; }
+    .jsoneditor-value.jsoneditor-number { color: #d97706 !important; }
+    .jsoneditor-value.jsoneditor-boolean { color: #7c3aed !important; }
+    .jsoneditor-value.jsoneditor-null { color: #dc2626 !important; }
+    .jsoneditor-statusbar { background: #f1f5f9 !important; border-top-color: rgba(71,66,220,0.1) !important; color: #64748b !important; }
+    .jsoneditor-navigation-bar { background: #f8fafc !important; border-bottom: none !important; color: #64748b !important; }
+    // ACE editor light theme
+    .jsoneditor-code { background: #ffffff !important; }
+    .ace_editor { background-color: #ffffff !important; color: #1e293b !important; }
+    .ace_gutter { background: #f1f5f9 !important; color: #94a3b8 !important; border-right: 1px solid rgba(71,66,220,0.1) !important; }
+    .ace_gutter-cell { color: #94a3b8 !important; }
+    .ace_gutter-active-line { background: rgba(71,66,220,0.06) !important; color: #4742dc !important; }
+    .ace_scroller, .ace_content { background: #ffffff !important; }
+    .ace_cursor { color: #4742dc !important; border-left-color: #4742dc !important; }
+    .ace_marker-layer .ace_selection { background: rgba(71,66,220,0.15) !important; }
+    .ace_marker-layer .ace_active-line { background: rgba(71,66,220,0.04) !important; }
+    .ace_variable { color: #4742dc !important; }
+    .ace_string { color: #059669 !important; }
+    .ace_constant.ace_numeric { color: #d97706 !important; }
+    .ace_constant.ace_language { color: #7c3aed !important; }
+  }
+  ::ng-deep .form-editor-wrapper {
+    background: #f8fafc !important; border-color: rgba(71,66,220,0.14) !important;
+    .jsoneditor { background: #ffffff !important; }
+    .jsoneditor-menu { background: linear-gradient(135deg, #eef2ff 0%, #e8ecff 100%) !important; border-bottom: none !important; button { background-color: rgba(255,255,255,0.7) !important; border: 1px solid rgba(71,66,220,0.2) !important; border-radius: 5px !important; margin: 1px !important; filter: invert(1) brightness(0.35) !important; opacity: 0.85 !important; &:hover:not(:disabled) { background-color: rgba(255,255,255,0.9) !important; opacity: 1 !important; } } .jsoneditor-search { display: none !important; } select { background-color: #fff !important; color: #334155 !important; border: 1px solid rgba(71,66,220,0.2) !important; border-radius: 5px !important; } }
+    .jsoneditor-tree, .jsoneditor-treecontent, .jsoneditor-outer { background: #ffffff !important; }
+    .jsoneditor-tree tr:hover > td { background: rgba(71,66,220,0.05) !important; }
+    .jsoneditor-field { color: #4742dc !important; }
+    .jsoneditor-value.jsoneditor-string { color: #059669 !important; }
+    .jsoneditor-value.jsoneditor-number { color: #d97706 !important; }
+    .jsoneditor-value.jsoneditor-boolean { color: #7c3aed !important; }
+    .jsoneditor-value.jsoneditor-null { color: #dc2626 !important; }
+    .jsoneditor-statusbar { background: #f1f5f9 !important; border-top-color: rgba(71,66,220,0.1) !important; color: #64748b !important; }
+    .jsoneditor-code { background: #ffffff !important; }
+    .ace_editor { background-color: #ffffff !important; color: #1e293b !important; }
+    .ace_gutter { background: #f1f5f9 !important; color: #94a3b8 !important; border-right: 1px solid rgba(71,66,220,0.1) !important; }
+    .ace_gutter-active-line { background: rgba(71,66,220,0.06) !important; color: #4742dc !important; }
+    .ace_scroller, .ace_content { background: #ffffff !important; }
+    .ace_cursor { color: #4742dc !important; border-left-color: #4742dc !important; }
+    .ace_marker-layer .ace_selection { background: rgba(71,66,220,0.15) !important; }
+    .ace_marker-layer .ace_active-line { background: rgba(71,66,220,0.04) !important; }
+    .ace_variable { color: #4742dc !important; }
+    .ace_string { color: #059669 !important; }
+    .ace_constant.ace_numeric { color: #d97706 !important; }
+    .ace_constant.ace_language { color: #7c3aed !important; }
+  }
+}
