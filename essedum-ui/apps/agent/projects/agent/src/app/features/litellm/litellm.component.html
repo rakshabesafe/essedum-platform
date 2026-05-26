@@ -1,0 +1,17 @@
+<div class="embed-fullscreen">
+  <iframe
+    *ngIf="isUrlConfigured"
+    #litellmIframeRef
+    id="litellmIframe"
+    [src]="currentIframeUrl"
+    frameborder="0"
+    allow="fullscreen; microphone; camera">
+  </iframe>
+  <div *ngIf="!isUrlConfigured" class="not-configured">
+    <div class="not-configured-icon">
+      <i class="bi bi-plug-fill"></i>
+    </div>
+    <h3>LiteLLM Not Configured</h3>
+    <p>The LiteLLM service URL has not been configured for this environment. Set <code>litellmUrl</code> in the environment configuration to enable this integration.</p>
+  </div>
+</div>

@@ -1,0 +1,888 @@
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+// ── Global form field overrides ───────────────────────────────────────────────
+:host ::ng-deep mat-form-field,
+:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
+
+// ── Form field — no hover bg, underline on selects only (dark default) ────────
+:host ::ng-deep .mat-mdc-form-field {
+  --mdc-filled-text-field-container-color: transparent;
+  --mdc-filled-text-field-hover-state-layer-opacity: 0;
+  --mdc-filled-text-field-focus-state-layer-opacity: 0;
+}
+// Hide underline on text inputs, show only on selects
+:host ::ng-deep .mdc-line-ripple { display: none !important; }
+:host ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple { display: block !important; }
+:host ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::before {
+  border-bottom-color: rgba(79,142,247,0.5) !important;
+}
+:host ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::after {
+  border-bottom-color: #4f8ef7 !important;
+}
+:host ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-text-field--filled { border-bottom: 1px solid rgba(79,142,247,0.5) !important; }
+:host ::ng-deep .mdc-text-field--filled .mdc-text-field__ripple { display: none !important; }
+
+:host ::ng-deep .mdc-text-field--filled {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  border-bottom: none !important;
+  transition: none !important;
+}
+:host ::ng-deep .mdc-text-field--filled::after { border-bottom: none !important; }
+:host ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; }
+:host ::ng-deep .mat-mdc-form-field-focus-overlay { opacity: 0 !important; background: transparent !important; }
+
+:host ::ng-deep .mdc-floating-label { color: #b8cce0 !important; font-size: 13px !important; }
+:host ::ng-deep .mdc-floating-label--float-above { color: #7eb8ff !important; font-size: 11px !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
+// Remove textarea resize handle
+:host ::ng-deep textarea.mat-mdc-input-element { resize: none !important; }
+
+// Dropdown — arrow + value
+:host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e2e8f0 !important; font-size: 14px !important; }
+:host ::ng-deep .mat-mdc-select-placeholder { color: #6b7fa0 !important; }
+:host ::ng-deep .mat-mdc-select-arrow { color: #7eb8ff !important; }
+:host ::ng-deep mat-error { color: #f87171 !important; font-size: 11px !important; }
+
+// Dropdown panel options (dark default)
+:host ::ng-deep .mat-mdc-option .mdc-list-item__primary-text { color: #e2e8f0 !important; font-size: 14px !important; }
+:host ::ng-deep .mat-mdc-option:hover:not(.mdc-list-item--disabled) { background: rgba(79,142,247,0.12) !important; }
+:host ::ng-deep .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background: rgba(79,142,247,0.18) !important;
+  .mdc-list-item__primary-text { color: #7eb8ff !important; }
+}
+
+// ── Layout ────────────────────────────────────────────────────────────────────
+.agent-edit-container {
+  display: block;
+  width: 100%;
+  background: transparent;
+}
+
+.content-wrapper {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 24px;
+  padding: 16px 20px 40px;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.main-content {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: 0 !important;         // forces flex shrink properly
+  max-width: none !important;
+  padding-right: 4px;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid rgba(79,142,247,0.15);
+  background: transparent;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  color: #b8cce0;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+  &:hover { color: #4f8ef7; }
+}
+
+.cancel-btn {
+  background: rgba(255,255,255,0.06) !important;
+  color: #b8cce0 !important;
+  border: 1px solid rgba(79,142,247,0.2) !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 20px !important;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 20px !important;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(79,142,247,0.3) !important;
+}
+
+// ── Section Cards ─────────────────────────────────────────────────────────────
+.section-card {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(79,142,247,0.12) !important;
+  border-radius: 12px !important;
+  padding: 18px 22px !important;
+  margin-bottom: 14px !important;
+}
+
+.section-header-with-collapse {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.section-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.section-title, .section-title-hoverable {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #b8cce0 !important;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.15s, transform 0.15s;
+  min-width: 160px;
+}
+
+.section-content { margin-top: 8px; }
+
+.collapse-btn {
+  background: transparent;
+  border: none;
+  color: #b8cce0;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+  &:hover { color: #4f8ef7; }
+}
+
+// ── Badges ────────────────────────────────────────────────────────────────────
+.required-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #f87171;
+  background: rgba(248,113,113,0.12);
+  border: 1px solid rgba(248,113,113,0.3);
+  border-radius: 4px;
+  padding: 1px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.info-badge {
+  font-size: 10px;
+  font-weight: 500;
+  color: #7eb8ff;
+  background: rgba(79,142,247,0.12);
+  border: 1px solid rgba(79,142,247,0.25);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.count {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4f8ef7;
+  background: rgba(79,142,247,0.15);
+  border-radius: 10px;
+  padding: 1px 7px;
+}
+
+.required-indicator { color: #f87171; margin-left: 2px; }
+
+// ── Add button ────────────────────────────────────────────────────────────────
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(79,142,247,0.15) !important;
+  color: #7eb8ff !important;
+  border: 1px solid rgba(79,142,247,0.3) !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 4px 12px !important;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: rgba(79,142,247,0.25) !important; }
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.add-btn-small {
+  @extend .add-btn;
+  padding: 2px 8px !important;
+  font-size: 11px !important;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: #b8cce0;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+  &:hover { color: #4f8ef7; }
+}
+
+.icon-btn-small {
+  @extend .icon-btn;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.remove-icon-btn {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+  &:hover { opacity: 1; }
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+// ── Form rows ─────────────────────────────────────────────────────────────────
+.full-width { width: 100% !important; }
+.flex-grow { flex: 1 !important; }
+
+.add-item-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.selector-add-row, .domain-add-row { gap: 12px; }
+
+.cid-field-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  .cid-input { flex: 1; }
+}
+
+// ── Items list ────────────────────────────────────────────────────────────────
+.items-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.item-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px 3px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  background: rgba(79,142,247,0.12);
+  color: #7eb8ff;
+  border: 1px solid rgba(79,142,247,0.25);
+
+  &.skill-badge {
+    background: rgba(99,102,241,0.12);
+    color: #a5b4fc;
+    border-color: rgba(99,102,241,0.25);
+  }
+
+  &.selector-badge {
+    background: rgba(6,182,212,0.1);
+    color: #67e8f9;
+    border-color: rgba(6,182,212,0.2);
+  }
+}
+
+// ── Domain items ──────────────────────────────────────────────────────────────
+.domain-item {
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(79,142,247,0.1);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.domain-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  h4 { margin: 0; font-size: 13px; color: #c8d8ea; font-weight: 600; }
+}
+
+.domain-desc { font-size: 12px; color: #b8cce0; margin: 4px 0 0; }
+
+// ── Tables (bootstrap .form-control & .sync-params-table) ────────────────────
+.sync-params-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+
+  thead tr {
+    background: rgba(79,142,247,0.08) !important;
+  }
+
+  .table-header-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #b8cce0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(79,142,247,0.15);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(79,142,247,0.07);
+    &:last-child { border-bottom: none; }
+  }
+
+  td {
+    padding: 8px 12px;
+    vertical-align: middle;
+    color: #e2e8f0;
+  }
+}
+
+// Bootstrap form-control inside tables (dark default)
+.form-control {
+  background: rgba(255,255,255,0.05) !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(79,142,247,0.2) !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  transition: border-color 0.15s;
+  &:focus {
+    background: rgba(255,255,255,0.08) !important;
+    border-color: #4f8ef7 !important;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(79,142,247,0.15) !important;
+  }
+  option { background: #1a2540 !important; color: #e2e8f0 !important; }
+}
+
+// Override Bootstrap table-striped white rows — use ::ng-deep for full specificity
+:host ::ng-deep .table-striped > tbody > tr:nth-of-type(odd) > *,
+:host ::ng-deep .table-striped > tbody > tr:nth-of-type(even) > *,
+:host ::ng-deep .table > tbody > tr > td,
+:host ::ng-deep .table > thead > tr > th {
+  background: transparent !important;
+  --bs-table-striped-bg: transparent !important;
+  --bs-table-bg: transparent !important;
+  color: #e2e8f0 !important;
+}
+:host ::ng-deep .table-bordered > :not(caption) > * > *,
+:host ::ng-deep .table-striped > :not(caption) > * > * {
+  border-color: rgba(79,142,247,0.12) !important;
+}
+:host ::ng-deep .table-bordered,
+:host ::ng-deep .table-striped {
+  border-color: rgba(79,142,247,0.15) !important;
+}
+
+// fa-icon buttons inside tables — compact circle icon buttons
+.remove-btn-icon {
+  font-size: 14px !important;
+  color: #f87171 !important;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(248,113,113,0.1);
+  border: 1px solid rgba(248,113,113,0.25);
+  transition: background 0.15s, border-color 0.15s;
+  &:hover {
+    background: rgba(248,113,113,0.2) !important;
+    border-color: rgba(248,113,113,0.45) !important;
+  }
+}
+
+.add-btn-icon {
+  font-size: 14px !important;
+  color: #7eb8ff !important;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(79,142,247,0.12);
+  border: 1px solid rgba(79,142,247,0.3);
+  transition: background 0.15s, border-color 0.15s;
+  &:hover {
+    background: rgba(79,142,247,0.22) !important;
+    border-color: rgba(79,142,247,0.5) !important;
+  }
+}
+
+// ── Edit table (tools parameters) ────────────────────────────────────────────
+.edit-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  font-size: 13px;
+
+  thead tr { background: rgba(79,142,247,0.08); }
+  th {
+    color: #b8cce0;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(79,142,247,0.15);
+  }
+  td {
+    padding: 6px 8px;
+    vertical-align: middle;
+    color: #e2e8f0;
+    border-bottom: 1px solid rgba(79,142,247,0.06);
+  }
+  .table-field { width: 100% !important; }
+}
+
+.tool-params { min-width: 120px; }
+
+// ── Signature / tool / resource / prompt items ────────────────────────────────
+.signature-item, .tool-edit-item, .resource-edit-item, .prompt-edit-item {
+  padding: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(79,142,247,0.1);
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.signature-header, .tool-header, .resource-header, .prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  h3, h4 { margin: 0; color: #c8d8ea; font-size: 13px; font-weight: 600; }
+}
+
+.parameters-section {
+  margin-top: 10px;
+}
+
+.subsection-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  h4 { margin: 0; font-size: 12px; font-weight: 600; color: #b8cce0; }
+}
+
+// ── Empty states ──────────────────────────────────────────────────────────────
+.empty-state {
+  text-align: center;
+  padding: 14px;
+  color: #6b7fa0;
+  font-size: 13px;
+}
+
+.empty-state-small {
+  color: #6b7fa0;
+  font-size: 12px;
+  padding: 8px 0;
+}
+
+// ── Section divider ───────────────────────────────────────────────────────────
+.section-divider {
+  height: 1px;
+  background: rgba(79,142,247,0.1);
+  margin: 12px 0;
+  &.thin { margin: 8px 0; opacity: 0.6; }
+}
+
+// ── Side nav ──────────────────────────────────────────────────────────────────
+.side-nav {
+  width: 200px !important;
+  flex: 0 0 200px !important;
+  max-width: 200px !important;
+  min-width: 200px !important;
+  flex-shrink: 0;
+  position: sticky;
+  top: 16px;
+  align-self: flex-start;
+
+  nav {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(79,142,247,0.12);
+    border-radius: 12px;
+    padding: 10px 0;
+    overflow: hidden;
+  }
+
+  .nav-item {
+    display: block;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #b8cce0;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    text-decoration: none;
+
+    &:hover {
+      color: #4f8ef7;
+      background: rgba(79,142,247,0.07);
+    }
+
+    &.active {
+      color: #4f8ef7;
+      border-left-color: #4f8ef7;
+      background: rgba(79,142,247,0.1);
+      font-weight: 600;
+    }
+  }
+}
+
+// ── Light Theme ───────────────────────────────────────────────────────────────
+:host-context(body.header-light-theme) {
+  ::ng-deep .mat-mdc-form-field { --mdc-filled-text-field-container-color: transparent; }
+  ::ng-deep .mdc-line-ripple { display: none !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple { display: block !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::before { border-bottom-color: rgba(35,79,153,0.45) !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::after { border-bottom-color: #234f99 !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-text-field--filled { border-bottom: 1px solid rgba(35,79,153,0.45) !important; }
+  ::ng-deep .mdc-text-field--filled {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    border-bottom: none !important;
+  }
+  ::ng-deep .mdc-text-field--filled::after { border-bottom: none !important; }
+  ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; }
+  ::ng-deep .mat-mdc-form-field-focus-overlay { opacity: 0 !important; background: transparent !important; }
+  ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
+  ::ng-deep textarea.mat-mdc-input-element { resize: none !important; }
+  ::ng-deep .mdc-floating-label { color: #64748b !important; }
+  ::ng-deep .mdc-floating-label--float-above { color: #234f99 !important; }
+  ::ng-deep mat-select .mat-mdc-select-value-text { color: #0f172a !important; }
+  ::ng-deep .mat-mdc-select-placeholder { color: #94a3b8 !important; }
+  ::ng-deep .mat-mdc-select-arrow { color: #234f99 !important; }
+  ::ng-deep mat-error { color: #dc2626 !important; }
+  ::ng-deep .mat-mdc-option .mdc-list-item__primary-text { color: #0f172a !important; }
+  ::ng-deep .mat-mdc-option:hover:not(.mdc-list-item--disabled) { background: rgba(99,102,241,0.08) !important; }
+  ::ng-deep .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+    background: rgba(99,102,241,0.12) !important;
+    .mdc-list-item__primary-text { color: #234f99 !important; }
+  }
+
+  .header {
+    border-bottom-color: rgba(99,102,241,0.15);
+  }
+
+  .page-title { color: #0f172a; }
+  .back-btn { color: #64748b; &:hover { color: #234f99; } }
+
+  .cancel-btn {
+    background: rgba(35,79,153,0.06) !important;
+    color: #234f99 !important;
+    border-color: rgba(99,102,241,0.2) !important;
+  }
+
+  .save-btn {
+    background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+    box-shadow: 0 2px 12px rgba(35,79,153,0.35) !important;
+  }
+
+  .section-card {
+    background: rgba(255,255,255,0.85) !important;
+    border-color: rgba(99,102,241,0.12) !important;
+  }
+
+  .section-title, .section-title-hoverable { color: #4A5568 !important; }
+  .collapse-btn { color: #64748b; &:hover { color: #234f99; } }
+
+  .required-badge {
+    color: #dc2626;
+    background: rgba(220,38,38,0.08);
+    border-color: rgba(220,38,38,0.25);
+  }
+
+  .info-badge {
+    color: #234f99;
+    background: rgba(99,102,241,0.08);
+    border-color: rgba(99,102,241,0.2);
+  }
+
+  .count {
+    color: #234f99;
+    background: rgba(35,79,153,0.1);
+  }
+
+  .add-btn {
+    background: rgba(35,79,153,0.1) !important;
+    color: #234f99 !important;
+    border-color: rgba(99,102,241,0.25) !important;
+    &:hover { background: rgba(99,102,241,0.18) !important; }
+  }
+
+  .add-btn-small { @extend .add-btn; }
+
+  .icon-btn { color: #64748b; &:hover { color: #234f99; } }
+  .icon-btn-small { @extend .icon-btn; }
+
+  .item-chip {
+    background: rgba(99,102,241,0.08);
+    color: #234f99;
+    border-color: rgba(99,102,241,0.2);
+
+    &.skill-badge {
+      background: rgba(99,102,241,0.08);
+      color: #234f99;
+      border-color: rgba(99,102,241,0.2);
+    }
+
+    &.selector-badge {
+      background: rgba(6,182,212,0.06);
+      color: #0891b2;
+      border-color: rgba(6,182,212,0.18);
+    }
+  }
+
+  .domain-item {
+    background: rgba(255,255,255,0.7);
+    border-color: rgba(99,102,241,0.12);
+    .domain-header h4 { color: #1e293b; }
+    .domain-desc { color: #64748b; }
+  }
+
+  // Bootstrap form-control — light
+  .form-control {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    border-color: rgba(99,102,241,0.2) !important;
+    &:focus {
+      background: #fff !important;
+      border-color: #234f99 !important;
+      box-shadow: 0 0 0 2px rgba(99,102,241,0.12) !important;
+    }
+    option { background: #fff !important; color: #0f172a !important; }
+  }
+
+  // Override bootstrap table-striped white rows in light mode
+  .table-striped tbody tr:nth-of-type(odd),
+  .table-striped tbody tr:nth-of-type(even),
+  .table tbody tr,
+  .table thead tr {
+    background: transparent !important;
+    color: #0f172a !important;
+  }
+  .table-bordered, .table-striped {
+    border-color: rgba(99,102,241,0.15) !important;
+    td, th { border-color: rgba(35,79,153,0.1) !important; }
+  }
+
+  .remove-btn-icon {
+    color: #dc2626 !important;
+    background: rgba(220,38,38,0.08) !important;
+    border-color: rgba(220,38,38,0.2) !important;
+    &:hover { background: rgba(220,38,38,0.16) !important; border-color: rgba(220,38,38,0.4) !important; }
+  }
+  .add-btn-icon {
+    color: #234f99 !important;
+    background: rgba(99,102,241,0.08) !important;
+    border-color: rgba(99,102,241,0.25) !important;
+    &:hover { background: rgba(99,102,241,0.16) !important; border-color: rgba(35,79,153,0.45) !important; }
+  }
+
+  ::ng-deep .table > thead > tr > th { color: #4A5568 !important; }
+  ::ng-deep .table > tbody > tr > td { color: #0f172a !important; }
+
+  .sync-params-table {
+    thead tr { background: rgba(35,79,153,0.06) !important; }
+    .table-header-title {
+      color: #4A5568 !important;
+      border-bottom-color: rgba(99,102,241,0.15);
+    }
+    tbody tr { border-bottom-color: rgba(99,102,241,0.07); }
+    td { color: #0f172a !important; }
+  }
+
+  .edit-table {
+    thead tr { background: rgba(35,79,153,0.06); }
+    th { color: #4A5568 !important; border-bottom-color: rgba(99,102,241,0.15); }
+    td { color: #0f172a !important; border-bottom-color: rgba(35,79,153,0.06); }
+  }
+
+  .signature-item, .tool-edit-item, .resource-edit-item, .prompt-edit-item {
+    background: rgba(255,255,255,0.75);
+    border-color: rgba(99,102,241,0.12);
+  }
+
+  .signature-header, .tool-header, .resource-header, .prompt-header {
+    h3, h4 { color: #1e293b; }
+  }
+
+  .subsection-header h4 { color: #4A5568; }
+  .section-divider { background: rgba(0,0,0,0.07); }
+  .empty-state { color: #94a3b8; }
+  .empty-state-small { color: #94a3b8; }
+
+  .side-nav {
+    nav {
+      background: rgba(255,255,255,0.9);
+      border-color: rgba(99,102,241,0.12);
+    }
+
+    .nav-item {
+      color: #4A5568;
+      &:hover {
+        color: #234f99;
+        background: rgba(35,79,153,0.06);
+      }
+      &.active {
+        color: #234f99;
+        border-left-color: #234f99;
+        background: rgba(99,102,241,0.08);
+      }
+    }
+  }
+}
+
+// ── Dark Theme explicit ───────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
+  ::ng-deep .mat-mdc-form-field { --mdc-filled-text-field-container-color: transparent; }
+  ::ng-deep .mdc-line-ripple { display: none !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple { display: block !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.5) !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mdc-text-field--filled { border-bottom: 1px solid rgba(79,142,247,0.5) !important; }
+  ::ng-deep .mdc-text-field--filled {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    border-bottom: none !important;
+  }
+  ::ng-deep .mdc-text-field--filled::after { border-bottom: none !important; }
+  ::ng-deep .mdc-text-field--filled:hover { background: transparent !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: transparent !important; }
+  ::ng-deep .mat-mdc-form-field-focus-overlay { opacity: 0 !important; }
+  ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; }
+  ::ng-deep .mdc-floating-label { color: #b8cce0 !important; }
+  ::ng-deep .mdc-floating-label--float-above { color: #7eb8ff !important; }
+  ::ng-deep mat-select .mat-mdc-select-value-text { color: #e2e8f0 !important; }
+  ::ng-deep .mat-mdc-select-placeholder { color: #6b7fa0 !important; }
+  ::ng-deep .mat-mdc-select-arrow { color: #7eb8ff !important; }
+
+  .page-title { color: #e2e8f0; }
+  .back-btn { color: #b8cce0; &:hover { color: #4f8ef7; } }
+
+  .cancel-btn {
+    background: rgba(79,142,247,0.12) !important;
+    color: #7eb8ff !important;
+    border-color: rgba(79,142,247,0.4) !important;
+  }
+
+  .save-btn {
+    background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+    box-shadow: 0 2px 12px rgba(79,142,247,0.3) !important;
+  }
+
+  .section-card {
+    background: rgba(255,255,255,0.04) !important;
+    border-color: rgba(79,142,247,0.12) !important;
+  }
+
+  .section-title, .section-title-hoverable { color: #b8cce0 !important; }
+
+  .form-control {
+    background: rgba(255,255,255,0.05) !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(79,142,247,0.2) !important;
+    &:focus {
+      background: rgba(255,255,255,0.08) !important;
+      border-color: #4f8ef7 !important;
+      box-shadow: 0 0 0 2px rgba(79,142,247,0.15) !important;
+    }
+    option { background: #1a2540; color: #e2e8f0; }
+  }
+
+  .sync-params-table {
+    thead tr { background: rgba(79,142,247,0.08) !important; }
+    .table-header-title { color: #b8cce0; }
+    td { color: #e2e8f0; }
+  }
+
+  .domain-item {
+    .domain-header h4 { color: #c8d8ea; }
+    .domain-desc { color: #b8cce0; }
+  }
+
+  .signature-item, .tool-edit-item, .resource-edit-item, .prompt-edit-item {
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(79,142,247,0.1);
+  }
+
+  .signature-header, .tool-header, .resource-header, .prompt-header {
+    h3, h4 { color: #c8d8ea; }
+  }
+
+  .side-nav {
+    nav {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(79,142,247,0.12);
+    }
+    .nav-item {
+      color: #b8cce0;
+      &:hover { color: #4f8ef7; background: rgba(79,142,247,0.07); }
+      &.active {
+        color: #4f8ef7;
+        border-left-color: #4f8ef7;
+        background: rgba(79,142,247,0.1);
+      }
+    }
+  }
+}

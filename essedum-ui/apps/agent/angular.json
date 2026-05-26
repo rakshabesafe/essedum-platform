@@ -1,0 +1,82 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "agent": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": { "style": "scss" }
+      },
+      "root": "projects/agent",
+      "sourceRoot": "projects/agent/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "ngx-build-plus:browser",
+          "options": {
+            "outputPath": "dist/agent",
+            "index": "projects/agent/src/index.html",
+            "main": "projects/agent/src/main.ts",
+            "polyfills": "projects/agent/src/polyfills.ts",
+            "tsConfig": "projects/agent/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/agent/src/favicon.ico",
+              "projects/agent/src/assets"
+            ],
+            "styles": [],
+            "scripts": [],
+            "extraWebpackConfig": "projects/agent/webpack.config.js",
+            "commonChunk": false
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                { "type": "initial", "maximumWarning": "3mb", "maximumError": "5mb" },
+                { "type": "anyComponentStyle", "maximumWarning": "1mb", "maximumError": "5mb" }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/agent/src/environments/environment.ts",
+                  "with": "projects/agent/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "ngx-build-plus:dev-server",
+          "configurations": {
+            "production": { "browserTarget": "agent:build:production" },
+            "development": { "browserTarget": "agent:build:development" }
+          },
+          "defaultConfiguration": "development",
+          "options": {
+            "port": 8085,
+            "publicHost": "http://localhost:8085",
+            "extraWebpackConfig": "projects/agent/webpack.config.js"
+          }
+        },
+        "extract-i18n": {
+          "builder": "ngx-build-plus:extract-i18n",
+          "options": {
+            "browserTarget": "agent:build",
+            "extraWebpackConfig": "projects/agent/webpack.config.js"
+          }
+        }
+      }
+    }
+  },
+  "cli": { "analytics": false }
+}

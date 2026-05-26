@@ -1,0 +1,23 @@
+:host {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.aip-top, #mainCtr, .aip-container {
+  width: 100% !important; max-width: 100% !important; padding: 0 !important;
+}
+#mainrightCnt, [class*="col-md-"], [class*="col-lg-"], [class*="col-sm-"] {
+  width: 100% !important; max-width: 100% !important; flex: none !important; padding: 0 16px !important;
+}
+.aip-card-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 320px)) !important;
+  gap: 20px !important; width: 100% !important; padding: 0 0 40px !important;
+  justify-content: start !important;
+  > * { max-width: 320px !important; width: 100% !important; flex: none !important; padding: 0 !important; }
+}
+.aip-card-wrapper, .card-wrapper { width: 100% !important; max-width: 320px !important; height: 100%; overflow: visible !important; }
+.aip-card-container {
+  > * { overflow: visible !important; }
+}

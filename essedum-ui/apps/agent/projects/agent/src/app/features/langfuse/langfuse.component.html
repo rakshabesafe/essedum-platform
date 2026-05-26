@@ -1,0 +1,17 @@
+<div class="embed-fullscreen">
+  <iframe
+    *ngIf="isUrlConfigured"
+    #langfuseIframeRef
+    id="langfuseIframe"
+    [src]="currentIframeUrl"
+    frameborder="0"
+    allow="fullscreen; microphone; camera">
+  </iframe>
+  <div *ngIf="!isUrlConfigured" class="not-configured">
+    <div class="not-configured-icon">
+      <i class="bi bi-bar-chart-line-fill"></i>
+    </div>
+    <h3>Langfuse Not Configured</h3>
+    <p>The Langfuse observability URL has not been configured for this environment. Set <code>langfuseUrl</code> in the environment configuration to enable this integration.</p>
+  </div>
+</div>
