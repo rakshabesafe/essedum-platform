@@ -1,0 +1,25 @@
+<div class="mx-3 my-4 tags-wrapper">
+    <div class="tags-scroll-area">
+        <div class="mb-4" *ngFor="let cat of category">
+            <div class="flex items-baseline mx-5 mb-3">
+                <h5 class="cat-title"><b>{{cat | titlecase}}</b></h5>
+            </div>
+            <div class="flex flex-wrap">
+                <a class="tagbrdr"
+                    [ngClass]="{'tagbrdr--selected': inc==selectedTag || tagStatus[inc.category+' - '+inc.label]}"
+                    *ngFor="let inc of tags[cat]">
+                    <span class="tag-label" (click)="filterByTag(inc)">{{inc.label}}</span>
+                </a>&nbsp;&nbsp;
+                <a class="show-more-link" *ngIf="tagsBackup[cat]?.length>10" (click)="showMore(cat)"
+                    href="javascript:void(0)">
+                    <span [ngClass]="!catStatus[cat]?'fa fa-plus-square': 'fa fa-minus-square'"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="tags-footer">
+        <button class="add-tags-btn" [disabled]="false" (click)="updateTag()">
+            Add Tags to {{ componentType =='pipelines' ? 'Pipeline' : (componentType =='model' ? 'Model' : 'App')}}
+        </button>
+    </div>
+</div>
