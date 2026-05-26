@@ -1,11 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { DatasourceService } from '../datasource/datasource.service';
-import { DatasetServices } from '../dataset/dataset-service';
-import { Services } from '../services/service';
-import { PipelineService } from '../services/pipeline.service';
+import { catchError, map } from 'rxjs/operators';
 
 interface ModuleStat {
   label: string;
@@ -32,48 +28,41 @@ interface PipelineCard {
 export class DashboardComponent implements OnInit {
 
   // Routes are absolute paths under /landing so each card navigates into the
-  // owning MFE (data-ops, agent, integration). The dashboard lives in the
-  // integration MFE but its cards reach across MFE boundaries.
+  // owning MFE (data-ops, agent, integration).
   moduleStats: ModuleStat[] = [
-    { label: 'Connections',    count: 12, sub: '10 active · 2 error',       icon: 'fa-plug',         accent: '#3b82f6', route: '/landing/data/connections' },
-    { label: 'Datasets',       count: 28, sub: '45 GB total · 5 new',        icon: 'fa-database',     accent: '#10b981', route: '/landing/data/datasets' },
-    { label: 'Models',         count: 34, sub: '12 deployed · 22 available', icon: 'fa-cubes',        accent: '#8b5cf6', route: '/landing/data/models' },
-    { label: 'Agent Pipelines',count: 9,  sub: '5 running · 4 idle',         icon: 'fa-code-fork',    accent: '#fb923c', route: '/landing/agent/pipeline' },
-    { label: 'MCP Pipelines',  count: 6,  sub: '4 active · 2 paused',        icon: 'fa-server',       accent: '#06b6d4', route: '/landing/integration/pipelines' },
-    { label: 'App Pipelines',  count: 11, sub: '8 deployed · 3 staging',     icon: 'fa-window-restore',accent: '#fbbf24', route: '/landing/integration/apps' },
+    { label: 'Connections',     count: 0, sub: '0 total', icon: 'fa-plug',           accent: '#3b82f6', route: '/landing/data/connections' },
+    { label: 'Datasets',        count: 0, sub: '0 total', icon: 'fa-database',       accent: '#10b981', route: '/landing/data/datasets' },
+    { label: 'Models',          count: 0, sub: '0 total', icon: 'fa-cubes',          accent: '#8b5cf6', route: '/landing/data/models' },
+    { label: 'Agent Pipelines', count: 0, sub: '0 total', icon: 'fa-code-fork',      accent: '#fb923c', route: '/landing/agent/pipeline' },
+    { label: 'MCP Pipelines',   count: 0, sub: '0 total', icon: 'fa-server',         accent: '#06b6d4', route: '/landing/integration/pipelines' },
+    { label: 'App Pipelines',   count: 0, sub: '0 total', icon: 'fa-window-restore', accent: '#fbbf24', route: '/landing/integration/apps' },
   ];
 
   topAgentPipelines: PipelineCard[] = [];
   topMcpPipelines: PipelineCard[]   = [];
   topAppPipelines: PipelineCard[]   = [];
 
-  constructor(
-    private datasourceService: DatasourceService,
-    private datasetService: DatasetServices,
-    private services: Services,
-    private pipelineService: PipelineService
-  ) {}
+  // Backend proxy prefix. Matches `baseUrl` injected into every MFE
+  // (apps/<name>/src/environments/environment.ts) and the host's nginx proxy_pass.
+  private readonly api = '/api/aip';
+
+  constructor(private https: HttpClient) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
   }
 
   private loadDashboardData(): void {
-    const modelParams = new HttpParams();
-    const datasetParams = new HttpParams()
-      .set('project', sessionStorage.getItem('organization') || '')
-      .set('search', '');
-
     forkJoin({
-      connections:      this.datasourceService.getDatasources().pipe(catchError(() => of([]))),
-      datasets:         this.datasetService.getDatasetsLenBySearch('').pipe(catchError(() => of(0))),
-      models:           this.services.getCountModels(modelParams).pipe(catchError(() => of(0))),
-      agentCount:       this.pipelineService.getPipelinesCount('pipeline-agent').pipe(catchError(() => of(0))),
-      mcpCount:         this.pipelineService.getPipelinesCount('mcp-pipeline', 'mcpServer').pipe(catchError(() => of(0))),
-      appCount:         this.pipelineService.getPipelinesCount('app-pipeline', 'appPipeline').pipe(catchError(() => of(0))),
-      agentPipelines:   this.pipelineService.getPipelinesByInterfaceType('pipeline-agent', null, 1, 3).pipe(catchError(() => of([]))),
-      mcpPipelines:     this.pipelineService.getPipelinesByInterfaceType('mcp-pipeline', 'mcpServer', 1, 3).pipe(catchError(() => of([]))),
-      appPipelines:     this.pipelineService.getPipelinesByInterfaceType('app-pipeline', 'appPipeline', 1, 3).pipe(catchError(() => of([]))),
+      connections:    this.getDatasources().pipe(catchError(() => of([]))),
+      datasets:       this.getDatasetsLen().pipe(catchError(() => of(0))),
+      models:         this.getCountModels().pipe(catchError(() => of(0))),
+      agentCount:     this.getPipelinesCount('pipeline-agent').pipe(catchError(() => of(0))),
+      mcpCount:       this.getPipelinesCount('mcp-pipeline', 'mcpServer').pipe(catchError(() => of(0))),
+      appCount:       this.getPipelinesCount('app-pipeline', 'appPipeline').pipe(catchError(() => of(0))),
+      agentPipelines: this.getPipelinesByInterfaceType('pipeline-agent', null, 1, 3).pipe(catchError(() => of([]))),
+      mcpPipelines:   this.getPipelinesByInterfaceType('mcp-pipeline', 'mcpServer', 1, 3).pipe(catchError(() => of([]))),
+      appPipelines:   this.getPipelinesByInterfaceType('app-pipeline', 'appPipeline', 1, 3).pipe(catchError(() => of([]))),
     }).subscribe(results => {
       const connCount = Array.isArray(results.connections) ? results.connections.length : 0;
       this.moduleStats[0].count = connCount;
@@ -103,6 +92,54 @@ export class DashboardComponent implements OnInit {
       this.topMcpPipelines   = this.mapToPipelineCards(results.mcpPipelines,   'fa-server');
       this.topAppPipelines   = this.mapToPipelineCards(results.appPipelines,   'fa-window-restore');
     });
+  }
+
+  private getDatasources() {
+    return this.https
+      .get<any>(`${this.api}/service/v1/datasources/all`, { observe: 'response' })
+      .pipe(map(r => r.body));
+  }
+
+  private getDatasetsLen() {
+    const org = sessionStorage.getItem('organization') || '';
+    return this.https
+      .get<any>(`${this.api}/datasets/len/${org}`, { observe: 'response', params: { search: '' } })
+      .pipe(map(r => r.body));
+  }
+
+  private getCountModels() {
+    const org = sessionStorage.getItem('organization') || '';
+    return this.https
+      .get<any>(`${this.api}/service/v1/models/count/${org}`, { observe: 'response', params: new HttpParams() })
+      .pipe(map(r => r.body));
+  }
+
+  private getPipelinesCount(interfacetype: string, type?: string) {
+    let params = this.basePipelineParams(interfacetype);
+    if (type) params = params.set('type', type);
+    return this.https
+      .get<any>(`${this.api}/service/v1/pipelines/count`, { observe: 'response', params })
+      .pipe(map(r => r.body));
+  }
+
+  private getPipelinesByInterfaceType(interfacetype: string, type: string | null, page: number, size: number) {
+    let params = this.basePipelineParams(interfacetype)
+      .set('page', String(page))
+      .set('size', String(size));
+    if (type) params = params.set('type', type);
+    return this.https
+      .get<any>(`${this.api}/service/v1/pipelines/training/list`, { observe: 'response', params })
+      .pipe(map(r => r.body));
+  }
+
+  private basePipelineParams(interfacetype: string): HttpParams {
+    const org = sessionStorage.getItem('organization') || '';
+    return new HttpParams()
+      .set('project', org)
+      .set('isCached', 'true')
+      .set('adapter_instance', 'internal')
+      .set('interfacetype', interfacetype)
+      .set('cloud_provider', 'internal');
   }
 
   private mapToPipelineCards(pipelines: any[], defaultIcon: string): PipelineCard[] {

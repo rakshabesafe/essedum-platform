@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil, filter, map, take } from 'rxjs/operators';
 import { VibeStudioService } from '../services/vibe-studio.service';
-import { APP_TYPE_OPTIONS, AppType, VibeFile } from '../models/vibe-studio.models';
+import { APP_TYPE_OPTIONS, AppType, VibeFile, VibeModel } from '../models/vibe-studio.models';
 import { Services } from '@essedum/shared-lib';
 import { StreamingServices } from '@essedum/shared-lib';
 
