@@ -35,7 +35,6 @@ export class SidebarComponent implements OnInit {
         { label: "Datasets", icon: "table", url: "./data/datasets", children: [] },
         { label: "Models", icon: "superpowers", url: "./data/models", children: [] },
         { label: "Connections", icon: "plug", url: "./data/connections", children: [] },
-        { label: "Schemas", icon: "puzzle-piece", url: "./data/schemas", children: [] },
       ],
     },
     {
@@ -56,6 +55,7 @@ export class SidebarComponent implements OnInit {
         { label: "Apps", icon: "th-large", url: "./integration/apps", children: [] },
         { label: "Instances", icon: "server", url: "./integration/instances", children: [] },
         { label: "Jobs", icon: "tasks", url: "./integration/jobs", children: [] },
+        { label: "Schemas", icon: "puzzle-piece", url: "./integration/schemas", children: [] },
       ],
     },
     {
@@ -1128,13 +1128,13 @@ export class SidebarComponent implements OnInit {
     './aibrain/coreDatasources':'./data/connections',
     './aibrain/connections':    './data/connections',
     './aibrain/models':         './data/models',
-    './aibrain/schemas':        './data/schemas',
+    './aibrain/schemas':        './integration/schemas',
     // Data Ops — aip namespace variants (some DashConsts rows use ./aip/* instead of ./aibrain/*)
     './aip/datasets':           './data/datasets',
     './aip/datasources':        './data/connections',
     './aip/connections':        './data/connections',
     './aip/models':             './data/models',
-    './aip/schemas':            './data/schemas',
+    './aip/schemas':            './integration/schemas',
 
     // Agents (was aip_app / agent module)
     './aibrain/agent':          './agent/studio',

@@ -20,13 +20,13 @@ const LEGACY_REDIRECTS: Routes = [
   { path: 'aip/datasources',      redirectTo: 'data/connections',  pathMatch: 'full' },
   { path: 'aip/connections',      redirectTo: 'data/connections',  pathMatch: 'full' },
   { path: 'aip/models',           redirectTo: 'data/models',       pathMatch: 'full' },
-  { path: 'aip/schemas',          redirectTo: 'data/schemas',      pathMatch: 'full' },
+  { path: 'aip/schemas',          redirectTo: 'integration/schemas',      pathMatch: 'full' },
   { path: 'aibrain/datasets',     redirectTo: 'data/datasets',     pathMatch: 'full' },
   { path: 'aibrain/datasources',  redirectTo: 'data/connections',  pathMatch: 'full' },
   { path: 'aibrain/connections',  redirectTo: 'data/connections',  pathMatch: 'full' },
   { path: 'aibrain/coreDatasources', redirectTo: 'data/connections', pathMatch: 'full' },
   { path: 'aibrain/models',       redirectTo: 'data/models',       pathMatch: 'full' },
-  { path: 'aibrain/schemas',      redirectTo: 'data/schemas',      pathMatch: 'full' },
+  { path: 'aibrain/schemas',      redirectTo: 'integration/schemas',      pathMatch: 'full' },
 
   // Agents
   { path: 'aip/agent',            redirectTo: 'agent/studio',      pathMatch: 'full' },

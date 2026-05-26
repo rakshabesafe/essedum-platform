@@ -86,6 +86,13 @@ import { JobsService } from '../features/services/jobs.service';
 // swagger-custom
 import { SwaggerCustomComponent } from '../features/swagger-custom/swagger-custom.component';
 
+// Features: schema (moved from data-ops MFE 2026-05-26 per user request)
+import { SchemaComponent } from '../features/schema/schema.component';
+import { ModalConfigSchemaComponent } from '../features/schema/modal-config-schema/modal-config-schema.component';
+import { ModalConfigSchemaEditorComponent } from '../features/schema/modal-config-schema/modal-config-schema-editor/modal-config-schema-editor.component';
+import { ModalConfigSchemaHeaderComponent } from '../features/schema/modal-config-schema/modal-config-schema-header/modal-config-schema-header.component';
+import { SchemaRelationshipService } from '../features/schema/schema-relationship.service';
+
 // Migrated from legacy aip-app-ui (2026-05-25): salus iframe wrapper.
 // Dashboard moved to host (shell-app-ui/landing/dashboard) per MFE plan §1.
 import { SalusComponent } from '../features/salus/salus.component';
@@ -148,6 +155,11 @@ import { environment } from '../../environments/environment';
     InstanceDescriptionComponent,
     // jobs
     JobsComponent,
+    // schema (moved from data-ops 2026-05-26)
+    SchemaComponent,
+    ModalConfigSchemaComponent,
+    ModalConfigSchemaEditorComponent,
+    ModalConfigSchemaHeaderComponent,
     // swagger-custom
     SwaggerCustomComponent,
     // migrated from legacy aip-app-ui (dashboard moved to host)
@@ -223,6 +235,7 @@ import { environment } from '../../environments/environment';
     AdapterServices,
     EventsService,
     SchemaRegistryService,
+    SchemaRelationshipService,
     PipelineService,
     JobsService,
     RaiservicesService,

@@ -16,6 +16,9 @@ import { InstanceDescriptionComponent } from '../features/instance/instance-desc
 
 import { JobsComponent } from '../features/jobs/jobs.component';
 
+import { SchemaComponent } from '../features/schema/schema.component';
+import { ModalConfigSchemaComponent } from '../features/schema/modal-config-schema/modal-config-schema.component';
+
 // Migrated from legacy aip-app-ui (2026-05-25): salus iframe wrapper.
 // Dashboard moved to host (shell-app-ui/landing/dashboard) per MFE plan §1.
 import { SalusComponent } from '../features/salus/salus.component';
@@ -63,6 +66,16 @@ const routes: Routes = [
     path: 'jobs',
     children: [
       { path: '', component: JobsComponent },
+    ],
+  },
+
+  {
+    path: 'schemas',
+    children: [
+      { path: '', component: SchemaComponent },
+      { path: 'create', component: ModalConfigSchemaComponent },
+      { path: 'view', component: ModalConfigSchemaComponent },
+      { path: 'edit', component: ModalConfigSchemaComponent },
     ],
   },
 ];

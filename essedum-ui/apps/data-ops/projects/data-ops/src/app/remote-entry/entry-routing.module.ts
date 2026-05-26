@@ -14,9 +14,6 @@ import { DatasourceComponent } from '../features/datasource/datasource.component
 import { DatasourceConfigComponent } from '../features/datasource/datasource-config/datasource-config.component';
 import { ConnectionViewComponent } from '../features/datasource/connection-view/connection-view.component';
 
-import { SchemaComponent } from '../features/schema/schema.component';
-import { ModalConfigSchemaComponent } from '../features/schema/modal-config-schema/modal-config-schema.component';
-
 // Routes are mounted at /data/** by the host (manifest entry data-ops.routePath = 'data').
 // RouterModule.forChild ONLY — never forRoot in a remote.
 const routes: Routes = [
@@ -63,16 +60,6 @@ const routes: Routes = [
       { path: 'view/:name/:view', component: ConnectionViewComponent },
       { path: 'edit/:name/:edit', component: ConnectionViewComponent },
       { path: 'preview/:name', component: ConnectionViewComponent },
-    ],
-  },
-
-  {
-    path: 'schemas',
-    children: [
-      { path: '', component: SchemaComponent },
-      { path: 'create', component: ModalConfigSchemaComponent },
-      { path: 'view', component: ModalConfigSchemaComponent },
-      { path: 'edit', component: ModalConfigSchemaComponent },
     ],
   },
 ];
