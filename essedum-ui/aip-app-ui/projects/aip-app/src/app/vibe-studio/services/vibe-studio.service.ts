@@ -424,7 +424,18 @@ export class VibeStudioService implements OnDestroy {
     this.http.post(url,
       { session_id: this.session.id, provider, model },
       { headers: this.getHttpHeaders() },
-    ).subscribe({ error: () => {} });
+    ).subscribe({
+      error: () => {
+        const errMsg: VibeChatMessage = {
+          role: 'assistant',
+          content: '⚠️ Failed to update the agent/model configuration. Please check your selection and try again.',
+          timestamp: new Date(),
+        };
+        this.session.messages.push(errMsg);
+        this.messages$.next([...this.session.messages]);
+        this.status$.next('error');
+      },
+    });
   }
 
   // ─── Goose reply SSE stream ──────────────────────────────────────────────────
@@ -483,6 +494,12 @@ export class VibeStudioService implements OnDestroy {
                 this.tokenStream$.next(chunk);
                 this.updateStreamingAssistantMessage(assistantText);
               });
+              // If the stream closed with no content, surface an error in the chat panel.
+              if (!assistantText.trim()) {
+                assistantText = '⚠️ The agent did not return a response. This could be a model configuration issue or the agent may be unavailable. Please check your agent/model selection and try again.';
+                this.updateStreamingAssistantMessage(assistantText);
+                this.status$.next('error');
+              }
               this.finaliseAssistantMessage(assistantText);
               return;
             }
@@ -498,7 +515,11 @@ export class VibeStudioService implements OnDestroy {
             read();
           }).catch((err: any) => {
             if (err?.name !== 'AbortError') {
+              const errMsg = '⚠️ Connection to the agent was interrupted. Please try again.';
+              if (!assistantText.trim()) assistantText = errMsg;
+              this.updateStreamingAssistantMessage(assistantText);
               this.finaliseAssistantMessage(assistantText);
+              this.status$.next('error');
             }
           });
         };

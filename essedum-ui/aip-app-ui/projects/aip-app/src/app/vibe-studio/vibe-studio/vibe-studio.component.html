@@ -30,52 +30,59 @@
       </div>
     </div>
 
-    <!-- Step 1: Agent selector (loaded from /config/providers) -->
-    <div class="model-picker-section">
-      <div class="model-picker-label">
-        <span class="step-badge">1</span>
-        <span>Choose agent</span>
-      </div>
-      <div class="model-picker-dropdown">
-        <div *ngIf="providersLoading" class="providers-loading">
-          <i class="bi bi-arrow-repeat providers-loading-spin"></i>
-          Loading agents...
-        </div>
-        <div *ngIf="!providersLoading" class="provider-select-wrap">
-          <select
-            class="provider-select"
-            [(ngModel)]="selectedAgent"
-            (ngModelChange)="onAgentSelect($event)"
-          >
-            <option [ngValue]="null" disabled>Select an agent…</option>
-            <option *ngFor="let p of providerOptions" [value]="p.value">{{ p.label }}</option>
-          </select>
-          <i class="bi bi-chevron-down provider-select-chevron"></i>
-        </div>
-      </div>
-    </div>
+    <!-- Steps 1 & 2: Agent + Model in a compact inline row -->
+    <div class="steps-row">
 
-    <!-- Step 2: Model selector (unlocked after agent selected) -->
-    <div class="model-picker-section">
-      <div class="model-picker-label" [class.model-picker-label--inactive]="!selectedAgent">
-        <span class="step-badge" [class.step-badge--inactive]="!selectedAgent">2</span>
-        <span>Choose model</span>
-        <span *ngIf="!selectedAgent" class="step-hint">← Select an agent first</span>
-      </div>
-      <div class="model-picker-dropdown" [class.picker-section--locked]="!selectedAgent">
-        <div class="provider-select-wrap">
-          <select
-            class="provider-select"
-            [(ngModel)]="selectedModel"
-            (ngModelChange)="onModelSelect($event)"
-            [disabled]="!selectedAgent"
-          >
-            <option [ngValue]="null" disabled>Select a model…</option>
-            <option *ngFor="let m of modelOptions" [value]="m.value">{{ m.label }}</option>
-          </select>
-          <i class="bi bi-chevron-down provider-select-chevron"></i>
+      <!-- Step 1: Agent -->
+      <div class="step-col">
+        <div class="model-picker-label">
+          <span class="step-badge">1</span>
+          <span>Agent</span>
+        </div>
+        <div class="model-picker-dropdown">
+          <div *ngIf="providersLoading" class="providers-loading">
+            <i class="bi bi-arrow-repeat providers-loading-spin"></i>
+            Loading…
+          </div>
+          <div *ngIf="!providersLoading" class="provider-select-wrap">
+            <select
+              class="provider-select"
+              [(ngModel)]="selectedAgent"
+              (ngModelChange)="onAgentSelect($event)"
+            >
+              <option [ngValue]="null" disabled>Select agent…</option>
+              <option *ngFor="let p of providerOptions" [value]="p.value">{{ p.label }}</option>
+            </select>
+            <i class="bi bi-chevron-down provider-select-chevron"></i>
+          </div>
         </div>
       </div>
+
+      <div class="steps-row-sep"><i class="bi bi-chevron-right"></i></div>
+
+      <!-- Step 2: Model (locked until agent chosen) -->
+      <div class="step-col" [class.step-col--locked]="!selectedAgent">
+        <div class="model-picker-label" [class.model-picker-label--inactive]="!selectedAgent">
+          <span class="step-badge" [class.step-badge--inactive]="!selectedAgent">2</span>
+          <span>Model</span>
+          <span *ngIf="!selectedAgent" class="step-hint">← pick agent first</span>
+        </div>
+        <div class="model-picker-dropdown">
+          <div class="provider-select-wrap">
+            <select
+              class="provider-select"
+              [(ngModel)]="selectedModel"
+              (ngModelChange)="onModelSelect($event)"
+              [disabled]="!selectedAgent"
+            >
+              <option [ngValue]="null" disabled>Select model…</option>
+              <option *ngFor="let m of modelOptions" [value]="m.value">{{ m.label }}</option>
+            </select>
+            <i class="bi bi-chevron-down provider-select-chevron"></i>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Step 3: App type cards (locked until both step 1 + 2 done) -->
