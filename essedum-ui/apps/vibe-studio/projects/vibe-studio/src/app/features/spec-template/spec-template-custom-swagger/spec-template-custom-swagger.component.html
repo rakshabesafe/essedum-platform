@@ -1,0 +1,182 @@
+<div>
+    <div class="spec-view-slider">
+        <div class="lfx-u-pad-r-16" [ngStyle]="{'color': (!swaggerView) ? 'grey' : '#0094ff'}">Swagger View</div>
+        <mat-slider [disabled]="disabled" class="slider-toggle-width" min="0" max="1" step="1">
+            <input matSliderThumb [value]="swaggerView ? 0 : 1" (input)="toggle()" aria-label="Toggle Swagger/JSON View" />
+        </mat-slider>
+        <div class="lfx-u-pad-l-16" [ngStyle]="{'color': (swaggerView) ? 'grey' : '#0094ff'}">JSON View</div>
+    </div>
+
+    <div class="spec-view-content">
+        <div *ngIf="swaggerView">
+            <div *ngIf="apispecTemplate">
+                <div class="spec-header">
+                    <section class="block col-12">
+                        <div *ngIf="apispecTemplate && apispecTemplate.info">
+                            <h2 class="spec-header.title" style="padding-top: 10px;color: #FFFFFF;">
+                                {{Essedum}} {{essedumTitle}}
+                                <span>
+                                    <small><pre>{{apispecTemplate && apispecTemplate.info.version}}</pre></small>
+                                    <small><pre>OAS3</pre></small>
+                                </span>
+                            </h2>
+                        </div>
+                        <div *ngIf="!apispecTemplate || !apispecTemplate.info">
+                            <h2 class="spec-header.title" style="padding-top: 10px;color: #FFFFFF;">
+                                Empty or Invalid Api Spec
+                                <span>
+                                    <small><pre>0</pre></small>
+                                    <small><pre>OAS3</pre></small>
+                                </span>
+                            </h2>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="spec-body">
+                    <div class="lfx-u-mar-tb-8">
+                        <span class="lfx-u-servers">Servers</span>
+                        <mat-form-field appearance="fill" class="wd-350 custom-alias-field" subscriptSizing="dynamic">
+                            <mat-select [(value)]="serverUrl" (selectionChange)="selectChange($event)"
+                                (openChange)="onServerUrlChange($event)">
+                                <mat-option *ngFor="let option of serverUrls" [value]="option.value">
+                                    {{ option.value }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <mat-accordion class="example-headers-align" multi>
+                        <mat-expansion-panel *ngFor="let spec of formattedapispec; let i=index">
+                            <mat-expansion-panel-header class="exp-header" style="height: 45px; margin-bottom: 1%">
+                                <mat-panel-title>
+                                    <span class="opblock-summary-method">{{spec.requestType}}</span>
+                                </mat-panel-title>
+                                <mat-panel-description>{{spec.path}}</mat-panel-description>
+                            </mat-expansion-panel-header>
+
+                            <div class="opblock-section-header">
+                                <div class="tab-header">
+                                    <h4 class="opblock-title">Parameters</h4>
+                                </div>
+                                <button *ngIf="executionRequired" class="btn try-out_btn" (click)="clickBtn(spec)"
+                                    style="margin-left:55%;">{{spec['button']}}</button>
+                                <div *ngIf="isAdapter">
+                                    <div *ngIf="existingPaths.indexOf(spec.path+spec.requestType)>-1" style="display: flex;">
+                                        <ul class="d-flex justify-content-between align-items-center">
+                                            <li>
+                                                <mat-icon class="aip-led-icons aip-cursor mx-2"
+                                                    (click)="editMethod(spec)" matTooltip="Edit"
+                                                    [matTooltipPosition]="tooltipPosition" style="cursor: pointer">edit</mat-icon>
+                                            </li>
+                                            <li>
+                                                <mat-icon class="aip-led-icons aip-cursor mx-2"
+                                                    (click)="deleteMethod(spec)" matTooltip="Delete"
+                                                    [matTooltipPosition]="tooltipPosition" style="cursor: pointer">delete</mat-icon>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div *ngIf="spec.parameters || spec.requestBody" class="exp-body">
+                                <div class="param-col-header">
+                                    <span class="param-col-name">Name</span>
+                                    <span class="param-col-desc">Description</span>
+                                </div>
+                                <mat-divider></mat-divider>
+
+                                <div *ngIf="spec.parameters">
+                                    <div *ngFor="let param of spec.parameters" class="param-row">
+                                        <span class="param-name">{{param.name}}</span>
+                                        <span class="param-desc">{{param.description}}</span>
+                                        <div class="param-input-wrap" *ngIf="spec['button']=='Try it out'">
+                                            <input type="text" class="param-input" disabled placeholder="" value="{{param.name}}">
+                                        </div>
+                                        <div class="param-input-wrap" *ngIf="spec['button']=='Cancel'">
+                                            <input type="text" class="param-input" placeholder="" value="{{param.name}}"
+                                                [(ngModel)]="param['value']">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="spec.requestBody && spec.requestType=='POST'" class="param-row">
+                                    <span class="param-name">body</span>
+                                    <span class="param-desc">{{spec.requestBody.description}}</span>
+                                    <div class="param-body-section">
+                                        <textarea class="param-textarea param-textarea--disabled"
+                                            [(ngModel)]="spec.requestBody['value']" disabled
+                                            *ngIf="spec['button']=='Try it out'" rows="5"></textarea>
+                                        <textarea class="param-textarea"
+                                            [(ngModel)]="spec.requestBody['value']"
+                                            *ngIf="spec['button']=='Cancel'" rows="5"></textarea>
+                                    </div>
+                                    <div class="param-content-type">
+                                        <select class="content-type-select">
+                                            <option value="application/json">application/json</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="!spec.parameters && !spec.requestBody" class="no-params">No Parameters</div>
+
+                                <div *ngIf="spec['button']=='Cancel'" class="execute-section">
+                                    <button class="save-btn" (click)="execute(spec)">Execute</button>
+                                    <button *ngIf="spec['executeFlag']" class="cancel-btn"
+                                        (click)="spec['executeFlag']=false">Clear</button>
+                                </div>
+                            </div>
+
+                            <div *ngIf="spec.responses">
+                                <div class="opblock-section-header">
+                                    <div class="tab-header">
+                                        <h4 class="opblock-title">Responses</h4>
+                                    </div>
+                                </div>
+                                <div class="exp-body">
+                                    <div class="param-col-header">
+                                        <span class="param-col-name">Code</span>
+                                        <span class="param-col-desc">Details</span>
+                                    </div>
+                                    <mat-divider></mat-divider>
+                                    <pre *ngIf="spec['executeFlag']" class="response-pre">{{response | json}}</pre>
+                                </div>
+                            </div>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+
+                    <section class="models">
+                        <mat-accordion>
+                            <mat-expansion-panel>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title><h4>Schemas</h4></mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <mat-divider></mat-divider>
+                                <div class="model-container">
+                                    <mat-expansion-panel>
+                                        <mat-expansion-panel-header>
+                                            <mat-panel-title><h5>input</h5></mat-panel-title>
+                                        </mat-expansion-panel-header>
+                                        <mat-panel-description>{{schema && schema.input}}</mat-panel-description>
+                                    </mat-expansion-panel>
+                                    &nbsp;&nbsp;
+                                    <mat-expansion-panel>
+                                        <mat-expansion-panel-header>
+                                            <mat-panel-title><h5>output</h5></mat-panel-title>
+                                        </mat-expansion-panel-header>
+                                        <mat-panel-description>{{schema && schema.output}}</mat-panel-description>
+                                    </mat-expansion-panel>
+                                </div>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!swaggerView">
+            <json-editor [options]="editorOptions" [data]="data.apispectemplate" style="height: 450px;"
+                #formJsonEditor class="cipJSONEditor"></json-editor>
+        </div>
+    </div>
+</div>

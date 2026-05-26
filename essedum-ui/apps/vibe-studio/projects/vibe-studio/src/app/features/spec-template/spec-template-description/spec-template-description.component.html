@@ -1,0 +1,149 @@
+<div *ngIf="card" class="aip-container lfx-l-level2-middle-ctr lfx-u-pad-lr-24">
+
+    <app-aip-header [cardTitle]="cardTitle" [cardName]="domainName | titlecase" [action]="'view-details'"
+        [backAction]="true" [closeAction]="false" [showRelatedInstances]="showRelatedAdapters"
+        (navigateBack)="toggler()" (edit)="redirectToEdit()(content3)" (delete)="deleteSpecTemplate(card?.name)"
+        (zoom)="listToggle()">
+    </app-aip-header>
+    <mat-card class="lfx-schema-card">
+        <mat-tab-group id="schema-modal-tabs" class="tabs-left-aligned" mat-stretch-tabs="false"
+            (selectedIndexChange)="basicReqTabChange($event)">
+
+            <!-- Details Tab -->
+            <mat-tab label="Details" data-tab-id="Instance-Details">
+                <div class="tab_content" id="tabContent_0">
+                    <div class="lfx-u-mar-t-8 container-fluid row">
+                        <div class="field-display col-md-12">
+                            <div class="lfx-u-body-sm mt-3">
+                                Description
+                            </div>
+                            <div class="lfx-u-body-xl my-4" style="min-height: 6rem;">
+                                {{card?.description}}
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <hr class="aip-line" />
+                            <div class="row">
+                                <div class="field-display aip-createdBy col-md-6">
+                                    <div class="lfx-u-body-sm aip-label-color">CreatedBy
+                                    </div>
+                                    <div class="flex mt-2 align-items-center ">
+                                        <div class="lfx-c-avatar  lfx-c-avatar--sm" style="margin: 0 1rem 0 0;">
+                                            {{getShortName(card?.createdby)}}</div>
+                                        <div class="lfx-u-body-md lfx-u-mar-lr-8">
+                                            {{card?.createdby}}</div>
+                                    </div>
+                                </div>
+                                <div class="field-display col-md-6">
+                                    <div class="lfx-u-body-sm aip-label-color">Created
+                                        On
+                                    </div>
+                                    <div class="lfx-u-body-md mt-3">{{card?.createdon}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-tab>
+            <mat-tab label="API Spec" data-tab-id="Instance-APISpec">
+
+                <app-spec-template-custom-swagger [data]="card"
+                    [isAdapter]="isAdapter"></app-spec-template-custom-swagger>
+
+            </mat-tab>
+        </mat-tab-group>
+    </mat-card>
+    <ng-template #editModal let-modal>
+        <app-adapter-create-edit [data]=card [action]="editAction"></app-adapter-create-edit>
+    </ng-template>
+    <div *ngIf="showRelatedAdapters" class="lfx-l-level2-right-col lfx-u-pad-t-10">
+        <mat-card class="lfx-related-card" *ngIf="relatedAdapters.length > 0; else noRelatedAdapters">
+            <div class="lfx-u-header-lg lfx-u-pad-tb-16 lfx-u-pad-l-32 customHeader"> Related
+                Components </div>
+            <div class="aip-filter aip-scroll-hover">
+                <div type="default" styleClass="" contentClass="">
+                    <div class="lfx-c-panel__content">
+                        <div class="lfx-u-pad-16">
+                            <mat-list position="left" [selectOnClick]="true">
+                                <li class="aip-daa" *ngFor="let component of relatedAdapters">
+                                    <div class="aip-related-list" (click)="redirectToSelectedComponent(component)">
+                                        <div class="lfx-u-pad-8 aip-cursor">
+                                            <div class="aip-related-component-ellipsis">
+                                                <span
+                                                    class="lfx-c-nav__nomar lfx-u-header-xl lfx-u-text-neutral-80">{{component.value}}</span>
+                                            </div>
+                                            <div class="lfx-c-badge float-end lfx-c-badge--active aip-related-badge">
+                                                <div>
+                                                    <span [matTooltip]="'Related Implementation'"
+                                                        [matTooltipPosition]="tooltipPosition">{{component.viewValue}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="aip-daa" *ngFor="let component of relatedInstances">
+                                    <div class="aip-related-list row lfx-u-pad-tb-8">
+                                        <div class="col-md-12 lfx-u-no-pad-lr flex justify-content-between">
+                                            <div class="aip-cursor lfx-u-pad-l-24 aip-related-component-ellipsis col-md-7"
+                                                (click)="redirectToSelectedComponent(component)">
+                                                <span
+                                                    class="lfx-c-nav__nomar lfx-u-header-xl lfx-u-text-neutral-80">{{component.value}}</span>
+                                            </div>
+                                            <div class="col-md-5 float-end flex">
+                                                <div class="lfx-c-badge lfx-c-badge--warning">
+                                                    <span [matTooltip]="'Related Instance'"
+                                                        [matTooltipPosition]="tooltipPosition">{{component.viewValue}}</span>
+                                                </div>
+                                                <ng-container *ngIf="executionRequired">
+                                                    <button mat-button [matMenuTriggerFor]="overflowMenu"
+                                                        class="aip-cursor lfx-u-pad-l-8 d-inline-block">
+                                                        {{ priorityMapIns[component.value] ||
+                                                        '-' }}
+                                                    </button>
+                                                    <mat-menu #overflowMenu="matMenu">
+                                                        <button mat-menu-item (click)="setDefault(component)">
+                                                            <span class="lfx-u-mar-l-8">setDefault</span>
+                                                        </button>
+                                                        <button mat-menu-item>
+                                                            <span class="lfx-u-mar-l-8">changeOrder</span>
+                                                            <mat-form-field appearance="fill" class="ml-2"
+                                                                style="width: 80px; margin-left: 8px;">
+                                                                <mat-select
+                                                                    [(ngModel)]="priorityMapIns[component.value]"
+                                                                    (selectionChange)="changePriority($event, component)">
+                                                                    <mat-option
+                                                                        *ngFor="let num of [].constructor(nOfIns); let i = index"
+                                                                        [value]="i+1">
+                                                                        {{ i+1 }}
+                                                                    </mat-option>
+                                                                </mat-select>
+                                                            </mat-form-field>
+                                                        </button>
+                                                    </mat-menu>
+                                                </ng-container>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </mat-list>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+        <ng-template #noRelatedAdapters>
+            <mat-card class="lfx-related-card">
+                <div class="lfx-u-body-md lfx-u-text-neutral-80 lfx-u-line-2 aip-desc-ellipsis lfx-u-pad-tb-16">
+                    <div class="flex justify-content-center align-items-center flex-column">
+                        <img src="assets/images/aip_empty_state_leds.svg" class="img-responsive img-color"
+                            alt="aip_empty_state_leds" style="width:15rem" />
+                        No Related Components
+                    </div>
+                </div>
+            </mat-card>
+        </ng-template>
+    </div>
+
+</div>

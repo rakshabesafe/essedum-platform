@@ -1,0 +1,52 @@
+<div class="aip-container lfx-u-pad-lr-24">
+    <app-aip-header [cardTitle]="CARD_TITLE" [action]="'edit'" [backAction]="true" (navigateBack)="navigateBack()">
+    </app-aip-header>
+
+
+    <div>
+        <!-- Name Field -->
+        <div class="lfx-u-mar-t-16 lfx-u-pad-b-8">
+            <div class="lfx-u-sub-header-alias">
+                Name
+                <span class="required-indicator">*</span>
+            </div>
+            <mat-form-field appearance="fill" class="w-100 custom-alias-field" subscriptSizing="dynamic">
+                <input matInput id="schm-modal-alias" [disabled]="false" [(ngModel)]="data.domainname" required
+                    (ngModelChange)="domainNameChanges($event)" placeholder="Name" readonly class="custom-alias-input">
+            </mat-form-field>
+        </div>
+
+        <!-- Description Field -->
+        <div class="lfx-u-pad-b-8">
+            <div class="lfx-u-sub-header-alias">Description</div>
+            <mat-form-field appearance="fill" class="w-100 custom-alias-field" subscriptSizing="dynamic">
+                <input matInput id="schm-modal-description" [(ngModel)]="data.description" placeholder="Description"
+                    class="custom-alias-input">
+            </mat-form-field>
+        </div>
+
+        <!-- Capability Field -->
+        <div class="lfx-u-pad-b-8">
+            <div class="lfx-u-sub-header-alias"> Capability </div>
+            <mat-form-field appearance="fill" class="w-100 custom-alias-field" subscriptSizing="dynamic">
+                <mat-select id="column-type-select" [(ngModel)]="data.capability" placeholder="Select Capability"
+                    (selectionChange)="selectChange($event)">
+                    <mat-option *ngFor="let option of capabilityList" [value]="option.value">
+                        {{ option.viewValue }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <!-- JSON Editor -->
+        <json-editor [options]="editorOptions" [data]="data.apispectemplate" #formJsonEditor
+            class="cipJSONEditor"></json-editor>
+
+
+        <div mat-dialog-actions class="dialog-actions">
+            <button class="save-btn" (click)="editSpecTemplate()">
+                Update
+            </button>
+        </div>
+    </div>
+</div>
