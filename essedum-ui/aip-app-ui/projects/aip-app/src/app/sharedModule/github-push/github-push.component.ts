@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { GitHubService } from '../services/github.service';
 import { GitHubRepository, PushRequest, PullRequest } from '../models/github.models';
 import { AgentPipelineService } from '../../agent-pipeline/agent-pipeline.service';
@@ -43,53 +43,68 @@ export class GitHubPushComponent implements OnInit {
   constructor(private githubService: GitHubService,
     private agentPipelineService: AgentPipelineService,
     private service: Services,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
-    this.checkAuthStatus();
+    // Defer auth check to avoid blocking the UI on dialog open.
+    // Restore cached session data so the component is ready instantly.
+    const cachedUsername = sessionStorage.getItem('git_username');
+    if (cachedUsername) {
+      this.username = cachedUsername;
+      this.isAuthenticated = true;
+    }
   }
 
   /**
-   * Check if user is already authenticated
+   * Check if user is already authenticated (called lazily on modal open)
    */
   checkAuthStatus(): void {
+    this.isLoading = true;
+    this.cdr.detectChanges();
     this.githubService.checkAuthStatus().subscribe({
       next: (status) => {
         this.isAuthenticated = status.authenticated;
+        this.isLoading = false;
         if (status.authenticated && status.githubUsername) {
           this.username = status.githubUsername;
-
-          // Store username in sessionStorage
           sessionStorage.setItem('git_username', this.username);
-          //this.updateGitHubConfig();
-
-          this.loadRepositories();
+          // Only load repositories in push mode (pull mode uses a URL input)
+          if (this.mode === 'push') {
+            this.loadRepositories();
+          }
+        } else {
+          // Not authenticated — automatically start OAuth login flow
+          this.login();
         }
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error checking auth status:', error);
+        this.isLoading = false;
+        // Attempt login anyway so the user can authenticate
+        this.login();
+        this.cdr.detectChanges();
       }
     });
   }
 
   /**
-   * Open modal
+   * Open modal — auth check is deferred until here so dialog opening is instant
    */
   openModal(): void {
     this.errorMessage = '';
     this.successMessage = '';
+    this.showModal = true;
+    this.cdr.detectChanges(); // Paint the modal immediately
 
-    // Both push and pull modes require authentication
+    // If we don't have a confirmed auth state yet, check now (user already clicked the button)
     if (!this.isAuthenticated) {
-      // User needs to login - trigger login automatically
-      this.login();
+      this.checkAuthStatus();
       return;
     }
 
-    // User already authenticated, show modal
-    this.showModal = true;
-    
-    // Load repositories for push mode
+    // Already authenticated via cache — load repos for push mode if not loaded yet
     if (this.mode === 'push' && this.repositories.length === 0) {
       this.loadRepositories();
     }
@@ -123,24 +138,23 @@ export class GitHubPushComponent implements OnInit {
   login(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     this.githubService.initiateOAuthFlow().subscribe({
       next: (status) => {
         this.isLoading = false;
         this.isAuthenticated = true;
         this.username = status.githubUsername || '';
-
-        // // Store username in sessionStorage
-        // sessionStorage.setItem('git_username', this.username);
-        //this.updateGitHubConfig();
-
+        sessionStorage.setItem('git_username', this.username);
         this.showModal = true;
+        this.cdr.detectChanges();
         this.loadRepositories();
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = error.message || 'Authentication failed. Please try again.';
-        this.showModal = true; // Show modal with error message
+        this.showModal = true;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -150,34 +164,27 @@ export class GitHubPushComponent implements OnInit {
    */
   logout(): void {
     this.isLoading = true;
+    this.cdr.detectChanges();
     this.githubService.logout().subscribe({
       next: () => {
-        // Clear local state
         this.isAuthenticated = false;
         this.username = '';
         this.repositories = [];
         this.branches = [];
         this.resetForm();
         this.isLoading = false;
-
-        // Clear sessionStorage
-        // sessionStorage.removeItem('git_username');
-        // sessionStorage.removeItem('git_selected_Repo');
-        // sessionStorage.removeItem('git_selected_branch');
-        // sessionStorage.removeItem('github_config');
-
-        // Show message to user about logging out from GitHub
         this.successMessage = 'Logged out successfully. Next login will prompt for account selection.';
+        this.cdr.detectChanges();
         setTimeout(() => {
           this.successMessage = '';
+          this.cdr.detectChanges();
         }, 3000);
-
-        // Keep modal open to allow login to different account
       },
       error: (error) => {
         console.error('Logout error:', error);
         this.isLoading = false;
         this.errorMessage = 'Failed to logout. Please try again.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -188,15 +195,18 @@ export class GitHubPushComponent implements OnInit {
   loadRepositories(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     this.githubService.getRepositories().subscribe({
       next: (repos) => {
         this.repositories = repos;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'Failed to load repositories: ' + error.message;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -230,16 +240,13 @@ export class GitHubPushComponent implements OnInit {
         if (!this.selectedBranch || !branches.includes(this.selectedBranch)) {
           this.selectedBranch = branches.length > 0 ? branches[0] : '';
         }
-
-        // Store selected branch in sessionStorage
-        //sessionStorage.setItem('git_selected_branch', this.selectedBranch);
-        //this.updateGitHubConfig();
-
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'Failed to load branches: ' + error.message;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -297,10 +304,12 @@ export class GitHubPushComponent implements OnInit {
         this.branches = branches;
         this.selectedBranch = branches.length > 0 ? branches[0] : '';
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'Failed to load branches: ' + (error.error?.message || error.message || 'Repository may not exist or is not public');
+        this.cdr.detectChanges();
       }
     });
   }
@@ -377,12 +386,14 @@ export class GitHubPushComponent implements OnInit {
           next: (response) => {
             this.isLoading = false;
             this.successMessage = response;
+            this.cdr.detectChanges();
             this.saveGitConfig();
-            setTimeout(() => this.closeModal(), 2000);
+            setTimeout(() => { this.closeModal(); this.cdr.detectChanges(); }, 2000);
           },
           error: (error) => {
             this.isLoading = false;
             this.errorMessage = 'Push failed: ' + (error.error || error.message);
+            this.cdr.detectChanges();
           }
         });
       },
@@ -421,26 +432,25 @@ export class GitHubPushComponent implements OnInit {
 
     this.githubService.pullFromGitHub(request).subscribe({
       next: (response) => {
-        console.log('Pull response:', response);
         this.successMessage = 'Successfully pulled from GitHub! Creating ZIP file...';
+        this.cdr.detectChanges();
 
-        // Convert files to ZIP
         this.createZipFromPulledFiles(response.files).then((zipFile) => {
           this.isLoading = false;
           this.successMessage = 'ZIP file created successfully!';
-
-          // Emit the zip file for parent component to handle upload
+          this.cdr.detectChanges();
           this.zipFileCreated.emit(zipFile);
-
-          setTimeout(() => this.closeModal(), 2000);
+          setTimeout(() => { this.closeModal(); this.cdr.detectChanges(); }, 2000);
         }).catch((error) => {
           this.isLoading = false;
           this.errorMessage = 'Failed to create ZIP file: ' + error.message;
+          this.cdr.detectChanges();
         });
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'Pull failed: ' + (error.error?.message || error.message || 'Unknown error');
+        this.cdr.detectChanges();
       }
     });
   }

@@ -1,0 +1,29 @@
+{
+  "_comment": "Edit this file to add or remove items from the 'App Modules' dropdown in the sidebar. Each item must also exist in the sidebar menu (fetched from the backend). The 'label' must exactly match the sidebar menu label.",
+  "advancedMenuItems": [
+    {
+      "label": "Agent Designer",
+      "description": "Design AI agent workflows"
+    },
+    {
+      "label": "Lite LLM",
+      "description": "Manage LLM proxy & routing"
+    },
+    {
+      "label": "Langfuse",
+      "description": "Monitor & trace LLM calls"
+    },
+    {
+      "label": "Salus",
+      "description": "Security & compliance hub"
+    },
+    {
+      "label": "Apps",
+      "description": "Browse & launch applications"
+    },
+    {
+      "label": "App List",
+      "description": "Browse & launch applications"
+    }
+  ]
+}
