@@ -1,0 +1,118 @@
+
+<div class="aip-container lfx-u-pad-lr-30" id="mainCtr">
+    <!-- Header Section -->
+    <app-aip-header [cardTitle]="cardTitle" [lastRefreshedTime]="lastRefreshedTime" [showAddButton]="editAuth"
+        (search)="searchApp($event)" (refresh)="ngOnInit()" (add)="openAddedit(false)">
+    </app-aip-header>
+
+    <!-- Filter Section -->
+    <app-aip-filter [tagrefresh]="tagrefresh" [servicev1]="'apps'" [selectedAppTypeList]="{
+                        selectedTagType: selectedTagType,
+                        selectedTag : selectedTag
+                      }" (tagSelected)="tagSelectedEvent($event)"
+        (filterStatusChange)="onFilterStatusChange($event)"></app-aip-filter>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" role="status" aria-label="Loading cards">
+        <app-aip-loading></app-aip-loading>
+    </div>
+
+    <!-- Content Area (only shown when not loading) -->
+    <ng-container *ngIf="!loading">
+
+        <!-- Cards container -->
+        <div *ngIf="appData.length>0" class="row" style='min-width: -webkit-fill-available;padding: 0px;'>
+            <div class="col-4" *ngFor="let app of appData,let index=index" style="margin-bottom: 2%;">
+                <div style="display: block">
+                    <mat-card class="mat-mdc-card mdc-card lfx-c-card example-card card-shadow"
+                        [class.is-hovered]="app.hover || menuOpenIndex === index"
+                        appearance="outlined"
+                        (mouseenter)="app.hover = true"
+                        (mouseleave)="app.hover = false">
+
+                        <!-- Main content: title + description + image -->
+                        <div class="main-card-div">
+                            <div class="card-text-col">
+                                <mat-card-header class="mat-card-header-transition">
+                                    <mat-card-title class="lfx-card-header">{{app?.alias}}</mat-card-title>
+                                </mat-card-header>
+                                <mat-card-content class="lfx-app-description">
+                                    {{app?.description}}
+                                </mat-card-content>
+                            </div>
+                            <div class="card-image-col">
+                                <img *ngIf="app.image" class="lfx-card-image" [src]="app?.image"
+                                    alt="App image" />
+                                <img *ngIf="!app.image" class="lfx-card-image"
+                                    src="assets/images/apps_default_logo.jpeg"
+                                    alt="Default App Image" />
+                            </div>
+                        </div>
+
+                        <!-- Actions overlay — slides up from bottom on hover -->
+                        <div class="card-actions-overlay">
+                            <mat-card-actions class="card-actions-hover d-flex justify-content-between">
+
+                                <button mat-flat-button class="overview-btn"
+                                    (click)="openApp(app, 'overview')">
+                                    Overview
+                                </button>
+
+                                <button mat-icon-button class="button-hover"
+                                    (click)="openApp(app, 'runApp')"
+                                    matTooltip="Open App" [matTooltipPosition]="'above'">
+                                    <mat-icon class="embed_option">pan_tool_alt</mat-icon>
+                                </button>
+
+                                <div class="aip-cursor">
+                                    <div class="aip-hover-avatar lfx-c-avatar">
+                                        {{(app.target.created_by)|firstCharacter}}
+                                    </div>
+                                    <div class="aip-hover-detail">
+                                        <div class="lfx-u-header-md lfx-u-mar-8">{{app.target.created_by}}</div>
+                                    </div>
+                                </div>
+
+                                <div class="dropdown d-inline-block">
+                                    <mat-icon class="aip-cursor action-icon" [matMenuTriggerFor]="menu"
+                                        (menuOpened)="menuOpenIndex = index"
+                                        (menuClosed)="menuOpenIndex = null">
+                                        more_vert
+                                    </mat-icon>
+                                    <mat-menu #menu="matMenu">
+                                        <button mat-menu-item *ngIf="app.isvideoPresent"
+                                            (click)="openApp(app, 'video')">
+                                            Open Video
+                                        </button>
+                                        <button mat-menu-item *ngIf="app.scope=='pipeline'|| app.scope=='chain'"
+                                            (click)="navigate(app)">
+                                            Navigate
+                                        </button>
+                                        <button mat-menu-item *ngIf="editAuth" (click)="openAddedit(true,app)">
+                                            Edit
+                                        </button>
+                                        <button mat-menu-item (click)="deleteApp(index)">
+                                            Delete
+                                        </button>
+                                    </mat-menu>
+                                </div>
+
+                            </mat-card-actions>
+                        </div>
+
+                    </mat-card>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <app-aip-empty-state *ngIf="shouldShowEmptyState"></app-aip-empty-state>
+
+        <!-- Pagination -->
+        <app-aip-pagination *ngIf="shouldShowPagination" [pageNumber]="pageNumber" [noOfPages]="noOfPages"
+            [pageArr]="pageArr" [startIndex]="startIndex" [endIndex]="endIndex" [hoverStates]="hoverStates"
+            (prevPage)="prevPage()" (nextPage)="nextPage()" (changePage)="changePage($event)">
+        </app-aip-pagination>
+
+    </ng-container>
+</div>

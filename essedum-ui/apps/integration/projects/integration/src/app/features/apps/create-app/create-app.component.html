@@ -1,0 +1,88 @@
+<div class="dialog-wrapper">
+  <!-- Gradient accent top stripe -->
+  <div class="dialog-accent-bar"></div>
+
+  <!-- Header -->
+  <header class="dialog-header">
+    <h2 class="dialog-title">
+      App Details &ndash; {{ edit ? 'Update' : 'Create' }}
+    </h2>
+    <button class="close-btn" (click)="closeModal()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <!-- Body -->
+  <main class="dialog-body">
+    <form class="dialog-form">
+
+      <mat-form-field appearance="fill" class="full-width" floatLabel="always">
+        <mat-label>Display Name</mat-label>
+        <input matInput placeholder="Enter Name..." [(ngModel)]="alias" name="displayName" required *ngIf="!edit">
+        <input matInput placeholder="Enter Name..." [(ngModel)]="editCanvas.alias" name="displayNameEdit" required *ngIf="edit">
+        <mat-error *ngIf="edit && !editCanvas.alias">This field is required</mat-error>
+        <mat-error *ngIf="!edit && !alias">This field is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width" floatLabel="always">
+        <mat-label>Description</mat-label>
+        <input matInput placeholder="Enter App Description..." [(ngModel)]="description" name="description" *ngIf="!edit">
+        <input matInput placeholder="Enter App Description..." [(ngModel)]="editCanvas.description" name="descriptionEdit" *ngIf="edit">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width" floatLabel="always" *ngIf="edit">
+        <mat-label>Tryout Link</mat-label>
+        <input matInput placeholder="Paste your link..." [(ngModel)]="editCanvas.tryoutlink" name="tryoutLink">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width" floatLabel="always">
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="apptype" name="appType" required (selectionChange)="setAppType($event)" *ngIf="!edit">
+          <mat-option *ngFor="let type of appTypeList" [value]="type.value">{{ type.viewValue }}</mat-option>
+        </mat-select>
+        <mat-select [(ngModel)]="editCanvas.scope" name="appTypeEdit" required (selectionChange)="setAppType($event)" *ngIf="edit">
+          <mat-option *ngFor="let type of appTypeList" [value]="type.value">{{ type.viewValue }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="edit && !editCanvas.scope">This field is required</mat-error>
+        <mat-error *ngIf="!edit && !apptype">This field is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width" floatLabel="always" *ngIf="isUrl">
+        <mat-label>URL</mat-label>
+        <input matInput [(ngModel)]="link" name="url" required *ngIf="!edit">
+        <input matInput [(ngModel)]="editCanvas.url" name="urlEdit" required *ngIf="edit">
+        <mat-error *ngIf="edit && !editCanvas.url">This field is required</mat-error>
+        <mat-error *ngIf="!edit && !link">This field is required</mat-error>
+      </mat-form-field>
+
+      <!-- Logo Upload -->
+      <div class="logo-section">
+        <div class="logo-upload-card">
+          <div *ngIf="exceededSize" class="error-message">
+            <em class="error-text">Maximum upload file size: 250KB</em>
+          </div>
+          <div class="upload-header">
+            <span class="upload-label">Logo</span>
+            <label class="upload-icon-wrapper" for="logoUpload">
+              <input id="logoUpload" type="file" class="file-input" accept=".png,.jpg,.jpeg" (change)="onImageChange($event)">
+              <mat-icon>upload</mat-icon>
+            </label>
+          </div>
+          <img *ngIf="edit && finalImage" [src]="finalImage" alt="App Logo" class="uploaded-image">
+          <img *ngIf="!edit" #myImage alt="App Logo" class="uploaded-image"
+            [style.display]="uploader.queue.length > 0 ? 'block' : 'none'">
+        </div>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- Footer -->
+  <footer class="dialog-footer">
+    <button class="btn-cancel" type="button" (click)="closeModal()">Cancel</button>
+    <button class="btn-save" type="button" [disabled]="disableSave"
+      (click)="disableSave ? null : (edit ? editDetails() : saveDetails())">
+      {{ edit ? 'Update' : 'Save' }}
+    </button>
+  </footer>
+</div>

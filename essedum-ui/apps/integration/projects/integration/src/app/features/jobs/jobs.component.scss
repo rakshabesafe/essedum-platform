@@ -1,0 +1,153 @@
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; padding: 12px 20px; }
+.mt-3 { width: 100% !important; }
+
+// ── Table ─────────────────────────────────────────────────────────────────────
+table { width: 100% !important; border-collapse: collapse; }
+th {
+  padding: 10px 12px !important;
+  text-align: left !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #8b949e !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border-bottom: none !important;
+  background: rgba(88,166,255,0.03) !important;
+}
+td {
+  padding: 10px 12px !important;
+  text-align: left !important;
+  font-size: 12px !important;
+  color: #c9d1d9 !important;
+  border-bottom: none !important;
+}
+tr:hover td { background: rgba(88,166,255,0.04) !important; }
+
+// ── Total Jobs label ──────────────────────────────────────────────────────────
+span[style*="color"], .total-jobs { color: #58a6ff !important; font-size: 12px !important; font-weight: 600 !important; }
+.title-jobs { color: #58a6ff !important; font-size: 12px !important; font-weight: 600 !important; display: flex !important; align-items: center !important; justify-content: space-between !important; }
+.refresh-area { margin-left: auto !important; }
+.refresh-btn {
+  width: 30px !important;
+  height: 30px !important;
+  color: #8b949e !important;
+  transition: all 0.15s !important;
+  &:hover { color: #58a6ff !important; background: rgba(88,166,255,0.08) !important; }
+}
+
+// ── Refresh button ────────────────────────────────────────────────────────────
+button[mat-icon-button] {
+  width: 30px !important;
+  height: 30px !important;
+  color: #8b949e !important;
+  transition: all 0.15s !important;
+  &:hover { color: #58a6ff !important; background: rgba(88,166,255,0.08) !important; }
+}
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+.pagination-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 14px 0 !important;
+  border-top: 1px solid rgba(88,166,255,0.08) !important;
+  margin-top: 8px !important;
+
+  .pg-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(88,166,255,0.15) !important;
+    background: transparent !important;
+    color: #8b949e !important;
+    cursor: pointer !important;
+    transition: all 0.15s !important;
+    padding: 0 !important;
+
+    mat-icon {
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+    }
+
+    &:hover:not([disabled]) {
+      background: rgba(88,166,255,0.08) !important;
+      border-color: rgba(88,166,255,0.4) !important;
+      color: #58a6ff !important;
+    }
+    &[disabled] {
+      opacity: 0.3 !important;
+      cursor: not-allowed !important;
+    }
+  }
+
+  .pg-num {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 30px !important;
+    height: 30px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(88,166,255,0.12) !important;
+    background: transparent !important;
+    color: #8b949e !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    padding: 0 6px !important;
+    transition: all 0.15s !important;
+
+    &:hover {
+      background: rgba(88,166,255,0.08) !important;
+      border-color: rgba(88,166,255,0.3) !important;
+      color: #c9d1d9 !important;
+    }
+
+    &.active {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+      border-color: transparent !important;
+      color: #fff !important;
+      box-shadow: 0 2px 8px rgba(79,70,229,0.4) !important;
+    }
+  }
+}
+
+// ── Action icons in table ─────────────────────────────────────────────────────
+mat-icon, .mat-icon {
+  color: #8b949e !important;
+  cursor: pointer !important;
+  transition: color 0.15s !important;
+  font-size: 18px !important;
+  &:hover { color: #58a6ff !important; }
+}
+
+// ── Light theme ───────────────────────────────────────────────────────────────
+:host-context(body.header-light-theme) {
+  th { color: #64748b !important; border-bottom: none !important; background: rgba(71,66,220,0.03) !important; }
+  td { color: #334155 !important; border-bottom: none !important; }
+  tr:hover td { background: rgba(71,66,220,0.03) !important; }
+  span[style*="color"], .total-jobs { color: #4742dc !important; }
+
+  button[mat-icon-button] { color: #94a3b8 !important; &:hover { color: #4742dc !important; background: rgba(71,66,220,0.06) !important; } }
+
+  .pagination-bar {
+    border-top-color: #e2e8f0 !important;
+    .pg-btn {
+      border-color: rgba(71,66,220,0.15) !important;
+      color: #94a3b8 !important;
+      &:hover:not([disabled]) { background: rgba(71,66,220,0.06) !important; color: #4742dc !important; border-color: rgba(71,66,220,0.3) !important; }
+    }
+    .pg-num {
+      border-color: rgba(71,66,220,0.12) !important;
+      color: #64748b !important;
+      &:hover { background: rgba(71,66,220,0.04) !important; color: #4742dc !important; }
+      &.active { background: linear-gradient(135deg, #4742dc, #7c3aed) !important; color: #fff !important; border-color: transparent !important; }
+    }
+  }
+
+  mat-icon, .mat-icon { color: #94a3b8 !important; &:hover { color: #4742dc !important; } }
+}

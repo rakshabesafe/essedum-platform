@@ -1,0 +1,326 @@
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+// ── Material deep overrides (dark default) ────────────────────────────────────
+:host ::ng-deep mat-form-field,
+:host ::ng-deep .mat-mdc-form-field { width: 100% !important; min-width: 0 !important; }
+:host ::ng-deep .mat-mdc-text-field-wrapper { width: 100% !important; }
+:host ::ng-deep .mdc-text-field--filled {
+  background: rgba(255,255,255,0.07) !important;
+  border-radius: 10px 10px 0 0 !important;
+  transition: background 0.18s !important;
+}
+:host ::ng-deep .mdc-text-field--filled:hover { background: rgba(255,255,255,0.11) !important; }
+:host ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: rgba(79,142,247,0.13) !important; }
+:host ::ng-deep .mdc-floating-label { color: #7a9cbf !important; font-size: 13px !important; }
+:host ::ng-deep .mdc-floating-label--float-above { color: #7eb8ff !important; font-size: 11px !important; letter-spacing: 0.3px !important; }
+:host ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; font-size: 14px !important; }
+:host ::ng-deep textarea.mat-mdc-input-element { line-height: 1.6 !important; }
+:host ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(79,142,247,0.55) !important; }
+:host ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f8ef7 !important; }
+:host ::ng-deep mat-select .mat-mdc-select-value-text { color: #e2e8f0 !important; }
+:host ::ng-deep .mat-mdc-select-placeholder { color: #4d6882 !important; }
+:host ::ng-deep .mat-mdc-select-arrow { color: #4d6882 !important; }
+:host ::ng-deep .mat-mdc-form-field-hint { color: #7a9cbf !important; font-size: 11px !important; }
+:host ::ng-deep mat-error { color: #f87171 !important; font-size: 11px !important; }
+:host ::ng-deep mat-checkbox .mdc-label { color: #c8d8ea !important; font-size: 13.5px !important; }
+:host ::ng-deep mat-radio-button .mdc-label { color: #c8d8ea !important; font-size: 13px !important; }
+:host ::ng-deep mat-chip-row, :host ::ng-deep .mat-mdc-chip {
+  background: rgba(79,142,247,0.13) !important;
+  color: #b8cce0 !important;
+  border: 1px solid rgba(79,142,247,0.25) !important;
+}
+
+// ── Expansion panels (datasource form) ───────────────────────────────────────
+// ── Expansion panels (datasource form) ───────────────────────────────────────
+:host ::ng-deep mat-expansion-panel {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(79,142,247,0.12) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+:host ::ng-deep .mat-expansion-panel-header {
+  background: rgba(79,142,247,0.06) !important;
+  border-radius: 10px !important;
+  transition: background 0.18s !important;
+  &:hover { background: rgba(79,142,247,0.1) !important; }
+}
+:host ::ng-deep .mat-expansion-panel-body { color: #c8d8ea !important; }
+:host ::ng-deep mat-panel-title { color: #b8cce0 !important; font-size: 13px !important; font-weight: 600 !important; }
+
+// ── Main form glass panel ─────────────────────────────────────────────────────
+// ── Main form glass panel ─────────────────────────────────────────────────────
+.aip-container {
+  padding: 3px 26px 24px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: rgba(8,14,36,0.88) !important;
+  border: 1px solid rgba(79,142,247,0.16) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.05) inset !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+// Gradient accent top stripe on .aip-container
+.aip-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4f8ef7 0%, #234f99 55%, #0a1d61 100%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+// ── mat-card (for schema and other nested card contexts) ──────────────────────
+// ── mat-card (for schema and other nested card contexts) ──────────────────────
+mat-card, .mat-mdc-card {
+  background: rgba(8,14,36,0.92) !important;
+  border: 1px solid rgba(79,142,247,0.18) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05) inset !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  position: relative !important;
+}
+mat-card::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #4f8ef7 0%, #234f99 55%, #0a1d61 100%);
+  flex-shrink: 0;
+}
+
+// ── Section sub-labels ────────────────────────────────────────────────────────
+// ── Section sub-labels ────────────────────────────────────────────────────────
+.lfx-u-sub-header-alias {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #4d6882 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.2px !important;
+  margin-bottom: 8px !important;
+  padding-left: 10px !important;
+  position: relative !important;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 14px;
+    background: linear-gradient(180deg, #4f8ef7, #0a1d61);
+    border-radius: 2px;
+  }
+}
+
+.required-indicator { color: #f87171 !important; margin-left: 2px !important; }
+
+// ── Layout ────────────────────────────────────────────────────────────────────
+// ── Layout ────────────────────────────────────────────────────────────────────
+.row { margin: 0 !important; }
+.col-12, .col-lg-12, .col-md-12 { width: 100% !important; max-width: 100% !important; padding: 0 !important; margin-bottom: 4px; }
+.lfx-u-mar-b-16 { margin-bottom: 14px !important; }
+
+// ── Action bar ────────────────────────────────────────────────────────────────
+// ── Action bar ────────────────────────────────────────────────────────────────
+.dialog-actions, .action-button-container, .form-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 14px 0 4px !important;
+  border-top: 1px solid rgba(79,142,247,0.08) !important;
+  margin-top: 18px !important;
+}
+
+// ── Primary button ────────────────────────────────────────────────────────────
+// ── Primary button ────────────────────────────────────────────────────────────
+button.action-button[color="primary"],
+button[mat-raised-button][color="primary"],
+button[mat-flat-button][color="primary"],
+.action-button[color="primary"] {
+  background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 8px 26px !important;
+  box-shadow: 0 4px 18px rgba(79,70,229,0.45) !important;
+  letter-spacing: 0.2px !important;
+  transition: box-shadow 0.18s, transform 0.15s !important;
+
+  &:hover:not([disabled]) {
+    box-shadow: 0 6px 28px rgba(79,70,229,0.6) !important;
+    transform: translateY(-1px) !important;
+  }
+  &[disabled] { opacity: 0.4 !important; box-shadow: none !important; transform: none !important; }
+}
+
+// ── Cancel / ghost button ─────────────────────────────────────────────────────
+// ── Cancel / ghost button ─────────────────────────────────────────────────────
+button[mat-stroked-button],
+button.cancel-button,
+button[mat-raised-button]:not([color]):not(.action-button) {
+  background: transparent !important;
+  color: #7a9cbf !important;
+  border: 1px solid rgba(79,142,247,0.25) !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  padding: 8px 20px !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s, color 0.15s !important;
+
+  &:hover:not([disabled]) {
+    border-color: rgba(79,142,247,0.55) !important;
+    color: #c8d8ea !important;
+  }
+}
+
+// ── Upload zone ───────────────────────────────────────────────────────────────
+// ── Upload zone ───────────────────────────────────────────────────────────────
+.logo-upload-card, .upload-card, .upload-zone {
+  background: rgba(79,142,247,0.04) !important;
+  border: 1.5px dashed rgba(79,142,247,0.28) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  box-shadow: none !important;
+  transition: border-color 0.18s, background 0.18s !important;
+
+  &:hover {
+    background: rgba(79,142,247,0.07) !important;
+    border-color: rgba(79,142,247,0.52) !important;
+  }
+}
+.upload-label { font-size: 10px !important; font-weight: 700 !important; color: #4d6882 !important; text-transform: uppercase !important; letter-spacing: 1px !important; }
+.upload-icon-wrapper { cursor: pointer !important; color: #4f8ef7 !important; }
+.file-input { display: none !important; }
+.error-text { color: #f87171 !important; font-size: 11px !important; }
+
+// ── Section divider ───────────────────────────────────────────────────────────
+// ── Section divider ───────────────────────────────────────────────────────────
+.section-divider, hr {
+  border: none !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, rgba(79,142,247,0.15), transparent) !important;
+  margin: 16px 0 !important;
+}
+
+// ── Light theme ───────────────────────────────────────────────────────────────
+// ── Light theme ───────────────────────────────────────────────────────────────
+:host-context(body.header-light-theme) {
+  ::ng-deep .mdc-text-field--filled { background: #f1f5f9 !important; }
+  ::ng-deep .mdc-text-field--filled:hover { background: #e8edf5 !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: rgba(99,102,241,0.07) !important; }
+  ::ng-deep .mdc-floating-label { color: #64748b !important; }
+  ::ng-deep .mdc-floating-label--float-above { color: #234f99 !important; }
+  ::ng-deep .mat-mdc-input-element { color: #0f172a !important; }
+  ::ng-deep textarea.mat-mdc-input-element { color: #0f172a !important; }
+  ::ng-deep mat-select .mat-mdc-select-value-text { color: #0f172a !important; }
+  ::ng-deep .mat-mdc-select-placeholder { color: #94a3b8 !important; }
+  ::ng-deep .mat-mdc-select-arrow { color: #94a3b8 !important; }
+  ::ng-deep .mat-mdc-form-field-hint { color: #64748b !important; }
+  ::ng-deep .mdc-line-ripple::before { border-bottom-color: rgba(99,102,241,0.45) !important; }
+  ::ng-deep .mdc-line-ripple::after { border-bottom-color: #4f46e5 !important; }
+  ::ng-deep mat-checkbox .mdc-label { color: #1e293b !important; }
+  ::ng-deep mat-radio-button .mdc-label { color: #1e293b !important; }
+  ::ng-deep mat-chip-row, ::ng-deep .mat-mdc-chip {
+    background: rgba(35,79,153,0.1) !important;
+    color: #234f99 !important;
+    border-color: rgba(99,102,241,0.25) !important;
+  }
+  ::ng-deep mat-expansion-panel {
+    background: rgba(99,102,241,0.04) !important;
+    border-color: rgba(99,102,241,0.12) !important;
+  }
+  ::ng-deep .mat-expansion-panel-header { background: rgba(35,79,153,0.06) !important; }
+  ::ng-deep mat-panel-title { color: #334155 !important; }
+  ::ng-deep .mat-expansion-panel-body { color: #1e293b !important; }
+
+  .aip-container {
+    background: #ffffff !important;
+    border-color: rgba(99,102,241,0.16) !important;
+    box-shadow: 0 8px 40px rgba(99,102,241,0.12), 0 2px 8px rgba(0,0,0,0.06) !important;
+  }
+  .aip-container::before {
+    background: linear-gradient(90deg, #4f8ef7 0%, #234f99 55%, #0a1d61 100%);
+  }
+
+  mat-card, .mat-mdc-card {
+    background: #ffffff !important;
+    border-color: rgba(99,102,241,0.16) !important;
+    box-shadow: 0 8px 32px rgba(35,79,153,0.1), 0 2px 6px rgba(0,0,0,0.05) !important;
+  }
+  mat-card::before {
+    background: linear-gradient(90deg, #4f8ef7 0%, #234f99 55%, #0a1d61 100%);
+  }
+
+  .lfx-u-sub-header-alias { color: #64748b !important; }
+
+  .dialog-actions, .action-button-container, .form-actions {
+    border-top-color: rgba(35,79,153,0.1) !important;
+  }
+
+  button.action-button[color="primary"],
+  button[mat-raised-button][color="primary"],
+  button[mat-flat-button][color="primary"] {
+    background: #234f99 !important;
+    box-shadow: 0 4px 18px rgba(79,70,229,0.35) !important;
+    &:hover:not([disabled]) { box-shadow: 0 6px 28px rgba(79,70,229,0.5) !important; }
+  }
+
+  button[mat-stroked-button], button.cancel-button,
+  button[mat-raised-button]:not([color]):not(.action-button) {
+    color: #64748b !important;
+    border-color: rgba(99,102,241,0.25) !important;
+    &:hover:not([disabled]) { border-color: rgba(35,79,153,0.55) !important; color: #234f99 !important; }
+  }
+
+  .logo-upload-card, .upload-card, .upload-zone {
+    background: rgba(99,102,241,0.04) !important;
+    border-color: rgba(99,102,241,0.22) !important;
+    &:hover { background: rgba(99,102,241,0.07) !important; border-color: rgba(35,79,153,0.45) !important; }
+  }
+  .upload-label { color: #64748b !important; }
+  .upload-icon-wrapper { color: #234f99 !important; }
+}
+
+// ── Dark theme explicit ───────────────────────────────────────────────────────
+// ── Dark theme explicit ───────────────────────────────────────────────────────
+:host-context(body.header-dark-theme) {
+  ::ng-deep .mdc-text-field--filled { background: rgba(255,255,255,0.07) !important; }
+  ::ng-deep .mdc-text-field--filled:hover { background: rgba(255,255,255,0.11) !important; }
+  ::ng-deep .mdc-text-field--filled.mdc-text-field--focused { background: rgba(79,142,247,0.13) !important; }
+  ::ng-deep .mat-mdc-input-element { color: #e2e8f0 !important; }
+
+  .aip-container {
+    background: rgba(8,14,36,0.88) !important;
+    border-color: rgba(79,142,247,0.16) !important;
+  }
+
+  mat-card, .mat-mdc-card {
+    background: rgba(8,14,36,0.92) !important;
+    border-color: rgba(79,142,247,0.18) !important;
+  }
+
+  button.action-button[color="primary"],
+  button[mat-raised-button][color="primary"],
+  button[mat-flat-button][color="primary"] {
+    background: linear-gradient(135deg, #234f99 0%, #0a1d61 100%) !important;
+    box-shadow: 0 4px 18px rgba(79,70,229,0.45) !important;
+  }
+
+  button[mat-stroked-button], button.cancel-button {
+    color: #7a9cbf !important;
+    border-color: rgba(79,142,247,0.25) !important;
+  }
+}
+
