@@ -170,13 +170,10 @@ mailserver:
 security:
   silentRefreshTimeoutFactor: 0.85
 
+# Eureka removed - using K8s service discovery
 eureka:
   client:
-    service-url:
-      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
-    enabled: ${EUREKA_ENABLED:false}
-  instance:
-    prefer-ip-address: true
+    enabled: false
 
 icip:
   pathPrefix: api/aip
