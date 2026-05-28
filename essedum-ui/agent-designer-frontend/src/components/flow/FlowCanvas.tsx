@@ -10,6 +10,7 @@ import { useFlowStore } from '../../store/flowStore';
 import type { AgentFlowNode, FlowNodeData, NodeDefinition } from '../../types/flow';
 import { FlowNode } from './FlowNode';
 import { CATEGORY_META } from '../../data/nodeDefinitions';
+import { LABELS } from '../../lib/labels';
 
 const nodeTypes: NodeTypes = { agentNode: FlowNode };
 
@@ -109,13 +110,12 @@ function Canvas() {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center space-y-3 animate-fade-in">
             <div className="text-5xl">⚡</div>
-            <h3 className="text-lg font-semibold text-foreground">Start Building Your Flow</h3>
+            <h3 className="text-lg font-semibold text-foreground">{LABELS.CANVAS_EMPTY_HEADING}</h3>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-              Drag nodes from the left panel onto this canvas,<br />
-              then connect them to build your agent workflow
+              {LABELS.CANVAS_EMPTY_DESCRIPTION}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
-              {['🤖 LLMs', '🔍 Tools', '🔌 MCP', '🧠 Agents', '💾 Memory', '📝 Prompts'].map((tag) => (
+              {LABELS.CANVAS_NODE_TAGS.map((tag) => (
                 <span key={tag} className="px-2 py-1 rounded-full bg-muted border border-border text-[11px] text-muted-foreground">
                   {tag}
                 </span>

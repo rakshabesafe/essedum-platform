@@ -14,6 +14,7 @@ import { Trash2, Copy, Eye, EyeOff, ChevronDown, ChevronRight } from 'lucide-rea
 import { CATEGORY_META } from '../../data/nodeDefinitions';
 import { cn } from '../../lib/utils';
 import { toast } from 'sonner';
+import { LABELS } from '../../lib/labels';
 
 export function NodeInspector() {
   const { nodes, selectedNodeId, updateNodeConfig, updateNodeLabel, deleteNode, duplicateNode } = useFlowStore();
@@ -25,14 +26,14 @@ export function NodeInspector() {
     return (
       <aside className="w-72 flex flex-col bg-card border-l border-border h-full animate-slide-in-right flex-shrink-0">
         <div className="px-4 py-3 border-b border-border">
-          <h2 className="text-xs font-bold text-foreground uppercase tracking-widest">Inspector</h2>
+          <h2 className="text-xs font-bold text-foreground uppercase tracking-widest">{LABELS.INSPECTOR_TITLE}</h2>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-3">
           <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
             <span className="text-lg">🔍</span>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Select a node on the canvas to configure its properties
+            {LABELS.INSPECTOR_EMPTY_STATE}
           </p>
         </div>
       </aside>
@@ -179,10 +180,10 @@ export function NodeInspector() {
             status === 'error' && 'bg-destructive/10 text-destructive',
             status === 'skipped' && 'bg-muted text-muted-foreground',
           )}>
-            {status === 'running' && '⟳ Running…'}
-            {status === 'success' && '✓ Completed'}
-            {status === 'error' && '✕ Error'}
-            {status === 'skipped' && '— Skipped'}
+            {status === 'running' && LABELS.INSPECTOR_STATUS_RUNNING}
+            {status === 'success' && LABELS.INSPECTOR_STATUS_SUCCESS}
+            {status === 'error' && LABELS.INSPECTOR_STATUS_ERROR}
+            {status === 'skipped' && LABELS.INSPECTOR_STATUS_SKIPPED}
           </div>
         )}
 
@@ -191,16 +192,16 @@ export function NodeInspector() {
           <Button
             size="sm" variant="outline"
             className="h-7 text-[11px] gap-1 flex-1"
-            onClick={() => { duplicateNode(node.id); toast.success('Node duplicated'); }}
+            onClick={() => { duplicateNode(node.id); toast.success(LABELS.INSPECTOR_TOAST_DUPLICATED); }}
           >
-            <Copy className="w-3 h-3" /> Duplicate
+            <Copy className="w-3 h-3" /> {LABELS.INSPECTOR_BTN_DUPLICATE}
           </Button>
           <Button
             size="sm" variant="outline"
             className="h-7 text-[11px] gap-1 flex-1 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
-            onClick={() => { deleteNode(node.id); toast.info('Node deleted'); }}
+            onClick={() => { deleteNode(node.id); toast.info(LABELS.INSPECTOR_TOAST_DELETED); }}
           >
-            <Trash2 className="w-3 h-3" /> Delete
+            <Trash2 className="w-3 h-3" /> {LABELS.INSPECTOR_BTN_DELETE}
           </Button>
         </div>
       </div>
@@ -246,7 +247,7 @@ export function NodeInspector() {
           {/* Output preview */}
           {output != null && (
             <div className="mt-2">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">Output Preview</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">{LABELS.INSPECTOR_OUTPUT_PREVIEW}</p>
               <div className="code-block text-[10px] leading-relaxed max-h-32 overflow-auto">
                 {String(output)}
               </div>

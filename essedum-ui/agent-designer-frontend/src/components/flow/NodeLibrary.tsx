@@ -6,6 +6,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Badge } from '../ui/badge';
 import { Search, ChevronDown, ChevronRight, GripVertical } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { LABELS } from '../../lib/labels';
 
 const CATEGORIES = ['input', 'output', 'llm', 'tool', 'mcp', 'agent', 'memory', 'prompt', 'condition'] as const;
 
@@ -70,11 +71,11 @@ export function NodeLibrary() {
     <aside className="w-64 flex flex-col bg-card border-r border-border h-full animate-slide-in-left flex-shrink-0">
       {/* Header */}
       <div className="px-3 py-3 border-b border-border flex-shrink-0">
-        <h2 className="text-xs font-bold text-foreground uppercase tracking-widest mb-2">Node Library</h2>
+        <h2 className="text-xs font-bold text-foreground uppercase tracking-widest mb-2">{LABELS.LIBRARY_TITLE}</h2>
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
           <Input
-            placeholder="Search nodes…"
+            placeholder={LABELS.LIBRARY_SEARCH_PLACEHOLDER}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-8 h-8 text-xs bg-background"
@@ -133,7 +134,7 @@ export function NodeLibrary() {
       {/* Drag hint */}
       <div className="px-3 py-2 border-t border-border flex-shrink-0">
         <p className="text-[10px] text-muted-foreground text-center">
-          Drag nodes onto the canvas
+          {LABELS.LIBRARY_DRAG_HINT}
         </p>
       </div>
     </aside>

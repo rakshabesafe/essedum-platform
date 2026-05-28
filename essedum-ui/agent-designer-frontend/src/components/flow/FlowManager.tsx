@@ -8,6 +8,7 @@ import { Badge } from '../ui/badge';
 import { Plus, Trash2, Download, Search, Clock, Layers } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { toast } from 'sonner';
+import { LABELS } from '../../lib/labels';
 
 export function FlowManager() {
   const {
@@ -27,7 +28,7 @@ export function FlowManager() {
         <DialogHeader className="px-5 pt-5 pb-4 border-b border-border">
           <DialogTitle className="flex items-center gap-2 text-base">
             <Layers className="w-4 h-4 text-primary" />
-            Flow Manager
+            {LABELS.FLOW_MANAGER_TITLE}
           </DialogTitle>
         </DialogHeader>
 
@@ -36,7 +37,7 @@ export function FlowManager() {
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <Input
-                placeholder="Search flows…"
+                placeholder={LABELS.FLOW_MANAGER_SEARCH_PLACEHOLDER}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-8 h-8 text-xs bg-background"
@@ -44,9 +45,9 @@ export function FlowManager() {
             </div>
             <Button
               size="sm" className="h-8 text-xs gap-1.5"
-              onClick={() => { newFlow(); setShowFlowManager(false); toast.info('New flow created'); }}
+              onClick={() => { newFlow(); setShowFlowManager(false); toast.info(LABELS.FLOW_MANAGER_TOAST_NEW_FLOW); }}
             >
-              <Plus className="w-3 h-3" /> New Flow
+              <Plus className="w-3 h-3" /> {LABELS.FLOW_MANAGER_NEW_FLOW}
             </Button>
           </div>
         </div>
@@ -58,10 +59,10 @@ export function FlowManager() {
                 <Layers className="w-5 h-5 text-muted-foreground" />
               </div>
               <p className="text-sm text-muted-foreground">
-                {search ? `No flows matching "${search}"` : 'No saved flows yet'}
+                {search ? `No flows matching "${search}"` : LABELS.FLOW_MANAGER_NO_FLOWS}
               </p>
               <p className="text-xs text-muted-foreground">
-                Save a flow using the Save button in the top bar
+                {LABELS.FLOW_MANAGER_SAVE_HINT}
               </p>
             </div>
           ) : (
@@ -77,7 +78,7 @@ export function FlowManager() {
                         ? 'bg-primary/10 border-primary/30'
                         : 'border-transparent hover:bg-muted/70 hover:border-border/50'
                     )}
-                    onClick={() => { loadFlow(flow.id).then(() => toast.success(`Loaded "${flow.name}"`)).catch(() => toast.error('Failed to load flow')); }}
+                    onClick={() => { loadFlow(flow.id).then(() => toast.success(`Loaded "${flow.name}"`)).catch(() => toast.error(LABELS.FLOW_MANAGER_TOAST_LOAD_FAILED)); }}
                   >
                     <div className={cn(
                       'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
@@ -88,7 +89,7 @@ export function FlowManager() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-foreground truncate">{flow.name}</span>
-                        {isActive && <Badge className="text-[9px] h-4 px-1.5 bg-primary text-primary-foreground">Active</Badge>}
+                        {isActive && <Badge className="text-[9px] h-4 px-1.5 bg-primary text-primary-foreground">{LABELS.FLOW_MANAGER_ACTIVE_BADGE}</Badge>}
                       </div>
                       <div className="flex items-center gap-3 mt-0.5 text-[10px] text-muted-foreground">
                         <span className="flex items-center gap-1">
@@ -108,15 +109,15 @@ export function FlowManager() {
                           a.href = url; a.download = `${flow.name.replace(/\s+/g, '_')}.json`; a.click();
                           URL.revokeObjectURL(url);
                         }}
-                        title="Export"
+                        title={LABELS.FLOW_MANAGER_EXPORT_TITLE}
                       >
                         <Download className="w-3 h-3" />
                       </Button>
                       <Button
                         size="icon" variant="ghost"
                         className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => { deleteFlow(flow.id).then(() => toast.info(`Deleted "${flow.name}"`)).catch(() => toast.error('Failed to delete flow')); }}
-                        title="Delete"
+                        onClick={() => { deleteFlow(flow.id).then(() => toast.info(`Deleted "${flow.name}"`)).catch(() => toast.error(LABELS.FLOW_MANAGER_TOAST_DELETE_FAILED)); }}
+                        title={LABELS.FLOW_MANAGER_DELETE_TITLE}
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
@@ -129,12 +130,12 @@ export function FlowManager() {
         </ScrollArea>
 
         <div className="px-5 py-3 border-t border-border bg-muted/30 flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">{savedFlows.length} saved flows</span>
+          <span className="text-xs text-muted-foreground">{savedFlows.length} {LABELS.FLOW_MANAGER_SAVED_FLOWS_SUFFIX}</span>
           <Button
             size="sm" variant="outline" className="h-8 text-xs gap-1.5"
-            onClick={() => { saveFlow().then(() => toast.success('Flow saved')).catch(() => toast.error('Failed to save flow')); }}
+            onClick={() => { saveFlow().then(() => toast.success(LABELS.FLOW_MANAGER_TOAST_FLOW_SAVED)).catch(() => toast.error(LABELS.FLOW_MANAGER_TOAST_FLOW_SAVE_FAILED)); }}
           >
-            <Plus className="w-3 h-3" /> Save Current Flow
+            <Plus className="w-3 h-3" /> {LABELS.FLOW_MANAGER_SAVE_CURRENT}
           </Button>
         </div>
       </DialogContent>
