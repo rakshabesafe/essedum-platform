@@ -1,35 +1,35 @@
-# Multi-stage build for the Essedum MFE topology: 1 host (shell-app-ui) + 4 child MFEs.
+# Multi-stage build for the Essedum MFE topology: 1 host (shell) + 4 child MFEs.
 # Build context is expected to be the essedum-platform/ parent directory.
 
 FROM node:24.1.0-alpine AS build
 
 WORKDIR /workspace
 
-# ---- Host (shell-app-ui) ---------------------------------------------------
+# ---- Host (shell) ----------------------------------------------------------
 # Built first so its node_modules and dist exist before the MFEs compile.
-# MFE tsconfigs reference ../../shell-app-ui/projects/shared-lib via the
+# MFE tsconfigs reference ../../shell/projects/shared-lib via the
 # "@essedum/shared-lib" path alias, so the shell sources must be on disk.
-COPY essedum-ui/shell-app-ui/ ./shell-app-ui/
-WORKDIR /workspace/shell-app-ui
+COPY essedum-ui/shell/ ./shell/
+WORKDIR /workspace/shell
 RUN npm install --legacy-peer-deps --verbose
 RUN npm run build-prod
 
 # ---- MFEs ------------------------------------------------------------------
-COPY essedum-ui/apps/ /workspace/apps/
+COPY essedum-ui/modules/ /workspace/modules/
 
-WORKDIR /workspace/apps/agent
+WORKDIR /workspace/modules/agent-studio
 RUN npm install --legacy-peer-deps --verbose
 RUN npm run build-prod
 
-WORKDIR /workspace/apps/data-ops
+WORKDIR /workspace/modules/data-ops
 RUN npm install --legacy-peer-deps --verbose
 RUN npm run build-prod
 
-WORKDIR /workspace/apps/integration
+WORKDIR /workspace/modules/integration-hub
 RUN npm install --legacy-peer-deps --verbose
 RUN npm run build-prod
 
-WORKDIR /workspace/apps/vibe-studio
+WORKDIR /workspace/modules/vibe-studio
 RUN npm install --legacy-peer-deps --verbose
 RUN npm run build-prod
 
@@ -54,11 +54,11 @@ RUN mkdir -p /app/ui/shell \
              /app/ui/integration \
              /app/ui/vibe-studio
 
-COPY --from=build /workspace/shell-app-ui/dist/common-app       /app/ui/shell/
-COPY --from=build /workspace/apps/agent/dist/agent              /app/ui/agent/
-COPY --from=build /workspace/apps/data-ops/dist/data-ops        /app/ui/data-ops/
-COPY --from=build /workspace/apps/integration/dist/integration  /app/ui/integration/
-COPY --from=build /workspace/apps/vibe-studio/dist/vibe-studio  /app/ui/vibe-studio/
+COPY --from=build /workspace/shell/dist/shell                            /app/ui/shell/
+COPY --from=build /workspace/modules/agent-studio/dist/agent-studio       /app/ui/agent/
+COPY --from=build /workspace/modules/data-ops/dist/data-ops               /app/ui/data-ops/
+COPY --from=build /workspace/modules/integration-hub/dist/integration-hub /app/ui/integration/
+COPY --from=build /workspace/modules/vibe-studio/dist/vibe-studio         /app/ui/vibe-studio/
 
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
