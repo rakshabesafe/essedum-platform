@@ -1,4 +1,4 @@
-﻿# =====================================================
+# =====================================================
 # API Gateway - Spring Cloud Gateway
 # =====================================================
 # Routes all requests to the appropriate microservice.
@@ -23,7 +23,7 @@ spring:
       # ---- Default Filters ----
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
-      # ---- Route Definitions ----
+              # ---- Route Definitions ----
       # IMPORTANT: Routes are ordered so that more specific paths match first.
       # All paths mirror the monolith's API exactly (pathPrefix = api/aip).
       routes:
@@ -61,7 +61,7 @@ spring:
         - id: usm-misc
           uri: ${USM_SERVICE_URL:http://localhost:8081}
           predicates:
-            - Path=/api/delegates/**,/api/email/**,/api/country-time-zones/**,/api/usm-modules/**,/api/usm-module-organisations/**,/api/usm-notificationss/**,/api/usm-portfolios/**,/api/usm-stages/**,/api/user-project-roles/**,/api/user-units/**,/api/user-process-mappings/**,/api/usm-role-to-roles/**,/api/usm-user-to-users/**,/api/file-extension-keys/**,/api/icms-processs/**,/api/dash-constants/**
+            - Path=/api/delegates/**,/api/email/**,/api/country-time-zones/**,/api/usm-modules/**,/api/usm-module-organisations/**,/api/usm-notificationss/**,/api/usm-portfolios/**,/api/usm-stages/**,/api/user-project-roles/**,/api/user-units/**,/api/user-process-mappings/**,/api/usm-role-to-roles/**,/api/usm-user-to-users/**,/api/file-extension-keys/**,/api/icms-processs/**,/api/dash-constants/**,/api/get-dash-constants
         - id: usm-config
           uri: ${USM_SERVICE_URL:http://localhost:8081}
           predicates:
@@ -214,7 +214,7 @@ management:
         enabled: true
 logging:
   level:
-    org.springframework.cloud.gateway: INFO
+    org.springframework.cloud.gateway: TRACE
     reactor.netty: INFO
 # ---- JWT Authentication (same secret as downstream services) ----
 jwt:
