@@ -28,7 +28,7 @@ FastAPI backend for the AgentFlow Designer. Provides flow authoring, execution (
 - [Testing](#testing)
 - [Project Structure](#project-structure)
 - [PostgreSQL (Production)](#running-with-postgresql-production)
-- [Dependency Notes (Artifactory)](#dependency-notes-artifactory)
+- [Dependency Notes (Artifactory)](#dependency-notes-infosys-artifactory)
 
 ---
 
@@ -37,7 +37,7 @@ FastAPI backend for the AgentFlow Designer. Provides flow authoring, execution (
 | Tool | Version | Notes |
 |------|---------|-------|
 | Python | 3.11+ or 3.14 | Tested on 3.14.2 |
-| pip | latest | Use Artifactory pip.ini |
+| pip | latest | Use Artifactory pip.ini on Infosys network |
 | Ollama | optional | Local LLM at http://localhost:11434 |
 | Qdrant | optional | RAG endpoints only |
 | PostgreSQL | optional | SQLite used by default for local dev |
@@ -54,7 +54,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-### 2. Configure the Artifactory pip source 
+### 2. Configure the Artifactory pip source (Infosys network)
 
 ```powershell
 $env:PIP_CONFIG_FILE = ".\pip.ini"
@@ -159,6 +159,13 @@ Base URL: `http://127.0.0.1:8180`
 
 ### Health
 
+**Functionality:** Exposes liveness and readiness probes for the API server. The liveness probe confirms the process is alive; the readiness probe verifies the database connection is active and the server can handle traffic.
+
+**Use:**
+- Call `/health` from a load balancer or container orchestrator (Kubernetes, Docker Compose) as a liveness check — if it returns anything other than 200, the container is restarted.
+- Call `/health/ready` before routing traffic to the instance (readiness gate). Also useful for smoke-testing the server after startup to confirm the DB migration ran correctly.
+- Both endpoints are used by `test_ollama.py` and `_check_endpoints.py` to verify the server is up before running tests.
+
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/health` | Liveness check → `{"status": "ok"}` |
@@ -167,6 +174,15 @@ Base URL: `http://127.0.0.1:8180`
 ---
 
 ### Flows
+
+**Functionality:** Flows are the central concept of AgentFlow Designer. A flow is a directed acyclic graph (DAG) of nodes and edges that defines an agent pipeline — for example: receive user input → format a prompt → call an LLM → return the response. This API provides full CRUD for flow definitions stored in the database. Flows hold their node and edge configuration as JSON; no execution happens here.
+
+**Use:**
+- `GET /api/v1/flows` — called on page load by the Designer frontend to populate the flow list/sidebar.
+- `POST /api/v1/flows` — called when the user saves a new flow from the canvas. Also used programmatically to seed flows for testing.
+- `GET /api/v1/flows/{flow_id}` — called when the user opens a flow in the canvas editor to load its node/edge graph for rendering.
+- `PUT /api/v1/flows/{flow_id}` — called on every canvas auto-save or manual save to persist node position, config, and edge changes.
+- `DELETE /api/v1/flows/{flow_id}` — called when the user deletes a flow. Cascades to all associated executions and execution logs.
 
 | Method | Path | Description |
 |--------|------|-------------|
@@ -263,6 +279,15 @@ All fields are optional in the update payload.
 
 ### Executions
 
+**Functionality:** Drives the asynchronous execution of a flow. When a run is triggered, the server immediately creates an execution record (status: `pending`), returns the `execution_id`, and dispatches the actual node-by-node execution as a background task powered by LangGraph. This non-blocking design allows the client to poll for status or subscribe to real-time WebSocket events while the flow runs. Each execution stores its final input, output, error, and per-node logs.
+
+**Use:**
+- `POST .../run` — triggered from the Designer's "Run" button or from external systems calling the API. The `message` field carries the user's input. Pass `session_id` to enable memory across multiple calls to the same flow. Returns `execution_id` immediately (202 Accepted).
+- `GET /api/v1/executions/{id}` — poll this after triggering a run to check if the status has moved from `pending` → `running` → `completed`. Read the `output` field when status is `completed` to get the final response.
+- `GET /api/v1/executions/{id}/logs` — fetch step-by-step node logs for debugging. Each log entry shows which node ran, its level (`info`, `success`, `warning`, `error`), and detail payload.
+- `POST .../stop` — sends a cancellation signal to a `running` execution. The execution transitions to `stopped` status.
+- `GET /api/v1/executions` — used in a run-history panel to list past executions, optionally filtered by `flow_id`.
+
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/api/v1/executions/flows/{flow_id}/run` | Run a flow (async, returns 202) |
@@ -338,6 +363,12 @@ Log levels: `info`, `success`, `warning`, `error`
 
 ### Node Registry
 
+**Functionality:** A static catalog of all available node types in the V1 execution engine. Each node definition includes its type key, display label, description, and configuration schema. This allows the frontend to dynamically render the node library palette and validate node configurations without hardcoding type information.
+
+**Use:**
+- `GET /api/v1/nodes` — called on Designer load to populate the node library panel on the left sidebar. Each entry drives the draggable node cards the user can add to the canvas.
+- `GET /api/v1/nodes/{node_type}` — called when a node is selected on the canvas to fetch its configuration schema, which drives the node inspector/settings panel on the right. For example, fetching `/api/v1/nodes/model` returns the schema for provider, model name, temperature, and max_tokens fields.
+
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/api/v1/nodes` | List all V1 node type definitions |
@@ -358,6 +389,15 @@ Log levels: `info`, `success`, `warning`, `error`
 ---
 
 ### LLM Connectors
+
+**Functionality:** Provides direct access to LLM providers (Ollama, Azure OpenAI, AWS Bedrock, Google Vertex AI) outside of flow execution. These endpoints wrap the underlying connector layer and expose it as a standalone API for model discovery, connectivity testing, and direct chat completions. They are also used internally by the `model` node executor during flow runs.
+
+**Use:**
+- `GET /api/v1/llm/models?provider=ollama` — populates the model picker dropdown in the `model` node's configuration panel. Call with different `provider` values to list models for each connected LLM backend.
+- `POST /api/v1/llm/test` — called from the Settings / Provider Config screen when the user clicks "Test Connection". Verifies credentials and reachability without sending a real chat message. Returns `{"status": "ok"}` on success.
+- `POST /api/v1/llm/chat` — used for the built-in chat playground in the Designer, enabling users to test a model directly before embedding it in a flow. Can also be called programmatically to build LLM-powered features outside of the flow engine.
+
+**Supported providers**: `ollama`, `azure_openai`, `bedrock`, `vertex_ai`
 
 | Method | Path | Description |
 |--------|------|-------------|
@@ -421,6 +461,14 @@ Log levels: `info`, `success`, `warning`, `error`
 
 ### MCP Tools
 
+**Functionality:** Integrates with external [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) servers. MCP servers expose callable tools (functions) that can be invoked by the `mcp_tool` node in a flow — for example, a web search tool, a database query tool, or a code execution sandbox. These endpoints let users register and inspect MCP servers without running a full flow.
+
+**Use:**
+- `POST /api/v1/mcp/test` — called from the MCP server configuration screen to verify the server URL is reachable before saving it. Optionally validates a specific tool name exists on the server.
+- `GET /api/v1/mcp/servers/{server_url}/tools` — called when configuring an `mcp_tool` node to populate the tool picker dropdown. Returns the list of available tools with their names, descriptions, and input schemas so the user can select which tool to call and understand its parameters.
+
+> **Note:** MCP endpoints require an external MCP server to be running. They will timeout or error if the target server URL is unreachable.
+
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/api/v1/mcp/test` | Test an MCP server connection |
@@ -452,6 +500,17 @@ Log levels: `info`, `success`, `warning`, `error`
 ---
 
 ### Knowledge Bases
+
+**Functionality:** Manages named vector knowledge bases used for Retrieval-Augmented Generation (RAG). A knowledge base (KB) is a configuration record that maps to a Qdrant vector collection. It defines how documents are chunked, which embedding model encodes them, and how vectors are stored. Creating a KB provisions the collection in Qdrant; deleting it removes the collection and all associated document records.
+
+**Use:**
+- `POST /api/v1/knowledge-bases` — called when a user creates a new KB from the Knowledge Base management screen. Specify the embedding model and dimensions to match your embedding provider (e.g., `text-embedding-ada-002` with 1536 dims for Azure OpenAI, or a local model with 384 dims for Ollama). **Requires Qdrant to be running.**
+- `GET /api/v1/knowledge-bases` — populates the KB list in the management screen and the KB picker dropdown inside `rag_agent` node configuration.
+- `GET /api/v1/knowledge-bases/{kb_id}` — fetches full details including `doc_count` to show ingestion progress.
+- `PUT /api/v1/knowledge-bases/{kb_id}` — updates the display name or description. Embedding settings cannot be changed after creation (would invalidate existing vectors).
+- `DELETE /api/v1/knowledge-bases/{kb_id}` — removes the KB, all document records, all chunk records, and the Qdrant collection. Irreversible.
+
+> **Requires:** Qdrant running at `QDRANT_HOST:QDRANT_PORT` (default `localhost:6333`). Without Qdrant, `POST` returns 500.
 
 | Method | Path | Description |
 |--------|------|-------------|
@@ -499,6 +558,14 @@ Log levels: `info`, `success`, `warning`, `error`
 
 ### Documents
 
+**Functionality:** Handles document ingestion into a knowledge base. When a file is uploaded, the server parses it into text, splits it into overlapping chunks (using the KB's `chunk_size` / `chunk_overlap` settings), generates vector embeddings for each chunk, and stores them in Qdrant. The upload returns immediately (202) and processing runs asynchronously; poll the document status until it reaches `ready`.
+
+**Use:**
+- `POST .../documents` — called from the KB document upload dialog. Send the file as `multipart/form-data`. The document moves through statuses: `pending` → `processing` → `ready` (or `error` on failure).
+- `GET .../documents` — lists all documents in a KB with their ingestion status. Used to show the document table in the KB management screen, including processing progress.
+- `GET .../documents/{doc_id}` — fetches full metadata for a single document: page count, chunk count, file size, and any error message if ingestion failed.
+- `DELETE .../documents/{doc_id}` — removes the document record, all its chunk records from the database, and the corresponding vectors from Qdrant. Used when the user removes a document from a KB.
+
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/api/v1/knowledge-bases/{kb_id}/documents` | Upload a document (multipart/form-data) |
@@ -536,6 +603,17 @@ Document statuses: `pending` → `processing` → `ready` | `error`
 ---
 
 ### RAG Query
+
+**Functionality:** Executes a full Retrieval-Augmented Generation pipeline in a single call — without needing to build a flow. Given a natural language query and one or more knowledge base IDs, it: (1) embeds the query, (2) performs a similarity search in Qdrant to retrieve the top-K most relevant document chunks, (3) assembles them into a context prompt, and (4) calls the specified LLM to generate a grounded answer. Optionally returns the source chunks with relevance scores.
+
+**Use:**
+- Called directly from a RAG playground / test screen to validate that a KB is correctly indexed and returning relevant content before embedding it in a flow.
+- Used by the `rag_agent` node executor internally during flow execution.
+- Pass `include_sources: true` to inspect which document chunks were retrieved and their relevance scores — useful for debugging poor RAG quality.
+- Adjust `top_k` (number of chunks) and `score_threshold` (minimum similarity) to tune retrieval precision vs. recall.
+- Provide a `system_prompt` to control how the LLM uses the retrieved context (e.g., "Answer only from the provided context. If unsure, say I don't know.").
+
+> **Requires:** A knowledge base with at least one ingested document and Qdrant running. Pass a valid KB UUID in `knowledge_base_ids`.
 
 | Method | Path | Description |
 |--------|------|-------------|
@@ -597,6 +675,13 @@ Document statuses: `pending` → `processing` → `ready` | `error`
 
 ### Memory
 
+**Functionality:** Manages conversation history (short-term memory) scoped to a flow and optionally a session. Memory is stored as an ordered list of `{role, content}` message entries in the `memories` table. During flow execution, if the flow has a `memory` node, it reads prior turns from this store and injects them into the LLM context, enabling multi-turn conversations. Memory is keyed by `flow_id` + optional `session_id`, so multiple independent sessions can share the same flow without interfering with each other.
+
+**Use:**
+- `GET /api/v1/memory/{flow_id}` — read back all conversation turns for a flow (+ session). Used by the `memory` executor node at the start of a flow run to inject prior context into the prompt. Also used by the chat UI to render conversation history.
+- `POST /api/v1/memory/{flow_id}` — append a new message turn (user or assistant) to the memory store. Called by the `memory` executor after each flow run to record the user input and the generated response for future turns.
+- `DELETE /api/v1/memory/{flow_id}` — clears all memory entries for a flow (+ session). Use this from the UI's "Clear conversation" button, or call it in tests to reset state between runs. Pass `?session_id=...` to clear only a specific session.
+
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/api/v1/memory/{flow_id}` | Load memory entries |
@@ -633,6 +718,16 @@ Document statuses: `pending` → `processing` → `ready` | `error`
 ---
 
 ### WebSocket
+
+**Functionality:** Provides a real-time event stream for a single flow execution. After triggering a run with `POST .../run`, the client opens a WebSocket connection using the returned `execution_id`. The server pushes structured JSON events as the flow progresses node-by-node: when execution starts, when each node begins and completes (with its output), on node errors, and when the full execution finishes or fails. The connection closes automatically when the execution reaches a terminal state (`completed`, `error`, or `stopped`).
+
+**Use:**
+- Connect immediately after calling `POST .../run` to stream live progress in the Designer's execution panel — showing which nodes are running, their outputs, and any errors without polling.
+- Use `node_completed` events to render intermediate outputs as each node finishes (e.g., show the prompt template output before the LLM responds).
+- Use `execution_completed` to capture the final output and update the chat display.
+- Fall back to polling `GET /api/v1/executions/{id}` if WebSocket is unavailable (e.g., behind a proxy that doesn't support upgrade).
+
+> **Note:** In V1, WebSocket fan-out uses an in-process `asyncio.Queue`. For multi-instance deployments, a shared pub/sub backend (Valkey / KeyDB) is needed.
 
 | Protocol | Path |
 |----------|------|
@@ -846,7 +941,7 @@ backend/
 ├── .env.example              # Template for production config
 ├── requirements.txt          # Full production dependencies
 ├── requirements-local.txt    # Slim deps for local dev (SQLite, no qdrant-client)
-├── pip.ini                   # Artifactory pip index
+├── pip.ini                   # Artifactory pip index (Infosys network)
 ├── test_langgraph.py         # LangGraph integration tests
 └── test_ollama.py            # Ollama LLM call tests
 ```
@@ -886,7 +981,7 @@ py run.py
 
 ---
 
-## Dependency Notes (Artifactory)
+## Dependency Notes (Infosys Artifactory)
 
 Several packages are pinned due to Artifactory 403 blocks on specific versions:
 
@@ -897,7 +992,7 @@ Several packages are pinned due to Artifactory 403 blocks on specific versions:
 | `colorama` | `0.4.4` | 0.4.5 and 0.4.6 are 403 blocked |
 | `click` | `7.1.2` | click 8.x requires colorama>=0.4.6 |
 
-To install packages:
+To install packages on Infosys network:
 
 ```powershell
 $env:PIP_CONFIG_FILE = ".\pip.ini"
