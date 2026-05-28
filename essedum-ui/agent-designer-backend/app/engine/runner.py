@@ -4,12 +4,13 @@ Flow execution runner.
 Responsibilities:
   - Validate all nodes are V1-supported
   - Create + update Execution records
-  - Topologically sort nodes and execute them in order
-  - Broadcast real-time events over WebSocket (via Redis pub/sub)
+  - Compile flow JSON into a LangGraph StateGraph and invoke it
+  - Broadcast real-time events over WebSocket (via in-process asyncio.Queue)
   - Persist per-node ExecutionLog records
   - Expose ConnectionManager for WS clients
 """
 
+import asyncio
 import json
 import logging
 import uuid
@@ -17,57 +18,48 @@ from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import WebSocket
-from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.engine.compiler import AgentFlowState, compile_flow
 from app.engine.executors import get_executor
-from app.engine.graph import get_node_by_id, resolve_inputs, topological_sort
 from app.models.execution import Execution, ExecutionLog, ExecutionStatus, LogLevel
 
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# WebSocket connection manager
+# WebSocket connection manager (in-process asyncio.Queue fan-out)
 # ---------------------------------------------------------------------------
 
 class ConnectionManager:
     def __init__(self) -> None:
-        self._connections: dict[str, list[WebSocket]] = {}
+        # execution_id → list of (WebSocket, Queue) pairs
+        self._connections: dict[str, list[tuple[WebSocket, asyncio.Queue]]] = {}
 
-    async def connect(self, execution_id: str, ws: WebSocket) -> None:
+    async def connect(self, execution_id: str, ws: WebSocket) -> asyncio.Queue:
         await ws.accept()
-        self._connections.setdefault(execution_id, []).append(ws)
+        queue: asyncio.Queue = asyncio.Queue()
+        self._connections.setdefault(execution_id, []).append((ws, queue))
+        return queue
 
-    def disconnect(self, execution_id: str, ws: WebSocket) -> None:
-        connections = self._connections.get(execution_id, [])
-        if ws in connections:
-            connections.remove(ws)
+    def disconnect(self, execution_id: str, ws: WebSocket, queue: asyncio.Queue) -> None:
+        pairs = self._connections.get(execution_id, [])
+        self._connections[execution_id] = [(w, q) for w, q in pairs if w is not ws]
+        # signal sender task to exit
+        try:
+            queue.put_nowait(None)
+        except asyncio.QueueFull:
+            pass
 
     async def broadcast(self, execution_id: str, message: dict) -> None:
         payload = json.dumps(message)
-        for ws in list(self._connections.get(execution_id, [])):
+        for _ws, queue in list(self._connections.get(execution_id, [])):
             try:
-                await ws.send_text(payload)
+                await queue.put(payload)
             except Exception:
                 pass
 
 
 manager = ConnectionManager()
-
-
-# ---------------------------------------------------------------------------
-# Redis channel helpers
-# ---------------------------------------------------------------------------
-
-def _channel(execution_id: str) -> str:
-    return f"execution:{execution_id}"
-
-
-async def _publish(redis: Redis, execution_id: str, event: dict) -> None:
-    try:
-        await redis.publish(_channel(execution_id), json.dumps(event))
-    except Exception as exc:
-        logger.warning("Redis publish failed for %s: %s", execution_id, exc)
 
 
 # ---------------------------------------------------------------------------
@@ -79,15 +71,14 @@ async def run_flow(
     flow_id: str,
     input_data: dict[str, Any],
     db: AsyncSession,
-    redis: Redis,
+    execution_id: str | None = None,
 ) -> str:
     """
-    Create an Execution record and kick off the flow synchronously.
-    Returns the execution_id.
+    Create an Execution record, compile the flow into a LangGraph StateGraph,
+    invoke it, and return the execution_id.
 
     Intended to be called inside a FastAPI BackgroundTask.
     """
-    from sqlalchemy import select
     from app.models.flow import Flow
 
     # ── Load flow ──────────────────────────────────────────────────────────
@@ -98,23 +89,28 @@ async def run_flow(
     nodes: list[dict] = row.nodes or []
     edges: list[dict] = row.edges or []
 
-    # ── Validate V1 node types ─────────────────────────────────────────────
-    for node in nodes:
-        get_executor(node["type"])  # raises for unsupported types
+    # ── Create or update Execution record ────────────────────────────────────
+    if execution_id:
+        # Endpoint pre-created the record; update it to running
+        execution = await db.get(Execution, execution_id)
+        if execution is None:
+            raise ValueError(f"Execution '{execution_id}' not found.")
+        execution.status = ExecutionStatus.running
+        execution.started_at = datetime.now(timezone.utc)
+        await db.flush()
+    else:
+        execution = Execution(
+            id=str(uuid.uuid4()),
+            flow_id=flow_id,
+            status=ExecutionStatus.running,
+            started_at=datetime.now(timezone.utc),
+            input=input_data,
+        )
+        db.add(execution)
+        await db.flush()
+        execution_id = execution.id
 
-    # ── Create Execution record ────────────────────────────────────────────
-    execution = Execution(
-        id=str(uuid.uuid4()),
-        flow_id=flow_id,
-        status=ExecutionStatus.running,
-        started_at=datetime.now(timezone.utc),
-        input=input_data,
-    )
-    db.add(execution)
-    await db.flush()
-    execution_id = execution.id
-
-    # ── Build execution context ────────────────────────────────────────────
+    # ── Build execution context (passed through LangGraph state) ───────────
     session_id: str | None = input_data.get("session_id")
     ctx: dict[str, Any] = {
         "flow_id": flow_id,
@@ -122,71 +118,59 @@ async def run_flow(
         "session_id": session_id,
         "input": input_data,
         "db": db,
-        "redis": redis,
     }
-    node_outputs: dict[str, Any] = {}
 
-    await _publish(redis, execution_id, {
+    await manager.broadcast(execution_id, {
         "event": "execution_started",
         "execution_id": execution_id,
     })
 
-    # ── Topological execution ──────────────────────────────────────────────
+    # ── Validate V1 node types (after execution record exists so we can mark error) ──
     try:
-        order = topological_sort(nodes, edges)
-    except ValueError as exc:
-        await _fail_execution(execution, db, redis, str(exc))
+        for node in nodes:
+            get_executor(node["type"])  # raises for unsupported types
+    except Exception as exc:
+        await _fail_execution(execution, db, str(exc))
         return execution_id
 
+    # ── Compile flow → LangGraph StateGraph ───────────────────────────────
+    try:
+        compiled = compile_flow(
+            nodes,
+            edges,
+            broadcast_fn=manager.broadcast,
+            log_fn=_log,
+        )
+    except Exception as exc:
+        await _fail_execution(execution, db, str(exc))
+        return execution_id
+
+    # ── Invoke LangGraph graph ─────────────────────────────────────────────
+    initial_state: AgentFlowState = {
+        "node_outputs": {},
+        "execution_id": execution_id,
+        "context": ctx,
+        "error": None,
+    }
+
+    try:
+        final_state: AgentFlowState = await compiled.ainvoke(initial_state)
+    except Exception as exc:
+        logger.exception("LangGraph invocation failed: %s", exc)
+        await _fail_execution(execution, db, str(exc))
+        return execution_id
+
+    # ── Handle error propagated through state ─────────────────────────────
+    if final_state.get("error"):
+        await _fail_execution(execution, db, final_state["error"])
+        return execution_id
+
+    # ── Collect final output from chat_output node ─────────────────────────
     final_output: dict = {}
-
-    for node_id in order:
-        try:
-            node = get_node_by_id(nodes, node_id)
-        except KeyError:
-            continue
-
-        node_type = node.get("type", "")
-
-        await _publish(redis, execution_id, {
-            "event": "node_started",
-            "execution_id": execution_id,
-            "node_id": node_id,
-            "node_type": node_type,
-        })
-
-        try:
-            inputs = resolve_inputs(node_id, edges, node_outputs)
-            executor = get_executor(node_type)
-            output = await executor.execute(node, inputs, ctx)
-            node_outputs[node_id] = output
-
-            # Track final output from chat_output nodes
-            if node_type == "chat_output":
-                final_output = output
-
-            await _log(db, execution_id, node_id, LogLevel.success,
-                       f"Node '{node_id}' completed successfully.")
-            await _publish(redis, execution_id, {
-                "event": "node_completed",
-                "execution_id": execution_id,
-                "node_id": node_id,
-                "node_type": node_type,
-                "output": output,
-            })
-
-        except Exception as exc:
-            logger.exception("Node %s failed: %s", node_id, exc)
-            await _log(db, execution_id, node_id, LogLevel.error,
-                       f"Node '{node_id}' failed.", {"error": str(exc)})
-            await _publish(redis, execution_id, {
-                "event": "node_error",
-                "execution_id": execution_id,
-                "node_id": node_id,
-                "error": str(exc),
-            })
-            await _fail_execution(execution, db, redis, str(exc))
-            return execution_id
+    for node in nodes:
+        if node.get("type") == "chat_output":
+            final_output = final_state["node_outputs"].get(node["id"], {})
+            break
 
     # ── Mark completed ─────────────────────────────────────────────────────
     execution.status = ExecutionStatus.completed
@@ -194,7 +178,7 @@ async def run_flow(
     execution.output = final_output
     await db.commit()
 
-    await _publish(redis, execution_id, {
+    await manager.broadcast(execution_id, {
         "event": "execution_completed",
         "execution_id": execution_id,
         "output": final_output,
@@ -211,10 +195,13 @@ async def _log(
     db: AsyncSession,
     execution_id: str,
     node_id: str,
-    level: LogLevel,
+    level: LogLevel | str,
     message: str,
     detail: dict | None = None,
 ) -> None:
+    # Accept both LogLevel enum values and plain strings from the compiler
+    if isinstance(level, str):
+        level = LogLevel(level)
     log = ExecutionLog(
         id=str(uuid.uuid4()),
         execution_id=execution_id,
@@ -231,14 +218,13 @@ async def _log(
 async def _fail_execution(
     execution: Execution,
     db: AsyncSession,
-    redis: Redis,
     error: str,
 ) -> None:
     execution.status = ExecutionStatus.error
     execution.completed_at = datetime.now(timezone.utc)
     execution.error = error
     await db.commit()
-    await _publish(redis, execution.id, {
+    await manager.broadcast(execution.id, {
         "event": "execution_error",
         "execution_id": execution.id,
         "error": error,

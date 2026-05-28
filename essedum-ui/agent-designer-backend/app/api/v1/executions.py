@@ -1,9 +1,9 @@
 from typing import List
 from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from redis.asyncio import Redis
 
-from app.dependencies import get_db, get_redis
+from app.dependencies import get_db
+from app.db.session import AsyncSessionLocal
 from app.schemas.execution import ExecutionResponse, ExecutionLogResponse, ExecutionRunRequest as RunRequest
 from app.services.execution_service import (
     get_execution, list_executions, get_execution_logs, stop_execution,
@@ -13,13 +13,18 @@ from app.engine.runner import run_flow
 router = APIRouter(prefix="/executions", tags=["executions"])
 
 
+async def _run_flow_with_own_session(flow_id: str, input_data: dict, execution_id: str) -> None:
+    """Run a flow using a fresh DB session (background task safe)."""
+    async with AsyncSessionLocal() as db:
+        await run_flow(flow_id=flow_id, input_data=input_data, db=db, execution_id=execution_id)
+
+
 @router.post("/flows/{flow_id}/run", status_code=status.HTTP_202_ACCEPTED)
 async def run_flow_endpoint(
     flow_id: str,
     request: RunRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-    redis: Redis = Depends(get_redis),
 ):
     # Kick off in background; returns execution_id immediately
     import uuid
@@ -35,12 +40,13 @@ async def run_flow_endpoint(
     db.add(execution)
     await db.commit()
 
+    # Use a fresh session for the background task — the request session closes
+    # after the response is sent, which would break any DB operations in run_flow.
     background_tasks.add_task(
-        run_flow,
+        _run_flow_with_own_session,
         flow_id=flow_id,
         input_data=request.model_dump(),
-        db=db,
-        redis=redis,
+        execution_id=execution.id,
     )
     return {"execution_id": execution.id, "status": "pending"}
 

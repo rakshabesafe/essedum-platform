@@ -1,6 +1,5 @@
 __pycache__
-agent_flow-local.db
-agent_flow.db
+*.db
 .env
 *.log
 pip.ini

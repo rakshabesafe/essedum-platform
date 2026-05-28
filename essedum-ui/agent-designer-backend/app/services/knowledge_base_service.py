@@ -44,12 +44,15 @@ async def create_knowledge_base(
     db.add(kb)
     await db.flush()
 
-    # Create Qdrant collection
-    vdb = get_provider(kb.vectordb_provider, kb.vectordb_config or {})
-    await vdb.create_collection(
-        collection_name=collection_name,
-        dimensions=kb.embedding_dims,
-    )
+    # Create Qdrant collection (best-effort — skip if Qdrant unavailable)
+    try:
+        vdb = get_provider(kb.vectordb_provider, kb.vectordb_config or {})
+        await vdb.create_collection(
+            collection_name=collection_name,
+            dimensions=kb.embedding_dims,
+        )
+    except Exception:
+        pass  # Qdrant not available; collection will be created on first use
 
     await db.commit()
     await db.refresh(kb)

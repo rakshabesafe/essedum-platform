@@ -16,9 +16,6 @@ class Settings(BaseSettings):
         "postgresql+asyncpg://agentflow:agentflow@localhost:5432/agentflow"
     )
 
-    # Redis
-    redis_url: str = "redis://localhost:6379"
-
     # Qdrant (V1 — only supported vector store)
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
@@ -39,6 +36,9 @@ class Settings(BaseSettings):
     google_project_id: Optional[str] = None
     google_location: str = "us-central1"
     google_application_credentials: Optional[str] = None
+
+    # Ollama (local LLM)
+    ollama_base_url: str = "http://localhost:11434/v1"
 
 
 settings = Settings()

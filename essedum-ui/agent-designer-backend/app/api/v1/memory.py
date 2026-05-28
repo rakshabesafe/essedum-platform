@@ -23,7 +23,7 @@ async def get_memory(
     result = await db.execute(stmt)
     records = result.scalars().all()
     if not records:
-        raise NotFoundError(f"No memory found for flow '{flow_id}'.")
+        return []
     return [{"id": str(m.id), "session_id": m.session_id, "entries": m.entries} for m in records]
 
 

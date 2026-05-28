@@ -25,15 +25,5 @@ async def ready(db: AsyncSession = Depends(get_db)):
     except Exception as exc:
         checks["db"] = str(exc)
 
-    # Redis check (optional — no hard failure)
-    try:
-        from app.dependencies import get_redis
-        redis = await get_redis()
-        await redis.ping()
-        checks["redis"] = "ok"
-    except Exception as exc:
-        logger.warning("Redis unavailable: %s", exc)
-        checks["redis"] = "unavailable"
-
     overall = "ready" if checks["db"] == "ok" else "degraded"
     return {"status": overall, "checks": checks}

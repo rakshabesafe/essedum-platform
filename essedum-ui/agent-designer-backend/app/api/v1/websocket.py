@@ -1,11 +1,8 @@
 import asyncio
-import json
 import logging
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from redis.asyncio import Redis
 
-from app.dependencies import get_redis
 from app.engine.runner import manager
 
 logger = logging.getLogger(__name__)
@@ -17,31 +14,22 @@ router = APIRouter(tags=["websocket"])
 async def execution_ws(execution_id: str, websocket: WebSocket):
     """
     WebSocket endpoint for real-time execution events.
-    Also subscribes to the Redis pub/sub channel so events are delivered
-    even if the execution runs in a different worker process.
+    Uses an in-process asyncio.Queue per connection — no Redis required.
+    Events are pushed by the execution runner via manager.broadcast().
     """
-    from app.dependencies import get_redis as _get_redis
+    queue: asyncio.Queue = await manager.connect(execution_id, websocket)
 
-    await manager.connect(execution_id, websocket)
+    async def _sender():
+        while True:
+            message = await queue.get()
+            if message is None:  # sentinel: connection closed
+                return
+            try:
+                await websocket.send_text(message)
+            except Exception:
+                return
 
-    # Also subscribe to Redis channel for cross-process delivery
-    redis: Redis = await anext(aiter(_get_redis()))
-    pubsub = redis.pubsub()
-    channel = f"execution:{execution_id}"
-    await pubsub.subscribe(channel)
-
-    async def _redis_listener():
-        async for message in pubsub.listen():
-            if message["type"] == "message":
-                data = message.get("data", b"")
-                if isinstance(data, bytes):
-                    data = data.decode()
-                try:
-                    await websocket.send_text(data)
-                except Exception:
-                    return
-
-    listener_task = asyncio.create_task(_redis_listener())
+    sender_task = asyncio.create_task(_sender())
 
     try:
         while True:
@@ -49,15 +37,5 @@ async def execution_ws(execution_id: str, websocket: WebSocket):
     except WebSocketDisconnect:
         pass
     finally:
-        listener_task.cancel()
-        await pubsub.unsubscribe(channel)
-        manager.disconnect(execution_id, websocket)
-
-
-# Helpers for async generator protocol
-def aiter(obj):
-    return obj.__aiter__()
-
-
-async def anext(obj):
-    return await obj.__anext__()
+        sender_task.cancel()
+        manager.disconnect(execution_id, websocket, queue)

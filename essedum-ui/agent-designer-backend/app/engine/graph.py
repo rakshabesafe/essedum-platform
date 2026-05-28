@@ -10,8 +10,20 @@ def build_adjacency(nodes: list[dict], edges: list[dict]) -> dict[str, list[str]
     return adj
 
 
-def topological_sort(nodes: list[dict], edges: list[dict]) -> list[str]:
-    """Kahn's algorithm. Raises ValueError on cycle detection."""
+def topological_sort(
+    nodes: list[dict],
+    edges: list[dict],
+    *,
+    allow_cycles: bool = False,
+) -> list[str]:
+    """
+    Kahn's algorithm.
+    Raises ValueError on cycle detection unless allow_cycles=True.
+
+    Note: the LangGraph compiler (compiler.py) does NOT call this function —
+    it lets LangGraph handle node ordering natively, which supports cycles for
+    agent-loop nodes. This function is retained for validation and dry-run paths.
+    """
     node_ids = {n["id"] for n in nodes}
     in_degree: dict[str, int] = {nid: 0 for nid in node_ids}
 
@@ -36,7 +48,14 @@ def topological_sort(nodes: list[dict], edges: list[dict]) -> list[str]:
                 queue.append(neighbor)
 
     if len(order) != len(node_ids):
-        raise ValueError("Flow graph contains a cycle — cannot execute.")
+        if not allow_cycles:
+            raise ValueError(
+                "Flow graph contains a cycle — cannot execute as a plain DAG. "
+                "Use agent_loop nodes for cyclic patterns (V2)."
+            )
+        # Cycles present but allowed — append remaining nodes in arbitrary order
+        visited = set(order)
+        order += [nid for nid in node_ids if nid not in visited]
 
     return order
 

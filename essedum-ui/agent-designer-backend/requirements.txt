@@ -8,6 +8,7 @@ websockets==12.0
 sqlalchemy[asyncio]==2.0.31
 asyncpg==0.29.0
 psycopg2-binary==2.9.9
+aiosqlite==0.22.1
 alembic==1.13.2
 
 # Validation & settings
@@ -15,10 +16,8 @@ pydantic==2.8.2
 pydantic-settings==2.3.4
 
 # Cache
-redis[asyncio]==5.0.7
-
-# Task queue (background ingestion)
-celery[redis]==5.4.0
+# (Redis removed for V1 — in-process asyncio.Queue used for WebSocket fan-out)
+# For V2/production, replace with Valkey (BSD-3) or KeyDB (BSD-3)
 
 # Vector DB - Qdrant (V1)
 qdrant-client==1.10.1
@@ -45,6 +44,10 @@ unstructured[pdf]==0.15.0
 # Chunking & tokenization
 langchain-text-splitters==0.2.4
 tiktoken==0.7.0
+
+# LangGraph execution engine (MIT)
+langgraph>=0.2.0
+langgraph-checkpoint-sqlite>=1.0.0
 
 # Testing
 pytest==8.2.2
