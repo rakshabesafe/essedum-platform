@@ -62,10 +62,14 @@
 // TAB GROUP
 // =============================================================================
 ::ng-deep .mat-mdc-tab-group {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
   .mat-mdc-tab-header {
     background: #161b22 !important;
     border-bottom: none !important;
     padding: 0 12px;
+    flex-shrink: 0;
   }
   .mat-mdc-tab-label-container { flex-grow: 0 !important; }
   .mat-mdc-tab-labels { gap: 8px; justify-content: flex-start !important; }
@@ -90,28 +94,83 @@
   }
   .mdc-tab--active .mdc-tab__text-label { color: #58a6ff !important; font-weight: 600 !important; }
   .mdc-tab-indicator__content--underline { border-color: #58a6ff !important; border-width: 2px !important; }
-  .mat-mdc-tab-body-wrapper { flex: 1; }
+  .mat-mdc-tab-body-wrapper { flex: 1 !important; min-height: 0; }
 }
 
-.tab-content { padding: 0 !important; }
+.tab-content {
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+}
+
+// Material's tab-body chain (mat-tab-group → mat-mdc-tab-body-wrapper →
+// mat-mdc-tab-body → mat-mdc-tab-body-content) collapses to shrink-to-content
+// inside the federated MFE bundle (the host's Material CSS singleton doesn't
+// fully apply to the remote's DOM). Force every level to fill, otherwise the
+// .file-panel grid sees only its explorer's 260px as the available width.
+:host ::ng-deep mat-tab-group,
+:host ::ng-deep .mat-mdc-tab-group {
+  display: block !important;
+  width: 100% !important;
+}
+:host ::ng-deep .mat-mdc-tab-body-wrapper {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  position: relative !important;
+}
+:host ::ng-deep .mat-mdc-tab-body {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+:host ::ng-deep .mat-mdc-tab-body-content {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 100% !important;
+  position: relative !important;
+}
 
 // =============================================================================
 // FILE STRUCTURE (CODESPACE TAB) - VS Code Layout
 // =============================================================================
 .file-structure-container {
-  display: block;
+  display: flex !important;
+  flex-direction: column !important;
   width: 100% !important;
-  min-height: calc(100vh - 240px);
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
   background: #0d1117;
 }
 
-// CRITICAL: file-panel contains BOTH explorer and editor - must be flex row
+// CRITICAL: explorer + editor side-by-side. Using CSS grid so the editor's
+// width is computed explicitly (1fr after the explorer's fixed column) rather
+// than relying on flex propagation, which the federated chunk doesn't get
+// reliably from Material's tab-body styles.
 .file-panel {
-  display: flex !important;
-  flex-direction: row !important;
+  display: grid !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
   width: 100% !important;
-  height: calc(100vh - 240px);
+  min-width: 0 !important;
+  height: 100%;
+  flex: 1;
   overflow: hidden;
+}
+
+// RIGHT SIDE - FILE EDITOR (1fr column in the grid above)
+.file-editor-container {
+  min-width: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 // =============================================================================
@@ -449,9 +508,12 @@
 
 // Editor content area
 .editor-content-wrapper {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
+  display: flex !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
 }
 
 .text-editor-container {
@@ -462,9 +524,24 @@
 }
 
 .python-editor-container {
-  flex: 1;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
   overflow: auto;
   background: #0d1117;
+  display: flex !important;
+  flex-direction: column !important;
+
+  app-enl-code-editor {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 400px;
+  }
 }
 
 // Line numbers gutter - VS Code style

@@ -300,13 +300,13 @@ export class DatasourceComponent implements OnInit, OnChanges {
 
   viewConnection(name) {
     this.view = true;
-    this.router.navigate(['./view/' + name, this.view], {
+    this.router.navigate(['view', name, this.view], {
       relativeTo: this.route,
     });
   }
   editConnection(name) {
     this.edit = true;
-    this.router.navigate(['./edit/' + name, this.edit], {
+    this.router.navigate(['edit', name, this.edit], {
       relativeTo: this.route,
     });
   }

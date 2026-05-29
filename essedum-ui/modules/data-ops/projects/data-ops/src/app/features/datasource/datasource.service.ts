@@ -1,25 +1,25 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { Datasource } from './datasource';
 import { map, shareReplay } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
-
+import { Datasource } from '@essedum/shared-lib';
+ 
 @Injectable()
 export class DatasourceService {
   messageService: any;
   private apiCache = new Map<string, Observable<any>>();
-  
+ 
   constructor(private https: HttpClient, @Inject('dataSets') private dataUrl: string) { }
-
+ 
   clearCache(): void {
     this.apiCache.clear();
   }
-
+ 
   clearCacheEntry(key: string): void {
     this.apiCache.delete(key);
   }
-
+ 
   getDatasource(name: string): Observable<any> {
     const org = sessionStorage.getItem("organization");
     return this.https.get(this.dataUrl + '/datasources/' + name + '/' + org, {
@@ -33,7 +33,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getDatasourcesByName(name: any): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/search/' + name, { observe: 'response', params: { org: sessionStorage.getItem("organization") } })
       .pipe(map(response => {
@@ -43,7 +43,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   testConnection(datasource: Datasource): Observable<any> {
     return this.https.post(this.dataUrl + '/datasources/test', datasource, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -56,7 +56,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   isVaultEnabled(): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/isVaultEnabled', {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -69,7 +69,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   createDatasource(datasource: Datasource): Observable<any> {
     return this.https.post(this.dataUrl + '/datasources/add', datasource, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -82,7 +82,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-  
+ 
   saveDatasource(datasource: Datasource): Observable<any> {
     return this.https.post(this.dataUrl + '/datasources/save/' + (datasource.id ? datasource.id : datasource.alias), datasource, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -95,15 +95,15 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getDatasources(): Observable<any> {
     const org = sessionStorage.getItem("organization");
     const cacheKey = `datasources-all-${org}`;
-    
+   
     if (this.apiCache.has(cacheKey)) {
       return this.apiCache.get(cacheKey)!;
     }
-    
+   
     const request$ = this.https.get(this.dataUrl + '/datasources/all', {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
       observe: 'response',
@@ -119,11 +119,11 @@ export class DatasourceService {
         }),
         shareReplay({ bufferSize: 1, refCount: true })
       );
-    
+   
     this.apiCache.set(cacheKey, request$);
     return request$;
   }
-
+ 
   getDatasourceByPluginType(type, search, interfacetype, page, size,organization?): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/type/paginated/' + type, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -137,7 +137,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getDatasourceCountByPluginType(type, search): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/type/count/' + type, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -164,9 +164,9 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
  
-
+ 
+ 
   getDatasourceGroups(page, size): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/groups/all', {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -180,7 +180,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getDatasourcesForGroup(group: string): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/all/' + group, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -194,7 +194,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getPluginsLength(): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/all/len')
       .pipe(map(response => {
@@ -204,7 +204,7 @@ export class DatasourceService {
         return this.handleError(err)
       }))
   }
-
+ 
   getDatasourceJson(page, size): Observable<any> {
     let headers = new HttpHeaders().append("Authorization", "Bearer " + localStorage.getItem("jwtToken"))
     return this.https.get(this.dataUrl + '/datasources/types', { params: { page: page, size: size },headers:headers })
@@ -215,7 +215,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getDatasourceJsonByDatasourceName(name): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/types/' + name + '/' + sessionStorage.getItem("organization"), {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -228,7 +228,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getDatasourceByNameAndType(name, type, page, size): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/type/search/' + name + '/' + type, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -242,7 +242,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   deleteDatasource(name): Observable<any> {
     const org = sessionStorage.getItem("organization");
     return this.https.delete(this.dataUrl + '/datasources/delete/' + name + '/' + org, {
@@ -256,7 +256,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   addGroupModelEntity(name: String, groups: any[]): Observable<any> {
     return this.https.post(this.dataUrl + '/entities/add/datasource/' + name, groups, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -269,7 +269,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   deleteGroupModelEntity(name: String): Observable<any> {
     return this.https.post(this.dataUrl + '/entities/delete/datasource/' + name, sessionStorage.getItem("organization"), {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -282,7 +282,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getGroupsForEntity(name: string): Observable<any> {
     return this.https.get(this.dataUrl + '/groups/all/datasource/' + name, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -296,7 +296,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   private handleError(error: any) {
     // TODO: seems we cannot use messageService from here...
     const errMsg = error.error;
@@ -306,7 +306,7 @@ export class DatasourceService {
     // }
     return throwError(errMsg);
   }
-
+ 
   getDatasourcesNames(): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/names', {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -320,7 +320,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getDatasourcesAliases(): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/names', {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -334,7 +334,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getCoreDatasourceByType(type, search, page, size): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/type/paginated/' + type, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -348,7 +348,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getCoreDatasourceCountByType(type, search): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/type/count/' + type, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -362,7 +362,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getCoreDatasourceJsonByDatasourceName(name): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/types/' + name + '/' + "core", {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -375,7 +375,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getCoreDatasource(name: string, org: any): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/get/' + name + '/' + org, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -388,7 +388,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getDatasourcesNames1(org): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/names', {
       headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
@@ -402,7 +402,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getAdapterTypes(): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/get/adapterTypes', {
       observe: 'response'
@@ -414,7 +414,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   getAdaptersByOrg(): Observable<any> {
     return this.https.get(this.dataUrl + '/datasources/getadapters/'+sessionStorage.getItem("organization"), {
       observe: 'response'
@@ -426,7 +426,7 @@ export class DatasourceService {
         return this.handleError(err);
       }));
   }
-
+ 
   scheduleDatasourceTest(timeId, expression): Observable<any> {
     try{
       let body = {
@@ -448,22 +448,22 @@ export class DatasourceService {
     }
    
     }
-
+ 
       getDocs(pluginType){
         const org = sessionStorage.getItem("organization");
         return this.https.get(this.dataUrl + '/datasources/getDocs/' + pluginType + '/' + org,
       { observe: 'response',responseType: 'text'})
       .pipe(map(response => {
-        
+       
         return response.body;
       }))
       .pipe(catchError(err => {
         return this.handleError(err)
       }))
       }
-
+ 
       getSpecTemplateNames(): Observable<any> {
-        return this.https.get('/api/aip/spectemplates/specTemplateNames/list', {
+        return this.https.get(this.dataUrl + '/mlspectemplates/specTemplateNames/list', {
           headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
           observe: 'response'
         })
@@ -474,9 +474,9 @@ export class DatasourceService {
             return this.handleError(err);
           }));
       }
-    
+   
       getSpecTemplateByName(templateName: string): Observable<any> {
-        return this.https.get('/api/aip/spectemplates/'+templateName, {
+        return this.https.get(this.dataUrl + '/mlspectemplates/'+templateName, {
           headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
           observe: 'response'
         })
@@ -487,9 +487,9 @@ export class DatasourceService {
             return this.handleError(err);
           }));
       }
-
+ 
       createInstance(instance: any): Observable<any> {
-        return this.https.post('/api/aip/instances/add', instance, {
+        return this.https.post(this.dataUrl + '/mlinstances/add', instance, {
           headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
           observe: 'response'
         })
@@ -500,9 +500,9 @@ export class DatasourceService {
             return this.handleError(err);
           }));
       }
-
+ 
       getInstance(name: string, org: any): Observable<any> {
-        return this.https.get('/api/aip/instances/' + name + '/' + org, {
+        return this.https.get(this.dataUrl + '/mlinstances/' + name + '/' + org, {
           headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
           observe: 'response'
         })
@@ -513,9 +513,9 @@ export class DatasourceService {
             return this.handleError(err);
           }));
       }
-
+ 
       getInstancesByAlias(alias: string, org: any): Observable<any> {
-        return this.https.get('/api/aip/instances/searchByAlias/' + alias + '/' + org, {
+        return this.https.get(this.dataUrl + '/mlinstances/searchByAlias/' + alias + '/' + org, {
           headers: new HttpHeaders({ 'Content-Type': 'application/json; charset=utf-8' }),
           observe: 'response'
         })
@@ -527,3 +527,5 @@ export class DatasourceService {
           }));
       }
 }
+ 
+ 

@@ -767,18 +767,8 @@ mat-card-actions.card-actions-hover {
 }
 
 // ══ BORDERLESS TEXT FIELDS ════════════════════════════════════════════════════
-// Simple: no lines, no borders, no indicators on any form field, ever.
-.mat-mdc-form-field,
-.mat-mdc-form-field *,
-.mat-mdc-form-field *::before,
-.mat-mdc-form-field *::after,
-// -- Form field underlines: visible in dark/light themes -----------
-.mdc-text-field__ripple,
-.mat-mdc-form-field-focus-overlay {
-  display: none !important;
-  opacity: 0 !important;
-  background: transparent !important;
-}
+// Note: Global form field hiding was removed as it broke component-specific styling.
+// Individual components (connection-view, etc.) manage their own form field appearance.
 .mdc-line-ripple {
   display: block !important;
   visibility: visible !important;

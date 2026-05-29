@@ -74,6 +74,10 @@ import { PipelineCreateComponent } from '../features/pipeline/pipeline-create/pi
 import { LitellmComponent } from '../features/litellm/litellm.component';
 import { LangfuseComponent } from '../features/langfuse/langfuse.component';
 
+// Ace-based code editor used by agent-pipeline + agent-directory-edit screens.
+// Copied from vibe-studio MFE so the agent MFE doesn't need a cross-MFE component reference.
+import { EnlCodeEditorComponent } from '../features/enl-code-editor/enl-code-editor.component';
+
 // Shared local UI (copied verbatim from monolith for now)
 import { TagsComponent } from '@essedum/shared-lib';
 
@@ -122,6 +126,8 @@ import { environment } from '../../environments/environment';
     LitellmComponent,
     LangfuseComponent,
     GitHubPushComponent,
+    // ace-based code editor (copied from vibe-studio MFE)
+    EnlCodeEditorComponent,
     // sharedModule aip-* — remaining MFE-private (rest moved to SharedLibUiModule)
     AipFilterComponent,
   ],

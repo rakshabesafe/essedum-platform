@@ -2,11 +2,13 @@ import {
   Component,
   OnInit,
   OnDestroy,
+  AfterViewInit,
   HostListener,
   Input,
   Inject,
   ChangeDetectorRef,
   ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -81,7 +83,7 @@ interface AgentState {
   templateUrl: './agent-pipeline.component.html',
   styleUrls: ['./agent-pipeline.component.scss'],
 })
-export class AgentPipelineComponent implements OnInit, OnDestroy {
+export class AgentPipelineComponent implements OnInit, AfterViewInit, OnDestroy {
   streamItem: StreamingServices;
   cardToggled: boolean = false;
   card: any;
@@ -2002,6 +2004,7 @@ export class AgentPipelineComponent implements OnInit, OnDestroy {
 
     // Use content directly from the file node (already loaded from upload API)
     this.selectedFileContent = node.content || 'No content available';
+    console.log('File selected:', node.name, 'Content length:', this.selectedFileContent.length, 'Has content:', !!node.content);
     this.originalFileContent = this.selectedFileContent; // Store original content
     this.isUserModifiedContent = false; // Reset user modification flag
     this.userModifiedLines.clear(); // Clear user modified lines
@@ -3629,8 +3632,56 @@ export class AgentPipelineComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Remove event listener to prevent memory leaks
     window.removeEventListener('beforeunload', this.handleBeforeUnload.bind(this));
-    
+
     // Clean up WebSocket connection
     this.disconnectWebSocket();
+
+    // Tear down the Material tab-body width forcer.
+    this.tabSizeObserver?.disconnect();
+    this.tabSizeObserver = null;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Material tab-body width forcer
+  //
+  // In the federated MFE bundle, Material's mat-mdc-tab-body / mat-mdc-tab-body-
+  // content lose the host's `width: 100%; position: absolute; inset: 0` styling
+  // and collapse to shrink-to-content (260px, matching only the file explorer).
+  // CSS ::ng-deep fixes don't pierce reliably here. So we own this with JS:
+  // measure the outer panel and set inline widths on every Material wrapper.
+  // Inline styles beat any cascade ordering.
+  // ---------------------------------------------------------------------------
+  private tabSizeObserver: ResizeObserver | null = null;
+  @ViewChild('panelShell', { static: false }) private panelShellRef?: ElementRef<HTMLElement>;
+
+  ngAfterViewInit(): void {
+    // Defer to next frame so Material has finished rendering mat-tab-body.
+    requestAnimationFrame(() => this.installTabSizeForcer());
+  }
+
+  private installTabSizeForcer(): void {
+    const root = (this.panelShellRef?.nativeElement) ?? (document.querySelector('.lfx-u-mar-t-16') as HTMLElement | null);
+    if (!root || typeof ResizeObserver === 'undefined') return;
+
+    const apply = () => {
+      const w = root.clientWidth;
+      if (w <= 0) return;
+      const targets = root.querySelectorAll<HTMLElement>(
+        '.mat-mdc-tab-body-wrapper, .mat-mdc-tab-body, .mat-mdc-tab-body-content'
+      );
+      targets.forEach((el) => {
+        el.style.setProperty('width', `${w}px`, 'important');
+        el.style.setProperty('max-width', 'none', 'important');
+        el.style.setProperty('min-width', '0', 'important');
+      });
+    };
+
+    apply();
+    this.tabSizeObserver = new ResizeObserver(apply);
+    this.tabSizeObserver.observe(root);
+
+    // Re-apply on tab switch and after late DOM mutations (mat-tab swaps body content).
+    const mo = new MutationObserver(() => apply());
+    mo.observe(root, { childList: true, subtree: true });
   }
 }
