@@ -1,0 +1,24 @@
+# Dependencies — reinstalled fresh inside the container
+node_modules/
+
+# Build output — rebuilt inside the container
+dist/
+render/
+
+# Local environment files — never include secrets in the image
+.env
+.env.local
+.env.*.local
+
+# Version control
+.git/
+.gitignore
+
+# Editor and OS files
+.vscode/
+.DS_Store
+*.log
+
+# Test / dev artifacts
+coverage/
+*.test.*

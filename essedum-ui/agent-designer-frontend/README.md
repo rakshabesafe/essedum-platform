@@ -1,203 +1,396 @@
 # AgentFlow Designer
 
-A visual drag-and-drop workflow designer for building AI agent pipelines. Built with React 19, TypeScript, Vite, Tailwind CSS, and React Flow (@xyflow/react).
+AgentFlow Designer is a visual, drag-and-drop tool for building AI agent workflows. You connect nodes together on a canvas to design pipelines — no coding required to build and run flows.
+
+Built with **React 19**, **TypeScript**, **Vite**, **Tailwind CSS**, and **React Flow**.
 
 ---
 
 ## Table of Contents
 
+- [What Does This App Do?](#what-does-this-app-do)
+- [How the App Works (User Flow)](#how-the-app-works-user-flow)
+- [App Structure](#app-structure)
 - [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Running Locally](#running-locally)
-- [Build & Deploy](#build--deploy)
-- [Project Structure](#project-structure)
-- [Configuration](#configuration)
+- [Local Setup](#local-setup)
+  - [Option A — Dev Server (recommended for development)](#option-a--dev-server-recommended-for-development)
+  - [Option B — Docker (run without Node.js)](#option-b--docker-run-without-nodejs)
+- [Environment Variables](#environment-variables)
+- [Deploy to Kubernetes](#deploy-to-kubernetes)
 - [Keyboard Shortcuts](#keyboard-shortcuts)
-- [Enterprise Readiness Checklist](#enterprise-readiness-checklist)
-- [Known Limitations](#known-limitations)
 - [Tech Stack](#tech-stack)
+
+---
+
+## What Does This App Do?
+
+AgentFlow Designer lets you:
+
+- **Drag nodes** from a left-side panel onto the canvas (e.g. LLM, Tool, Agent, Input, Output nodes)
+- **Connect nodes** by drawing edges between them to define data flow
+- **Configure each node** using the right-side inspector panel (set prompts, API endpoints, model names, etc.)
+- **Run the flow** and watch execution logs stream in real time at the bottom
+- **Save and load flows** — stored in the browser's local storage
+- **Export / import flows** as JSON files for sharing
+
+---
+
+## How the App Works (User Flow)
+
+```
+ ┌─────────────────────────────────────────────────────────────────┐
+ │                         Top Bar                                 │
+ │  [New Flow]  [Save]  [Load]  [Export JSON]  [Import JSON]  [Run]│
+ └─────────────────────────────────────────────────────────────────┘
+        │
+        ▼
+ ┌──────────────┐    ┌───────────────────────────────┐    ┌────────────────┐
+ │  Node Library│    │         Flow Canvas           │    │ Node Inspector │
+ │  (Left side) │───▶│  Drag & drop nodes here       │───▶│ (Right side)   │
+ │              │    │  Connect nodes with edges     │    │ Edit selected  │
+ │  - LLM       │    │  Pan with mouse drag          │    │ node's config  │
+ │  - Agent     │    │  Zoom with scroll wheel       │    │ fields         │
+ │  - Tool      │    │                               │    │                │
+ │  - Input     │    │                               │    │                │
+ │  - Output    │    │                               │    │                │
+ └──────────────┘    └───────────────────────────────┘    └────────────────┘
+                                   │
+                                   ▼
+                     ┌─────────────────────────┐
+                     │      Logs Panel         │
+                     │  (bottom of the screen) │
+                     │  Live execution output  │
+                     └─────────────────────────┘
+```
+
+**Typical workflow:**
+
+1. Open the app in a browser
+2. Drag an **Input** node onto the canvas → set your prompt or data
+3. Drag an **LLM** node → configure the model name and system prompt
+4. Drag an **Output** node → connect it to the LLM's output
+5. Draw connections: Input → LLM → Output
+6. Click **Run** (`Ctrl + Enter`) — watch the logs panel
+7. Click **Save** (`Ctrl + S`) to keep the flow for later
+
+---
+
+## App Structure
+
+```
+agent-designer-frontend/
+│
+├── src/
+│   ├── pages/
+│   │   ├── Index.tsx              ← Landing / welcome page
+│   │   └── Designer.tsx           ← Main page with all panels
+│   │
+│   ├── components/
+│   │   ├── flow/
+│   │   │   ├── TopBar.tsx         ← Header: save, load, run buttons
+│   │   │   ├── NodeLibrary.tsx    ← Left panel: list of available nodes
+│   │   │   ├── FlowCanvas.tsx     ← Centre: the drag-and-drop canvas
+│   │   │   ├── FlowNode.tsx       ← How each node looks on the canvas
+│   │   │   ├── NodeInspector.tsx  ← Right panel: edit selected node
+│   │   │   ├── LogsPanel.tsx      ← Bottom: execution log viewer
+│   │   │   ├── FlowManager.tsx    ← Save / load / delete flow dialogs
+│   │   │   └── KeyboardShortcuts.tsx
+│   │   └── ui/                    ← Reusable UI components (buttons, dialogs, etc.)
+│   │
+│   ├── data/
+│   │   └── nodeDefinitions.ts     ← All node types, their icons, fields, connections
+│   │
+│   ├── store/
+│   │   └── FlowContext.tsx        ← App-wide state (nodes, edges, logs, run status)
+│   │
+│   └── types/
+│       └── flow.ts                ← TypeScript types for nodes, edges, fields
+│
+├── Dockerfile                     ← Container build (Node build → Nginx serve)
+├── vite.config.ts                 ← Build config (outputs single index.html)
+├── tailwind.config.js             ← Styling theme
+├── package.json                   ← Dependencies and scripts
+└── index.html                     ← App entry point
+```
+
+**Key concept:** The build produces a **single `dist/index.html`** file with all JavaScript and CSS inlined. This one file is the entire app — easy to share, host, or drop into any web server.
 
 ---
 
 ## Prerequisites
 
-| Tool | Version |
-|------|---------|
-| Node.js | v18+ (tested on v23.11.1) |
-| npm | v9+ (tested on v10.9.2) |
-
-> **Corporate network note:** A `.npmrc` is included that points npm to the internal Artifactory registry (`infyartifactory.jfrog.io`) with SSL verification disabled. Remove or replace `.npmrc` if installing from the public npm registry.
+| Tool | Version | Why you need it |
+|------|---------|-----------------|
+| Node.js | v18 or higher | To run the dev server and build the app |
+| npm | v9 or higher | To install packages |
+| Docker | v20 or higher | To build and run as a container |
+| kubectl | v1.25 or higher | To deploy to Kubernetes |
 
 ---
 
-## Installation
+## Local Setup
+
+### Option A — Dev Server (recommended for development)
+
+This gives you live hot-reload as you edit code.
+
+**1. Install dependencies**
 
 ```bash
-# Navigate to the project folder
-cd agentflow_designer_f8024fd0
-
-# Standard install
+cd agent-designer-frontend
 npm install
-
-# External / open-source (public npm registry — remove .npmrc first):
-# rm .npmrc && npm install
 ```
 
----
-
-## Running Locally
+**2. Create your local environment file from the example**
 
 ```bash
-# Start the development server with hot-reload
+cp .env.example .env.local
+```
+
+Then open `.env.local` and set your values (see [Environment Variables](#environment-variables) for full details). At minimum, set:
+
+```env
+VITE_PORT=4000
+VITE_API_BASE_URL=http://localhost:4545
+```
+
+> If you skip this step, the app uses the defaults: port `4000`, backend at `http://localhost:4545`.
+
+**3. Start the app**
+
+```bash
 npm run dev
 ```
 
-App will be available at: **http://localhost:5173**
+Open your browser at **http://localhost:4000**
 
-> If port 5173 is in use, Vite automatically tries the next available port (e.g. 5174). Check terminal output for the exact URL.
+> The port comes from `VITE_PORT` in your `.env.local`. Change it there if `4000` is already in use.
 
----
+**Other useful commands:**
 
-## Build & Deploy
-
-### Production build
 ```bash
-npm run build
-```
-
-Output is placed in the `dist/` folder as a **single self-contained `index.html`** file (via `vite-plugin-singlefile`). All JS, CSS, and assets are inlined — no separate asset files needed.
-
-### Preview production build locally
-```bash
-npm run preview
-```
-
-### Type check only (no emit)
-```bash
-npm run typecheck
-```
-
-### Lint
-```bash
-npm run lint
-```
-
-### Deploying
-
-Since the build output is a single `dist/index.html`, deploy by:
-
-| Method | Steps |
-|--------|-------|
-| Static server (Nginx/Apache) | Copy `dist/index.html` to the web root |
-| Azure Static Web Apps | Point build output to `dist/` |
-| AWS S3 + CloudFront | Upload `dist/index.html`, set index document |
-| SharePoint / internal portal | Embed or link `dist/index.html` directly |
-| Docker | Serve `dist/index.html` via any Nginx container |
-
----
-
-## Project Structure
-
-```
-agentflow_designer_f8024fd0/
-├── public/                    # Static public assets
-├── src/
-│   ├── assets/                # Images, logos (SVG)
-│   ├── components/
-│   │   ├── flow/              # Core flow editor components
-│   │   │   ├── FlowCanvas.tsx       # React Flow canvas (drag-and-drop)
-│   │   │   ├── FlowNode.tsx         # Custom node renderer
-│   │   │   ├── FlowManager.tsx      # Save/load/delete flow dialogs
-│   │   │   ├── KeyboardShortcuts.tsx
-│   │   │   ├── LogsPanel.tsx        # Execution log viewer
-│   │   │   ├── NodeInspector.tsx    # Node config panel (right sidebar)
-│   │   │   ├── NodeLibrary.tsx      # Node palette (left sidebar)
-│   │   │   └── TopBar.tsx           # Header bar with all actions
-│   │   └── ui/                # shadcn/ui component library (40+ components)
-│   ├── data/
-│   │   └── nodeDefinitions.ts # All available node types and their config fields
-│   ├── hooks/                 # Custom React hooks
-│   ├── lib/
-│   │   ├── storeFactory.ts    # Zustand store factory wrapper
-│   │   └── utils.ts           # cn() class merge utility (clsx + tailwind-merge)
-│   ├── pages/
-│   │   ├── Designer.tsx       # Main designer page layout
-│   │   └── Index.tsx          # Landing/entry page
-│   ├── store/
-│   │   ├── FlowContext.tsx    # Central state (useReducer + React Context)
-│   │   ├── flowStore.ts       # Re-exports FlowProvider + useFlowStore
-│   │   └── useFlowStore.ts    # useFlowStore hook
-│   └── types/
-│       └── flow.ts            # All TypeScript types and interfaces
-├── index.html
-├── vite.config.ts
-├── tailwind.config.js
-├── tsconfig.json
-└── package.json
+npm run build       # Create a production build in dist/
+npm run preview     # Serve the production build locally to test it
+npm run typecheck   # Check for TypeScript errors without building
+npm run lint        # Check for code style issues
 ```
 
 ---
 
-## Configuration
+### Option B — Docker (run without Node.js)
 
-### Environment Variables
+Use this if you want to run the app as a container, or you don't have Node.js installed.
 
-Currently the app has no `.env` configuration. For enterprise use, create `.env.local` in the root:
+**1. Build the Docker image**
 
-```env
-VITE_APP_TITLE=AgentFlow Designer
-VITE_API_BASE_URL=https://your-backend-api.company.com
-VITE_AUTH_PROVIDER=azure-ad
-VITE_ENVIRONMENT=production
+```bash
+cd agent-designer-frontend
+docker build -t agent-designer-frontend:latest .
 ```
 
-Access in code via `import.meta.env.VITE_APP_TITLE`. Variables must be prefixed with `VITE_` to be exposed to the browser.
+What happens inside:
+- Stage 1: Node.js installs packages and builds the app
+- Stage 2: Nginx serves the built `index.html` on port 80
 
-### Vite Config (`vite.config.ts`)
+**2. Run the container**
 
-| Setting | Value | Purpose |
-|---------|-------|---------|
-| `viteSingleFile` plugin | enabled | Produces one self-contained `index.html` |
-| `assetsInlineLimit` | very high | Inlines all assets into the single HTML |
-| `cssCodeSplit` | `false` | Single CSS bundle |
-| `minify` | `esbuild` | Fast minification |
-
-### Tailwind Theming (`src/index.css`)
-
-All design tokens are CSS custom properties under `:root`. To retheme:
-
-```css
-:root {
-  --primary: 195 100% 50%;      /* cyan accent */
-  --accent: 262 83% 68%;        /* purple accent */
-  --background: 222 20% 8%;     /* dark background */
-  /* Node type colors */
-  --node-llm: 195 100% 50%;
-  --node-agent: 262 83% 68%;
-  --node-tool: 142 70% 50%;
-}
+```bash
+docker run -d \
+  --name agent-designer-frontend \
+  -p 3000:80 \
+  agent-designer-frontend:latest
 ```
 
-### Adding New Node Types (`src/data/nodeDefinitions.ts`)
+Open your browser at **http://localhost:3000**
 
-1. Add the category to `NodeCategory` type in `src/types/flow.ts`
-2. Add category metadata to `CATEGORY_META` in `nodeDefinitions.ts`
-3. Add one or more node definitions to `NODE_DEFINITIONS` array
+**3. Useful container commands**
 
-```typescript
-{
-  type: 'my_custom_node',
-  category: 'tool',
-  label: 'My Custom Node',
-  description: 'Does something useful',
-  icon: '🔧',
-  color: 'hsl(142 70% 50%)',
-  inputs: [{ id: 'in', label: 'Input', type: 'any' }],
-  outputs: [{ id: 'out', label: 'Output', type: 'any' }],
-  fields: [
-    { id: 'endpoint', label: 'API Endpoint', type: 'text', required: true },
-  ],
-}
+```bash
+# See live logs
+docker logs -f agent-designer-frontend
+
+# Stop the container
+docker stop agent-designer-frontend
+
+# Remove the container
+docker rm agent-designer-frontend
+
+# Rebuild and restart after changes
+docker build -t agent-designer-frontend:latest . \
+  && docker stop agent-designer-frontend \
+  && docker rm agent-designer-frontend \
+  && docker run -d --name agent-designer-frontend -p 3000:80 agent-designer-frontend:latest
+```
+
+---
+
+## Environment Variables
+
+The `.env.example` file in the project root contains every supported variable with descriptions and defaults. Use it as the template:
+
+```bash
+cp .env.example .env.local   # create your local config (never commit this file)
+```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_PORT` | `4000` | Port the dev server (`npm run dev`) listens on |
+| `VITE_API_BASE_URL` | `http://localhost:4545` | Backend API base URL. All `/api/*` and `/health` calls are proxied here during dev |
+| `VITE_LOGIN_IMAGE_URL` | _(popsy illustration)_ | Image displayed on the login page. Use an `https://` URL or a `/public/` path |
+| `VITE_APP_TITLE` | `AgentFlow Designer` | Browser tab title |
+| `VITE_ENVIRONMENT` | `development` | Environment label — `development`, `staging`, or `production` |
+
+> All variables must start with `VITE_` to be exposed in the browser. Access them in code with `import.meta.env.VITE_VARIABLE_NAME`.
+
+---
+
+## Deploy to Kubernetes
+
+### Overview
+
+```
+Developer Machine
+      │
+      ▼
+ docker build          ← builds the image
+      │
+      ▼
+ docker push           ← pushes to a container registry (e.g. Docker Hub, ACR, ECR)
+      │
+      ▼
+ kubectl apply         ← tells Kubernetes to pull and run the image
+      │
+      ▼
+ Kubernetes Cluster
+ ┌──────────────────────────────────┐
+ │  Namespace: essedum              │
+ │  ┌───────────┐                   │
+ │  │   Pod     │ ← runs the Nginx  │
+ │  │ (Nginx)   │   container       │
+ │  └─────┬─────┘                   │
+ │        │                         │
+ │  ┌─────▼─────┐                   │
+ │  │  Service  │ ← internal access │
+ │  └─────┬─────┘                   │
+ │        │                         │
+ │  ┌─────▼─────┐                   │
+ │  │  Ingress  │ ← external URL    │
+ │  └───────────┘                   │
+ └──────────────────────────────────┘
+```
+
+---
+
+### Step 1 — Build the production image
+
+```bash
+cd agent-designer-frontend
+docker build -t agent-designer-frontend:latest .
+```
+
+---
+
+### Step 2 — Push to your container registry
+
+```bash
+# Tag the image for your registry
+docker tag agent-designer-frontend:latest <your-registry>/agent-designer-frontend:v1.0.0
+
+# Push it
+docker push <your-registry>/agent-designer-frontend:v1.0.0
+```
+
+Replace `<your-registry>` with your actual registry address (e.g. `myregistry.azurecr.io`, `docker.io/myusername`).
+
+---
+
+### Step 3 — Make sure the Kubernetes namespace exists
+
+```bash
+kubectl create namespace essedum --dry-run=client -o yaml | kubectl apply -f -
+```
+
+---
+
+### Step 4 — Apply the Kubernetes manifests
+
+The manifest files are in `essedum-platform/k8s/frontend/`:
+
+```bash
+kubectl apply -f essedum-platform/k8s/frontend/deployment.yaml
+kubectl apply -f essedum-platform/k8s/frontend/service.yaml
+kubectl apply -f essedum-platform/k8s/frontend/ingress.yaml
+```
+
+> Before applying, open `deployment.yaml` and update the `image:` field to point to the image you pushed in Step 2.
+
+---
+
+### Step 5 — Check that everything is running
+
+```bash
+# Are the pods running?
+kubectl get pods -n essedum -l app=frontend
+
+# See pod logs
+kubectl logs -n essedum -l app=frontend --tail=50
+
+# Is the service created?
+kubectl get svc -n essedum
+
+# What is the ingress address?
+kubectl get ingress -n essedum
+```
+
+Wait until the pod shows `Running` status. The ingress will show an `ADDRESS` once the load balancer is ready.
+
+---
+
+### Step 6 — Open the app
+
+Once the ingress has an address, open it in your browser:
+
+```
+http://<INGRESS-ADDRESS>
+```
+
+For local testing with a custom hostname, add a line to your `/etc/hosts` file:
+
+```
+<INGRESS-ADDRESS>   agent-designer.yourdomain.com
+```
+
+Then open `http://agent-designer.yourdomain.com`.
+
+---
+
+### Step 7 — Deploy a new version
+
+```bash
+# 1. Build and push the new image
+docker build -t <your-registry>/agent-designer-frontend:v1.0.1 .
+docker push <your-registry>/agent-designer-frontend:v1.0.1
+
+# 2. Update the running deployment
+kubectl set image deployment/frontend \
+  frontend=<your-registry>/agent-designer-frontend:v1.0.1 \
+  -n essedum
+
+# 3. Watch the rollout complete
+kubectl rollout status deployment/frontend -n essedum
+
+# 4. Roll back if something goes wrong
+kubectl rollout undo deployment/frontend -n essedum
+```
+
+---
+
+### Tear down
+
+```bash
+kubectl delete -f essedum-platform/k8s/frontend/ingress.yaml
+kubectl delete -f essedum-platform/k8s/frontend/service.yaml
+kubectl delete -f essedum-platform/k8s/frontend/deployment.yaml
 ```
 
 ---
@@ -210,96 +403,31 @@ All design tokens are CSS custom properties under `:root`. To retheme:
 | `Ctrl + N` | New flow |
 | `Ctrl + Enter` | Run / Stop execution |
 | `Delete` | Delete selected node |
-| `Shift + Click` | Multi-select nodes |
-| `Scroll` | Zoom canvas in/out |
-| `Click + Drag` (canvas) | Pan canvas |
-
----
-
-## Enterprise Readiness Checklist
-
-Items to address before production enterprise deployment:
-
-### Security
-- [ ] **Authentication** — Integrate SSO/OAuth2 (Azure AD, Okta, SAML). App currently has no auth layer.
-- [ ] **Authorization** — Implement role-based access control (viewer / editor / admin) per flow
-- [ ] **JSON import validation** — The flow import in TopBar has no schema validation. Add JSON schema validation (e.g. with `zod`) to reject malformed or malicious payloads
-- [ ] **Content Security Policy** — Add CSP headers on the server hosting the built app
-- [ ] **Corporate SSL** — Replace `--strict-ssl false` workaround by installing your corporate Root CA certificate into Node.js's trusted certificate store
-
-### Stability & Error Handling
-- [ ] **Error Boundaries** — Add React `ErrorBoundary` wrappers at page level and panel level to prevent full-app white screen crashes
-- [ ] **Null safety** — `document.getElementById('root')!` in `main.tsx` should have a graceful fallback
-- [ ] **Log size cap** — Execution logs are unbounded in memory. Add a maximum entries limit (e.g. 500 entries) to prevent memory exhaustion on long-running flows
-- [ ] **File input validation** — Add MIME type + extension validation on JSON import, not just `.json` extension check
-
-### State & Persistence
-- [ ] **Backend persistence** — Flows are currently saved only to browser `localStorage`. For enterprise, sync to a REST API / database (PostgreSQL, MongoDB, Azure Cosmos DB)
-- [ ] **Multi-user / collaboration** — No concurrent edit support. Consider WebSocket-based real-time collaboration (e.g. Liveblocks, PartyKit, or custom)
-- [ ] **Export versioning** — Add `schemaVersion` field to exported flow JSON for forward/backward compatibility
-- [ ] **Undo / Redo** — No undo history. Add command-pattern undo stack for node operations
-
-### Performance
-- [ ] **Code splitting** — Currently builds as a single ~2MB+ bundle. Split vendor / app chunks for teams serving via CDN
-- [ ] **Node library virtualization** — NodeLibrary renders all nodes at once. Add virtual scrolling for large catalogs (react-virtual)
-- [ ] **Self-hosted fonts** — App loads Google Fonts (JetBrains Mono, Syne) from the internet. Self-host for air-gapped / intranet environments
-
-### Testing
-- [ ] **Unit tests** — No test suite. Add Vitest + React Testing Library
-- [ ] **E2E tests** — Add Playwright for critical paths: create flow → add nodes → connect → run → export
-- [ ] **Type coverage** — Enable `strict: true` in tsconfig for stricter type checking
-
-### Observability
-- [ ] **Error tracking** — Integrate Sentry or Azure Application Insights for runtime error capture
-- [ ] **Usage analytics** — Track which node types are used, flow run success/failure rates
-- [ ] **Structured logging** — Replace `console.error` with a structured logger (e.g. `pino`)
-
-### CI/CD
-- [ ] **Pipeline** — Add GitHub Actions or Azure DevOps pipeline: `lint → typecheck → build → test → deploy`
-- [ ] **Environment promotion** — Separate `dev`, `staging`, `production` build configs via `.env.development` / `.env.production`
-- [ ] **`.env.example`** — Document required environment variables for new developers
-
-### Accessibility (WCAG 2.1 AA)
-- [ ] **ARIA labels** — Flow canvas nodes need `aria-label` and `role` attributes for screen readers
-- [ ] **Focus management** — Keyboard focus should be trapped in modals (dialogs are using Radix which handles this, but verify canvas focus)
-- [ ] **Color contrast** — Verify all text/background pairs meet 4.5:1 contrast ratio
-- [ ] **Reduced motion** — Respect `prefers-reduced-motion` for node animations
-
----
-
-## Known Limitations
-
-| Area | Current State | Recommended Fix |
-|------|--------------|----------------|
-| Execution | Simulated (mock delays + fake outputs) | Connect to real agent execution backend API |
-| Persistence | Browser `localStorage` only | Backend API + database |
-| Authentication | None | Azure AD SSO / OAuth2 |
-| Collaboration | Single user only | WebSocket real-time sync |
-| Mobile | Desktop-optimized only | Responsive layout or dedicated mobile view |
-| Fonts | Loaded from Google CDN | Self-host font files for intranet/air-gapped |
-| Flow validation | None | Add graph validation before execution (cycle detection, required fields check) |
+| `Shift + Click` | Select multiple nodes |
+| `Scroll` | Zoom in / out |
+| `Click + Drag` on canvas | Pan the canvas |
 
 ---
 
 ## Tech Stack
 
-| Library | Version | Purpose |
-|---------|---------|---------|
+| Library | Version | What it does |
+|---------|---------|--------------|
 | React | 19 | UI framework |
-| TypeScript | 5.9 | Type safety |
-| Vite | 7 | Build tool & dev server |
-| @xyflow/react | 12 | Flow canvas — drag, drop, connect nodes |
+| TypeScript | 5.9 | Type-safe JavaScript |
+| Vite | 7 | Fast build tool and dev server |
+| @xyflow/react | 12 | The drag-and-drop flow canvas |
 | Tailwind CSS | 3.4 | Utility-first styling |
-| shadcn/ui | — | Accessible UI component library (Radix primitives) |
-| React Router | 7 | Client-side routing |
-| Lucide React | 0.554 | Icon library |
-| Sonner | 2 | Toast notifications |
-| React Hook Form | 7 | Form state management |
-| Zod | 4 | Schema validation (available, not yet wired to import) |
-| TanStack Query | 5 | Server state management (available, not yet used) |
+| shadcn/ui | — | Pre-built accessible UI components |
+| React Router | 7 | Page navigation |
+| Lucide React | 0.554 | Icons |
+| Sonner | 2 | Toast / notification messages |
+| React Hook Form | 7 | Form handling |
+| Zod | 4 | Data validation |
+| TanStack Query | 5 | Server data fetching (ready to use) |
 
 ---
 
 ## License
 
-MIT License — Open source. See [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
