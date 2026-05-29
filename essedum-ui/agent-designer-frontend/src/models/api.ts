@@ -93,3 +93,27 @@ export interface KnowledgeBaseResponse {
   created_at: string;
   updated_at: string;
 }
+
+// ─── LLM Models ───────────────────────────────────────────────────────────────
+
+export interface LlmModelsResponse {
+  provider: string;
+  models: string[];
+}
+
+export interface LlmChatMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
+export interface LlmChatRequest {
+  provider: string;
+  model: string;
+  messages: LlmChatMessage[];
+  temperature?: number;
+  max_tokens?: number;
+}
+
+export interface LlmChatResponse {
+  response: string;
+}

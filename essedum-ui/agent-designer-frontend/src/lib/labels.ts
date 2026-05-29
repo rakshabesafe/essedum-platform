@@ -47,6 +47,11 @@ export const LABELS = {
   PLAYGROUND_EMPTY_STATE: 'Send a message to start the playground session.',
   PLAYGROUND_NEW_SESSION: 'New Session',
   PLAYGROUND_SELECT_SESSION_PLACEHOLDER: 'Select session',
+  PLAYGROUND_PROVIDER_LABEL: 'Provider',
+  PLAYGROUND_MODEL_LABEL: 'Model',
+  PLAYGROUND_MODEL_LOADING: 'Loading…',
+  PLAYGROUND_MODEL_PLACEHOLDER: 'Select model',
+  PLAYGROUND_ERROR_PREFIX: 'Error: ',
 
   // ── FlowManager ────────────────────────────────────────────────────────
   FLOW_MANAGER_TITLE: 'Flow Manager',

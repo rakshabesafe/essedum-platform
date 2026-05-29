@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFlowStore } from '../../store/flowStore';
 import type { NodeField } from '../../types/flow';
 import { Input } from '../ui/input';
@@ -15,12 +15,50 @@ import { CATEGORY_META } from '../../data/nodeDefinitions';
 import { cn } from '../../lib/utils';
 import { toast } from 'sonner';
 import { LABELS } from '../../lib/labels';
+import { llmService, SUPPORTED_PROVIDERS } from '../../services/llmService';
 
 export function NodeInspector() {
   const { nodes, selectedNodeId, updateNodeConfig, updateNodeLabel, deleteNode, duplicateNode } = useFlowStore();
   const node = nodes.find((n) => n.id === selectedNodeId);
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+
+  // LLM-specific: dynamic model list (Ollama only for now)
+  const isLlmNode = node?.data.definition.type === 'ollama-llm';
+  const llmProvider = isLlmNode ? String(node!.data.config.llm_provider ?? 'ollama') : 'ollama';
+  const [llmModels, setLlmModels] = useState<string[]>([]);
+  const [llmModelsLoading, setLlmModelsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isLlmNode) return;
+    let cancelled = false;
+    setLlmModels([]);
+    setLlmModelsLoading(true);
+
+    const currentModel = String(node!.data.config.model ?? '');
+
+    llmService
+      .listModels(llmProvider)
+      .then((res) => {
+        if (!cancelled) {
+          const fetched = res.models;
+          // Always include the already-saved model so the dropdown shows it even if
+          // the API returns a list that doesn't include it (e.g. manually entered name)
+          const enriched = currentModel && !fetched.includes(currentModel)
+            ? [currentModel, ...fetched]
+            : fetched;
+          setLlmModels(enriched);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          // API unreachable — still show the saved model so the value isn't lost
+          setLlmModels(currentModel ? [currentModel] : []);
+        }
+      })
+      .finally(() => { if (!cancelled) setLlmModelsLoading(false); });
+    return () => { cancelled = true; };
+  }, [isLlmNode, llmProvider]);
 
   if (!node) {
     return (
@@ -208,7 +246,63 @@ export function NodeInspector() {
 
       <ScrollArea className="flex-1">
         <div className="px-3 py-2 space-y-1">
+
+          {/* ── LLM API section: provider + dynamic model picker (Ollama only) ── */}
+          {definition.type === 'ollama-llm' && (
+            <div>
+              <div className="py-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                LLM API
+              </div>
+              <div className="space-y-2.5 mb-2">
+                {/* Provider */}
+                <div className="space-y-1">
+                  <Label className="text-[11px] text-foreground font-medium">Provider</Label>
+                  <Select
+                    value={String(config.llm_provider ?? 'ollama')}
+                    onValueChange={(v) => updateField('llm_provider', v)}
+                  >
+                    <SelectTrigger className="h-8 text-xs bg-background">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SUPPORTED_PROVIDERS.map((p) => (
+                        <SelectItem key={p} value={p} className="text-xs">{p}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Model — dynamic from API */}
+                <div className="space-y-1">
+                  <Label className="text-[11px] text-foreground font-medium">
+                    Model <span className="text-destructive ml-0.5">*</span>
+                  </Label>
+                  <Select
+                    value={String(config.model ?? '')}
+                    onValueChange={(v) => updateField('model', v)}
+                    disabled={llmModelsLoading || llmModels.length === 0}
+                  >
+                    <SelectTrigger className="h-8 text-xs bg-background">
+                      <SelectValue placeholder={llmModelsLoading ? 'Loading…' : 'Select model'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {llmModels.map((m) => (
+                        <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <Separator className="my-1" />
+            </div>
+          )}
+
           {Object.entries(groups).map(([group, fields]) => {
+            // For Ollama nodes, the 'model' field is handled by the LLM API section above
+            const visibleFields = definition.type === 'ollama-llm'
+              ? fields.filter((f) => f.id !== 'model')
+              : fields;
+            if (visibleFields.length === 0) return null;
             const isCollapsed = collapsedGroups[group];
             return (
               <div key={group}>
@@ -222,7 +316,7 @@ export function NodeInspector() {
 
                 {!isCollapsed && (
                   <div className="space-y-2.5 mb-2">
-                    {fields.map((field) => (
+                    {visibleFields.map((field) => (
                       <div key={field.id} className="space-y-1">
                         <div className="flex items-center justify-between">
                           <Label className="text-[11px] text-foreground font-medium">

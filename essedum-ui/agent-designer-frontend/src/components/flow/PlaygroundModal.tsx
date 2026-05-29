@@ -29,6 +29,8 @@ import {
 import { cn } from '../../lib/utils';
 import { LABELS } from '../../lib/labels';
 import { useFlowStore } from '../../store/flowStore';
+import { llmService } from '../../services/llmService';
+import type { LlmChatMessage } from '../../models/api';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -84,10 +86,28 @@ function makeSession(flowName: string, index: number): StoredSession {
   };
 }
 
+// Maps frontend node type to the backend-supported provider name
+const NODE_TYPE_TO_PROVIDER: Record<string, string> = {
+  'ollama-llm':      'ollama',
+  'openai-llm':      'azure_openai',  // backend uses Azure OpenAI connector (OpenAI-compatible)
+  'anthropic-llm':   'bedrock',        // Anthropic via AWS Bedrock
+  'google-llm':      'vertex_ai',      // Google via Vertex AI
+  'mistral-llm':     'bedrock',        // Mistral via AWS Bedrock
+  'cohere-llm':      'bedrock',        // Cohere via AWS Bedrock
+};
+
+// Resolve backend provider from node config (explicit override) or derived from node type
+function resolveProvider(nodeType: string, config: Record<string, unknown>): string {
+  return String(config.llm_provider ?? NODE_TYPE_TO_PROVIDER[nodeType] ?? 'ollama');
+}
+
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
-  const { currentFlowName, currentFlowId } = useFlowStore();
+  const { currentFlowName, currentFlowId, nodes } = useFlowStore();
+
+  // Use flow ID (or name as fallback) as the key so sessions are isolated per flow
+  const flowKey = currentFlowId ?? currentFlowName;
 
   const initialSession = makeSession(currentFlowName, 1);
 
@@ -104,16 +124,49 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // ── Per-flow session cache ─────────────────────────────────────────────
+  // Stores snapshots for every flow visited so history is preserved when switching
+  type FlowSnapshot = { sessions: StoredSession[]; activeSessionId: string };
+  const flowSnapshotsRef = useRef<Record<string, FlowSnapshot>>({});
+
+  // Always-current refs so the flow-switch effect can read latest state synchronously
+  const sessionsRef = useRef(sessions);
+  const activeSessionIdRef = useRef(activeSessionId);
+  sessionsRef.current = sessions;
+  activeSessionIdRef.current = activeSessionId;
+
+  // Track which flow we were on before the current render
+  const prevFlowKeyRef = useRef(flowKey);
+
   // Derive active session data
   const activeSession = sessions.find((s) => s.info.sessionId === activeSessionId) ?? sessions[0];
   const messages = activeSession.messages;
 
-  // Sync flow name into all sessions when flow changes
+  // Save current sessions for the old flow then restore (or create fresh) for the new flow
   useEffect(() => {
-    setSessions((prev) =>
-      prev.map((s) => ({ ...s, info: { ...s.info, flowName: currentFlowName } }))
-    );
-  }, [currentFlowName]);
+    const prevKey = prevFlowKeyRef.current;
+    if (prevKey !== flowKey) {
+      // Save snapshot for the flow we're leaving
+      flowSnapshotsRef.current[prevKey] = {
+        sessions: sessionsRef.current,
+        activeSessionId: activeSessionIdRef.current,
+      };
+      prevFlowKeyRef.current = flowKey;
+    }
+
+    const snapshot = flowSnapshotsRef.current[flowKey];
+    if (snapshot) {
+      setSessions(snapshot.sessions);
+      setActiveSessionId(snapshot.activeSessionId);
+    } else {
+      const fresh = makeSession(currentFlowName, 1);
+      setSessions([fresh]);
+      setActiveSessionId(fresh.info.sessionId);
+    }
+    setInputValue('');
+    setIsLoading(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flowKey]);
 
   // Auto-scroll
   useEffect(() => {
@@ -152,13 +205,41 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
     setInputValue('');
     setIsLoading(true);
 
-    // Placeholder response — replace with real API call once endpoint is shared
+    // Resolve provider + model from the first LLM node in the flow
+    const llmNode = nodes.find((n) => n.data.definition.category === 'llm');
+    const nodeType = llmNode?.data.definition.type ?? '';
+    const nodeConfig = llmNode?.data.config ?? {};
+    const provider = resolveProvider(nodeType, nodeConfig);
+    const model = String(nodeConfig.model ?? '');
+    // Prefer temperature/tokens from the node config; fall back to sensible defaults
+    const temperature = typeof nodeConfig.temperature === 'number' ? nodeConfig.temperature : 0.7;
+    const maxTokens =
+      typeof nodeConfig.num_predict === 'number' ? nodeConfig.num_predict  // Ollama field
+      : typeof nodeConfig.max_tokens === 'number' ? nodeConfig.max_tokens  // OpenAI / others
+      : 1000;
+
+    // Build full conversation history from current session messages + new user message
+    const history = activeSession.messages.map<LlmChatMessage>((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+    const llmMessages: LlmChatMessage[] = [
+      ...history,
+      { role: 'user', content: text },
+    ];
+
     try {
-      await new Promise((r) => setTimeout(r, 800));
+      const data = await llmService.chat({
+        provider,
+        model,
+        messages: llmMessages,
+        temperature,
+        max_tokens: maxTokens,
+      });
       const assistantMsg: ChatMessage = {
         id: uid('msg-'),
         role: 'assistant',
-        content: `[Playground] Received: "${text}"\n\nThis is a placeholder response. Connect the playground to your flow execution endpoint to get real results.`,
+        content: data.response,
         timestamp: nowTime(),
       };
       setSessions((prev) =>
@@ -168,11 +249,21 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
             : s
         )
       );
-    } catch {
+    } catch (err) {
+      const errorText =
+        err instanceof Error
+          ? `${LABELS.PLAYGROUND_ERROR_PREFIX}${err.message}`
+          : `${LABELS.PLAYGROUND_ERROR_PREFIX}Unknown error`;
+      const errorMsg: ChatMessage = {
+        id: uid('msg-'),
+        role: 'assistant',
+        content: errorText,
+        timestamp: nowTime(),
+      };
       setSessions((prev) =>
         prev.map((s) =>
           s.info.sessionId === sessionId
-            ? { ...s, info: { ...s.info, status: 'error' } }
+            ? { ...s, messages: [...s.messages, errorMsg], info: { ...s.info, status: 'error' } }
             : s
         )
       );
@@ -207,6 +298,27 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
             </div>
 
             <div className="flex items-center gap-2 mr-7">
+              {/* LLM indicator — provider/model come from the LLM node in the flow */}
+              {(() => {
+                const llmNode = nodes.find((n) => n.data.definition.category === 'llm');
+                if (!llmNode) return (
+                  <Badge variant="outline" className="text-[10px] h-5 px-1.5 text-muted-foreground">
+                    No LLM node
+                  </Badge>
+                );
+                const nodeType = llmNode.data.definition.type;
+                const provider = resolveProvider(nodeType, llmNode.data.config);
+                const model = String(llmNode.data.config.model ?? '');
+                return (
+                  <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-mono max-w-[200px] truncate">
+                    {provider}{model ? ` · ${model}` : ''}
+                  </Badge>
+                );
+              })()}
+
+              {/* Divider */}
+              <div className="w-px h-4 bg-border" />
+
               {/* Input Type */}
               <Select value={inputType} onValueChange={(v) => setInputType(v as typeof inputType)}>
                 <SelectTrigger className="h-7 text-xs w-24 bg-background">
