@@ -14,7 +14,7 @@ RUN mkdir -p /app/conf /app/lib /app/log
 RUN cp /sv/data-service/src/main/resources/*.yml /app/conf
 RUN cp /sv/data-service/src/main/resources/*.xml /app/conf
 
-RUN rm -f /app/conf/application-oauth2.yml
+RUN rm -f /app/conf/application-oauth2.yml /app/conf/application-mysql-oauth2.yml
 
 # Copy the compiled data-service JAR
 RUN cp /sv/data-service/target/data-service*.jar /app/

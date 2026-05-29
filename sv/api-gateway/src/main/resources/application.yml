@@ -23,7 +23,7 @@ spring:
       # ---- Default Filters ----
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
-              # ---- Route Definitions ----
+        # ---- Route Definitions ----
       # IMPORTANT: Routes are ordered so that more specific paths match first.
       # All paths mirror the monolith's API exactly (pathPrefix = api/aip).
       routes:
@@ -57,7 +57,7 @@ spring:
         - id: usm-permissions
           uri: ${USM_SERVICE_URL:http://localhost:8081}
           predicates:
-            - Path=/api/permissions/**,/api/role-permissionss/**,/api/usm-permission-apis/**,/api/user-api-permissionss/**
+            - Path=/api/permissions/**,/api/role-permissionss/**,/api/usm-role-permissionss/**,/api/usm-permission-apis/**,/api/user-api-permissionss/**
         - id: usm-misc
           uri: ${USM_SERVICE_URL:http://localhost:8081}
           predicates:
@@ -172,6 +172,15 @@ spring:
           uri: ${ICIP_SERVICE_URL:http://localhost:8082}
           predicates:
             - Path=/api/aip/streamingServices/**
+        # Frontend calls /api/aip/groups/** but the controller is mapped under
+        # /api/aip/service/v1 (ICIPMlopsController). Rewrite the path so the
+        # request reaches the correct endpoint on icip-service.
+        - id: icip-groups
+          uri: ${ICIP_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/aip/groups/**
+          filters:
+            - RewritePath=/api/aip/groups/(?<segment>.*), /api/aip/service/v1/groups/${segment}
         - id: icip-pipeline
           uri: ${ICIP_SERVICE_URL:http://localhost:8082}
           predicates:

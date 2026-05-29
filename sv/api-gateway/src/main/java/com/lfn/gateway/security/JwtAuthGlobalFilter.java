@@ -89,8 +89,23 @@ public class JwtAuthGlobalFilter implements GlobalFilter, Ordered {
             return onUnauthorized(exchange, "Authorization header must start with Bearer");
         }
 
-        // Validate JWT token
         String token = authHeader.substring(BEARER_PREFIX.length());
+
+        // OAuth2 / Keycloak mode: tokens are RS256-signed by the IdP and must be
+        // validated by the downstream resource servers (each microservice runs
+        // spring-boot-starter-oauth2-resource-server). The gateway only relays
+        // the Bearer header and the service access-token for downstream trust.
+        if ("oauth2".equalsIgnoreCase(authProperties.getMode())) {
+            log.debug("OAuth2 mode - relaying Bearer token without local validation for path: {}", path);
+            ServerHttpRequest.Builder relayBuilder = request.mutate()
+                    .header(GATEWAY_AUTH_HEADER, "true");
+            if (serviceAccessToken != null && !serviceAccessToken.isEmpty()) {
+                relayBuilder.header(ACCESS_TOKEN_HEADER, serviceAccessToken);
+            }
+            return chain.filter(exchange.mutate().request(relayBuilder.build()).build());
+        }
+
+        // dbjwt mode: validate HMAC-signed JJWT locally
         if (!jwtUtil.validateToken(token)) {
             log.info("Rejected - Invalid or expired JWT token for path: {}", path);
             return onUnauthorized(exchange, "Invalid or expired JWT token");

@@ -25,6 +25,13 @@ public class GatewayAuthProperties {
      */
     private List<String> openPaths = new ArrayList<>();
 
+    /**
+     * Auth mode: "dbjwt" (default, HMAC JJWT validation at the gateway) or
+     * "oauth2" (Keycloak / OIDC – the gateway skips local validation and
+     * relays the Bearer token to downstream resource servers).
+     */
+    private String mode = "dbjwt";
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -40,5 +47,12 @@ public class GatewayAuthProperties {
     public void setOpenPaths(List<String> openPaths) {
         this.openPaths = openPaths;
     }
-}
 
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+}

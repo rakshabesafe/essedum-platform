@@ -14,7 +14,7 @@ RUN mkdir -p /app/conf /app/lib /app/log
 RUN cp /sv/vibe-service/src/main/resources/*.yml /app/conf
 RUN cp /sv/vibe-service/src/main/resources/*.xml /app/conf
 
-RUN rm -f /app/conf/application-oauth2.yml
+RUN rm -f /app/conf/application-oauth2.yml /app/conf/application-mysql-oauth2.yml
 
 # Copy the compiled vibe-service JAR
 RUN cp /sv/vibe-service/target/vibe-service*.jar /app/

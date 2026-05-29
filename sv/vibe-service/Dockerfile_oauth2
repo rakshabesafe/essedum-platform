@@ -21,8 +21,10 @@ RUN --mount=type=cache,target=/root/.m2/repository \
 RUN mkdir -p /app/conf /app/lib /app/log && \
     cp /sv/vibe-service/src/main/resources/*.yml /app/conf && \
     cp /sv/vibe-service/src/main/resources/*.xml /app/conf && \
-    rm -f /app/conf/application-mysql.yml && \
+    # Mirror monolith: swap mysql config only if an oauth2-specific override
+    # is shipped. Otherwise keep the default application-mysql.yml in place.
     if [ -f /app/conf/application-mysql-oauth2.yml ]; then \
+      rm -f /app/conf/application-mysql.yml && \
       mv /app/conf/application-mysql-oauth2.yml /app/conf/application-mysql.yml; \
     fi && \
     cp -r /sv/app/lib /app 2>/dev/null || true && \
@@ -39,8 +41,8 @@ COPY nginx_backend.conf /etc/nginx/nginx.conf
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
-# Import SSL cert
-COPY lfn-keycloak2.crt $JAVA_HOME/bin/
+# Import SSL cert (build context = sv/ root, cert lives inside the service folder)
+COPY vibe-service/lfn-keycloak2.crt $JAVA_HOME/bin/
 RUN keytool -importcert -trustcacerts \
     -file $JAVA_HOME/bin/lfn-keycloak2.crt \
     -alias "lfn-keycloak" \
