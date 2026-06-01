@@ -5,23 +5,19 @@ import { viteSingleFile } from "vite-plugin-singlefile";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
-  const port = parseInt(env.VITE_PORT || '4000', 10);
-  const backendUrl = env.VITE_API_BASE_URL || 'http://localhost:4545';
+  const port = parseInt(env.VITE_PORT, 10) || 3000;
+  const backendUrl = env.VITE_API_BASE_URL;
 
   return {
     plugins: [react(), viteSingleFile()],
     server: {
       port,
-      proxy: {
-        '/api': {
-          target: backendUrl,
-          changeOrigin: true,
+      ...(backendUrl ? {
+        proxy: {
+          '/api': { target: backendUrl, changeOrigin: true },
+          '/health': { target: backendUrl, changeOrigin: true },
         },
-        '/health': {
-          target: backendUrl,
-          changeOrigin: true,
-        },
-      },
+      } : {}),
     },
     resolve: {
       alias: {
