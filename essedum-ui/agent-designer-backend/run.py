@@ -9,4 +9,5 @@ sys.path.insert(0, str(backend_dir))
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="127.0.0.1", port=8180)
+    root_path = os.environ.get("ROOT_PATH", "")
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8180, root_path=root_path)

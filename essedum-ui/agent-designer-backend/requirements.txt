@@ -13,7 +13,7 @@ alembic==1.13.2
 
 # Validation & settings
 pydantic==2.8.2
-pydantic-settings==2.3.4
+pydantic-settings>=2.5.2
 
 # Cache
 # (Redis removed for V1 — in-process asyncio.Queue used for WebSocket fan-out)
