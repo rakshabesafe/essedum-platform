@@ -86,25 +86,23 @@ function makeSession(flowName: string, index: number): StoredSession {
   };
 }
 
-// Maps frontend node type to the backend-supported provider name
-const NODE_TYPE_TO_PROVIDER: Record<string, string> = {
-  'ollama-llm':        'ollama',
-  'openai-llm':        'azure_openai',  // backend uses Azure OpenAI connector (OpenAI-compatible)
-  'azure-openai-llm':  'azure_openai',  // Azure OpenAI
-  'anthropic-llm':     'bedrock',       // Anthropic via AWS Bedrock
-  'google-llm':        'vertex_ai',     // Google via Vertex AI
-  'mistral-llm':       'bedrock',       // Mistral via AWS Bedrock
-  'cohere-llm':        'bedrock',       // Cohere via AWS Bedrock
-};
+// Maps frontend node type to the backend-supported provider name.
+// Using Map instead of a plain object avoids Generic Object Injection Sink:
+// Map.get() does not access object properties by user-controlled key.
+const NODE_TYPE_TO_PROVIDER = new Map<string, string>([
+  ['ollama-llm',       'ollama'],
+  ['openai-llm',       'azure_openai'],  // backend uses Azure OpenAI connector (OpenAI-compatible)
+  ['azure-openai-llm', 'azure_openai'],  // Azure OpenAI
+  ['anthropic-llm',    'bedrock'],       // Anthropic via AWS Bedrock
+  ['google-llm',       'vertex_ai'],     // Google via Vertex AI
+  ['mistral-llm',      'bedrock'],       // Mistral via AWS Bedrock
+  ['cohere-llm',       'bedrock'],       // Cohere via AWS Bedrock
+]);
 
 // Resolve backend provider from node config (explicit override) or derived from node type.
-// Object.hasOwn guard prevents prototype-pollution: bracket access on a plain object with an
-// attacker-controlled key (e.g. '__proto__') would otherwise read inherited properties.
+// Map.get() is safe from prototype-pollution — no bracket access on a plain object.
 function resolveProvider(nodeType: string, config: Record<string, unknown>): string {
-  const mapped = Object.hasOwn(NODE_TYPE_TO_PROVIDER, nodeType)
-    ? NODE_TYPE_TO_PROVIDER[nodeType]
-    : undefined;
-  return String(config.llm_provider ?? mapped ?? 'ollama');
+  return String(config.llm_provider ?? NODE_TYPE_TO_PROVIDER.get(nodeType) ?? 'ollama');
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
