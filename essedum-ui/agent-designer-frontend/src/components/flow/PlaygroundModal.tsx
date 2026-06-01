@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -134,11 +134,14 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
   type FlowSnapshot = { sessions: StoredSession[]; activeSessionId: string };
   const flowSnapshotsRef = useRef<Map<string, FlowSnapshot>>(new Map());
 
-  // Always-current refs so the flow-switch effect can read latest state synchronously
+  // Always-current refs so the flow-switch effect can read latest state synchronously.
+  // Updated via useLayoutEffect (runs after render, before effects) to satisfy react-hooks/refs.
   const sessionsRef = useRef(sessions);
   const activeSessionIdRef = useRef(activeSessionId);
-  sessionsRef.current = sessions;
-  activeSessionIdRef.current = activeSessionId;
+  useLayoutEffect(() => {
+    sessionsRef.current = sessions;
+    activeSessionIdRef.current = activeSessionId;
+  });
 
   // Track which flow we were on before the current render
   const prevFlowKeyRef = useRef(flowKey);
