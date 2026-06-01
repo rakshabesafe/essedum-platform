@@ -211,24 +211,9 @@ export class EnlCodeEditorComponent
 
       this.isEditorInitialized = true;
       console.log('ACE Editor initialized successfully');
-
-      // The container's flex width may not be finalized when ngAfterViewInit
-      // fires inside a freshly-rendered *ngIf subtree. Observe the host so ace
-      // re-measures whenever the box actually gets dimensions.
-      this.attachResizeObserver();
     } catch (error) {
       console.error('Error initializing ACE editor:', error);
     }
-  }
-
-  private attachResizeObserver(): void {
-    if (typeof ResizeObserver === 'undefined' || !this.codeEditorElmRef?.nativeElement) return;
-    const ro = new ResizeObserver(() => {
-      if (this.codeEditor) this.codeEditor.resize(true);
-    });
-    ro.observe(this.codeEditorElmRef.nativeElement);
-    // Also kick once after the next frame in case the observer hasn't fired yet.
-    requestAnimationFrame(() => this.codeEditor?.resize(true));
   }
 
   private loadAceModules(): void {
@@ -302,9 +287,8 @@ export class EnlCodeEditorComponent
   private getEditorOptions(): Partial<ace.Ace.EditorOptions> {
     return {
       highlightActiveLine: true,
-      // No minLines/maxLines: lets ace size to its container instead of
-      // auto-growing to fit content (which produced a 1806px-tall editor
-      // that got pushed off-screen inside agent-pipeline's flex layout).
+      minLines: 14,
+      maxLines: Infinity,
       displayIndentGuides: true,
       showPrintMargin: false,
       animatedScroll: true,

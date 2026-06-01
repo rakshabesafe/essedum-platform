@@ -1,38 +1,4 @@
-:host {
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 0;
-  min-height: 300px;
-  box-sizing: border-box;
-}
-
-// Inner template uses Bootstrap classes (.row .col .w-100 .h-100), which are
-// global in vibe-studio's monolithic-host context but not loaded inside this
-// MFE's federated chunk. Hard-size the inner wrappers so ace gets a real box.
-:host > .row {
-  display: flex !important;
-  flex: 1 !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-}
-:host > .row > .col {
-  display: flex !important;
-  flex: 1 !important;
-  padding: 0 !important;
-  min-width: 0;
-}
-:host .code-editor {
-  position: relative !important;
-  flex: 1 1 auto !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 400px;
-  // ace mounts internal .ace_scroller / .ace_content / .ace_gutter as absolute
-  // children — they need a sized positioned ancestor to be visible.
-}
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
 
 .code-editor-wrapper {
   width: 100%;
