@@ -88,12 +88,13 @@ function makeSession(flowName: string, index: number): StoredSession {
 
 // Maps frontend node type to the backend-supported provider name
 const NODE_TYPE_TO_PROVIDER: Record<string, string> = {
-  'ollama-llm':      'ollama',
-  'openai-llm':      'azure_openai',  // backend uses Azure OpenAI connector (OpenAI-compatible)
-  'anthropic-llm':   'bedrock',        // Anthropic via AWS Bedrock
-  'google-llm':      'vertex_ai',      // Google via Vertex AI
-  'mistral-llm':     'bedrock',        // Mistral via AWS Bedrock
-  'cohere-llm':      'bedrock',        // Cohere via AWS Bedrock
+  'ollama-llm':        'ollama',
+  'openai-llm':        'azure_openai',  // backend uses Azure OpenAI connector (OpenAI-compatible)
+  'azure-openai-llm':  'azure_openai',  // Azure OpenAI
+  'anthropic-llm':     'bedrock',       // Anthropic via AWS Bedrock
+  'google-llm':        'vertex_ai',     // Google via Vertex AI
+  'mistral-llm':       'bedrock',       // Mistral via AWS Bedrock
+  'cohere-llm':        'bedrock',       // Cohere via AWS Bedrock
 };
 
 // Resolve backend provider from node config (explicit override) or derived from node type
