@@ -121,6 +121,14 @@ spring:
           uri: ${DATA_SERVICE_URL:http://localhost:8083}
           predicates:
             - Path=/api/aip/mlspectemplates/**
+        - id: data-mltopics
+          uri: ${DATA_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/aip/mltopics/**
+        - id: data-mldatasettopics
+          uri: ${DATA_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/aip/mldatasettopics/**
         - id: data-service-proxy
           uri: ${DATA_SERVICE_URL:http://localhost:8083}
           predicates:

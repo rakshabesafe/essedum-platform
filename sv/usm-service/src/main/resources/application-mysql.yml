@@ -9,10 +9,10 @@ telemetry:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://${MYSQL_DATASOURCE_URL:localhost:3306}/telemetrydb
-    url: jdbc:mysql://${MYSQL_DATASOURCE_URL:localhost:3306}/telemetrydb
+    jdbcUrl: jdbc:mysql://${MYSQL_DATASOURCE_URL:mysql:3306}/telemetrydb
+    url: jdbc:mysql://${MYSQL_DATASOURCE_URL:mysql:3306}/telemetrydb
     username: ${MYSQL_USER:root}
-    password: ${MYSQL_PASSWORD:admin@121$}
+    password: ${MYSQL_PASSWORD:password}
 
 apipermission:
   disable_api_security_validation: false
@@ -26,9 +26,9 @@ config:
   active-profiles: mysql,dbjwt,btf,dbconstants,vault
   static-locations: file:/app/static/
 
-  datasourceurl: jdbc:mysql://${MYSQL_DATASOURCE_URL:localhost:3306}
+  datasourceurl: jdbc:mysql://${MYSQL_DATASOURCE_URL:mysql:3306}
   datasourceuser: ${MYSQL_USER:root}
-  datasourcepass: ${MYSQL_PASSWORD:admin@121$}
+  datasourcepass: ${MYSQL_PASSWORD:password}
   essedumcoredb: essedum_coredb
   essedumquartzdb: essedum_quartzdb
 
@@ -48,7 +48,7 @@ spring:
     name: usm-service
 
   liquibase:
-    enabled: true
+    enabled: false
     contexts: test,fresh,qa,2v13to300,acme,300to310,300to310-acme,acme_2v13to300,311to312
     change-log: "classpath:changelog/master.xml"
 
@@ -193,7 +193,7 @@ icip:
 
 quartz:
   liquibase:
-    enabled: true
+    enabled: false
     change-log: "classpath:changelog/quartz.xml"
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
