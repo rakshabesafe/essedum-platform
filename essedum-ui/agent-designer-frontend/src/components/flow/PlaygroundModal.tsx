@@ -129,9 +129,10 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // ── Per-flow session cache ─────────────────────────────────────────────
-  // Stores snapshots for every flow visited so history is preserved when switching
+  // Stores snapshots for every flow visited so history is preserved when switching.
+  // Map.get/set avoids Generic Object Injection Sink on bracket access.
   type FlowSnapshot = { sessions: StoredSession[]; activeSessionId: string };
-  const flowSnapshotsRef = useRef<Record<string, FlowSnapshot>>({});
+  const flowSnapshotsRef = useRef<Map<string, FlowSnapshot>>(new Map());
 
   // Always-current refs so the flow-switch effect can read latest state synchronously
   const sessionsRef = useRef(sessions);
@@ -151,14 +152,14 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
     const prevKey = prevFlowKeyRef.current;
     if (prevKey !== flowKey) {
       // Save snapshot for the flow we're leaving
-      flowSnapshotsRef.current[prevKey] = {
+      flowSnapshotsRef.current.set(prevKey, {
         sessions: sessionsRef.current,
         activeSessionId: activeSessionIdRef.current,
-      };
+      });
       prevFlowKeyRef.current = flowKey;
     }
 
-    const snapshot = flowSnapshotsRef.current[flowKey];
+    const snapshot = flowSnapshotsRef.current.get(flowKey);
     if (snapshot) {
       setSessions(snapshot.sessions);
       setActiveSessionId(snapshot.activeSessionId);
@@ -522,6 +523,7 @@ export function PlaygroundModal({ open, onClose }: PlaygroundModalProps) {
             />
             <Button
               size="icon"
+              aria-label="Send message"
               className="h-9 w-9 flex-shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={handleSend}
               disabled={!inputValue.trim() || isLoading}
