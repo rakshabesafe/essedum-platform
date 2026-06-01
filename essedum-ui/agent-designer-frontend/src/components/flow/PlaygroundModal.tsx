@@ -62,7 +62,9 @@ interface PlaygroundModalProps {
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function uid(prefix = '') {
-  return `${prefix}${Math.random().toString(36).slice(2, 9)}`;
+  const arr = new Uint8Array(6);
+  crypto.getRandomValues(arr);
+  return `${prefix}${Array.from(arr, (b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
 function nowTime() {
