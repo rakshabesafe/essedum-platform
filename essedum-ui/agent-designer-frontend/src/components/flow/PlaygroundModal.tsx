@@ -97,9 +97,14 @@ const NODE_TYPE_TO_PROVIDER: Record<string, string> = {
   'cohere-llm':        'bedrock',       // Cohere via AWS Bedrock
 };
 
-// Resolve backend provider from node config (explicit override) or derived from node type
+// Resolve backend provider from node config (explicit override) or derived from node type.
+// Object.hasOwn guard prevents prototype-pollution: bracket access on a plain object with an
+// attacker-controlled key (e.g. '__proto__') would otherwise read inherited properties.
 function resolveProvider(nodeType: string, config: Record<string, unknown>): string {
-  return String(config.llm_provider ?? NODE_TYPE_TO_PROVIDER[nodeType] ?? 'ollama');
+  const mapped = Object.hasOwn(NODE_TYPE_TO_PROVIDER, nodeType)
+    ? NODE_TYPE_TO_PROVIDER[nodeType]
+    : undefined;
+  return String(config.llm_provider ?? mapped ?? 'ollama');
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
