@@ -161,6 +161,12 @@ management:
 
 # Goose AI Coding Service Configuration
 vibe:
+  azure:
+    openai:
+      endpoint: ${AZURE_OPENAI_ENDPOINT:https://aiplatform-openai.openai.azure.com}
+      deployment-name: ${AZURE_OPENAI_DEPLOYMENT_NAME:gpt-4o-mini}
+      api-version: ${AZURE_OPENAI_API_VERSION:2024-10-21}
+      api-key: ${AZURE_OPENAI_API_KEY:}
   goose:
     service:
       url: ${GOOSE_URL:http://localhost:30132}

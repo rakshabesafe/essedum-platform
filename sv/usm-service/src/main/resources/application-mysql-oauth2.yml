@@ -48,7 +48,7 @@ spring:
     name: usm-service
 
   liquibase:
-    enabled: true
+    enabled: false
     contexts: test,fresh,qa,2v13to300,acme,300to310,300to310-acme,acme_2v13to300,311to312
     change-log: "classpath:changelog/master.xml"
 
@@ -193,7 +193,7 @@ icip:
 
 quartz:
   liquibase:
-    enabled: true
+    enabled: false
     change-log: "classpath:changelog/quartz.xml"
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
