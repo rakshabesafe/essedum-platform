@@ -28,6 +28,7 @@
     "@ng-bootstrap/ng-bootstrap": "^17.0.0",
     "@popperjs/core": "^2.11.8",
     "@stomp/stompjs": "^7.0.0",
+    "ace-builds": "1.36.2",
     "ang-jsoneditor": "3.1.0",
     "angular-dual-listbox": "^7.0.0",
     "angular-plotly.js": "^5.2.2",

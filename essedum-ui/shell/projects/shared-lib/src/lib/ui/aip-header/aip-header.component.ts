@@ -63,6 +63,12 @@ export class AipHeaderComponent {
   @Input() closeAction: boolean = false;
   @Input() showRelatedInstances: boolean = false;
   @Input() tagCategory:string='';
+  /**
+   * Optional MatMenu the + button should open as a dropdown. When provided,
+   * clicking + opens the menu instead of emitting (add). Used by the pipeline
+   * page where the + offers a choice between "New pipeline" / "From template".
+   */
+  @Input() addMenu: any = null;
   @Output() navigateBack = new EventEmitter<void>();
   @Output() search = new EventEmitter<string>();
   @Output() refresh = new EventEmitter<void>();

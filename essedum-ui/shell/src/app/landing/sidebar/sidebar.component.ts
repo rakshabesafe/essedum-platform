@@ -35,6 +35,7 @@ export class SidebarComponent implements OnInit {
         { label: "Datasets", icon: "table", url: "./data/datasets", children: [] },
         { label: "Models", icon: "superpowers", url: "./data/models", children: [] },
         { label: "Connections", icon: "plug", url: "./data/connections", children: [] },
+        { label: "Schemas", icon: "puzzle-piece", url: "./data/schemas", children: [] },
       ],
     },
     {
@@ -55,7 +56,8 @@ export class SidebarComponent implements OnInit {
         { label: "Apps", icon: "th-large", url: "./integration/apps", children: [] },
         { label: "Instances", icon: "server", url: "./integration/instances", children: [] },
         { label: "Jobs", icon: "tasks", url: "./integration/jobs", children: [] },
-        { label: "Schemas", icon: "puzzle-piece", url: "./integration/schemas", children: [] },
+        { label: "Scripts", icon: "terminal", url: "./integration/scripts", children: [] },
+        { label: "Spec Templates", icon: "file-text", url: "./integration/spec-templates", children: [] },
       ],
     },
     {
@@ -63,9 +65,6 @@ export class SidebarComponent implements OnInit {
       icon: "code",
       children: [
         { label: "Vibe Editor", icon: "magic", url: "./vibe/editor", children: [] },
-        { label: "Code Editor", icon: "file-code-o", url: "./vibe/code-editor", children: [] },
-        { label: "Scripts", icon: "terminal", url: "./vibe/scripts", children: [] },
-        { label: "Spec Templates", icon: "file-text", url: "./vibe/spec-templates", children: [] },
       ],
     },
   ];
@@ -1133,13 +1132,13 @@ export class SidebarComponent implements OnInit {
     './aibrain/coreDatasources':'./data/connections',
     './aibrain/connections':    './data/connections',
     './aibrain/models':         './data/models',
-    './aibrain/schemas':        './integration/schemas',
+    './aibrain/schemas':        './data/schemas',
     // Data Ops — aip namespace variants (some DashConsts rows use ./aip/* instead of ./aibrain/*)
     './aip/datasets':           './data/datasets',
     './aip/datasources':        './data/connections',
     './aip/connections':        './data/connections',
     './aip/models':             './data/models',
-    './aip/schemas':            './integration/schemas',
+    './aip/schemas':            './data/schemas',
 
     // Agents (was aip_app / agent module)
     './aibrain/agent':          './agent/studio',
@@ -1162,7 +1161,11 @@ export class SidebarComponent implements OnInit {
 
     // Vibe Studio (was aip_app vibe-studio)
     './aip/vibe-studio':        './vibe/editor',
-    './aip/specs':              './vibe/spec-templates',
+    './aip/specs':              './integration/spec-templates',
+    './aibrain/specs':          './integration/spec-templates',
+    './vibe/spec-templates':    './integration/spec-templates',
+    './vibe/scripts':           './integration/scripts',
+    './vibe/code-editor':       './integration/scripts',
 
     // Dashboard (migrated into integration MFE from legacy aip-app-ui)
     // Dashboard owned by host (was temporarily in integration MFE)

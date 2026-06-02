@@ -32,21 +32,30 @@
 
             <!-- Search toggle icon removed - search is now always visible -->
 
-            <!-- Add button (conditionally shown) -->
-            <div *ngIf="showAddButton" class="action-button">
-                <mat-icon [ngClass]="{'active': isAddHovered}" (click)="onAddClick()" matTooltip="Add"
-                    [matTooltipPosition]="TOOLTIP_POSITION" (mouseenter)="isAddHovered = true"
-                    (mouseleave)="isAddHovered = false" aria-label="Add new item">
-                    add
-                </mat-icon>
+            <!-- Add button (conditionally shown). Click on the WHOLE button
+                 area, not just the inner icon, so users can hit the padding too.
+                 If parent supplies [addMenu], the click opens that mat-menu;
+                 otherwise it emits the (add) output. -->
+            <div *ngIf="showAddButton && addMenu" class="action-button"
+                 [matMenuTriggerFor]="addMenu"
+                 matTooltip="Add" [matTooltipPosition]="TOOLTIP_POSITION"
+                 (mouseenter)="isAddHovered = true" (mouseleave)="isAddHovered = false"
+                 role="button" tabindex="0" aria-label="Add new item">
+                <mat-icon [ngClass]="{'active': isAddHovered}">add</mat-icon>
+            </div>
+            <div *ngIf="showAddButton && !addMenu" class="action-button" (click)="onAddClick()"
+                 matTooltip="Add" [matTooltipPosition]="TOOLTIP_POSITION"
+                 (mouseenter)="isAddHovered = true" (mouseleave)="isAddHovered = false"
+                 role="button" tabindex="0" aria-label="Add new item">
+                <mat-icon [ngClass]="{'active': isAddHovered}">add</mat-icon>
             </div>
 
             <!-- Refresh button -->
-            <div class="action-button">
-                <mat-icon [ngClass]="{'active': isRefreshHovered, 'rotate-icon': isRefreshing}"
-                    (click)="onRefreshClick()" matTooltip="Refresh" [matTooltipPosition]="TOOLTIP_POSITION"
-                    (mouseenter)="isRefreshHovered = true" (mouseleave)="isRefreshHovered = false"
-                    aria-label="Refresh data">
+            <div class="action-button" (click)="onRefreshClick()"
+                 matTooltip="Refresh" [matTooltipPosition]="TOOLTIP_POSITION"
+                 (mouseenter)="isRefreshHovered = true" (mouseleave)="isRefreshHovered = false"
+                 role="button" tabindex="0" aria-label="Refresh data">
+                <mat-icon [ngClass]="{'active': isRefreshHovered, 'rotate-icon': isRefreshing}">
                     autorenew
                 </mat-icon>
             </div>

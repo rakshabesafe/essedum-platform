@@ -17,12 +17,18 @@ import { InstanceDescriptionComponent } from '../features/instance/instance-desc
 
 import { JobsComponent } from '../features/jobs/jobs.component';
 
-import { SchemaComponent } from '../features/schema/schema.component';
-import { ModalConfigSchemaComponent } from '../features/schema/modal-config-schema/modal-config-schema.component';
+// Schema moved back to data-ops MFE on 2026-06-03.
+
+// 2026-06-03: moved here from vibe-studio MFE.
+import { SpecTemplateComponent } from '../features/spec-template/spec-template.component';
+import { CreateSpecTemplateComponent } from '../features/spec-template/create-spec-template/create-spec-template.component';
+import { EditSpecTemplateComponent } from '../features/spec-template/edit-spec-template/edit-spec-template.component';
+import { SpecTemplateDescriptionComponent } from '../features/spec-template/spec-template-description/spec-template-description.component';
 
 // Migrated from legacy aip-app-ui (2026-05-25): salus iframe wrapper.
 // Dashboard moved to host (shell/landing/dashboard) per MFE plan §1.
 import { SalusComponent } from '../features/salus/salus.component';
+import { PipelineEditorComponent } from '../features/pipeline/wizard/editor/pipeline-editor.component';
 
 // Routes mount under `/integration/**` per the host manifest (integration.routePath = 'integration').
 const routes: Routes = [
@@ -44,6 +50,14 @@ const routes: Routes = [
     children: [
       { path: '', component: PipelineComponent },
       { path: 'view/:cname', component: NativeScriptComponent },
+      { path: 'view-wizard/:cname', component: PipelineEditorComponent },
+    ],
+  },
+  {
+    path: 'training-pipelines',
+    children: [
+      { path: '', component: PipelineComponent },
+      { path: 'view-wizard/:cname', component: PipelineEditorComponent },
     ],
   },
 
@@ -71,13 +85,24 @@ const routes: Routes = [
     ],
   },
 
+  // 2026-06-03: /scripts moved here from vibe-studio. NativeScriptComponent
+  // was already declared in integration-hub.
   {
-    path: 'schemas',
+    path: 'scripts',
     children: [
-      { path: '', component: SchemaComponent },
-      { path: 'create', component: ModalConfigSchemaComponent },
-      { path: 'view', component: ModalConfigSchemaComponent },
-      { path: 'edit', component: ModalConfigSchemaComponent },
+      { path: '', component: NativeScriptComponent },
+      { path: 'view/:cname', component: NativeScriptComponent },
+    ],
+  },
+
+  // 2026-06-03: /spec-templates moved here from vibe-studio.
+  {
+    path: 'spec-templates',
+    children: [
+      { path: '', component: SpecTemplateComponent },
+      { path: 'create', component: CreateSpecTemplateComponent },
+      { path: 'edit/:dname', component: EditSpecTemplateComponent },
+      { path: ':cname', component: SpecTemplateDescriptionComponent },
     ],
   },
 ];
@@ -86,4 +111,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class EntryRoutingModule {}
+export class EntryRoutingModule { }
