@@ -1,0 +1,28 @@
+# Build context: essedum-platform/ (repo root)
+FROM node:22-alpine AS build
+
+WORKDIR /workspace
+COPY essedum-ui/shell/ ./shell/
+WORKDIR /workspace/shell
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
+RUN npm run build-prod
+
+FROM nginx:alpine
+RUN apk add --no-cache openssl && \
+    mkdir -p /etc/nginx/ssl && \
+    openssl req -x509 -nodes -days 3650 \
+      -newkey rsa:2048 \
+      -keyout /etc/nginx/ssl/server.key \
+      -out /etc/nginx/ssl/server.crt \
+      -subj "/CN=localhost"
+
+COPY essedum-ui/nginx_shell.conf /etc/nginx/nginx.conf
+WORKDIR /app
+RUN mkdir -p /app/ui/shell
+COPY --from=build /workspace/shell/dist/shell /app/ui/shell/
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh && chmod -R 755 /app/ui
+
+EXPOSE 8084
+ENTRYPOINT ["/entrypoint.sh"]

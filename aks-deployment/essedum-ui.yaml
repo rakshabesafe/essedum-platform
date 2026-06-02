@@ -1,22 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: essedum-ui
+  name: essedum-frontend-ui
   namespace: aipns # Namespace where the deployment will run
 spec:
-  replicas: 1 # Number of replicas
+  replicas: 5 # Number of replicas
   selector:
     matchLabels:
-      app: essedum-ui
+      app: essedum-frontend-ui
   template:
     metadata:
       labels:
-        app: essedum-ui
+        app: essedum-frontend-ui
     spec:
       containers:
-      - name: essedum-ui
-        image: 10.200.111.174:5000/essedum_app_frontend:latest
+      - name: essedum-frontend-ui
+        image: localhost:5000/essedum-ui:micro_latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8082
         - containerPort: 8084
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: essedum-frontend-ui-nginx-config

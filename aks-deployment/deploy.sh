@@ -1,0 +1,225 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Essedum Platform – One-Touch AKS Deployment Script
+# Usage:
+#   ./deploy.sh          – deploy / upgrade everything
+#   ./deploy.sh status   – show rollout status of all workloads
+#   ./deploy.sh teardown – delete all resources (prompts for confirmation)
+# =============================================================================
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NAMESPACE="aipns"
+ACTION="${1:-deploy}"
+
+# ─── Colour helpers ──────────────────────────────────────────────────────────
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; NC='\033[0m'
+info()    { echo -e "${CYAN}[INFO]${NC}  $*"; }
+success() { echo -e "${GREEN}[OK]${NC}    $*"; }
+warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
+error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; exit 1; }
+
+# ─── Pre-flight checks ───────────────────────────────────────────────────────
+check_prerequisites() {
+  info "Checking prerequisites..."
+  command -v kubectl >/dev/null 2>&1 || error "kubectl not found in PATH."
+  kubectl cluster-info >/dev/null 2>&1 || error "Cannot reach Kubernetes cluster. Check your kubeconfig."
+  success "Prerequisites OK."
+}
+
+# ─── Apply a manifest with a label ───────────────────────────────────────────
+apply() {
+  local label="$1"
+  local file="$2"
+  if [[ ! -f "${SCRIPT_DIR}/${file}" ]]; then
+    warn "Manifest not found, skipping: ${file}"
+    return
+  fi
+  info "Applying [${label}] → ${file}"
+  kubectl apply -f "${SCRIPT_DIR}/${file}"
+}
+
+# ─── Wait for a Deployment to become available ───────────────────────────────
+wait_for() {
+  local name="$1"
+  local ns="${2:-${NAMESPACE}}"
+  info "Waiting for deployment/${name} to be ready..."
+  kubectl rollout status deployment/"${name}" -n "${ns}" --timeout=180s \
+    && success "deployment/${name} is ready." \
+    || warn "deployment/${name} did not become ready within timeout – continuing."
+}
+
+# ─── DEPLOY ──────────────────────────────────────────────────────────────────
+deploy() {
+  info "====== Essedum Platform Deployment Started ======"
+
+  # 1. Cluster-level infrastructure
+  info "--- [1/9] Ingress-NGINX controller ---"
+  apply "ingress-nginx" "ingress-nginx-deploy.yaml"
+  wait_for "ingress-nginx-controller" "ingress-nginx"
+
+  info "--- [2/9] MetalLB config (if applicable) ---"
+  apply "metallb-config" "metallib-config.yaml"
+
+  # 2. Application namespace
+  info "--- [3/9] Namespace: ${NAMESPACE} ---"
+  kubectl create namespace "${NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
+  success "Namespace '${NAMESPACE}' ready."
+
+  # 3. Secrets (must be applied before workloads that reference them)
+  info "--- [3.5/9] Secrets ---"
+  apply "minio-secret" "essedum-minio-secret.yaml"
+
+  # 4. Persistent storage
+  info "--- [4/9] Persistent Volumes & Claims ---"
+  apply "mysql-pv"    "mysql_file_pv.yaml"
+  apply "qdrant-pv"   "qdrantfilepv.yaml"
+  apply "langflow-pv" "langflow_file_pv.yaml"
+
+  # 4. Stateful data-plane services
+  info "--- [5/9] Data stores (MySQL, Qdrant) ---"
+  apply "mysql"  "mysql_deployment_v3.yaml"
+  apply "qdrant" "qdrant_deployment.yaml"
+  wait_for "mysql"  "${NAMESPACE}"
+  wait_for "qdrant" "${NAMESPACE}"
+
+  # 5. Identity
+  info "--- [6/9] Keycloak (Identity) ---"
+  apply "keycloak" "keycloak_deployment.yaml"
+  wait_for "keycloak" "${NAMESPACE}"
+
+  # 6. Core application workloads
+  info "--- [7/9] Core application workloads ---"
+
+  # Backend microservices
+  apply "essedum-backend-api-gateway"  "essedum-backend.yaml"
+  apply "essedum-backend-usm"          "usm-service.yaml"
+  apply "essedum-backend-icip"         "icip-service.yaml"
+  apply "essedum-backend-data"         "data-service.yaml"
+  apply "essedum-backend-vibe"         "vibe-service.yaml"
+
+  wait_for "essedum-backend-api-gateway" "${NAMESPACE}"
+  wait_for "essedum-backend-usm"         "${NAMESPACE}"
+  wait_for "essedum-backend-icip"        "${NAMESPACE}"
+  wait_for "essedum-backend-data"        "${NAMESPACE}"
+  wait_for "essedum-backend-vibe"        "${NAMESPACE}"
+
+  # Frontend microservices (1 shell host + 4 MFE pods)
+  apply "essedum-frontend-shell"        "essedum-frontend-shell.yaml"
+  apply "essedum-frontend-agent"        "essedum-frontend-agent.yaml"
+  apply "essedum-frontend-data-ops"     "essedum-frontend-data-ops.yaml"
+  apply "essedum-frontend-integration"  "essedum-frontend-integration.yaml"
+  apply "essedum-frontend-vibe-studio"  "essedum-frontend-vibe-studio.yaml"
+
+  wait_for "essedum-frontend-shell"       "${NAMESPACE}"
+  wait_for "essedum-frontend-agent"       "${NAMESPACE}"
+  wait_for "essedum-frontend-data-ops"    "${NAMESPACE}"
+  wait_for "essedum-frontend-integration" "${NAMESPACE}"
+  wait_for "essedum-frontend-vibe-studio" "${NAMESPACE}"
+
+  # Supporting services
+  apply "pyjob-executor"               "pyjob-executor.yaml"
+  apply "proxy"                        "proxy-deployment.yml"
+  apply "langflow"                     "langflow-deployment-with-tls.yaml"
+  apply "builder-rbac"                 "builder-rbac.yml"
+  apply "builder"                      "builder-deployment.yml"
+  apply "goosed"                       "goosed-deployment.yaml"
+  apply "goose-ui"                     "goose-ui-deployment.yaml"
+  apply "vibe-configmap"               "vibe-code-builder-configmap.yml"
+  apply "vibe-builder"                 "vibe-code-builder-deployment.yml"
+
+  wait_for "pyjob-executor" "${NAMESPACE}"
+  wait_for "langflow"       "${NAMESPACE}"
+
+  # 7. Horizontal Pod Autoscalers
+  info "--- [8/9] Horizontal Pod Autoscalers ---"
+  apply "essedum-backend-api-gateway-hpa" "essedum-backend-hpa.yaml"
+  apply "keycloak-hpa"                    "keycloak-hpa.yaml"
+  apply "pyjob-hpa"                       "pyjob-executor-hpa.yaml"
+
+  # 8. Ingress rules
+  info "--- [9/9] Ingress rules ---"
+  apply "essedum-frontend-ingress"     "essedum-frontend-ingress.yaml"
+  apply "essedum-frontend-mfe-ingress" "essedum-frontend-mfe-ingress.yaml"
+  apply "essedum-api-ingress"          "essedum-api-ingress.yaml"
+  apply "keycloak-ingress"             "keycloak-ingress.yaml"
+  apply "ingress"                      "ingress.yaml"
+  apply "goose-ingress"                "goose-ingress.yaml"
+  apply "vibe-builder-ingress"         "vibe-code-builder-ingress.yaml"
+
+  success "====== Deployment Complete ======"
+  status
+}
+
+# ─── STATUS ──────────────────────────────────────────────────────────────────
+status() {
+  echo ""
+  info "===== Deployment Status: namespace '${NAMESPACE}' ====="
+  kubectl get deployments,pods,services,ingress -n "${NAMESPACE}" 2>/dev/null || true
+  echo ""
+  info "===== Ingress-NGINX controller ====="
+  kubectl get deployments,pods,services -n ingress-nginx 2>/dev/null || true
+}
+
+# ─── TEARDOWN ────────────────────────────────────────────────────────────────
+teardown() {
+  warn "This will DELETE all Essedum resources in namespace '${NAMESPACE}'."
+  read -rp "Type 'yes' to confirm: " confirm
+  [[ "${confirm}" == "yes" ]] || { info "Aborted."; exit 0; }
+
+  info "Removing ingress rules..."
+  kubectl delete -f "${SCRIPT_DIR}/essedum-frontend-ingress.yaml"     --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/essedum-frontend-mfe-ingress.yaml" --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/essedum-api-ingress.yaml"          --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/keycloak-ingress.yaml"             --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/ingress.yaml"                      --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/goose-ingress.yaml"                --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/vibe-code-builder-ingress.yaml"    --ignore-not-found
+
+  info "Removing HPAs..."
+  kubectl delete -f "${SCRIPT_DIR}/essedum-backend-hpa.yaml"  --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/keycloak-hpa.yaml"         --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/pyjob-executor-hpa.yaml"   --ignore-not-found
+
+  info "Removing workloads..."
+  for f in \
+    essedum-backend.yaml usm-service.yaml icip-service.yaml \
+    data-service.yaml vibe-service.yaml \
+    essedum-frontend-shell.yaml essedum-frontend-agent.yaml \
+    essedum-frontend-data-ops.yaml essedum-frontend-integration.yaml \
+    essedum-frontend-vibe-studio.yaml \
+    pyjob-executor.yaml proxy-deployment.yml langflow-deployment-with-tls.yaml \
+    builder-deployment.yml builder-rbac.yml \
+    goosed-deployment.yaml goose-ui-deployment.yaml \
+    vibe-code-builder-configmap.yml vibe-code-builder-deployment.yml; do
+    kubectl delete -f "${SCRIPT_DIR}/${f}" --ignore-not-found
+  done
+
+  info "Removing Keycloak..."
+  kubectl delete -f "${SCRIPT_DIR}/keycloak_deployment.yaml"  --ignore-not-found
+
+  info "Removing data stores..."
+  kubectl delete -f "${SCRIPT_DIR}/mysql_deployment_v3.yaml"  --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/qdrant_deployment.yaml"    --ignore-not-found
+
+  info "Removing Persistent Volumes..."
+  kubectl delete -f "${SCRIPT_DIR}/mysql_file_pv.yaml"        --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/qdrantfilepv.yaml"         --ignore-not-found
+  kubectl delete -f "${SCRIPT_DIR}/langflow_file_pv.yaml"     --ignore-not-found
+
+  info "Deleting namespace '${NAMESPACE}'..."
+  kubectl delete namespace "${NAMESPACE}" --ignore-not-found
+
+  success "Teardown complete."
+}
+
+# ─── Entry point ─────────────────────────────────────────────────────────────
+check_prerequisites
+
+case "${ACTION}" in
+  deploy)   deploy   ;;
+  status)   status   ;;
+  teardown) teardown ;;
+  *) error "Unknown action '${ACTION}'. Use: deploy | status | teardown" ;;
+esac

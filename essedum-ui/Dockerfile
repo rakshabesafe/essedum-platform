@@ -1,7 +1,7 @@
 # Multi-stage build for the Essedum MFE topology: 1 host (shell) + 4 child MFEs.
 # Build context is expected to be the essedum-platform/ parent directory.
 
-FROM node:24.1.0-alpine AS build
+FROM node:22-alpine AS build
 
 WORKDIR /workspace
 
@@ -11,26 +11,31 @@ WORKDIR /workspace
 # "@essedum/shared-lib" path alias, so the shell sources must be on disk.
 COPY essedum-ui/shell/ ./shell/
 WORKDIR /workspace/shell
-RUN npm install --legacy-peer-deps --verbose
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
 RUN npm run build-prod
 
 # ---- MFEs ------------------------------------------------------------------
 COPY essedum-ui/modules/ /workspace/modules/
 
 WORKDIR /workspace/modules/agent-studio
-RUN npm install --legacy-peer-deps --verbose
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
 RUN npm run build-prod
 
 WORKDIR /workspace/modules/data-ops
-RUN npm install --legacy-peer-deps --verbose
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
 RUN npm run build-prod
 
 WORKDIR /workspace/modules/integration-hub
-RUN npm install --legacy-peer-deps --verbose
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
 RUN npm run build-prod
 
 WORKDIR /workspace/modules/vibe-studio
-RUN npm install --legacy-peer-deps --verbose
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
 RUN npm run build-prod
 
 

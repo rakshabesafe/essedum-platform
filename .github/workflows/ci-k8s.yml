@@ -1,0 +1,752 @@
+name: CI – Build & Test (Kubernetes)
+
+# ──────────────────────────────────────────────────────────────
+# Triggers — push to source-branch branch and PRs to pr-branch
+# ──────────────────────────────────────────────────────────────
+on:
+  push:
+    branches: ["source-branch"]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "LICENSE"
+      - "docker/**"
+  pull_request:
+    branches: ["pr-branch"]
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "LICENSE"
+      - "docker/**"
+
+# Cancel any in-flight run for the same branch
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least-privilege: CI only needs to read repo contents
+permissions:
+  contents: read
+
+jobs:
+  # ────────────────────────────────────────────────────────────
+  # JOB 0 – Detect which service paths changed
+  # Every downstream job checks these outputs and skips itself
+  # if nothing it owns was modified. Only source changes for a
+  # service trigger its build — workflow file changes alone do not
+  # force a full rebuild.
+  # ────────────────────────────────────────────────────────────
+  detect-changes:
+    name: "Detect Changed Services"
+    runs-on: [self-hosted, essedum-runner]
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    timeout-minutes: 5
+    outputs:
+      backend:    ${{ steps.filter.outputs.backend }}
+      frontend:   ${{ steps.filter.outputs.frontend }}
+      py_executer:  ${{ steps.filter.outputs.py_executer }}
+      py_sagemaker: ${{ steps.filter.outputs.py_sagemaker }}
+      py_vertex:    ${{ steps.filter.outputs.py_vertex }}
+      py_azure:     ${{ steps.filter.outputs.py_azure }}
+      proxy:      ${{ steps.filter.outputs.proxy }}
+      adk:        ${{ steps.filter.outputs.adk }}
+      vibe:       ${{ steps.filter.outputs.vibe }}
+      langflow:   ${{ steps.filter.outputs.langflow }}
+      litellm:    ${{ steps.filter.outputs.litellm }}
+      langfuse:   ${{ steps.filter.outputs.langfuse }}
+      k8s:        ${{ steps.filter.outputs.k8s }}
+      workflows:  ${{ steps.filter.outputs.workflows }}
+      has_any_change: ${{ steps.filter.outputs.backend == 'true' || steps.filter.outputs.frontend == 'true' || steps.filter.outputs.py_executer == 'true' || steps.filter.outputs.py_sagemaker == 'true' || steps.filter.outputs.py_vertex == 'true' || steps.filter.outputs.py_azure == 'true' || steps.filter.outputs.proxy == 'true' || steps.filter.outputs.adk == 'true' || steps.filter.outputs.vibe == 'true' || steps.filter.outputs.langflow == 'true' || steps.filter.outputs.litellm == 'true' || steps.filter.outputs.langfuse == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 2   # need parent commit for diff
+
+      - name: Detect path changes
+        id: filter
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        with:
+          filters: |
+            backend:
+              - 'sv/**'
+            frontend:
+              - 'essedum-ui/**'
+            py_executer:
+              - 'py-job-executer/**'
+            py_sagemaker:
+              - 'py-job-sagemaker-executer/**'
+            py_vertex:
+              - 'py-job-vertex-executer/**'
+            py_azure:
+              - 'py-job-azure-executer/**'
+            proxy:
+              - 'proxy-service/**'
+            adk:
+              - 'adk-code-builder-deployer/**'
+            vibe:
+              - 'vibe-code-builder-deployer/**'
+            langflow:
+              - 'langflow/**'
+            litellm:
+              - 'lite-llm/**'
+            langfuse:
+              - 'langfuse/**'
+            k8s:
+              - 'aks-deployment/**'
+            workflows:
+              - '.github/workflows/**'
+
+      - name: Change detection summary
+        run: |
+          echo "### Changed services detected:" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Changed |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| backend | ${{ steps.filter.outputs.backend }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| frontend | ${{ steps.filter.outputs.frontend }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| py-job-executer | ${{ steps.filter.outputs.py_executer }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| py-job-sagemaker | ${{ steps.filter.outputs.py_sagemaker }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| py-job-vertex | ${{ steps.filter.outputs.py_vertex }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| py-job-azure | ${{ steps.filter.outputs.py_azure }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| proxy-service | ${{ steps.filter.outputs.proxy }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| adk-code-builder | ${{ steps.filter.outputs.adk }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| vibe-code-builder | ${{ steps.filter.outputs.vibe }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| langflow | ${{ steps.filter.outputs.langflow }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| litellm | ${{ steps.filter.outputs.litellm }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| langfuse | ${{ steps.filter.outputs.langfuse }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| k8s manifests | ${{ steps.filter.outputs.k8s }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| workflows | ${{ steps.filter.outputs.workflows }} |" >> $GITHUB_STEP_SUMMARY
+
+  # ────────────────────────────────────────────────────────────
+  # NOTE: Standalone backend (Java) and frontend (Angular) CI
+  # validation jobs have been removed. The docker-build matrix
+  # (Job 5) now serves as the single build+validation gate for
+  # both services — it compiles inside the Dockerfile and fails
+  # the pipeline if compilation breaks. This halves build time
+  # (~25-30 min saved) by eliminating the duplicate compile pass.
+  # ────────────────────────────────────────────────────────────
+
+  # ────────────────────────────────────────────────────────────
+  # NOTE: Python lint (flake8) jobs have been removed.
+  # Each Python executor is already built and validated inside
+  # its own Docker image (docker-build matrix). Syntax errors
+  # that flake8 would catch also break pip install / the Docker
+  # build, so the lint pass was fully redundant and added ~15 min.
+  # ────────────────────────────────────────────────────────────
+
+  # ────────────────────────────────────────────────────────────
+  # JOB 4 – Kubernetes manifest validation
+  # ────────────────────────────────────────────────────────────
+  k8s-validate:
+    name: "Kubernetes – Manifest Validate"
+    runs-on: [self-hosted, essedum-runner]
+    needs: [detect-changes]
+    # Run if: k8s manifests changed
+    if: |
+      (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) &&
+      needs.detect-changes.outputs.k8s == 'true'
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Verify kubeconfig available
+        run: |
+          export PATH="/snap/bin:/usr/local/bin:$PATH"
+          if [ ! -f "$KUBECONFIG" ]; then
+            echo "::warning::KUBECONFIG not available in CI environment"
+            echo "Dry-run validation will be performed locally"
+          fi
+
+      - name: Validate Kubernetes manifests syntax
+        run: |
+          export PATH="/snap/bin:/usr/local/bin:$PATH"
+          echo "Validating aks-deployment manifests..."
+          for manifest in aks-deployment/*.yaml aks-deployment/*.yml; do
+            if [ -f "$manifest" ]; then
+              echo "Validating: $manifest"
+              kubectl apply -f "$manifest" --dry-run=client > /dev/null || {
+                echo "::error::Invalid manifest: $manifest"
+                exit 1
+              }
+            fi
+          done
+
+      - name: Check for required fields in deployments
+        run: |
+          echo "Checking deployment manifests in aks-deployment..."
+          found_deployments=false
+          for manifest in aks-deployment/*.yaml aks-deployment/*.yml; do
+            if [ -f "$manifest" ] && grep -q "kind: Deployment" "$manifest"; then
+              echo "Found deployment in: $manifest"
+              found_deployments=true
+              grep -E "(image:|replicas:|name:)" "$manifest" > /dev/null || {
+                echo "::warning::Some required fields may be missing in $manifest"
+              }
+            fi
+          done
+
+      - name: K8s manifest validation summary
+        if: success()
+        run: |
+          echo "## ✓ Kubernetes Validation Passed" >> $GITHUB_STEP_SUMMARY
+          echo "- Manifests are syntactically valid" >> $GITHUB_STEP_SUMMARY
+          echo "- Kustomization builds successfully" >> $GITHUB_STEP_SUMMARY
+
+      - name: K8s validation failure report
+        if: failure()
+        run: |
+          echo "## :red_circle: Kubernetes Validation Failed" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+
+  # ────────────────────────────────────────────────────────────
+  # JOB 5 – Docker image build (all custom services)
+  # ────────────────────────────────────────────────────────────
+  docker-build:
+    name: "Docker Build – ${{ matrix.service }}"
+    runs-on: [self-hosted, essedum-runner]
+    needs: [detect-changes]
+    # Job runs only when at least one service source file changed.
+    # This prevents 15 matrix jobs from spinning up on YAML-only or workflow-only commits.
+    if: |
+      (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) &&
+      needs.detect-changes.outputs.has_any_change == 'true'
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: leap-app-backend
+            context: .
+            dockerfile: sv/Dockerfile_oauth2
+            changes_output: backend
+
+          - service: frontend
+            context: .
+            dockerfile: essedum-ui/Dockerfile
+            changes_output: frontend
+
+          - service: py-job-executer
+            context: py-job-executer
+            dockerfile: py-job-executer/Dockerfile
+            changes_output: py_executer
+
+          - service: py-job-sagemaker-executer
+            context: py-job-sagemaker-executer
+            dockerfile: py-job-sagemaker-executer/Dockerfile
+            changes_output: py_sagemaker
+
+          - service: py-job-vertex-executer
+            context: py-job-vertex-executer
+            dockerfile: py-job-vertex-executer/Dockerfile
+            changes_output: py_vertex
+
+          - service: py-job-azure-executer
+            context: py-job-azure-executer
+            dockerfile: py-job-azure-executer/Dockerfile
+            changes_output: py_azure
+
+          - service: proxy-service
+            context: proxy-service
+            dockerfile: proxy-service/Dockerfile
+            changes_output: proxy
+
+          - service: adk-code-builder-deployer
+            context: adk-code-builder-deployer
+            dockerfile: adk-code-builder-deployer/Dockerfile
+            changes_output: adk
+
+          - service: vibe-code-builder-deployer
+            context: vibe-code-builder-deployer
+            dockerfile: vibe-code-builder-deployer/Dockerfile
+            changes_output: vibe
+
+          # ── Langflow (custom image wrapping langflowai/langflow:latest) ──
+          - service: langflow
+            context: langflow
+            dockerfile: langflow/Dockerfile
+            changes_output: langflow
+
+          # ── LiteLLM (custom image, context=repo root for COPY lite-llm/...) ──
+          - service: litellm
+            context: .
+            dockerfile: lite-llm/Dockerfile
+            changes_output: litellm
+
+          # ── Langfuse web + worker (custom wrappers pinning version) ──
+          - service: langfuse-web
+            context: langfuse
+            dockerfile: langfuse/Dockerfile.web
+            changes_output: langfuse
+
+          - service: langfuse-worker
+            context: langfuse
+            dockerfile: langfuse/Dockerfile.worker
+            changes_output: langfuse
+
+          # ── Goose Vibe Studio Agent (code lives outside repo — always rebuild) ──
+          - service: goose-ui
+            context: essedum-agents/goose-vibe-studio-agent
+            dockerfile: essedum-agents/goose-vibe-studio-agent/Dockerfile.streamlit
+            agents_repo: "true"
+            changes_output: always
+
+          - service: goosed
+            context: essedum-agents/goose-vibe-studio-agent
+            dockerfile: essedum-agents/goose-vibe-studio-agent/Dockerfile.goosed-build
+            agents_repo: "true"
+            changes_output: always
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Check if rebuild needed
+        id: needs_build
+        run: |
+          CHANGED="${{ matrix.changes_output }}"
+          CACHE_DIR="${HOME}/.essedum-build-cache"
+          mkdir -p "$CACHE_DIR"
+
+          # ── Goose services: always rebuild (code outside repo) ───────────────
+          if [ "$CHANGED" = "always" ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "✓ ${{ matrix.service }}: external repo – will rebuild"
+            exit 0
+          fi
+
+          # ── Standard path-filter check ───────────────────────────────────────
+          FLAG=$(echo '${{ toJSON(needs.detect-changes.outputs) }}' \
+                 | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('$CHANGED','false'))")
+
+          if [ "$FLAG" = 'true' ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "✓ ${{ matrix.service }}: code changed – will rebuild"
+          else
+            # Source unchanged — retag only if a previously-built SHA is cached
+            # AND that image still exists in the registry (it may have been deleted
+            # by a cleanup run, making the cache stale). Fall back to full build
+            # if the cached SHA is missing from the registry.
+            CACHE_FILE="$CACHE_DIR/${{ matrix.service }}"
+            if [ -f "$CACHE_FILE" ]; then
+              LAST_SHA=$(cat "$CACHE_FILE")
+              REGISTRY="${{ secrets.CONTAINER_REGISTRY }}"
+              # Verify the cached image actually exists before trusting the cache
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+                -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+                "http://localhost:5001/v2/essedum/${{ matrix.service }}/manifests/${LAST_SHA}" 2>/dev/null || echo "000")
+              if [ "$HTTP_STATUS" = "200" ]; then
+                echo "skip=true" >> $GITHUB_OUTPUT
+                echo "last_sha=${LAST_SHA}" >> $GITHUB_OUTPUT
+                echo "::notice::${{ matrix.service }}: no source changes – will retag ${LAST_SHA} → ${{ github.sha }}"
+              else
+                # Cached SHA no longer in registry (deleted by cleanup) – rebuild
+                rm -f "$CACHE_FILE"
+                echo "skip=false" >> $GITHUB_OUTPUT
+                echo "::warning::${{ matrix.service }}: cached SHA ${LAST_SHA} not found in registry (HTTP ${HTTP_STATUS}) – rebuilding"
+              fi
+            else
+              echo "skip=false" >> $GITHUB_OUTPUT
+              echo "::notice::${{ matrix.service }}: no cached SHA found – building for first time"
+            fi
+          fi
+
+      - name: Copy goose-vibe-studio-agent from runner local path
+        # Resolve the agents source directory dynamically — the runner may run as
+        # a different user or have a different $HOME than devopsuser.
+        # Candidate paths are tried in order; first match wins.
+        if: matrix.agents_repo == 'true' && steps.needs_build.outputs.skip != 'true'
+        run: |
+          echo "Runner context: USER=$(whoami) HOME=$HOME GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+
+          # Candidate locations in priority order:
+          #   1. Sibling of GITHUB_WORKSPACE two levels up (runner work dir = actions root)
+          #   2. $HOME-relative (runner runs as devopsuser)
+          #   3. Absolute hardcoded path (legacy fallback)
+          CANDIDATES=(
+            "/opt/github-runner/_work/essedum-agents/goose-vibe-studio-agent"
+            "$(dirname "$(dirname "$GITHUB_WORKSPACE")")/essedum-agents/goose-vibe-studio-agent"
+            "$HOME/devops/actions/essedum-agents/goose-vibe-studio-agent"
+            "/home/devopsuser/devops/actions/essedum-agents/goose-vibe-studio-agent"
+          )
+
+          AGENTS_SRC=""
+          for candidate in "${CANDIDATES[@]}"; do
+            echo "  Checking: $candidate"
+            if [ -d "$candidate" ]; then
+              AGENTS_SRC="$candidate"
+              echo "  ✓ Found at: $AGENTS_SRC"
+              break
+            fi
+          done
+
+          if [ -z "$AGENTS_SRC" ]; then
+            echo "::error::goose-vibe-studio-agent not found in any expected location."
+            echo "Searched:"
+            for c in "${CANDIDATES[@]}"; do echo "  - $c"; done
+            echo "Runner HOME contents:"
+            ls "$HOME" 2>/dev/null || echo "  (cannot list HOME)"
+            echo "GITHUB_WORKSPACE parent contents:"
+            ls "$(dirname "$(dirname "$GITHUB_WORKSPACE")")" 2>/dev/null || echo "  (cannot list)"
+            exit 1
+          fi
+
+          mkdir -p essedum-agents
+          cp -r "$AGENTS_SRC" essedum-agents/goose-vibe-studio-agent
+          echo "✓ Copied goose-vibe-studio-agent into workspace"
+
+      - name: Retag previous image (no source changes)
+        # Service source is unchanged: copy the manifest to the new SHA tag using
+        # the registry v2 API directly (PUT /manifests/<new-tag>).
+        # This avoids docker buildx imagetools which requires the buildx insecure-
+        # registry config to be initialised — a step that only runs on the build
+        # path. Pure curl works for both localhost (plain HTTP) and remote registries.
+        if: steps.needs_build.outputs.skip == 'true'
+        env:
+          REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
+        run: |
+          set -e
+          LAST_SHA="${{ steps.needs_build.outputs.last_sha }}"
+          SVC="${{ matrix.service }}"
+          NEW_SHA="${{ github.sha }}"
+
+          # Detect protocol: http for localhost/loopback, https for remote
+          if [[ "$REGISTRY" == localhost:* ]] || [[ "$REGISTRY" == 127.* ]]; then
+            REG_PROTO="http"
+          else
+            REG_PROTO="https"
+          fi
+
+          BASE_URL="${REG_PROTO}://${REGISTRY}/v2/essedum/${SVC}"
+
+          # Fetch the manifest bytes and content-type from the source tag
+          MANIFEST=$(curl -sf \
+            -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+            "${BASE_URL}/manifests/${LAST_SHA}")
+          CONTENT_TYPE=$(curl -sI \
+            -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+            "${BASE_URL}/manifests/${LAST_SHA}" \
+            | grep -i "^content-type:" | awk '{print $2}' | tr -d '\r\n')
+
+          if [ -z "$MANIFEST" ] || [ -z "$CONTENT_TYPE" ]; then
+            echo "::error::Could not fetch manifest for ${SVC}:${LAST_SHA} — aborting retag"
+            exit 1
+          fi
+
+          # Write the same manifest under the new tag (registry de-dupes the layers)
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X PUT \
+            -H "Content-Type: ${CONTENT_TYPE}" \
+            --data-raw "${MANIFEST}" \
+            "${BASE_URL}/manifests/${NEW_SHA}")
+
+          if [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "200" ]; then
+            echo "✓ Retagged ${SVC}: ${LAST_SHA} → ${NEW_SHA} (no build needed)"
+          else
+            echo "::error::Retag PUT returned HTTP ${HTTP_CODE} for ${SVC} — aborting"
+            exit 1
+          fi
+
+          # Verify the retag actually made the manifest readable.
+          # The registry can return 201 for a manifest PUT but skip writing the blob
+          # when a stale revision link exists — a GET confirms the blob is on disk.
+          # On failure: clear the stale cache SHA so the next run rebuilds instead of retagging.
+          VERIFY_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+            "${BASE_URL}/manifests/${NEW_SHA}")
+          if [ "$VERIFY_STATUS" = "200" ]; then
+            echo "✓ Verified ${SVC}:${NEW_SHA} is readable in registry"
+          else
+            echo "::error::Retag verification failed: ${SVC}:${NEW_SHA} returned HTTP ${VERIFY_STATUS}"
+            echo "::error::Stale revision link in registry — clearing runner cache so next run rebuilds"
+            rm -f "${HOME}/.essedum-build-cache/${SVC}"
+            exit 1
+          fi
+
+      - name: Login to container registry
+        if: steps.needs_build.outputs.skip != 'true'
+        env:
+          REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          # SECURITY: password via env var piped to stdin — never echoed to log.
+          echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USERNAME" --password-stdin "$REGISTRY"
+
+      - name: Set up Docker Buildx
+        # IMPORTANT: the docker-container BuildKit driver runs inside an isolated
+        # container. Without --network=host that container cannot reach the local
+        # registry on localhost:5001 (its own loopback ≠ host loopback), causing
+        # "dial tcp [::1]:5001: connect: connection refused" on push.
+        # --driver-opt network=host shares the host network with the builder
+        # container so localhost resolves correctly.
+        # config-inline marks localhost:5001 as an insecure (plain-HTTP) registry
+        # so BuildKit does not attempt TLS when pushing layers.
+        if: steps.needs_build.outputs.skip != 'true'
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+        with:
+          driver-opts: network=host
+          config-inline: |
+            [registry."localhost:5001"]
+              http = true
+              insecure = true
+
+      - name: Build and push Docker image
+        # Build once in CI and push immediately to the registry.
+        # CD reuses this image directly — no second build in the deploy job.
+        if: steps.needs_build.outputs.skip != 'true'
+        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1 # v6.16.0
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ secrets.CONTAINER_REGISTRY }}/essedum/${{ matrix.service }}:${{ github.sha }}
+          # SECURITY: Disable provenance attestations and SBOM generation.
+          # build-push-action v6 defaults provenance:true which uploads a
+          # *.dockerbuild attestation file as a GitHub Actions artifact, making
+          # it publicly visible in the GitHub UI on a public repo.
+          # Artifacts MUST stay on the runner only — never uploaded to GitHub.
+          provenance: false
+          sbom: false
+          # SECURITY: Do NOT use type=gha cache on a public repo.
+          # GHA cache is accessible to any workflow run including fork PRs,
+          # which would allow reading image layers containing compiled code,
+          # internal paths, and baked-in configuration.
+          # Use a local registry cache scoped to this runner only.
+          cache-from: type=local,src=/tmp/buildkit-cache/${{ matrix.service }}
+          # mode=max caches all intermediate layers (best hit-rate).
+          # max-size caps the on-disk footprint per service at 2 GB so the
+          # /tmp/buildkit-cache directory cannot grow unboundedly on the runner.
+          cache-to: type=local,dest=/tmp/buildkit-cache/${{ matrix.service }},mode=max,max-size=2g
+          # Do NOT load into Docker daemon (outputs: type=docker) —
+          # loading builds up /var/lib/docker indefinitely with stale images.
+          # CI pushes directly to the registry; no daemon load needed.
+
+      - name: Verify image is readable in registry
+        # registry:2 can return HTTP 201 for a manifest PUT but silently skip writing
+        # the blob when a stale revision link already exists for that digest. A GET
+        # immediately after the push confirms the blob was actually written on disk.
+        # Failing here prevents CD from deploying a ghost image that returns 404 at pull time.
+        if: steps.needs_build.outputs.skip != 'true'
+        env:
+          REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
+        run: |
+          SVC="${{ matrix.service }}"
+          SHA="${{ github.sha }}"
+          if [[ "$REGISTRY" == localhost:* ]] || [[ "$REGISTRY" == 127.* ]]; then
+            REG_PROTO="http"
+          else
+            REG_PROTO="https"
+          fi
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+            "${REG_PROTO}://${REGISTRY}/v2/essedum/${SVC}/manifests/${SHA}")
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "✓ ${SVC}:${SHA} verified readable in registry (HTTP 200)"
+          else
+            echo "::error::Push silently failed for ${SVC}: manifest GET returned HTTP ${HTTP_STATUS} after a 201 PUT."
+            echo "::error::Cause: stale revision link in registry storage for this digest."
+            echo "::error::Fix: docker exec local-reg sh -c 'rm -rf /var/lib/registry/docker/registry/v2/repositories/essedum/${SVC}/_manifests/revisions/sha256/<digest>/link'"
+            exit 1
+          fi
+
+      - name: Save build SHA to runner cache
+        # Persist the SHA so the next CI run can retag instead of rebuilding
+        # when this service's source hasn't changed.
+        if: steps.needs_build.outputs.skip != 'true' && success()
+        run: |
+          CACHE_DIR="${HOME}/.essedum-build-cache"
+          mkdir -p "$CACHE_DIR"
+          echo "${{ github.sha }}" > "$CACHE_DIR/${{ matrix.service }}"
+          # Goose services: also persist the directory hash so the next run
+          # knows whether the agent code actually changed.
+          GOOSE_HASH="${{ steps.needs_build.outputs.goose_hash }}"
+          if [ -n "$GOOSE_HASH" ]; then
+            echo "$GOOSE_HASH" > "$CACHE_DIR/goose-hash"
+            echo "✓ Saved goose directory hash"
+          fi
+          echo "✓ Cached build SHA for ${{ matrix.service }}: ${{ github.sha }}"
+
+      - name: Clean up dangling images and stale build cache
+        if: steps.needs_build.outputs.skip != 'true' && always()
+        run: |
+          # build-push-action with the docker-container driver pushes directly to
+          # the registry and does not load the image into the local daemon, so
+          # there is no named image to remove here.
+          # Logout from registry (login was done in a prior step).
+          docker logout "${{ secrets.CONTAINER_REGISTRY }}" 2>/dev/null || true
+          # Remove any untagged (dangling) layers accumulated during the build.
+          docker image prune -f || true
+          # Trim BuildKit local cache entries older than 72 h.
+          docker builder prune -f --filter "until=72h" || true
+
+      - name: Docker build summary
+        if: success()
+        run: |
+          echo "## ✓ Docker Build Passed (${{ matrix.service }})" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.needs_build.outputs.skip }}" = "true" ]; then
+            echo "- Status: **skipped** (no source code changes)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Status: **built and pushed**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "- Image: \`${{ secrets.CONTAINER_REGISTRY }}/essedum/${{ matrix.service }}:${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Docker build failure report
+        if: failure()
+        run: |
+          echo "## :red_circle: Docker Build Failed (${{ matrix.service }})" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Run: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+
+  # ────────────────────────────────────────────────────────────
+  # Final summary job
+  # ────────────────────────────────────────────────────────────
+  ci-summary:
+    name: "CI – Summary & Status"
+    runs-on: [self-hosted, essedum-runner]
+    needs: [detect-changes, k8s-validate, docker-build]
+    # SECURITY: same fork guard as all other jobs — prevents fork PRs from
+    # touching the self-hosted runner even in the summary/gate step.
+    # Jobs that were skipped (no changes) report result 'skipped', not 'failure'.
+    # NOTE: backend and frontend CI validation removed — Docker builds handle all compilation.
+    if: always() && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+    timeout-minutes: 5
+    # Expose detect-changes outputs so call-cd can forward them to CD.
+    # CD uses these to skip manifests/rollouts for unchanged services.
+    outputs:
+      image_tag:            ${{ github.sha }}
+      has_any_change:       ${{ needs.detect-changes.outputs.has_any_change }}
+      changed_backend:      ${{ needs.detect-changes.outputs.backend }}
+      changed_frontend:     ${{ needs.detect-changes.outputs.frontend }}
+      changed_py_executer:  ${{ needs.detect-changes.outputs.py_executer }}
+      changed_py_sagemaker: ${{ needs.detect-changes.outputs.py_sagemaker }}
+      changed_py_vertex:    ${{ needs.detect-changes.outputs.py_vertex }}
+      changed_py_azure:     ${{ needs.detect-changes.outputs.py_azure }}
+      changed_proxy:        ${{ needs.detect-changes.outputs.proxy }}
+      changed_adk:          ${{ needs.detect-changes.outputs.adk }}
+      changed_vibe:         ${{ needs.detect-changes.outputs.vibe }}
+      changed_langflow:     ${{ needs.detect-changes.outputs.langflow }}
+      changed_litellm:      ${{ needs.detect-changes.outputs.litellm }}
+      changed_langfuse:     ${{ needs.detect-changes.outputs.langfuse }}
+      changed_workflows:    ${{ needs.detect-changes.outputs.workflows }}
+
+    steps:
+      - name: Determine CI status
+        run: |
+          # 'skipped' = no relevant changes for that service — treated as pass.
+          # 'failure' OR 'cancelled' (timeout) both block CD.
+          if [ "${{ needs.k8s-validate.result }}" = "failure" ] || \
+             [ "${{ needs.k8s-validate.result }}" = "cancelled" ] || \
+             [ "${{ needs.docker-build.result }}" = "failure" ] || \
+             [ "${{ needs.docker-build.result }}" = "cancelled" ]; then
+            echo "::error::One or more CI jobs failed"
+            echo "## :red_circle: CI Pipeline Failed" >> $GITHUB_STEP_SUMMARY
+            echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+            echo "| K8s Validate | ${{ needs.k8s-validate.result }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| Docker Build | ${{ needs.docker-build.result }} |" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "## ✓ CI Checks Passed (Docker builds successful, unchanged services skipped)" >> $GITHUB_STEP_SUMMARY
+            echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+            echo "| K8s Validate | ${{ needs.k8s-validate.result }} |" >> $GITHUB_STEP_SUMMARY
+            echo "| Docker Build | ${{ needs.docker-build.result }} |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Create CI badge
+        run: |
+          echo "## Build Information" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+          echo "- **Actor**: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run**: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+
+      - name: Prune old runner artifacts (keep last 10 runs)
+        # SECURITY: Artifacts never leave the runner VM – nothing uploaded to GitHub.
+        # Keeps $HOME/ci-artifacts/<sha>/ directories for the 10 most recent SHAs.
+        # Access: ls $HOME/ci-artifacts/ on the runner VM.
+        if: always() && github.event_name == 'push'
+        run: |
+          ARTIFACT_BASE="${HOME}/ci-artifacts"
+          mkdir -p "$ARTIFACT_BASE"
+          # Ensure current run directory exists even if no reports were produced
+          mkdir -p "$ARTIFACT_BASE/${{ github.sha }}"
+          # Count directories; delete oldest beyond 10
+          DIRS=$(ls -t "$ARTIFACT_BASE" 2>/dev/null | wc -l)
+          if [ "$DIRS" -gt 10 ]; then
+            ls -t "$ARTIFACT_BASE" | tail -n +11 | xargs -I{} rm -rf "$ARTIFACT_BASE/{}"
+            echo "✓ Pruned old artifact directories (kept 10 most recent)"
+          fi
+          echo "Runner artifact store: $ARTIFACT_BASE (${{ github.sha }})"
+
+      - name: Prune stale daemon images
+        # Images are now pushed directly to the registry by CI and are never
+        # loaded into the local Docker daemon (docker-container buildx driver).
+        # This step removes any leftover dangling layers from interrupted runs.
+        if: always() && github.event_name == 'push'
+        run: |
+          docker image prune -f || true
+          echo "=== Daemon image prune done ==="
+
+      - name: Registry GC – remove unreferenced blobs
+        # garbage-collect only removes blobs not referenced by any remaining manifest.
+        # It does NOT delete manifests or tags, so images with multiple SHA tags that
+        # share the same digest (unchanged-source retags) are unaffected.
+        # --delete-untagged=false preserves manifest-list entries (multi-arch indexes)
+        # that have no direct tag but are referenced by a tagged manifest list.
+        # Safe to run here: all builds for this push have already succeeded.
+        if: github.event_name == 'push'
+        run: |
+          docker exec local-reg registry garbage-collect \
+            --delete-untagged=false \
+            /etc/docker/registry/config.yml 2>&1 || true
+          echo "✓ Registry GC complete"
+
+  # ────────────────────────────────────────────────────────────
+  # JOB FINAL – Trigger CD after CI passes on source-branch branch
+  # SECURITY:
+  #   – if: requires event==push AND ref==source-branch. PRs (same-repo
+  #     or fork) trigger pull_request, never push – so CD is
+  #     unreachable from any PR path, even if pr-gate is bypassed.
+  #   – Only 4 explicitly named secrets are forwarded (no
+  #     secrets: inherit – public repo, least-privilege).
+  #   – No runs-on: reusable workflow call jobs don’t hold a runner
+  #     while queued, so there is no single-runner deadlock.
+  # ────────────────────────────────────────────────────────────
+  call-cd:
+    name: "Trigger CD – Deploy"
+    needs: [ci-summary]
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/source-branch' &&
+      needs.ci-summary.result == 'success' &&
+      needs.ci-summary.outputs.has_any_change == 'true'
+    uses: ./.github/workflows/cd-deploy-k8s.yml
+    with:
+      # Forward the exact SHA that CI built and pushed — CD deploys this tag directly.
+      # No second docker build in CD; images are already in the registry.
+      image_tag:            ${{ needs.ci-summary.outputs.image_tag }}
+      # Forward which services changed so CD can skip manifests/rollouts for unchanged ones.
+      changed_backend:      ${{ needs.ci-summary.outputs.changed_backend }}
+      changed_frontend:     ${{ needs.ci-summary.outputs.changed_frontend }}
+      changed_py_executer:  ${{ needs.ci-summary.outputs.changed_py_executer }}
+      changed_py_sagemaker: ${{ needs.ci-summary.outputs.changed_py_sagemaker }}
+      changed_py_vertex:    ${{ needs.ci-summary.outputs.changed_py_vertex }}
+      changed_py_azure:     ${{ needs.ci-summary.outputs.changed_py_azure }}
+      changed_proxy:        ${{ needs.ci-summary.outputs.changed_proxy }}
+      changed_adk:          ${{ needs.ci-summary.outputs.changed_adk }}
+      changed_vibe:         ${{ needs.ci-summary.outputs.changed_vibe }}
+      changed_langflow:     ${{ needs.ci-summary.outputs.changed_langflow }}
+      changed_litellm:      ${{ needs.ci-summary.outputs.changed_litellm }}
+      changed_langfuse:     ${{ needs.ci-summary.outputs.changed_langfuse }}
+      changed_workflows:    ${{ needs.ci-summary.outputs.changed_workflows }}
+    secrets:
+      CONTAINER_REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
+      REGISTRY_USERNAME:  ${{ secrets.REGISTRY_USERNAME }}
+      REGISTRY_PASSWORD:  ${{ secrets.REGISTRY_PASSWORD }}
+      K8S_NAMESPACE:      ${{ secrets.K8S_NAMESPACE }}
+

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: essedum-frontend-shell
+  namespace: aipns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: essedum-frontend-shell
+  template:
+    metadata:
+      labels:
+        app: essedum-frontend-shell
+    spec:
+      containers:
+      - name: essedum-frontend-shell
+        image: localhost:5000/essedum-frontend-shell:micro_latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8084
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: essedum-frontend-shell-service
+  namespace: aipns
+spec:
+  selector:
+    app: essedum-frontend-shell
+  ports:
+  - protocol: TCP
+    port: 8084
+    targetPort: 8084
+  type: LoadBalancer

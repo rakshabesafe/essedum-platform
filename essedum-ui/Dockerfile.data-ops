@@ -1,0 +1,22 @@
+# Build context: essedum-platform/ (repo root)
+FROM node:22-alpine AS build
+
+WORKDIR /workspace
+COPY essedum-ui/shell/ ./shell/
+WORKDIR /workspace/shell
+RUN npm install --legacy-peer-deps --force
+
+COPY essedum-ui/modules/data-ops/ /workspace/modules/data-ops/
+WORKDIR /workspace/modules/data-ops
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
+RUN npm run build-prod
+
+FROM nginx:alpine
+COPY essedum-ui/nginx_mfe.conf /etc/nginx/nginx.conf
+WORKDIR /app/ui
+COPY --from=build /workspace/modules/data-ops/dist/data-ops /app/ui/
+RUN chmod -R 755 /app/ui
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: essedum-backend-vibe
+  namespace: aipns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: essedum-backend-vibe
+  template:
+    metadata:
+      labels:
+        app: essedum-backend-vibe
+    spec:
+      hostAliases:
+      - ip: "localhost"
+        hostnames:
+        - "login.essedum-lfn.infosys.com"
+        - "essedum-lfn.infosys.com"
+      containers:
+      - name: essedum-backend-vibe
+        image: localhost:5000/essedum-vibe-service:micro_latest
+        imagePullPolicy: Always
+        env:
+        - name: MYSQL_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: essedum-db-secret
+              key: MYSQL_DATASOURCE_URL
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: essedum-db-secret
+              key: MYSQL_USER
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: essedum-db-secret
+              key: MYSQL_PASSWORD
+        - name: VIBE_AZURE_OPENAI_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: essedum-vibe-secret
+              key: VIBE_AZURE_OPENAI_ENDPOINT
+        - name: VIBE_AZURE_OPENAI_DEPLOYMENT_NAME
+          valueFrom:
+            secretKeyRef:
+              name: essedum-vibe-secret
+              key: VIBE_AZURE_OPENAI_DEPLOYMENT_NAME
+        - name: VIBE_AZURE_OPENAI_API_VERSION
+          valueFrom:
+            secretKeyRef:
+              name: essedum-vibe-secret
+              key: VIBE_AZURE_OPENAI_API_VERSION
+        - name: VIBE_AZURE_OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: essedum-vibe-secret
+              key: VIBE_AZURE_OPENAI_API_KEY
+        ports:
+        - containerPort: 8084
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: essedum-backend-vibe-service
+  namespace: aipns
+spec:
+  selector:
+    app: essedum-backend-vibe
+  ports:
+  - protocol: TCP
+    port: 8084
+    targetPort: 8084
+  type: ClusterIP

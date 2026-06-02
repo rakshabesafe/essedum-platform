@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: essedum-frontend-data-ops
+  namespace: aipns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: essedum-frontend-data-ops
+  template:
+    metadata:
+      labels:
+        app: essedum-frontend-data-ops
+    spec:
+      containers:
+      - name: essedum-frontend-data-ops
+        image: localhost:5000/essedum-frontend-data-ops:micro_latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: essedum-frontend-data-ops-service
+  namespace: aipns
+spec:
+  selector:
+    app: essedum-frontend-data-ops
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP
