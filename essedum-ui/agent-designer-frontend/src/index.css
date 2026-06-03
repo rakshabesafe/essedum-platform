@@ -1,0 +1,277 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 20% 8%;
+    --foreground: 220 15% 92%;
+
+    --card: 222 18% 11%;
+    --card-foreground: 220 15% 92%;
+
+    --popover: 222 20% 10%;
+    --popover-foreground: 220 15% 92%;
+
+    --primary: 195 100% 50%;
+    --primary-foreground: 222 20% 8%;
+
+    --secondary: 222 15% 16%;
+    --secondary-foreground: 220 15% 85%;
+
+    --muted: 222 15% 14%;
+    --muted-foreground: 220 10% 55%;
+
+    --accent: 262 83% 68%;
+    --accent-foreground: 220 15% 92%;
+
+    --destructive: 0 72% 60%;
+    --destructive-foreground: 220 15% 92%;
+
+    --border: 222 15% 20%;
+    --input: 222 15% 16%;
+    --ring: 195 100% 50%;
+
+    --radius: 0.625rem;
+
+    /* Custom design tokens */
+    --node-llm: 195 100% 50%;
+    --node-tool: 142 70% 50%;
+    --node-agent: 262 83% 68%;
+    --node-memory: 38 100% 60%;
+    --node-prompt: 316 70% 60%;
+    --node-mcp: 172 70% 50%;
+    --node-input: 220 80% 65%;
+    --node-output: 25 90% 60%;
+    --node-condition: 48 95% 55%;
+
+    --canvas-bg: 222 22% 7%;
+    --canvas-dot: 222 15% 18%;
+    --canvas-line: 222 15% 22%;
+
+    --glow-primary: 0 0 20px hsl(195 100% 50% / 0.35);
+    --glow-accent: 0 0 20px hsl(262 83% 68% / 0.35);
+    --glow-node: 0 4px 24px hsl(195 100% 50% / 0.15);
+
+    --shadow-node: 0 8px 32px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-panel: 4px 0 24px rgba(0, 0, 0, 0.4);
+    --shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-default: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --font-display: 'Roboto', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-display);
+    overflow: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+/* React Flow overrides */
+.react-flow__background {
+  background-color: hsl(var(--canvas-bg)) !important;
+}
+
+.react-flow__background pattern circle {
+  fill: hsl(var(--canvas-dot)) !important;
+}
+
+.react-flow__edge-path {
+  stroke: hsl(var(--primary) / 0.6) !important;
+  stroke-width: 2 !important;
+  filter: drop-shadow(0 0 4px hsl(var(--primary) / 0.3));
+}
+
+.react-flow__edge.selected .react-flow__edge-path,
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: hsl(var(--primary)) !important;
+  stroke-width: 2.5 !important;
+  filter: drop-shadow(0 0 8px hsl(var(--primary) / 0.6));
+}
+
+.react-flow__edge-interaction {
+  cursor: pointer;
+}
+
+.react-flow__connection-path {
+  stroke: hsl(var(--primary)) !important;
+  stroke-width: 2 !important;
+  stroke-dasharray: 5 5;
+  animation: dash 0.5s linear infinite;
+}
+
+@keyframes dash {
+  to { stroke-dashoffset: -10; }
+}
+
+.react-flow__handle {
+  width: 10px !important;
+  height: 10px !important;
+  border: 2px solid hsl(var(--primary)) !important;
+  background: hsl(var(--canvas-bg)) !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+}
+
+.react-flow__handle:hover {
+  background: hsl(var(--primary)) !important;
+  width: 14px !important;
+  height: 14px !important;
+  box-shadow: var(--glow-primary) !important;
+}
+
+.react-flow__handle-connecting {
+  background: hsl(var(--primary)) !important;
+}
+
+.react-flow__controls {
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-node) !important;
+}
+
+.react-flow__controls-button {
+  background: hsl(var(--card)) !important;
+  border: none !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--muted-foreground)) !important;
+  transition: all 0.15s ease !important;
+}
+
+.react-flow__controls-button:hover {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor !important;
+}
+
+.react-flow__minimap {
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.react-flow__minimap-mask {
+  fill: hsl(var(--muted) / 0.5) !important;
+}
+
+.react-flow__node.selected > div {
+  outline: 2px solid hsl(var(--primary)) !important;
+  outline-offset: 2px;
+}
+
+/* Node animations */
+@keyframes node-appear {
+  from { opacity: 0; transform: scale(0.85) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: var(--shadow-node); }
+  50% { box-shadow: var(--shadow-node), 0 0 20px hsl(var(--primary) / 0.3); }
+}
+
+@keyframes run-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes flow-line {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-in-top {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-node-appear { animation: node-appear 0.3s var(--ease-spring) forwards; }
+.animate-slide-in-left { animation: slide-in-left 0.25s var(--ease-smooth) forwards; }
+.animate-slide-in-right { animation: slide-in-right 0.25s var(--ease-smooth) forwards; }
+.animate-slide-in-top { animation: slide-in-top 0.2s var(--ease-smooth) forwards; }
+.animate-fade-in { animation: fade-in 0.2s ease forwards; }
+.animate-run-pulse { animation: run-pulse 1s ease infinite; }
+
+/* Node type color classes */
+.node-llm { --node-color: var(--node-llm); }
+.node-tool { --node-color: var(--node-tool); }
+.node-agent { --node-color: var(--node-agent); }
+.node-memory { --node-color: var(--node-memory); }
+.node-prompt { --node-color: var(--node-prompt); }
+.node-mcp { --node-color: var(--node-mcp); }
+.node-input { --node-color: var(--node-input); }
+.node-output { --node-color: var(--node-output); }
+.node-condition { --node-color: var(--node-condition); }
+
+/* Monaco-style code block */
+.code-block {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: hsl(222 25% 5%);
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  padding: 12px;
+  color: hsl(var(--foreground));
+  line-height: 1.6;
+}
+
+/* Log line colors */
+.log-info { color: hsl(var(--primary)); }
+.log-success { color: hsl(142 70% 50%); }
+.log-warning { color: hsl(38 100% 60%); }
+.log-error { color: hsl(var(--destructive)); }
+.log-node { color: hsl(var(--accent)); }
+.log-time { color: hsl(var(--muted-foreground)); }

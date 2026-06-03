@@ -1,0 +1,38 @@
+import uuid
+from datetime import datetime
+from typing import Any
+from pydantic import BaseModel, Field
+
+
+class FlowCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=255)
+    description: str | None = None
+    nodes: list[dict[str, Any]] = Field(default_factory=list)
+    edges: list[dict[str, Any]] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
+
+
+class FlowUpdate(BaseModel):
+    name: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = None
+    nodes: list[dict[str, Any]] | None = None
+    edges: list[dict[str, Any]] | None = None
+    tags: list[str] | None = None
+
+
+class FlowResponse(BaseModel):
+    id: uuid.UUID
+    name: str
+    description: str | None
+    nodes: list[dict[str, Any]]
+    edges: list[dict[str, Any]]
+    tags: list[str]
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class FlowListResponse(BaseModel):
+    items: list[FlowResponse]
+    total: int
