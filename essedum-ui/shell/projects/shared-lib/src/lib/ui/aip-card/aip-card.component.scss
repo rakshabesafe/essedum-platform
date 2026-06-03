@@ -295,24 +295,6 @@
   gap: 6px;
   position: relative;
   cursor: pointer;
-  &:hover .aip-hover-detail { display: block; }
-}
-
-.aip-hover-detail {
-  display: none;
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(15,23,42,0.96);
-  border: 1px solid rgba(35,79,153,0.2);
-  border-radius: 8px;
-  padding: 5px 10px;
-  white-space: nowrap;
-  font-size: 11px;
-  color: #e2e8f0;
-  z-index: 20;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
 
 .aip-more-actions-icon {
@@ -464,7 +446,6 @@
     &:nth-child(2):hover { background: rgba(129,140,248,0.12) !important; transform: scale(1.12) !important; }
     &:nth-child(3):hover { background: rgba(248,113,113,0.12) !important; transform: scale(1.12) !important; }
   }
-  .aip-hover-detail { background: rgba(15,23,42,0.97); border-color: rgba(99,102,241,0.2); color: #e2e8f0; }
   .aip-more-actions-icon { color: #3b82f6 !important; &:hover { color: #2563eb !important; background: rgba(59,130,246,0.15) !important; } }
   .view-icon-btn { color: #22d3ee !important; &:hover { color: #67e8f9 !important; background: rgba(34,211,238,0.15) !important; } }
 
