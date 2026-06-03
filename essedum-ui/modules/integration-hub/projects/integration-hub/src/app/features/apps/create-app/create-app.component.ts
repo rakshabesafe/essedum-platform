@@ -19,7 +19,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { App } from '@essedum/shared-lib';
 import { AppListComponent } from '../../apps/app-list/app-list.component';
 import { HttpParams } from '@angular/common/http';
-import { DatasetServices } from '../../dataset/dataset-service';
+import { DatasetServices } from '../../services/dataset-service';
 import { Stomp } from '@stomp/stompjs';
 import * as SockJS from 'sockjs-client';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';

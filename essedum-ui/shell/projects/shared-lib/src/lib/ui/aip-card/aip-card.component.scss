@@ -12,6 +12,18 @@
 /* mat-card clips its own children — move clipping to :host instead */
 ::ng-deep .mat-mdc-card {
   overflow: visible !important;
+  padding: 16px 18px !important;
+}
+
+/* Compact dataset-style card sizing: tighten inner padding and cap height
+   so non-Dataset cards (connections, models, pipelines, instances, agents,
+   schemas, spec-templates) match the slim Dataset card layout. */
+:host {
+  min-height: 0 !important;
+}
+::ng-deep .mat-mdc-card .mat-mdc-card-content {
+  padding: 0 !important;
+  flex: 1 1 auto;
 }
 
 // ── Card Background & Hover Effects ───────────────────────────────────────────
@@ -20,8 +32,8 @@
 // ── Background type icon ──────────────────────────────────────────────────────
 .card-bg-icon {
   position: absolute;
-  bottom: 60px;
-  right: 18px;
+  bottom: 56px;
+  right: 14px;
   pointer-events: none;
   z-index: 0;
 
@@ -32,18 +44,18 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80px;
-    height: 80px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    background: radial-gradient(ellipse at center, rgba(35,79,153,0.1) 0%, transparent 72%);
+    background: radial-gradient(ellipse at center, rgba(35,79,153,0.08) 0%, transparent 72%);
     pointer-events: none;
   }
 
   mat-icon {
-    font-size: 44px !important;
-    width: 44px !important;
-    height: 44px !important;
-    opacity: 0.15;
+    font-size: 28px !important;
+    width: 28px !important;
+    height: 28px !important;
+    opacity: 0.18;
     color: #234f99;
     display: block;
     position: relative;
@@ -198,7 +210,7 @@
   height: 17px !important;
   cursor: pointer;
   color: #64748b;
-  padding: 5px;
+  // padding: 5px;
   border-radius: 8px;
   transition: color 0.15s, background 0.15s;
   position: relative;
@@ -217,9 +229,9 @@
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 8px 12px !important;
-  margin: 0 !important;
-  min-height: 48px !important;
+  padding: 6px 0 0 !important;
+  margin: 10px 0 0 !important;
+  min-height: 36px !important;
   border-top: 1px solid rgba(99,102,241,0.08) !important;
 }
 
@@ -283,24 +295,6 @@
   gap: 6px;
   position: relative;
   cursor: pointer;
-  &:hover .aip-hover-detail { display: block; }
-}
-
-.aip-hover-detail {
-  display: none;
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(15,23,42,0.96);
-  border: 1px solid rgba(35,79,153,0.2);
-  border-radius: 8px;
-  padding: 5px 10px;
-  white-space: nowrap;
-  font-size: 11px;
-  color: #e2e8f0;
-  z-index: 20;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
 
 .aip-more-actions-icon {
@@ -452,7 +446,6 @@
     &:nth-child(2):hover { background: rgba(129,140,248,0.12) !important; transform: scale(1.12) !important; }
     &:nth-child(3):hover { background: rgba(248,113,113,0.12) !important; transform: scale(1.12) !important; }
   }
-  .aip-hover-detail { background: rgba(15,23,42,0.97); border-color: rgba(99,102,241,0.2); color: #e2e8f0; }
   .aip-more-actions-icon { color: #3b82f6 !important; &:hover { color: #2563eb !important; background: rgba(59,130,246,0.15) !important; } }
   .view-icon-btn { color: #22d3ee !important; &:hover { color: #67e8f9 !important; background: rgba(34,211,238,0.15) !important; } }
 
@@ -485,3 +478,89 @@
   .aip-menu-icon { color: #818cf8 !important; }
   .aip-menu-delete { color: #f87171 !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MATCH DATASET CARD LOOK — applied to all aip-card consumers
+   Wins by appearing last; uses ::ng-deep so it crosses encapsulation
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Kill the giant faded background icon — datasets don't have one */
+.card-bg-icon,
+.card-bg-icon::before,
+.card-shimmer-sweep {
+  display: none !important;
+}
+
+:host {
+  border-radius: 14px !important;
+}
+
+::ng-deep .mat-mdc-card.lfx-c-card {
+  position: relative !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(71, 66, 220, 0.12) !important;
+  border-radius: 14px !important;
+  padding: 16px 18px !important;
+  box-shadow: 0 4px 20px rgba(71, 66, 220, 0.08) !important;
+  overflow: hidden !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+::ng-deep .mat-mdc-card.lfx-c-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, #4742dc 0%, #6366f1 50%, #818cf8 100%) !important;
+  border-radius: 14px 14px 0 0 !important;
+}
+
+::ng-deep .mat-mdc-card.lfx-c-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 28px rgba(71, 66, 220, 0.18) !important;
+  border-color: rgba(71, 66, 220, 0.25) !important;
+}
+
+:host-context(body.header-dark-theme) ::ng-deep .mat-mdc-card.lfx-c-card {
+  background: linear-gradient(135deg, #0b1326 0%, #0f1a35 100%) !important;
+  border: 1px solid rgba(99, 102, 241, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+:host-context(body.header-dark-theme) ::ng-deep .mat-mdc-card.lfx-c-card::before {
+  background: linear-gradient(90deg, #3b82f6 0%, #6366f1 50%, #818cf8 100%) !important;
+}
+
+:host-context(body.header-dark-theme) ::ng-deep .mat-mdc-card.lfx-c-card:hover {
+  box-shadow: 0 8px 28px rgba(59, 130, 246, 0.3) !important;
+  border-color: rgba(99, 102, 241, 0.5) !important;
+}
+
+/* Slim header — tighter spacing */
+.card-main-header {
+  margin-bottom: 8px !important;
+}
+.card-main-title {
+  font-size: 14px !important;
+  color: #0f172a !important;
+  margin: 0 0 4px !important;
+}
+.card-main-date {
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+}
+
+/* Slim bottom action bar */
+.card-actions-hover {
+  padding: 8px 0 0 !important;
+  margin: 10px 0 0 !important;
+  min-height: 34px !important;
+  border-top: 1px solid rgba(71, 66, 220, 0.07) !important;
+}
+
+/* Dark theme: tweak header/date/action-bar colors */
+:host-context(body.header-dark-theme) .card-main-title { color: #d8e8f4 !important; }
+:host-context(body.header-dark-theme) .card-main-date  { color: #46637c !important; }
+:host-context(body.header-dark-theme) .card-actions-hover { border-top-color: rgba(68,128,245,0.07) !important; }

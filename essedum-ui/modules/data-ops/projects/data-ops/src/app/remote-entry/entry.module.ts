@@ -82,6 +82,13 @@ import { DatasourceConfigComponent } from '../features/datasource/datasource-con
 import { ConnectionViewComponent } from '../features/datasource/connection-view/connection-view.component';
 import { ModalConfigRestDatasourceComponent } from '../features/datasource/modal-config-rest-datasource/modal-config-rest-datasource.component';
 
+// Schema (moved back from integration-hub on 2026-06-03).
+import { SchemaComponent } from '../features/schema/schema.component';
+import { ModalConfigSchemaComponent } from '../features/schema/modal-config-schema/modal-config-schema.component';
+import { ModalConfigSchemaEditorComponent } from '../features/schema/modal-config-schema/modal-config-schema-editor/modal-config-schema-editor.component';
+import { ModalConfigSchemaHeaderComponent } from '../features/schema/modal-config-schema/modal-config-schema-header/modal-config-schema-header.component';
+import { SchemaRelationshipService } from '../features/schema/schema-relationship.service';
+
 // Shared local UI
 import { TagsComponent } from '@essedum/shared-lib';
 
@@ -154,6 +161,11 @@ const dbConfig: DBConfig = {
     DatasourceConfigComponent,
     ConnectionViewComponent,
     ModalConfigRestDatasourceComponent,
+    // schema (moved back from integration-hub 2026-06-03)
+    SchemaComponent,
+    ModalConfigSchemaComponent,
+    ModalConfigSchemaEditorComponent,
+    ModalConfigSchemaHeaderComponent,
     // shared local UI
     // sharedModule aip-* — remaining MFE-private ones (AipCard/Pagination/Header/etc
     // moved to @essedum/shared-lib SharedLibUiModule)
@@ -242,6 +254,7 @@ const dbConfig: DBConfig = {
     AdapterServices,
     EventsService,
     SchemaRegistryService,
+    SchemaRelationshipService,
     RaiservicesService,
     SemanticService,
     TagsService,

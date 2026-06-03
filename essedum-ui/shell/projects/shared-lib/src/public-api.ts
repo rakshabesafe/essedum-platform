@@ -19,6 +19,7 @@ export * from './lib/ui/aip-header/aip-header.component';
 export * from './lib/ui/aip-loading/aip-loading.component';
 export * from './lib/ui/aip-pagination/aip-pagination.component';
 export * from './lib/ui/aip-snackbar-custom/aip-snackbar-custom.component';
+export * from './lib/ui/enl-code-editor/enl-code-editor.component';
 export * from './lib/ui/confirm-delete-dialog/confirm-delete-dialog.component';
 export * from './lib/ui/pagination/pagination.component';
 export * from './lib/ui/pipes/first-character.pipe';

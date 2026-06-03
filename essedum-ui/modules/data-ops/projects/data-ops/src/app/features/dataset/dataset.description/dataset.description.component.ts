@@ -179,7 +179,7 @@ export class DatasetDescriptionComponent implements OnInit {
         cipAuthority.includes('link-component')
       )
         this.linkAuth = true;
-      if (cipAuthority.includes(this.rowObj.permission)) this.isAuth = false;
+      if (this.rowObj?.permission && cipAuthority.includes(this.rowObj.permission)) this.isAuth = false;
       if (
         cipAuthority.includes('dataset-unlink')
       )
@@ -191,7 +191,12 @@ export class DatasetDescriptionComponent implements OnInit {
       let cards = this.location.getState();
       this.card = cards['relatedData'].data;
       this.datasetAlias = this.card.alias;
-      this.metaData = JSON.parse(this.card.attributes);      
+      try {
+        this.metaData = JSON.parse(this.card.attributes);
+      } catch (e) {
+        console.error('Invalid dataset attributes JSON:', this.card.attributes, e);
+        this.metaData = {};
+      }
       this.metaDataKeys = Object.keys(this.metaData);
       this.metaDataValues = Object.values(this.metaData);
       this.rowObj = this.card;
@@ -226,7 +231,12 @@ export class DatasetDescriptionComponent implements OnInit {
       this.card = res;
       this.tempDataset['attributes']=this.card.attributes;
       this.tempDataset['datasource']=this.card.datasource;
-      this.metaData = JSON.parse(this.card.attributes);
+      try {
+        this.metaData = JSON.parse(this.card.attributes);
+      } catch (e) {
+        console.error('Invalid dataset attributes JSON:', this.card.attributes, e);
+        this.metaData = {};
+      }
       this.metaDataKeys = Object.keys(this.metaData);
       this.metaDataValues = Object.values(this.metaData);
       this.datasetAlias = this.card.alias;
@@ -249,8 +259,8 @@ export class DatasetDescriptionComponent implements OnInit {
       this.metaDataUrlKey = this.metaDataKeys[4];
       this.descValue = this.metaData.description;
       this.urlValue = this.metaData.url;
-      this.path=JSON.parse(this.card.attributes).path;
-      this.fileName=this.path + '/' + JSON.parse(this.card.attributes).object;
+      this.path=this.metaData.path;
+      this.fileName=this.path + '/' + this.metaData.object;
       this.datasetId=this.card.id
       this.viewType=this.card.views
       this.fileType(this.viewType)

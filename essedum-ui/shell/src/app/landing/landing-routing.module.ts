@@ -20,13 +20,14 @@ const LEGACY_REDIRECTS: Routes = [
   { path: 'aip/datasources',      redirectTo: 'data/connections',  pathMatch: 'full' },
   { path: 'aip/connections',      redirectTo: 'data/connections',  pathMatch: 'full' },
   { path: 'aip/models',           redirectTo: 'data/models',       pathMatch: 'full' },
-  { path: 'aip/schemas',          redirectTo: 'integration/schemas',      pathMatch: 'full' },
+  { path: 'aip/schemas',          redirectTo: 'data/schemas',      pathMatch: 'full' },
   { path: 'aibrain/datasets',     redirectTo: 'data/datasets',     pathMatch: 'full' },
   { path: 'aibrain/datasources',  redirectTo: 'data/connections',  pathMatch: 'full' },
   { path: 'aibrain/connections',  redirectTo: 'data/connections',  pathMatch: 'full' },
   { path: 'aibrain/coreDatasources', redirectTo: 'data/connections', pathMatch: 'full' },
   { path: 'aibrain/models',       redirectTo: 'data/models',       pathMatch: 'full' },
-  { path: 'aibrain/schemas',      redirectTo: 'integration/schemas',      pathMatch: 'full' },
+  { path: 'aibrain/schemas',      redirectTo: 'data/schemas',      pathMatch: 'full' },
+  { path: 'integration/schemas',  redirectTo: 'data/schemas',      pathMatch: 'full' },
 
   // Agents
   { path: 'aip/agent',            redirectTo: 'agent/studio',      pathMatch: 'full' },
@@ -59,9 +60,13 @@ const LEGACY_REDIRECTS: Routes = [
   { path: 'aip/salus',            redirectTo: 'integration/salus',           pathMatch: 'full' },
   { path: 'aibrain/salus',        redirectTo: 'integration/salus',           pathMatch: 'full' },
 
-  // Vibe Studio
-  { path: 'aip/vibe-studio',      redirectTo: 'vibe/editor',         pathMatch: 'full' },
-  { path: 'aip/specs',            redirectTo: 'vibe/spec-templates', pathMatch: 'full' },
+  // Vibe Studio (only /editor remains; scripts + spec-templates moved 2026-06-03)
+  { path: 'aip/vibe-studio',      redirectTo: 'vibe/editor',                 pathMatch: 'full' },
+  { path: 'aip/specs',            redirectTo: 'integration/spec-templates',  pathMatch: 'full' },
+  { path: 'aibrain/specs',        redirectTo: 'integration/spec-templates',  pathMatch: 'full' },
+  { path: 'vibe/spec-templates',  redirectTo: 'integration/spec-templates',  pathMatch: 'full' },
+  { path: 'vibe/scripts',         redirectTo: 'integration/scripts',         pathMatch: 'full' },
+  { path: 'vibe/code-editor',     redirectTo: 'integration/scripts',         pathMatch: 'full' },
 ];
 
 export const routes: Routes = [

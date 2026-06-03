@@ -26,6 +26,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatStepperModule } from '@angular/material/stepper';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatNativeDateModule } from '@angular/material/core';
 
@@ -57,6 +58,20 @@ import { MethodCreateEditComponent } from '../features/adapter/method-create-edi
 // Features: pipeline
 import { PipelineComponent } from '../features/pipeline/pipeline.component';
 import { PipelineCreateComponent } from '../features/pipeline/pipeline-create/pipeline-create.component';
+import { DataPipelineWizardComponent } from '../features/pipeline/wizard/data-pipeline-wizard/data-pipeline-wizard.component';
+import { TrainingPipelineWizardComponent } from '../features/pipeline/wizard/training-pipeline-wizard/training-pipeline-wizard.component';
+import { PipelineEditorComponent } from '../features/pipeline/wizard/editor/pipeline-editor.component';
+// Pipeline editor tabs (referenced from pipeline-editor.component.html)
+import { CodeEditorTabComponent } from '../features/pipeline/wizard/editor/tabs/code-editor-tab.component';
+import { ConfigTabComponent } from '../features/pipeline/wizard/editor/tabs/config-tab.component';
+import { GitTabComponent } from '../features/pipeline/wizard/editor/tabs/git-tab.component';
+import { LogsTabComponent } from '../features/pipeline/wizard/editor/tabs/logs-tab.component';
+import { MetricsTabComponent } from '../features/pipeline/wizard/editor/tabs/metrics-tab.component';
+import { RunHistoryTabComponent } from '../features/pipeline/wizard/editor/tabs/run-history-tab.component';
+import { VibeCodeTabComponent } from '../features/pipeline/wizard/editor/tabs/vibe-code-tab.component';
+// Shared wizard helpers
+import { GitLinkStepComponent } from '../features/pipeline/wizard/shared/git-link-step.component';
+import { FunctionLibraryComponent } from '../features/pipeline/wizard/editor/function-library/function-library.component';
 
 // Features: pipeline-dialog
 import { PipelineDialogComponent } from '../features/pipeline-dialog/pipeline-dialog.component';
@@ -70,10 +85,15 @@ import { UserSecretsComponent } from '../features/pipeline.description/user-secr
 // Features: native-script (ported from legacy aip-app-ui — fixes NG04002 on pipelines/view/:cname)
 import { NativeScriptComponent } from '../features/native-script/native-script.component';
 import { NativeScriptDialogComponent } from '../features/native-script/native-script-dialog/native-script-dialog.component';
-// app-enl-code-editor selector used inside native-script template; without it the
-// element fell through to CUSTOM_ELEMENTS_SCHEMA and the Script tab eventually
-// OOM-killed the renderer.
-import { EnlCodeEditorComponent } from '../features/enl-code-editor/enl-code-editor.component';
+// EnlCodeEditorComponent now lives in @essedum/shared-lib (2026-06-03 refactor).
+// It's declared by SharedLibUiModule which integration-hub already imports below.
+
+// 2026-06-03: spec-template moved here from vibe-studio MFE.
+import { SpecTemplateComponent } from '../features/spec-template/spec-template.component';
+import { CreateSpecTemplateComponent } from '../features/spec-template/create-spec-template/create-spec-template.component';
+import { EditSpecTemplateComponent } from '../features/spec-template/edit-spec-template/edit-spec-template.component';
+import { SpecTemplateDescriptionComponent } from '../features/spec-template/spec-template-description/spec-template-description.component';
+import { SpecTemplateCustomSwaggerComponent } from '../features/spec-template/spec-template-custom-swagger/spec-template-custom-swagger.component';
 
 // Features: apps
 import { AppListComponent } from '../features/apps/app-list/app-list.component';
@@ -94,12 +114,7 @@ import { JobsService } from '../features/services/jobs.service';
 // swagger-custom
 import { SwaggerCustomComponent } from '../features/swagger-custom/swagger-custom.component';
 
-// Features: schema (moved from data-ops MFE 2026-05-26 per user request)
-import { SchemaComponent } from '../features/schema/schema.component';
-import { ModalConfigSchemaComponent } from '../features/schema/modal-config-schema/modal-config-schema.component';
-import { ModalConfigSchemaEditorComponent } from '../features/schema/modal-config-schema/modal-config-schema-editor/modal-config-schema-editor.component';
-import { ModalConfigSchemaHeaderComponent } from '../features/schema/modal-config-schema/modal-config-schema-header/modal-config-schema-header.component';
-import { SchemaRelationshipService } from '../features/schema/schema-relationship.service';
+// Schema moved back to data-ops MFE on 2026-06-03 per user request.
 
 // Migrated from legacy aip-app-ui (2026-05-25): salus iframe wrapper.
 // Dashboard moved to host (shell/landing/dashboard) per MFE plan §1.
@@ -117,6 +132,17 @@ import { AipMethodCreateEditComponent } from '../features/sharedModule/aip-swagg
 
 // Services
 import { Services } from '@essedum/shared-lib';
+// Local Services class used by integration-hub's own wizards (data-pipeline,
+// training-pipeline). Distinct from the shared-lib Services — Angular's DI
+// keys them by class reference, so both can be provided side-by-side.
+import { Services as LocalServices } from '../features/services/service';
+// Local Services depends on a LOCAL encKey class (its own copy under features/services/),
+// not shared-lib's encKey. Same DI-key-by-class story.
+import { encKey as LocalEncKey } from '../features/services/encKey';
+import { GitLinkService } from '../features/services/git-link.service';
+import { WizardStateService } from '../features/pipeline/wizard/shared/wizard-state.service';
+import { VibeStudioService } from '../features/services/vibe-studio.service';
+import { GitHubService } from '../features/sharedModule/services/github.service';
 import { EventsService } from '../features/services/event.service';
 import { SchemaRegistryService } from '../features/services/schema-registry.service';
 import { PipelineService } from '../features/services/pipeline.service';
@@ -124,7 +150,7 @@ import { RaiservicesService } from '../features/services/raiservices.service';
 import { TagsService } from '@essedum/shared-lib';
 import { DashConstantService } from '@essedum/shared-lib';
 import { encKey } from '@essedum/shared-lib';
-import { DatasetServices } from '../features/dataset/dataset-service';
+import { DatasetServices } from '../features/services/dataset-service';
 import { SemanticService } from '../features/services/semantic.services';
 import { AipSnackbarCustomService } from '@essedum/shared-lib';
 import { AdapterServices } from '@essedum/shared-lib';
@@ -148,6 +174,20 @@ import { environment } from '../../environments/environment';
     PipelineComponent,
     PipelineCreateComponent,
     PipelineDialogComponent,
+    DataPipelineWizardComponent,
+    TrainingPipelineWizardComponent,
+    PipelineEditorComponent,
+    // Pipeline editor tab components
+    CodeEditorTabComponent,
+    ConfigTabComponent,
+    GitTabComponent,
+    LogsTabComponent,
+    MetricsTabComponent,
+    RunHistoryTabComponent,
+    VibeCodeTabComponent,
+    // Wizard shared helpers
+    GitLinkStepComponent,
+    FunctionLibraryComponent,
     JobDataViewerComponent,
     ShowOutputArtifactsComponent,
     NotebookDialogComponent,
@@ -155,7 +195,12 @@ import { environment } from '../../environments/environment';
     // native-script
     NativeScriptComponent,
     NativeScriptDialogComponent,
-    EnlCodeEditorComponent,
+    // spec-template (moved from vibe-studio 2026-06-03)
+    SpecTemplateComponent,
+    CreateSpecTemplateComponent,
+    EditSpecTemplateComponent,
+    SpecTemplateDescriptionComponent,
+    SpecTemplateCustomSwaggerComponent,
     // apps
     AppListComponent,
     ViewAppComponent,
@@ -167,11 +212,6 @@ import { environment } from '../../environments/environment';
     InstanceDescriptionComponent,
     // jobs
     JobsComponent,
-    // schema (moved from data-ops 2026-05-26)
-    SchemaComponent,
-    ModalConfigSchemaComponent,
-    ModalConfigSchemaEditorComponent,
-    ModalConfigSchemaHeaderComponent,
     // swagger-custom
     SwaggerCustomComponent,
     // migrated from legacy aip-app-ui (dashboard moved to host)
@@ -213,6 +253,7 @@ import { environment } from '../../environments/environment';
     MatSliderModule,
     MatSnackBarModule,
     MatTabsModule,
+    MatStepperModule,
     MatProgressSpinnerModule,
     MatNativeDateModule,
     ScrollingModule,
@@ -243,11 +284,17 @@ import { environment } from '../../environments/environment';
     { provide: 'dataSets', useFactory: (cfg: ApiConfig) => cfg.datasetsUrl, deps: [API_CONFIG] },
     { provide: 'sbx',      useFactory: (cfg: ApiConfig) => cfg.sandboxUrl,  deps: [API_CONFIG] },
     Services,
+    LocalServices,
+    LocalEncKey,
+    GitLinkService,
+    WizardStateService,
+    VibeStudioService,
+    GitHubService,
     DatasetServices,
     AdapterServices,
     EventsService,
+    // SchemaRegistryService kept: pipeline-dialog.component still imports it.
     SchemaRegistryService,
-    SchemaRelationshipService,
     PipelineService,
     JobsService,
     RaiservicesService,

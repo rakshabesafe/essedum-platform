@@ -21,6 +21,7 @@ import { AipLoadingComponent } from './aip-loading/aip-loading.component';
 import { AipPaginationComponent } from './aip-pagination/aip-pagination.component';
 import { AipSnackbarCustomComponent } from './aip-snackbar-custom/aip-snackbar-custom.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
+import { EnlCodeEditorComponent } from './enl-code-editor/enl-code-editor.component';
 import { PaginationComponent } from './pagination/pagination.component';
 import { FirstCharacterPipe } from './pipes/first-character.pipe';
 import { HighlightPipe, HighlightSearchPipe } from './pipes/highlight.pipe';
@@ -39,6 +40,7 @@ const PUBLIC_DECLARATIONS = [
   AipPaginationComponent,
   AipSnackbarCustomComponent,
   ConfirmDeleteDialogComponent,
+  EnlCodeEditorComponent,
   PaginationComponent,
   FirstCharacterPipe,
   HighlightPipe,

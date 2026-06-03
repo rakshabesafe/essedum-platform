@@ -121,13 +121,10 @@
             </button>
         </div>
 
-        <div class="aip-cursor">
+        <div class="aip-cursor" [matTooltip]="getAvatar()" matTooltipPosition="above">
             <div class="lfx-c-avatar lfx-c-avatar--sm aip-hover-avatar"
                 [ngStyle]="{ '--avatar-bg-color': getAvatarBackgroundColor() }">
                 {{ getAvatar() | firstCharacter }}
-            </div>
-            <div class="aip-hover-detail">
-                <div class="lfx-u-header-md lfx-u-mar-8">{{ getAvatar() }}</div>
             </div>
         </div>
 
