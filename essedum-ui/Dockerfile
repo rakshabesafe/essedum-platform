@@ -1,24 +1,45 @@
-# Use official Node image
-FROM node:24.1.0-alpine AS build
+# Multi-stage build for the Essedum MFE topology: 1 host (shell) + 4 child MFEs.
+# Build context is expected to be the essedum-platform/ parent directory.
 
-WORKDIR /aip-app-ui
+FROM node:22-alpine AS build
 
-COPY essedum-ui/aip-app-ui/ ./
+WORKDIR /workspace
 
-RUN npm install --legacy-peer-deps --verbose
-
+# ---- Host (shell) ----------------------------------------------------------
+# Built first so its node_modules and dist exist before the MFEs compile.
+# MFE tsconfigs reference ../../shell/projects/shared-lib via the
+# "@essedum/shared-lib" path alias, so the shell sources must be on disk.
+COPY essedum-ui/shell/ ./shell/
+WORKDIR /workspace/shell
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
 RUN npm run build-prod
 
-WORKDIR /shell-app-ui
+# ---- MFEs ------------------------------------------------------------------
+COPY essedum-ui/modules/ /workspace/modules/
 
-COPY essedum-ui/shell-app-ui/ ./
-
-RUN npm install --legacy-peer-deps --verbose
-
+WORKDIR /workspace/modules/agent-studio
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
 RUN npm run build-prod
 
-COPY essedum-ui/nginx_ui.conf /
+WORKDIR /workspace/modules/data-ops
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
+RUN npm run build-prod
 
+WORKDIR /workspace/modules/integration-hub
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
+RUN npm run build-prod
+
+WORKDIR /workspace/modules/vibe-studio
+RUN rm -f package-lock.json yarn.lock
+RUN npm install --legacy-peer-deps --force
+RUN npm run build-prod
+
+
+# ---- Runtime ---------------------------------------------------------------
 FROM nginx:alpine
 
 RUN apk add --no-cache openssl && \
@@ -29,25 +50,28 @@ RUN apk add --no-cache openssl && \
       -out /etc/nginx/ssl/server.crt \
       -subj "/CN=localhost"
 
-COPY essedum-ui/nginx_ui.conf /etc/nginx/nginx.conf
+COPY essedum-ui/nginx_ui_multi.conf /etc/nginx/nginx.conf
 
 WORKDIR /app
-RUN mkdir -p /app/ui/aip /app/ui/common
+RUN mkdir -p /app/ui/shell \
+             /app/ui/agent \
+             /app/ui/data-ops \
+             /app/ui/integration \
+             /app/ui/vibe-studio
 
-COPY --from=build /shell-app-ui/dist/common-app /app/ui/common/
-COPY --from=build /aip-app-ui/dist/aip-app /app/ui/aip
+COPY --from=build /workspace/shell/dist/shell                            /app/ui/shell/
+COPY --from=build /workspace/modules/agent-studio/dist/agent-studio       /app/ui/agent/
+COPY --from=build /workspace/modules/data-ops/dist/data-ops               /app/ui/data-ops/
+COPY --from=build /workspace/modules/integration-hub/dist/integration-hub /app/ui/integration/
+COPY --from=build /workspace/modules/vibe-studio/dist/vibe-studio         /app/ui/vibe-studio/
 
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
 RUN chmod -R 755 /app/ui
 
-# Set working directory to root
 WORKDIR /
 
-# Expose ports
-EXPOSE 8082 8083 8084 8085 8086 8087 4000 8089
+# Single ingress port served by nginx_ui_multi.conf (HTTPS).
+EXPOSE 8084
 
-# Start with entrypoint that replaces env-var placeholders, then launches Nginx
 ENTRYPOINT ["/entrypoint.sh"]
- 

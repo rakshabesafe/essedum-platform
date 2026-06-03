@@ -17,7 +17,7 @@ spec:
       serviceAccountName: builder-sa  # Grants permission per RBAC
       containers:
         - name: vibe-code-builder
-          image:  localhost:5000/vibe-code-builder-service:v1
+          image:  localhost:5000/vibe-code-builder-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000

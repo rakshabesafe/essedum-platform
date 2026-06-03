@@ -15,11 +15,9 @@ spec:
         app: builder
     spec:
       serviceAccountName: builder-sa  # Grants permission per RBAC
-      imagePullSecrets:
-        - name: regcred               # Secret for pulling this image (if private)
       containers:
         - name: builder
-          image:  acrreq0762935.azurecr.io/builder-service:v2
+          image:  localhost:5000/builder-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
@@ -28,21 +26,10 @@ spec:
               value: "tcp://buildkitd:1234"   # Points to your buildkitd Service
             - name: PYTHONUNBUFFERED
               value: "1"
-            - name: DOCKER_CONFIG
-              value: "/root/.docker"
           volumeMounts:
-            - name: docker-config
-              mountPath: /root/.docker
-              readOnly: true
             - name: dockerfile-template
               mountPath: /opt/fallback
       volumes:
-        - name: docker-config
-          secret:
-            secretName: regcred
-            items:
-              - key: .dockerconfigjson
-                path: config.json
         - name: dockerfile-template
           configMap:
             name: adk-dockerfile-template

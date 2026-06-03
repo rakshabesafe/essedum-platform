@@ -1,0 +1,215 @@
+// ═══════════════════════════════════════════════════════════════════
+//  MODEL LISTING — 2026 AI Platform  ✦  Dramatic Enterprise Theme
+// ═══════════════════════════════════════════════════════════════════
+:host { display: block !important; width: 100% !important; min-width: 0; box-sizing: border-box; }
+
+@keyframes fadeUp    { from { opacity:0; transform:translateY(12px); }  to { opacity:1; transform:translateY(0); } }
+@keyframes borderGlow{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+@keyframes cardIn    { from { opacity:0; transform:translateY(9px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+.aip-top, #mainCtr, .aip-main-content, #mainrightCnt {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#mainrightCnt { padding: 16px 20px 22px !important; animation: fadeUp 0.25s ease both !important; }
+
+.aip-content {
+  background: linear-gradient(150deg, rgba(11,20,44,0.94) 0%, rgba(7,13,30,0.92) 100%) !important;
+  border: 1px solid rgba(68,128,245,0.14) !important;
+  border-radius: 14px !important;
+  padding: 14px 14px 10px !important;
+  margin-bottom: 14px !important;
+  box-shadow: 0 10px 34px rgba(0,0,0,0.28), 0 1px 0 rgba(255,255,255,0.04) inset !important;
+  position: relative !important;
+  overflow: hidden !important;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #4480f5, #16b8e8, #875ef7, #4742dc, #4480f5);
+    background-size: 400% 100%;
+    animation: borderGlow 7s ease infinite;
+    pointer-events: none;
+  }
+}
+
+.aip-content.has-empty-state {
+  padding-bottom: 14px !important;
+}
+
+.model-empty-shell {
+  margin-top: 12px !important;
+  border: 1px solid rgba(68,128,245,0.12) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(160deg, rgba(9,16,39,0.72) 0%, rgba(7,12,29,0.58) 100%) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.22), 0 1px 0 rgba(255,255,255,0.03) inset !important;
+  position: relative !important;
+  overflow: hidden !important;
+  padding: 8px 10px !important;
+}
+
+.model-empty-shell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #4480f5, #16b8e8, #875ef7, #4f46e5, #4480f5);
+  background-size: 400% 100%;
+  animation: borderGlow 7s ease infinite;
+  pointer-events: none;
+}
+
+:host ::ng-deep app-aip-header,
+:host ::ng-deep app-aip-filter,
+:host ::ng-deep app-aip-pagination { display: block !important; }
+
+:host ::ng-deep app-aip-filter {
+  margin-top: 10px !important;
+  padding-top: 10px !important;
+  border-top: 1px solid rgba(68,128,245,0.09) !important;
+}
+
+:host ::ng-deep app-aip-empty-state.model-empty-state {
+  display: block !important;
+  margin-top: 0 !important;
+  min-height: auto !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  position: relative !important;
+  overflow: visible !important;
+  padding: 0 !important;
+}
+
+:host ::ng-deep app-aip-empty-state.model-empty-state > div {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep app-aip-empty-state.model-empty-state .empty-state,
+:host ::ng-deep app-aip-empty-state.model-empty-state .no-data,
+:host ::ng-deep app-aip-empty-state.model-empty-state .aip-empty-state,
+:host ::ng-deep app-aip-empty-state.model-empty-state .empty-container {
+  min-height: 155px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  text-align: center !important;
+}
+
+:host ::ng-deep app-aip-empty-state.model-empty-state img,
+:host ::ng-deep app-aip-empty-state.model-empty-state svg {
+  max-width: 108px !important;
+  width: 100% !important;
+  opacity: 0.95 !important;
+  filter: drop-shadow(0 4px 12px rgba(68,128,245,0.22)) !important;
+}
+
+:host ::ng-deep app-aip-empty-state.model-empty-state p,
+:host ::ng-deep app-aip-empty-state.model-empty-state span,
+:host ::ng-deep app-aip-empty-state.model-empty-state .empty-text,
+:host ::ng-deep app-aip-empty-state.model-empty-state .empty-message {
+  color: #6e9abb !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+}
+
+.aip-card-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)) !important;
+  gap: 14px !important;
+  width: 100% !important;
+  padding: 0 0 22px !important;
+  > * { max-width: none !important; width: 100% !important; flex: none !important; padding: 0 !important; }
+}
+
+.aip-card-container:empty {
+  padding-bottom: 0 !important;
+  min-height: 0 !important;
+}
+
+.aip-card-wrapper, .card-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  animation: cardIn 0.3s ease both !important;
+  &:nth-child(1){animation-delay:0.04s}
+  &:nth-child(2){animation-delay:0.08s}
+  &:nth-child(3){animation-delay:0.12s}
+  &:nth-child(4){animation-delay:0.16s}
+  &:nth-child(5){animation-delay:0.20s}
+  &:nth-child(6){animation-delay:0.24s}
+}
+
+.aip-card-wrapper:hover, .card-wrapper:hover {
+  transform: translateY(-2px) !important;
+  transition: transform 0.2s ease !important;
+}
+
+:host ::ng-deep app-aip-pagination {
+  display: block !important;
+  background: rgba(68,128,245,0.03) !important;
+  border: 1px solid rgba(68,128,245,0.1) !important;
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  LIGHT THEME
+// ══════════════════════════════════════════════════════════════════
+:host-context(body.header-light-theme) {
+  .aip-content {
+    background: #ffffff !important;
+    border-color: rgba(71,66,220,0.12) !important;
+    box-shadow: 0 8px 30px rgba(71,66,220,0.1), 0 1px 4px rgba(0,0,0,0.05) !important;
+    &::before { background: linear-gradient(90deg, #4742dc, #06b6d4, #7c3aed, #4f46e5, #4742dc); }
+  }
+
+  :host ::ng-deep app-aip-filter { border-top-color: rgba(71,66,220,0.09) !important; }
+
+  :host ::ng-deep app-aip-pagination {
+    background: rgba(71,66,220,0.03) !important;
+    border-color: rgba(71,66,220,0.1) !important;
+  }
+
+  .model-empty-shell {
+    background: linear-gradient(160deg, rgba(248,250,252,0.95) 0%, rgba(241,245,249,0.88) 100%) !important;
+    border-color: rgba(71,66,220,0.14) !important;
+    box-shadow: 0 8px 24px rgba(71,66,220,0.1), 0 1px 0 rgba(255,255,255,0.75) inset !important;
+  }
+
+  .model-empty-shell::before {
+    background: linear-gradient(90deg, #4742dc, #06b6d4, #7c3aed, #4f46e5, #4742dc);
+  }
+
+  :host ::ng-deep app-aip-empty-state.model-empty-state {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  :host ::ng-deep app-aip-empty-state.model-empty-state img,
+  :host ::ng-deep app-aip-empty-state.model-empty-state svg {
+    filter: drop-shadow(0 4px 12px rgba(71,66,220,0.18)) !important;
+  }
+
+  :host ::ng-deep app-aip-empty-state.model-empty-state p,
+  :host ::ng-deep app-aip-empty-state.model-empty-state span,
+  :host ::ng-deep app-aip-empty-state.model-empty-state .empty-text,
+  :host ::ng-deep app-aip-empty-state.model-empty-state .empty-message {
+    color: #64748b !important;
+  }
+}
