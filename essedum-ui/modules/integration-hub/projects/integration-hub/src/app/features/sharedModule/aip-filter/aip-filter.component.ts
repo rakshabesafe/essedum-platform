@@ -12,7 +12,7 @@ import { TagsService } from '@essedum/shared-lib';
 import { HttpParams } from '@angular/common/http';
 import { TagEventDTO } from '@essedum/shared-lib';
 import { AdapterServices } from '@essedum/shared-lib';
-import { DatasetServices } from '../../dataset/dataset-service';
+import { DatasetServices } from '../../services/dataset-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SemanticService } from '../../services/semantic.services';
 import { animate, style, transition, trigger } from '@angular/animations';

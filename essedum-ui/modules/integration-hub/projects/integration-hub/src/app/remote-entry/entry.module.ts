@@ -149,7 +149,7 @@ import { RaiservicesService } from '../features/services/raiservices.service';
 import { TagsService } from '@essedum/shared-lib';
 import { DashConstantService } from '@essedum/shared-lib';
 import { encKey } from '@essedum/shared-lib';
-import { DatasetServices } from '../features/dataset/dataset-service';
+import { DatasetServices } from '../features/services/dataset-service';
 import { SemanticService } from '../features/services/semantic.services';
 import { AipSnackbarCustomService } from '@essedum/shared-lib';
 import { AdapterServices } from '@essedum/shared-lib';

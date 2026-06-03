@@ -6,7 +6,7 @@ import { Subscription } from "rxjs";
 import { DatePipe } from "@angular/common";
 import { SchemaRegistryService } from '../services/schema-registry.service';
 import { EventsService } from '../services/event.service';
-import { DatasetServices } from '../dataset/dataset-service';
+import { DatasetServices } from '../services/dataset-service';
 import { JobsService } from '../services/jobs.service';
 
 @Component({
