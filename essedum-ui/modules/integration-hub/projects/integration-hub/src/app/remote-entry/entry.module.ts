@@ -26,6 +26,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatStepperModule } from '@angular/material/stepper';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatNativeDateModule } from '@angular/material/core';
 
@@ -252,6 +253,7 @@ import { environment } from '../../environments/environment';
     MatSliderModule,
     MatSnackBarModule,
     MatTabsModule,
+    MatStepperModule,
     MatProgressSpinnerModule,
     MatNativeDateModule,
     ScrollingModule,
