@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: essedum-frontend-agent
+  namespace: aipns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: essedum-frontend-agent
+  template:
+    metadata:
+      labels:
+        app: essedum-frontend-agent
+    spec:
+      containers:
+      - name: essedum-frontend-agent
+        image: localhost:5000/essedum-frontend-agent:micro_latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: essedum-frontend-agent-service
+  namespace: aipns
+spec:
+  selector:
+    app: essedum-frontend-agent
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP

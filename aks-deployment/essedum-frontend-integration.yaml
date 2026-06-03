@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: essedum-frontend-integration
+  namespace: aipns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: essedum-frontend-integration
+  template:
+    metadata:
+      labels:
+        app: essedum-frontend-integration
+    spec:
+      containers:
+      - name: essedum-frontend-integration
+        image: localhost:5000/essedum-frontend-integration:micro_latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: essedum-frontend-integration-service
+  namespace: aipns
+spec:
+  selector:
+    app: essedum-frontend-integration
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP

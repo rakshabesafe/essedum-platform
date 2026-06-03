@@ -1,0 +1,507 @@
+name: CD – Deploy (Kubernetes)
+
+# ──────────────────────────────────────────────────────────────
+# Triggers:
+#   workflow_call – called directly by CI (ci-k8s.yml call-cd job)
+#     after ci-summary passes on the source-branch branch.
+#     Only the 4 secrets this workflow actually uses are forwarded
+#     (public repo: never use secrets: inherit).
+#   workflow_dispatch – emergency manual deploy; requires repo
+#     write-access to trigger from the GitHub UI.
+# ──────────────────────────────────────────────────────────────
+on:
+  workflow_call:
+    # image_tag and changed_* are forwarded from CI's call-cd job.
+    # CD uses image_tag to deploy the exact SHA built by CI (no second build).
+    # changed_* flags let CD skip manifest apply / rollout for unchanged services.
+    inputs:
+      image_tag:
+        description: "Commit SHA of the images built and pushed by CI"
+        required: true
+        type: string
+      changed_backend:
+        required: false
+        type: string
+        default: 'false'
+      changed_frontend:
+        required: false
+        type: string
+        default: 'false'
+      changed_py_executer:
+        required: false
+        type: string
+        default: 'false'
+      changed_py_sagemaker:
+        required: false
+        type: string
+        default: 'false'
+      changed_py_vertex:
+        required: false
+        type: string
+        default: 'false'
+      changed_py_azure:
+        required: false
+        type: string
+        default: 'false'
+      changed_proxy:
+        required: false
+        type: string
+        default: 'false'
+      changed_adk:
+        required: false
+        type: string
+        default: 'false'
+      changed_vibe:
+        required: false
+        type: string
+        default: 'false'
+      changed_langflow:
+        required: false
+        type: string
+        default: 'false'
+      changed_litellm:
+        required: false
+        type: string
+        default: 'false'
+      changed_langfuse:
+        required: false
+        type: string
+        default: 'false'
+      changed_workflows:
+        required: false
+        type: string
+        default: 'false'
+    secrets:
+      CONTAINER_REGISTRY:
+        required: true
+      REGISTRY_USERNAME:
+        required: true
+      REGISTRY_PASSWORD:
+        required: true
+      K8S_NAMESPACE:
+        required: false
+  workflow_dispatch: {}
+
+# Only one deployment at a time
+concurrency:
+  group: cd-deploy-k8s
+  cancel-in-progress: false
+
+# Least-privilege: CD only needs to read repo contents
+permissions:
+  contents: read
+
+jobs:
+  # ────────────────────────────────────────────────────────────
+  # Deploy – Kubernetes-based deployment
+  # Runs on self-hosted runner with k8s cluster access.
+  # Called from CI (workflow_call) only after ci-summary passes,
+  # so no separate readiness check is needed here.
+  # The CONTAINER_REGISTRY environment adds a mandatory human
+  # approval gate before any image is pushed or manifest applied.
+  # ────────────────────────────────────────────────────────────
+  deploy:
+    name: "Deploy – Kubernetes Rollout"
+    runs-on: [self-hosted, essedum-runner]
+    timeout-minutes: 90
+    environment: CONTAINER_REGISTRY
+
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: source-branch
+          fetch-depth: 1
+
+      - name: Verify kubeconfig
+        run: |
+          export PATH="/snap/bin:/usr/local/bin:$PATH"
+          if [ ! -f "$KUBECONFIG" ]; then
+            echo "::error::KUBECONFIG not found at $KUBECONFIG"
+            exit 1
+          fi
+          kubectl cluster-info
+
+      - name: Get cluster context
+        run: |
+          export PATH="/snap/bin:/usr/local/bin:$PATH"
+          echo "Cluster: $(kubectl config current-context)"
+          echo "Namespace: $(kubectl config view --minify --output 'jsonpath={..namespace}')"
+
+      - name: Create/update ConfigMap from deployment config
+        run: |
+          export PATH="/snap/bin:/usr/local/bin:$PATH"
+          NAMESPACE=${K8S_NAMESPACE:-essedum}
+          if [ -f "k8s/config/app-config.yaml" ]; then
+            kubectl apply -f k8s/config/app-config.yaml -n "$NAMESPACE" || true
+          fi
+
+      - name: Create registry pull secret in cluster
+        env:
+          REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          export PATH="/snap/bin:/usr/local/bin:$PATH"
+          NAMESPACE="${K8S_NAMESPACE:-essedum}"
+          # Create/update the registry-credentials secret used by all app manifests
+          kubectl create secret docker-registry registry-credentials \
+            --docker-server="$REGISTRY" \
+            --docker-username="$REGISTRY_USERNAME" \
+            --docker-password="$REGISTRY_PASSWORD" \
+            --namespace="$NAMESPACE" \
+            --dry-run=client -o yaml | kubectl apply -f -
+          echo "✓ registry-credentials secret applied in namespace $NAMESPACE"
+
+      - name: Docker logout and image cleanup
+        if: always()
+        env:
+          REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
+        run: |
+          # SECURITY: Always logout to remove stored registry credentials from
+          # ~/.docker/config.json on the runner VM. This prevents credential
+          # reuse if the runner is compromised between workflow runs.
+          docker logout "$REGISTRY" || true
+
+          services=("leap-app-backend" "frontend" "py-job-executer" "py-job-sagemaker-executer" "py-job-vertex-executer" "py-job-azure-executer" "proxy-service" "adk-code-builder-deployer" "vibe-code-builder-deployer" "langflow" "litellm" "langfuse-web" "langfuse-worker" "goose-ui" "goosed")
+
+          # Remove images built for this specific SHA from the daemon.
+          # No time filter — the build just completed so these images are minutes old
+          # and a --filter "until=1h" would silently skip them.
+          for svc in "${services[@]}"; do
+            docker rmi "${REGISTRY}/essedum/${svc}:${{ github.sha }}" 2>/dev/null || true
+            # Also remove any localhost:5001 daemon copy from this SHA
+            docker rmi "localhost:5001/essedum/${svc}:${{ github.sha }}" 2>/dev/null || true
+          done
+
+          # Remove all remaining untagged (dangling) layers.
+          docker image prune -f || true
+          echo "✓ Docker logout complete and images cleaned up"
+
+      - name: Apply Kubernetes manifests
+        env:
+          K8S_NAMESPACE: ${{ secrets.K8S_NAMESPACE || 'essedum' }}
+          # Use the SHA that CI built and pushed. Falls back to github.sha when
+          # triggered manually via workflow_dispatch (inputs.image_tag is empty).
+          IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
+          # SECURITY: REGISTRY passed via env so it is never inline-expanded
+          # inside run: shell script text (prevents script injection).
+          REGISTRY: ${{ secrets.CONTAINER_REGISTRY }}
+        run: |
+          export PATH="/snap/bin:/usr/local/bin:$PATH"
+          NAMESPACE="${K8S_NAMESPACE}"
+          echo "Deploying to namespace: $NAMESPACE"
+
+          # Ensure app namespace exists
+          kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
+
+          # Create required system namespaces
+          kubectl create namespace ingress-nginx --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create namespace metallb-system --dry-run=client -o yaml | kubectl apply -f -
+
+          # Verify images are available in the registry before deploying.
+          # Only services whose changed_* flag is 'true' need an image at IMAGE_TAG
+          # (they were just built/retagged by CI). Unchanged services already have
+          # a running pod with their previous image — we skip their manifest update.
+          echo ""
+          echo "=== Verifying container images in registry ==="
+
+          # Map service name → changed flag from CI
+          declare -A svc_changed
+          svc_changed["leap-app-backend"]="${{ inputs.changed_backend }}"
+          svc_changed["frontend"]="${{ inputs.changed_frontend }}"
+          svc_changed["py-job-executer"]="${{ inputs.changed_py_executer }}"
+          svc_changed["py-job-sagemaker-executer"]="${{ inputs.changed_py_sagemaker }}"
+          svc_changed["py-job-vertex-executer"]="${{ inputs.changed_py_vertex }}"
+          svc_changed["py-job-azure-executer"]="${{ inputs.changed_py_azure }}"
+          svc_changed["proxy-service"]="${{ inputs.changed_proxy }}"
+          svc_changed["adk-code-builder-deployer"]="${{ inputs.changed_adk }}"
+          svc_changed["vibe-code-builder-deployer"]="${{ inputs.changed_vibe }}"
+          svc_changed["langflow"]="${{ inputs.changed_langflow }}"
+          svc_changed["litellm"]="${{ inputs.changed_litellm }}"
+          svc_changed["langfuse-web"]="${{ inputs.changed_langfuse }}"
+          svc_changed["langfuse-worker"]="${{ inputs.changed_langfuse }}"
+          svc_changed["goose-ui"]="true"
+          svc_changed["goosed"]="true"
+
+          # Choose protocol: insecure for localhost / loopback, https for everything else
+          if [[ "$REGISTRY" == localhost:* ]] || [[ "$REGISTRY" == 127.* ]]; then
+            REG_PROTO="http"
+          else
+            REG_PROTO="https"
+          fi
+
+          missing_images=0
+          services=("leap-app-backend" "frontend" "py-job-executer" "py-job-sagemaker-executer" "py-job-vertex-executer" "py-job-azure-executer" "proxy-service" "adk-code-builder-deployer" "vibe-code-builder-deployer" "langflow" "litellm" "langfuse-web" "langfuse-worker" "goose-ui" "goosed")
+          for svc in "${services[@]}"; do
+            changed="${svc_changed[$svc]}"
+            if [ "$changed" != "true" ]; then
+              echo "  Skipping ${svc} (unchanged – existing deployment untouched)"
+              continue
+            fi
+            echo -n "  Checking ${svc}... "
+            http_status=$(curl -sI -o /dev/null -w "%{http_code}" \
+              -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+              "${REG_PROTO}://${REGISTRY}/v2/essedum/${svc}/manifests/${IMAGE_TAG}" 2>/dev/null \
+              || echo "000")
+            if [ "$http_status" = "200" ]; then
+              echo "✓ Found in registry"
+            else
+              echo "✗ NOT FOUND (registry returned HTTP ${http_status}): ${REGISTRY}/essedum/${svc}:${IMAGE_TAG}"
+              missing_images=$((missing_images + 1))
+            fi
+          done
+
+          if [ "$missing_images" -gt 0 ]; then
+            echo ""
+            echo "::error::${missing_images} image(s) not found in registry — aborting deployment"
+            exit 1
+          else
+            echo ""
+            echo "✓ All changed-service images verified in registry"
+          fi
+          echo ""
+
+          # ── Step 1: Apply infra files with special handling ──
+          # For ingress-nginx: delete and recreate due to immutable selector
+          if [ -f "aks-deployment/ingress-nginx-deploy.yaml" ]; then
+            echo "Applying ingress-nginx deployment..."
+            # Delete existing deployment to avoid immutable selector error
+            kubectl delete deployment ingress-nginx-controller -n ingress-nginx --ignore-not-found || true
+            sleep 2
+            # Now apply the new one
+            sed 's|\${IMAGE_TAG}|'"${IMAGE_TAG}"'|g' "aks-deployment/ingress-nginx-deploy.yaml" | \
+              sed 's|\${REGISTRY}|'"${REGISTRY}"'|g' | \
+              kubectl apply -f - || {
+              echo "::warning::Failed to apply ingress-nginx-deploy.yaml, continuing..."
+            }
+          fi
+
+          # For metallb: apply config to the metallb-system namespace
+          if [ -f "aks-deployment/metallib-config.yaml" ]; then
+            echo "Applying metallb config..."
+            sed 's|\${IMAGE_TAG}|'"${IMAGE_TAG}"'|g' "aks-deployment/metallib-config.yaml" | \
+              sed 's|\${REGISTRY}|'"${REGISTRY}"'|g' | \
+              kubectl apply -f - || {
+              echo "::warning::Failed to apply metallib-config.yaml, continuing..."
+            }
+          fi
+
+          # ── Step 2: Remove stale ingress admission webhook if present ──
+          # Prevents: "failed calling webhook validate.nginx.ingress.kubernetes.io"
+          kubectl delete validatingwebhookconfiguration ingress-nginx-admission \
+            --ignore-not-found || true
+
+          # ── Step 2b: Patch ProgressDeadlineSeconds for all deployments ──
+          # Increase from default 600s (10m) to 900s (15m) to allow slower app startups
+          echo "Patching ProgressDeadlineSeconds for all deployments..."
+          for deployment in $(kubectl get deployments -n "$NAMESPACE" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null); do
+            kubectl patch deployment "$deployment" -n "$NAMESPACE" --type merge \
+              -p '{"spec":{"progressDeadlineSeconds":900}}' 2>/dev/null || true
+          done
+          echo "✓ ProgressDeadlineSeconds patched"
+
+          # ── Step 2c: Deploy MySQL first, wait until ready, then Keycloak ──
+          # Keycloak requires MySQL to be accepting connections before it starts.
+          # Applying them in order here complements the initContainer in the
+          # keycloak pod spec, which also waits for MySQL TCP to open.
+          echo "=== Applying MySQL first (Keycloak dependency) ==="
+          if [ -f "aks-deployment/mysql_deployment_v3.yaml" ]; then
+            sed 's|\${IMAGE_TAG}|'"${IMAGE_TAG}"'|g' "aks-deployment/mysql_deployment_v3.yaml" | \
+              sed 's|\${REGISTRY}|'"${REGISTRY}"'|g' | \
+              kubectl apply -n "$NAMESPACE" -f - || {
+              echo "::warning::Failed to apply mysql_deployment_v3.yaml, continuing..."
+            }
+            echo "Waiting for MySQL to be ready (timeout: 3 minutes)..."
+            kubectl rollout status deployment/mysql -n "$NAMESPACE" --timeout=3m || \
+              echo "::warning::MySQL rollout wait timed out – Keycloak initContainer will retry"
+          fi
+
+          echo "=== Applying Keycloak ==="
+          if [ -f "aks-deployment/keycloak_deployment.yaml" ]; then
+            sed 's|\${IMAGE_TAG}|'"${IMAGE_TAG}"'|g' "aks-deployment/keycloak_deployment.yaml" | \
+              sed 's|\${REGISTRY}|'"${REGISTRY}"'|g' | \
+              kubectl apply -n "$NAMESPACE" -f - || {
+              echo "::warning::Failed to apply keycloak_deployment.yaml, continuing..."
+            }
+          fi
+
+          # ── Step 3: Apply PVC-containing files with data preservation ──
+          # PVCs are immutable once bound; PV immutable fields (hostPath, nodeAffinity)
+          # cannot be changed on existing volumes. Suppress these known-safe server errors
+          # so the step does not fail while still applying all other resources normally.
+          echo "=== Applying Manifests with PVC Data Preservation ==="
+          PVC_FILES=(
+            "aks-deployment/clickhouse-deployment.yaml"
+            "aks-deployment/litellm-deployment.yaml"
+            "aks-deployment/litellm-postgres-deployment.yaml"
+            "aks-deployment/langfuse-postgres-deployment.yaml"
+            "aks-deployment/langfuse-minio-deployment.yaml"
+            "aks-deployment/langflow_file_pv.yaml"
+            "aks-deployment/mysql_file_pv.yaml"
+            "aks-deployment/qdrantfilepv.yaml"
+            "aks-deployment/qdrant_deployment.yaml"
+          )
+
+          for manifest in "${PVC_FILES[@]}"; do
+            if [ -f "$manifest" ]; then
+              echo ""
+              echo "Applying: $manifest (preserving PVC data)"
+              KUBECTL_ERR=$(mktemp /tmp/kubectl_err.XXXXXX)
+              # stdout (resource status lines) printed directly; stderr captured separately.
+              # This avoids merging the two streams, which made multi-line API error blocks
+              # impossible to filter reliably.
+              sed 's|\${IMAGE_TAG}|'"${IMAGE_TAG}"'|g' "$manifest" | \
+                sed 's|\${REGISTRY}|'"${REGISTRY}"'|g' | \
+                kubectl apply -n "$NAMESPACE" -f - 2>"$KUBECTL_ERR" && APPLY_RC=0 || APPLY_RC=$?
+
+              if [ "$APPLY_RC" -ne 0 ]; then
+                # kubectl uses lowercase "error:" for client-side failures (real problems).
+                # API server Forbidden/Invalid responses for existing PV/PVC start with
+                # "Error from server (Xxx):" – those are expected immutability errors, safe to skip.
+                CLIENT_ERRORS=$(grep -E "^error:" "$KUBECTL_ERR" || true)
+                if [ -n "$CLIENT_ERRORS" ]; then
+                  echo "::error::Unexpected errors in $manifest:"
+                  cat "$KUBECTL_ERR"
+                  rm -f "$KUBECTL_ERR"
+                  exit 1
+                else
+                  echo "  (PV/PVC resources skipped – already exist, data preserved)"
+                fi
+              fi
+              rm -f "$KUBECTL_ERR"
+            fi
+          done
+          
+          echo ""
+          echo "=== PVC Status (Data Preserved) ==="
+          kubectl get pvc -n "$NAMESPACE" --no-headers 2>/dev/null | awk '{print "  " $1 " (" $3 ") - Size: " $4}' || echo "  No PVCs found"
+
+          # ── Step 4: Apply all remaining app manifests ──
+          # Pre-scale backend to 0 before applying its manifest.
+          # This eliminates the rolling-update "old replicas pending termination"
+          # race: with no old pod running, the new pod starts clean and MySQL
+          # (already ready from Step 2c) is immediately reachable by the initContainer.
+          echo "Pre-scaling essedum-backend to 0 for clean restart..."
+          kubectl scale deployment essedum-backend -n "$NAMESPACE" --replicas=0 2>/dev/null || true
+          kubectl wait pods -n "$NAMESPACE" -l app=essedum-backend \
+            --for=delete --timeout=60s 2>/dev/null || true
+          echo "✓ Old backend pod cleared — manifest apply will bring it back up"
+          # Excluded from this loop:
+          #   - Already handled above (ingress-nginx, metallb, PVC files)
+          #   - Runner/RBAC infra that must not be disrupted mid-deploy
+          SKIP_FILES=(
+            "aks-deployment/ingress-nginx-deploy.yaml"
+            "aks-deployment/metallib-config.yaml"
+            "aks-deployment/clickhouse-deployment.yaml"
+            "aks-deployment/litellm-postgres-deployment.yaml"
+            "aks-deployment/langfuse-postgres-deployment.yaml"
+            "aks-deployment/langfuse-minio-deployment.yaml"
+            "aks-deployment/langflow_file_pv.yaml"
+            "aks-deployment/mysql_file_pv.yaml"
+            "aks-deployment/qdrantfilepv.yaml"
+            "aks-deployment/qdrant_deployment.yaml"
+            "aks-deployment/builder-rbac.yml"
+            "aks-deployment/github-runner-rbac.yml"
+            "aks-deployment/mysql_deployment_v3.yaml"
+            "aks-deployment/keycloak_deployment.yaml"
+            "aks-deployment/litellm-deployment.yaml"
+          )
+          for manifest in aks-deployment/*.yaml aks-deployment/*.yml; do
+            if [ ! -f "$manifest" ]; then continue; fi
+            # Skip files already handled above
+            skip=false
+            for skip_file in "${SKIP_FILES[@]}"; do
+              if [ "$manifest" = "$skip_file" ]; then skip=true; break; fi
+            done
+            if $skip; then continue; fi
+            echo "Applying: $manifest"
+            sed 's|\${IMAGE_TAG}|'"${IMAGE_TAG}"'|g' "$manifest" | \
+              sed 's|\${REGISTRY}|'"${REGISTRY}"'|g' | \
+              kubectl apply -n "$NAMESPACE" -f - || {
+              echo "::warning::Failed to apply $manifest, continuing..."
+            }
+          done
+
+      - name: Wait for rollout
+        env:
+          K8S_NAMESPACE: ${{ secrets.K8S_NAMESPACE || 'essedum' }}
+        run: |
+          export PATH="/snap/bin:/usr/local/bin:$PATH"
+          NAMESPACE="${K8S_NAMESPACE}"
+          # Per-deployment timeouts — default 10m, override per service if needed.
+          declare -A ROLLOUT_TIMEOUT
+
+          echo "Waiting for deployments to stabilize..."
+
+          # Deployments not managed by this CD pipeline — skip rollout check
+          SKIP_ROLLOUT=(
+            "github-runner"
+            "builder-service"
+            "buildkitd"
+          )
+
+          deployments=$(kubectl get deployments -n "$NAMESPACE" -o jsonpath='{.items[*].metadata.name}')
+          for deployment in $deployments; do
+            # Skip non-CD-managed deployments
+            skip=false
+            for skip_name in "${SKIP_ROLLOUT[@]}"; do
+              if [ "$deployment" = "$skip_name" ]; then skip=true; break; fi
+            done
+            if $skip; then
+              echo ">>> Skipping $deployment (not CD-managed)"
+              continue
+            fi
+
+            TIMEOUT="${ROLLOUT_TIMEOUT[$deployment]:-10m}"
+            echo ""
+            echo ">>> Monitoring $deployment (timeout: $TIMEOUT)..."
+            kubectl rollout status deployment/$deployment -n "$NAMESPACE" --timeout=$TIMEOUT || {
+              echo "::warning::Rollout status check timed out for $deployment"
+              echo "Pod status for $deployment:"
+              kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/name=$deployment -o wide 2>/dev/null || \
+              kubectl get pods -n "$NAMESPACE" -l app=$deployment -o wide 2>/dev/null || \
+              echo "No matching pods found with standard selectors"
+            }
+          done
+          
+          echo ""
+          echo "=== Final deployment status ==="
+          kubectl get deployments -n "$NAMESPACE" -o wide
+
+      - name: Deployment summary
+        if: success()
+        run: |
+          NAMESPACE="${{ secrets.K8S_NAMESPACE || 'essedum' }}"
+          echo "## ✓ Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "- **Namespace**: \`$NAMESPACE\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployed by**: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Services deployed**:" >> $GITHUB_STEP_SUMMARY
+          echo "- leap-app-backend" >> $GITHUB_STEP_SUMMARY
+          echo "- frontend" >> $GITHUB_STEP_SUMMARY
+          echo "- py-job-executer" >> $GITHUB_STEP_SUMMARY
+          echo "- py-job-sagemaker-executer" >> $GITHUB_STEP_SUMMARY
+          echo "- py-job-vertex-executer" >> $GITHUB_STEP_SUMMARY
+          echo "- py-job-azure-executer" >> $GITHUB_STEP_SUMMARY
+          echo "- proxy-service" >> $GITHUB_STEP_SUMMARY
+          echo "- adk-code-builder-deployer" >> $GITHUB_STEP_SUMMARY
+          echo "- vibe-code-builder-deployer" >> $GITHUB_STEP_SUMMARY
+          echo "- langflow" >> $GITHUB_STEP_SUMMARY
+          echo "- litellm" >> $GITHUB_STEP_SUMMARY
+          echo "- langfuse-web" >> $GITHUB_STEP_SUMMARY
+          echo "- langfuse-worker" >> $GITHUB_STEP_SUMMARY
+          echo "- goose-ui (Vibe Studio)" >> $GITHUB_STEP_SUMMARY
+          echo "- goosed (Vibe Studio agent server)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Deployment failure report
+        if: failure()
+        run: |
+          echo "## :red_circle: Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run**: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Check logs for details**" >> $GITHUB_STEP_SUMMARY
